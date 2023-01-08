@@ -38,6 +38,7 @@ export function getProps(map, id, el, cell) {
       } else if (cell == "costServices") {
         console.log(el[0]);
         map.newCostServices = el[0];
+      } else if (cell == "costMechanical") {
       }
     });
 }
@@ -109,6 +110,7 @@ export function deleteOper(map, ind, elem, id, akk) {
 }
 
 export function createOperation(map, arr, id, akk) {
+  console.log(id);
   fetch(`http://localhost:5000/api/cart/${id}`, {
     method: "POST",
     headers: {

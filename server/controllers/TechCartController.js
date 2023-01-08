@@ -110,6 +110,13 @@ class TechCartController {
             });
           })
           .then(TechCart.update({ totalCost: sum }, { where: { id: cartId } }));
+      } else if (cell == "costMechanical") {
+        const techOperation = TechOperation.create({
+          techCartId: cartId,
+          nameOperation: nameOper,
+          cell,
+          [cell]: +price,
+        }).then(TechCart.update({ totalCost: sum }, { where: { id: cartId } }));
       }
 
       return res.json("all good");

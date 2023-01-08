@@ -72,7 +72,7 @@ function FormOper({
                 <option selected disabled hidden value="">
                   Виберіть тип
                 </option>
-                <option value="Механізовані роботи">Механізовані роботи</option>
+                <option value="costMechanical">Механізовані роботи</option>
                 <option value="costHandWork">Ручні роботи</option>
                 <option value="costMaterials">Матеріали</option>
                 <option value="costServices">Послуги</option>
