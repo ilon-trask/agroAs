@@ -76,7 +76,7 @@ function FormOper({
                 <option value="costHandWork">Ручні роботи</option>
                 <option value="costMaterials">Матеріали</option>
                 <option value="costServices">Послуги</option>
-                <option value="Транспортування">Транспортування</option>
+                <option value="costTransport">Транспортування</option>
               </select>
             </div>
           </div>
@@ -86,7 +86,7 @@ function FormOper({
           <button
             className={css.button}
             onClick={() => {
-              if (cell == "") {
+              if (cell == "" || section == "") {
                 setIsErr(true);
               } else {
                 setIsErr(false);

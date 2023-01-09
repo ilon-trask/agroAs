@@ -3,6 +3,7 @@ const {
   TechOperation,
   CostMaterial,
   CostService,
+  CostTransport,
 } = require("../models/models");
 
 class TechCartController {
@@ -67,18 +68,23 @@ class TechCartController {
           section,
         },
       } = req.body;
-      console.log(cartId);
       console.log(sum);
-      console.log(req.body);
 
-      if (cell == "costMaterials") {
+      function createOper() {
         const techOperation = TechOperation.create({
           techCartId: cartId,
           nameOperation: nameOper,
           cell,
-          [cell]: +price * +amount,
+          [cell]: +price * +amount || +price,
           sectionId: section,
-        })
+        });
+        return techOperation;
+      }
+      function tehcCartUpdate() {
+        TechCart.update({ totalCost: sum }, { where: { id: cartId } });
+      }
+      if (cell == "costMaterials") {
+        createOper()
           .then((data) => {
             const operId = data.id;
             CostMaterial.create({
@@ -91,14 +97,9 @@ class TechCartController {
               techOperationId: operId,
             });
           })
-          .then(TechCart.update({ totalCost: sum }, { where: { id: cartId } }));
+          .then(tehcCartUpdate());
       } else if (cell == "costServices") {
-        const techOperation = TechOperation.create({
-          techCartId: cartId,
-          nameOperation: nameOper,
-          cell,
-          [cell]: +price,
-        })
+        createOper()
           .then((data) => {
             const operId = data.id;
             const costService = CostService.create({
@@ -109,14 +110,22 @@ class TechCartController {
               techOperationId: operId,
             });
           })
-          .then(TechCart.update({ totalCost: sum }, { where: { id: cartId } }));
+          .then(tehcCartUpdate());
+      } else if (cell == "costTransport") {
+        createOper()
+          .then((data) => {
+            const operId = data.id;
+            const costTransport = CostTransport.create({
+              nameTransport: nameOper,
+              price: +price,
+              unitsOfCost,
+              cell,
+              techOperationId: operId,
+            });
+          })
+          .then(tehcCartUpdate());
       } else if (cell == "costMechanical") {
-        const techOperation = TechOperation.create({
-          techCartId: cartId,
-          nameOperation: nameOper,
-          cell,
-          [cell]: +price,
-        }).then(TechCart.update({ totalCost: sum }, { where: { id: cartId } }));
+        createOper().then(tehcCartUpdate());
       }
 
       return res.json("all good");
@@ -175,9 +184,21 @@ class TechCartController {
     try {
       const { id, ind } = req.params;
       const [elem, akk] = req.body;
-      console.log(akk - (elem.costMaterials || elem.costHandWork));
+      console.log(elem);
+      console.log(
+        akk -
+          (elem.costMaterials ||
+            elem.costHandWork ||
+            elem.costMaterials ||
+            elem.costTransport)
+      );
 
-      let sum = akk - (elem.costMaterials || elem.costHandWork);
+      let sum =
+        akk -
+        (elem.costMaterials ||
+          elem.costHandWork ||
+          elem.costMaterials ||
+          elem.costTransport);
       console.log(ind);
       console.log(id);
       const costMaterials = CostMaterial.destroy({
@@ -187,6 +208,12 @@ class TechCartController {
       const costService = CostService.destroy({
         where: { techOperationId: ind },
       });
+      const costTransport = CostTransport.destroy({
+        where: { techOperationId: ind },
+      });
+      // const costMechanical = CostService.destroy({
+      //   where: { techOperationId: ind },
+      // });
 
       costMaterials
         .then(() => {
@@ -199,20 +226,31 @@ class TechCartController {
   getProps(req, res) {
     try {
       let { id, el, cell } = req.params;
-
-      if (cell == "costMaterials") {
-        const costMaterials = CostMaterial.findAll({
-          where: { techOperationId: el },
-        }).then((data) => {
-          return res.json(data);
-        });
-      } else if (cell == "costServices") {
-        const costServices = CostService.findAll({
-          where: { techOperationId: el },
-        }).then((data) => {
-          return res.json(data);
-        });
+      function get() {
+        if (cell == "costMaterials") {
+          const costMaterials = CostMaterial.findAll({
+            where: { techOperationId: el },
+          });
+          return costMaterials;
+        } else if (cell == "costServices") {
+          const costServices = CostService.findAll({
+            where: { techOperationId: el },
+          });
+          return costServices;
+        } else if (cell == "costTransport") {
+          const costTransport = CostTransport.findAll({
+            where: { techOperationId: el },
+          });
+          return costTransport;
+        }
       }
+      get().then((data) => {
+        return res.json(data);
+      });
+      // else if (cell == "costMechanical") {
+      //   const costMechanical = null;
+      //   return res.json();
+      // }
     } catch (e) {}
   }
   delete(req, res) {

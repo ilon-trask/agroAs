@@ -6,6 +6,8 @@ export default class MapStore {
     this._opers = [];
     this._costMaterials = [];
     this._costServices = [];
+    this._costMechanical = [];
+    this._costTransport = [];
     this._section = [];
     makeAutoObservable(this);
   }
@@ -28,6 +30,15 @@ export default class MapStore {
   set costMaterials(mat) {
     this._costMaterials = mat;
   }
+  set costMechanical(mech) {
+    this._costMechanical = mech;
+  }
+  set newCostTransport(trans) {
+    this._costTransport.push(trans);
+  }
+  set costTransport(trans) {
+    this._costTransport = trans;
+  }
   set newCostServices(serv) {
     this._costServices.push(serv);
   }
@@ -48,6 +59,12 @@ export default class MapStore {
   }
   get costServices() {
     return this._costServices;
+  }
+  get costMechanical() {
+    return this._costMechanical;
+  }
+  get costTransport() {
+    return this._costTransport;
   }
   get section() {
     return this._section;

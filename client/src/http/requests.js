@@ -28,8 +28,6 @@ export function getOpers(map, id) {
     });
 }
 export function getProps(map, id, el, cell) {
-  console.log(id);
-  console.log(el);
   fetch(`http://localhost:5000/api/cart/${id}/${el}/${cell}`)
     .then((res) => res.json())
     .then((el) => {
@@ -38,6 +36,8 @@ export function getProps(map, id, el, cell) {
       } else if (cell == "costServices") {
         console.log(el[0]);
         map.newCostServices = el[0];
+      } else if (cell == "costTransport") {
+        map.newCostTransport = el[0];
       } else if (cell == "costMechanical") {
       }
     });
@@ -111,6 +111,11 @@ export function deleteOper(map, ind, elem, id, akk) {
 
 export function createOperation(map, arr, id, akk) {
   console.log(id);
+  console.log(akk);
+  console.log(+arr.res.price * +arr.res.amount);
+  console.log(+arr.res.price);
+  console.log(+arr.res.price * +arr.res.amount || +arr.res.price);
+  console.log(akk + (+arr.res.price * +arr.res.amount || +arr.res.price));
   fetch(`http://localhost:5000/api/cart/${id}`, {
     method: "POST",
     headers: {
@@ -119,7 +124,7 @@ export function createOperation(map, arr, id, akk) {
     },
     body: JSON.stringify({
       cartId: id,
-      sum: akk + arr.res.price * arr.res.amount,
+      sum: +akk + (+arr.res.price * +arr.res.amount || +arr.res.price),
       arr,
     }),
   }).then(() => {
@@ -135,7 +140,7 @@ export function patchOperation(map, arr, id, akkum) {
     },
     body: JSON.stringify({
       cartId: id,
-      sum: akkum + arr.res.price * arr.res.amount,
+      sum: +akkum + (+arr.res.price * +arr.res.amount || +arr.res.price),
       arr,
     }),
   }).then(() => {

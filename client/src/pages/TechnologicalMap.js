@@ -8,6 +8,7 @@ import Easy from "../components/popupsforTechnologicalOper/Mater";
 import Service from "../components/popupsforTechnologicalOper/Service";
 import MapInputs from "../components/MapInputs";
 import MechanicalWork from "../components/popupsforTechnologicalOper/MechanicalWork";
+import Transport from "../components/popupsforTechnologicalOper/Transport";
 
 import { Context } from "../index";
 import { deleteOper, getOnlyCart } from "../http/requests";
@@ -22,7 +23,7 @@ const DevicePage = observer(() => {
   const [res, setRes] = useState({
     nameOper: "",
     price: "",
-    amount: "",
+    // amount: "",
   });
   const [mapRes, setMapRes] = useState({
     nameCart: "",
@@ -250,11 +251,17 @@ const DevicePage = observer(() => {
           </thead>
           <tbody>
             {operData?.map((el) => {
-              akk += el.costHandWork || el.costMaterials || el.costServices;
+              akk +=
+                el.costHandWork ||
+                el.costMaterials ||
+                el.costServices ||
+                el.costTransport;
               sum +=
-                mapData.area * el.costHandWork ||
-                mapData.area * el.costMaterials ||
-                mapData.area * el.costServices;
+                mapData.area *
+                (el.costHandWork ||
+                  el.costMaterials ||
+                  el.costServices ||
+                  el.costTransport);
               return (
                 <tr key={el.id}>
                   <td
@@ -275,6 +282,7 @@ const DevicePage = observer(() => {
                         amount: second.consumptionPerHectare,
                         unitsOfConsumption: second.unitsOfConsumption,
                       });
+                      console.log(el.cell);
                       setCell(el.cell);
                     }}
                   >
@@ -288,12 +296,14 @@ const DevicePage = observer(() => {
                   <td>{"0"}</td>
                   <td>{el.costHandWork * mapData.area || "0"}</td>
                   <td>{el.costMaterials * mapData.area || "0"}</td>
-                  <td>{"0"}</td>
+                  <td>{el.costTransport * mapData.area || "0"}</td>
                   <td>{el.costServices * mapData.area || "0"}</td>
                   <td>
-                    {mapData.area * el.costHandWork ||
-                      mapData.area * el.costMaterials ||
-                      mapData.area * el.costServices}
+                    {mapData.area *
+                      (el.costHandWork ||
+                        el.costMaterials ||
+                        el.costServices ||
+                        el.costTransport)}
                   </td>
                   <td
                     className="delet"
@@ -362,6 +372,21 @@ const DevicePage = observer(() => {
         />
       ) : cell == "costServices" ? (
         <Service
+          open={secondOpen}
+          setOpen={setSecondOpen}
+          cell={cell}
+          setCell={setCell}
+          section={section}
+          setSection={setSection}
+          akk={akk}
+          akkum={akkum}
+          res={res}
+          setRes={setRes}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      ) : cell == "costTransport" ? (
+        <Transport
           open={secondOpen}
           setOpen={setSecondOpen}
           cell={cell}
