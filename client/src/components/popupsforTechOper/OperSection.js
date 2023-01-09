@@ -68,8 +68,9 @@ function FormOper({
                   setCell(e.target.value);
                 }}
                 value={cell}
+                defaultValue={""}
               >
-                <option selected disabled hidden value="">
+                <option disabled hidden value="">
                   Виберіть тип
                 </option>
                 <option value="costMechanical">Механізовані роботи</option>
@@ -86,7 +87,7 @@ function FormOper({
           <button
             className={css.button}
             onClick={() => {
-              if (cell == "" || section == "") {
+              if (cell === "" || section === "") {
                 setIsErr(true);
               } else {
                 setIsErr(false);

@@ -1,9 +1,8 @@
 import React, { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Context } from "../..";
-import css from "../../components/Dialog.module.css";
-import { observer } from "mobx-react-lite";
-import { createOperation, patchOperation } from "../../http/requests";
+import { Context } from "../../..";
+import css from "../../../components/Dialog.module.css";
+import { createOperation, patchOperation } from "../../../http/requests";
 
 const MechanicalWork = ({
   open,

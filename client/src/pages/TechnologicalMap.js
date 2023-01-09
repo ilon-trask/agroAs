@@ -1,15 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Container from "react-bootstrap/esm/Container";
 import { observer } from "mobx-react-lite";
 import { Link, useParams } from "react-router-dom";
 
-import OperSection from "../components/popupsforTechnologicalOper/OperSection";
-import Easy from "../components/popupsforTechnologicalOper/Mater";
-import Service from "../components/popupsforTechnologicalOper/Service";
+import OperSection from "../components/popupsforTechOper/OperSection";
+import Mater from "../components/popupsforTechOper/newOpers/Mater";
+import Service from "../components/popupsforTechOper/newOpers/Service";
 import MapInputs from "../components/MapInputs";
-import MechanicalWork from "../components/popupsforTechnologicalOper/MechanicalWork";
-import Transport from "../components/popupsforTechnologicalOper/Transport";
+import MechanicalWork from "../components/popupsforTechOper/newOpers/MechanicalWork";
+import Transport from "../components/popupsforTechOper/newOpers/Transport";
+import PopupField from "../components/popupsforTechOper/newOpers/PopupField";
 
+import {
+  fiveInputs,
+  threeInputs,
+} from "../components/popupsforTechOper/newOpers/funs";
 import { Context } from "../index";
 import { deleteOper, getOnlyCart } from "../http/requests";
 
@@ -23,7 +28,7 @@ const DevicePage = observer(() => {
   const [res, setRes] = useState({
     nameOper: "",
     price: "",
-    // amount: "",
+    amount: "",
   });
   const [mapRes, setMapRes] = useState({
     nameCart: "",
@@ -43,7 +48,6 @@ const DevicePage = observer(() => {
   let sum = 0;
   let akk = 0;
   const [akkum, setAkkum] = useState(0);
-
   return (
     <Container>
       <div style={{ fontSize: "20px" }}>
@@ -355,8 +359,8 @@ const DevicePage = observer(() => {
         setSection={setSection}
       />
 
-      {cell == "costMaterials" ? (
-        <Easy
+      {cell === "costMaterials" ? (
+        <PopupField
           open={secondOpen}
           setOpen={setSecondOpen}
           cell={cell}
@@ -369,9 +373,12 @@ const DevicePage = observer(() => {
           setRes={setRes}
           update={update}
           setUpdate={setUpdate}
-        />
-      ) : cell == "costServices" ? (
-        <Service
+          func={fiveInputs}
+        >
+          <Mater res={res} setRes={setRes} />
+        </PopupField>
+      ) : cell === "costServices" ? (
+        <PopupField
           open={secondOpen}
           setOpen={setSecondOpen}
           cell={cell}
@@ -384,9 +391,12 @@ const DevicePage = observer(() => {
           setRes={setRes}
           update={update}
           setUpdate={setUpdate}
-        />
-      ) : cell == "costTransport" ? (
-        <Transport
+          func={threeInputs}
+        >
+          <Service res={res} setRes={setRes} />
+        </PopupField>
+      ) : cell === "costTransport" ? (
+        <PopupField
           open={secondOpen}
           setOpen={setSecondOpen}
           cell={cell}
@@ -399,8 +409,11 @@ const DevicePage = observer(() => {
           setRes={setRes}
           update={update}
           setUpdate={setUpdate}
-        />
-      ) : cell == "costMechanical" ? (
+          func={threeInputs}
+        >
+          <Transport res={res} setRes={setRes} />
+        </PopupField>
+      ) : cell === "costMechanical" ? (
         <MechanicalWork
           open={secondOpen}
           setOpen={setSecondOpen}

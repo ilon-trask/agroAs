@@ -31,14 +31,14 @@ export function getProps(map, id, el, cell) {
   fetch(`http://localhost:5000/api/cart/${id}/${el}/${cell}`)
     .then((res) => res.json())
     .then((el) => {
-      if (cell == "costMaterials") {
+      if (cell === "costMaterials") {
         map.newCostMaterials = el[0];
-      } else if (cell == "costServices") {
+      } else if (cell === "costServices") {
         console.log(el[0]);
         map.newCostServices = el[0];
-      } else if (cell == "costTransport") {
+      } else if (cell === "costTransport") {
         map.newCostTransport = el[0];
-      } else if (cell == "costMechanical") {
+      } else if (cell === "costMechanical") {
       }
     });
 }
