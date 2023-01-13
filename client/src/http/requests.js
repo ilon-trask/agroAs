@@ -1,5 +1,7 @@
 const CARTuRL = "http://localhost:5000/api/cart";
 const SECuRL = "http://localhost:5000/api/sec";
+const TRACuRL = "http://localhost:5000/api/tractor/";
+const MACHINEuRL = "http://localhost:5000/api/machine/";
 
 export function getCarts(map) {
   return fetch(CARTuRL)
@@ -21,6 +23,7 @@ export function getOpers(map, id) {
     .then((res) => {
       map.costMaterials = [];
       map.costServices = [];
+      map.costTransport = [];
       res.forEach((el) => {
         getProps(map, id, el.id, el.cell);
       });
@@ -34,7 +37,6 @@ export function getProps(map, id, el, cell) {
       if (cell === "costMaterials") {
         map.newCostMaterials = el[0];
       } else if (cell === "costServices") {
-        console.log(el[0]);
         map.newCostServices = el[0];
       } else if (cell === "costTransport") {
         map.newCostTransport = el[0];
@@ -77,6 +79,7 @@ export function createCart(map, data) {
 }
 
 export function updateMap(map, res) {
+  console.log("upd map");
   fetch("http://localhost:5000/api/cart", {
     method: "PATCH",
     headers: {
@@ -110,12 +113,7 @@ export function deleteOper(map, ind, elem, id, akk) {
 }
 
 export function createOperation(map, arr, id, akk) {
-  console.log(id);
-  console.log(akk);
-  console.log(+arr.res.price * +arr.res.amount);
-  console.log(+arr.res.price);
-  console.log(+arr.res.price * +arr.res.amount || +arr.res.price);
-  console.log(akk + (+arr.res.price * +arr.res.amount || +arr.res.price));
+  console.log(+akk + (+arr.res.price * +arr.res.amount || +arr.res.price));
   fetch(`http://localhost:5000/api/cart/${id}`, {
     method: "POST",
     headers: {
@@ -131,6 +129,7 @@ export function createOperation(map, arr, id, akk) {
     getCarts(map);
   });
 }
+
 export function patchOperation(map, arr, id, akkum) {
   fetch(`http://localhost:5000/api/cart/${id}`, {
     method: "PATCH",
@@ -152,4 +151,48 @@ export function getSection(map) {
   fetch(SECuRL)
     .then((data) => data.json())
     .then((res) => (map.section = res));
+}
+
+export function createTractor(map, res) {
+  console.log(res);
+  fetch(TRACuRL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      res,
+    }),
+  }).then(() => {
+    getTractor(map);
+  });
+}
+export function getTractor(map) {
+  fetch(TRACuRL)
+    .then((data) => data.json())
+    .then((res) => (map.tractor = res));
+}
+
+export function createMachine(map, res) {
+  console.log(res);
+  fetch(MACHINEuRL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      res,
+    }),
+  }).then(() => {
+    getMachine(map);
+  });
+}
+export function getMachine(map) {
+  fetch(MACHINEuRL)
+    .then((data) => data.json())
+    .then((res) => {
+      map.machine = res;
+    });
 }

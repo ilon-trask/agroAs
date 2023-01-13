@@ -6,9 +6,11 @@ export default class MapStore {
     this._opers = [];
     this._costMaterials = [];
     this._costServices = [];
-    this._costMechanical = [];
     this._costTransport = [];
     this._section = [];
+    this._tractor = [];
+    this._machine = [];
+    this._costMechanical = [];
     makeAutoObservable(this);
   }
 
@@ -48,6 +50,12 @@ export default class MapStore {
   set section(sec) {
     this._section = sec;
   }
+  set tractor(trac) {
+    this._tractor = trac;
+  }
+  set machine(machine) {
+    this._machine = machine;
+  }
   get maps() {
     return this._maps;
   }
@@ -68,5 +76,11 @@ export default class MapStore {
   }
   get section() {
     return this._section;
+  }
+  get tractor() {
+    return this._tractor;
+  }
+  get machine() {
+    return this._machine;
   }
 }

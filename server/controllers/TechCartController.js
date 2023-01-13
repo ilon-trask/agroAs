@@ -4,6 +4,9 @@ const {
   CostMaterial,
   CostService,
   CostTransport,
+  Tractor,
+  AgriculturalMachine,
+  Aggregate,
 } = require("../models/models");
 
 class TechCartController {
@@ -64,11 +67,22 @@ class TechCartController {
         sum,
         arr: {
           cell,
-          res: { nameOper, price, amount, unitsOfCost, unitsOfConsumption },
+          res: {
+            nameOper,
+            price,
+            amount,
+            unitsOfCost,
+            unitsOfConsumption,
+            fuelConsumption,
+            workingSpeed,
+            idMachine,
+            idTractor,
+          },
           section,
         },
       } = req.body;
-      console.log(sum);
+      console.log(sum + "sum");
+      console.log(cell);
 
       function createOper() {
         const techOperation = TechOperation.create({
@@ -80,9 +94,11 @@ class TechCartController {
         });
         return techOperation;
       }
+
       function tehcCartUpdate() {
         TechCart.update({ totalCost: sum }, { where: { id: cartId } });
       }
+
       if (cell == "costMaterials") {
         createOper()
           .then((data) => {
@@ -125,9 +141,67 @@ class TechCartController {
           })
           .then(tehcCartUpdate());
       } else if (cell == "costMechanical") {
-        createOper().then(tehcCartUpdate());
-      }
+        const cart = TechCart.findOne({ where: { id: cartId } }).then(
+          (cart) => {
+            const tractor = Tractor.findOne({ where: { id: idTractor } }).then(
+              (tractor) => {
+                const machine = AgriculturalMachine.findOne({
+                  where: { id: idMachine },
+                }).then((machine) => {
+                  console.log(tractor.nameTractor);
+                  console.log(machine.id);
+                  console.log(5);
+                  console.log(workingSpeed);
 
+                  const aggregate = Aggregate.create({
+                    amountOfTractorDepreciationPerHour: Math.round(
+                      +tractor.marketCost /
+                        +tractor.depreciationPeriod /
+                        220 /
+                        8
+                    ),
+                    fuelConsumption: +fuelConsumption,
+                    amountOfMachineDepreciationPerHour: Math.round(
+                      +machine.marketCost /
+                        +machine.depreciationPeriod /
+                        220 /
+                        8
+                    ),
+                    unitProductionAggregate: Math.round(
+                      (+machine.widthOfCapture * (+workingSpeed * 1000)) / 10000
+                    ),
+                    workingSpeed: +workingSpeed,
+                  });
+                  console.log(3);
+                  aggregate.then((aggregate) => {
+                    const operation = TechOperation.create({
+                      techCartId: cartId,
+                      nameOperation: nameOper,
+                      cell,
+                      costCars: Math.round(
+                        ((+aggregate.amountOfTractorDepreciationPerHour +
+                          +aggregate.amountOfMachineDepreciationPerHour) *
+                          1.05) /
+                          +aggregate.unitProductionAggregate
+                      ),
+                      costFuel: Math.round(
+                        (+fuelConsumption * +cart.priceDiesel) /
+                          +aggregate.unitProductionAggregate
+                      ),
+                      sectionId: section,
+                    }).then((operation) => {
+                      TechCart.update(
+                        { totalCost: sum },
+                        { where: { id: cartId } }
+                      );
+                    });
+                  });
+                });
+              }
+            );
+          }
+        );
+      }
       return res.json("all good");
     } catch (e) {
       console.log(e);
@@ -143,9 +217,6 @@ class TechCartController {
           res: { id, nameOper, price, amount, unitsOfCost, unitsOfConsumption },
         },
       } = req.body;
-      console.log(req.body);
-      console.log(cartId);
-      console.log(req.body);
       const techOperation = TechOperation.update(
         {
           techCartId: cartId,
@@ -171,6 +242,30 @@ class TechCartController {
               },
               { where: { techOperationId: id } }
             );
+            // } else if (cell == "costServices") {
+            //   const operId = data.id;
+            //   const costService = CostService.update(
+            //     {
+            //       nameService: nameOper,
+            //       price: +price,
+            //       unitsOfCost,
+            //       cell,
+            //       techOperationId: operId,
+            //     },
+            //     { where: { techOperationId: id } }
+            //   );
+            // } else if (cell == "costTransport") {
+            //   const operId = data.id;
+            //   const costTransport = CostTransport.update(
+            //     {
+            //       nameTransport: nameOper,
+            //       price: +price,
+            //       unitsOfCost,
+            //       cell,
+            //       techOperationId: operId,
+            //     },
+            //     { where: { techOperationId: id } }
+            //   );
           }
         })
         .then(TechCart.update({ totalCost: +sum }, { where: { id: cartId } }));
@@ -190,7 +285,8 @@ class TechCartController {
           (elem.costMaterials ||
             elem.costHandWork ||
             elem.costMaterials ||
-            elem.costTransport)
+            elem.costTransport ||
+            elem.costFuel + elem.costCars)
       );
 
       let sum =
@@ -198,7 +294,8 @@ class TechCartController {
         (elem.costMaterials ||
           elem.costHandWork ||
           elem.costMaterials ||
-          elem.costTransport);
+          elem.costTransport ||
+          elem.costFuel + elem.costCars);
       console.log(ind);
       console.log(id);
       const costMaterials = CostMaterial.destroy({
@@ -213,6 +310,11 @@ class TechCartController {
       });
       // const costMechanical = CostService.destroy({
       //   where: { techOperationId: ind },
+      // });
+      // const aggregate = Aggregate.destroy({
+      //   where: {
+      //     techOperationId: ind,
+      //   },
       // });
 
       costMaterials

@@ -14,6 +14,7 @@ import PopupField from "../components/popupsforTechOper/newOpers/PopupField";
 import {
   fiveInputs,
   threeInputs,
+  MechanicalWorkFunc,
 } from "../components/popupsforTechOper/newOpers/funs";
 import { Context } from "../index";
 import { deleteOper, getOnlyCart } from "../http/requests";
@@ -255,17 +256,21 @@ const DevicePage = observer(() => {
           </thead>
           <tbody>
             {operData?.map((el) => {
+              console.log(el.costCars);
+              console.log(el.costFuel);
               akk +=
                 el.costHandWork ||
                 el.costMaterials ||
                 el.costServices ||
-                el.costTransport;
+                el.costTransport ||
+                el.costCars + el.costFuel;
               sum +=
                 mapData.area *
                 (el.costHandWork ||
                   el.costMaterials ||
                   el.costServices ||
-                  el.costTransport);
+                  el.costTransport ||
+                  el.costCars + el.costFuel);
               return (
                 <tr key={el.id}>
                   <td
@@ -295,19 +300,20 @@ const DevicePage = observer(() => {
                   <td>{el.nameOperation}</td>
                   <td>{mapData.area}</td>
                   <td>{"0"}</td>
-                  <td>{"0"}</td>
-                  <td>{"0"}</td>
+                  <td>{el.costCars * mapData.area || "0"}</td>
+                  <td>{el.costFuel * mapData.area || "0"}</td>
                   <td>{"0"}</td>
                   <td>{el.costHandWork * mapData.area || "0"}</td>
                   <td>{el.costMaterials * mapData.area || "0"}</td>
                   <td>{el.costTransport * mapData.area || "0"}</td>
                   <td>{el.costServices * mapData.area || "0"}</td>
                   <td>
-                    {mapData.area *
+                    {+mapData.area *
                       (el.costHandWork ||
                         el.costMaterials ||
                         el.costServices ||
-                        el.costTransport)}
+                        el.costTransport ||
+                        +el.costCars + +el.costFuel)}
                   </td>
                   <td
                     className="delet"
@@ -323,7 +329,7 @@ const DevicePage = observer(() => {
 
             <tr>
               <td></td>
-              <td>Загальні витрати</td>
+              <td style={{ fontWeight: "bold" }}>Загальні витрати</td>
               <td></td>
               <td></td>
               <td></td>
@@ -414,7 +420,7 @@ const DevicePage = observer(() => {
           <Transport res={res} setRes={setRes} />
         </PopupField>
       ) : cell === "costMechanical" ? (
-        <MechanicalWork
+        <PopupField
           open={secondOpen}
           setOpen={setSecondOpen}
           cell={cell}
@@ -427,7 +433,10 @@ const DevicePage = observer(() => {
           setRes={setRes}
           update={update}
           setUpdate={setUpdate}
-        />
+          func={MechanicalWorkFunc}
+        >
+          <MechanicalWork res={res} setRes={setRes} />
+        </PopupField>
       ) : (
         ""
       )}

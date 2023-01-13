@@ -39,6 +39,14 @@ const PopupField = observer(
             amount: "",
             unitsOfCost: "",
             unitsOfConsumption: "",
+            nameTractor: "",
+            brand: "",
+            marketCost: "",
+            depreciationPeriod: "",
+            enginePower: "",
+            fuelConsumption: "",
+            numberOfPersonnel: "",
+            typeOfWork: "",
           });
         }}
       >
