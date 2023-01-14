@@ -194,6 +194,7 @@ class TechCartController {
                         { totalCost: sum },
                         { where: { id: cartId } }
                       );
+                      return res.json("all good");
                     });
                   });
                 });
@@ -242,30 +243,30 @@ class TechCartController {
               },
               { where: { techOperationId: id } }
             );
-            // } else if (cell == "costServices") {
-            //   const operId = data.id;
-            //   const costService = CostService.update(
-            //     {
-            //       nameService: nameOper,
-            //       price: +price,
-            //       unitsOfCost,
-            //       cell,
-            //       techOperationId: operId,
-            //     },
-            //     { where: { techOperationId: id } }
-            //   );
-            // } else if (cell == "costTransport") {
-            //   const operId = data.id;
-            //   const costTransport = CostTransport.update(
-            //     {
-            //       nameTransport: nameOper,
-            //       price: +price,
-            //       unitsOfCost,
-            //       cell,
-            //       techOperationId: operId,
-            //     },
-            //     { where: { techOperationId: id } }
-            //   );
+          } else if (cell == "costServices") {
+            const operId = data.id;
+            const costService = CostService.update(
+              {
+                nameService: nameOper,
+                price: +price,
+                unitsOfCost,
+                cell,
+                techOperationId: operId,
+              },
+              { where: { techOperationId: id } }
+            );
+          } else if (cell == "costTransport") {
+            const operId = data.id;
+            const costTransport = CostTransport.update(
+              {
+                nameTransport: nameOper,
+                price: +price,
+                unitsOfCost,
+                cell,
+                techOperationId: operId,
+              },
+              { where: { techOperationId: id } }
+            );
           }
         })
         .then(TechCart.update({ totalCost: +sum }, { where: { id: cartId } }));
@@ -308,14 +309,14 @@ class TechCartController {
       const costTransport = CostTransport.destroy({
         where: { techOperationId: ind },
       });
-      // const costMechanical = CostService.destroy({
-      //   where: { techOperationId: ind },
-      // });
-      // const aggregate = Aggregate.destroy({
-      //   where: {
-      //     techOperationId: ind,
-      //   },
-      // });
+      const costMechanical = CostService.destroy({
+        where: { techOperationId: ind },
+      });
+      const aggregate = Aggregate.destroy({
+        where: {
+          techOperationId: ind,
+        },
+      });
 
       costMaterials
         .then(() => {
@@ -344,15 +345,14 @@ class TechCartController {
             where: { techOperationId: el },
           });
           return costTransport;
+        } else if (cell == "costMechanical") {
+          const costMechanical = null;
+          return res.json();
         }
       }
       get().then((data) => {
         return res.json(data);
       });
-      // else if (cell == "costMechanical") {
-      //   const costMechanical = null;
-      //   return res.json();
-      // }
     } catch (e) {}
   }
   delete(req, res) {
