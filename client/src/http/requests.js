@@ -1,4 +1,5 @@
 const CARTuRL = "http://localhost:5000/api/cart";
+const OPERuRL = "http://localhost:5000/api/oper";
 const SECuRL = "http://localhost:5000/api/sec";
 const TRACuRL = "http://localhost:5000/api/tractor/";
 const MACHINEuRL = "http://localhost:5000/api/machine/";
@@ -18,7 +19,7 @@ export function getCarts(map) {
 }
 
 export function getOpers(map, id) {
-  fetch("http://localhost:5000/api/cart/" + id)
+  fetch(OPERuRL + "/" + id)
     .then((res) => res.json())
     .then((res) => {
       map.costMaterials = [];
@@ -31,7 +32,7 @@ export function getOpers(map, id) {
     });
 }
 export function getProps(map, id, el, cell) {
-  fetch(`http://localhost:5000/api/cart/${id}/${el}/${cell}`)
+  fetch(OPERuRL + "/" + id + "/" + el + "/" + cell)
     .then((res) => res.json())
     .then((el) => {
       if (cell === "costMaterials") {
@@ -79,8 +80,7 @@ export function createCart(map, data) {
 }
 
 export function updateMap(map, res) {
-  console.log("upd map");
-  fetch("http://localhost:5000/api/cart", {
+  fetch(CARTuRL, {
     method: "PATCH",
     headers: {
       "Content-type": "application/json; charset=UTF-8",
@@ -92,11 +92,7 @@ export function updateMap(map, res) {
 }
 
 export function deleteOper(map, ind, elem, id, akk) {
-  console.log(ind);
-  console.log(elem);
-  console.log(id);
-  console.log(akk);
-  fetch(`http://localhost:5000/api/cart/${id}/${ind}`, {
+  fetch(OPERuRL + "/" + id + "/" + ind, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
@@ -114,7 +110,7 @@ export function deleteOper(map, ind, elem, id, akk) {
 
 export function createOperation(map, arr, id, akk) {
   console.log(+akk + (+arr.res.price * +arr.res.amount || +arr.res.price));
-  fetch(`http://localhost:5000/api/cart/${id}`, {
+  fetch(OPERuRL + "/" + id, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -131,7 +127,7 @@ export function createOperation(map, arr, id, akk) {
 }
 
 export function patchOperation(map, arr, id, akkum) {
-  fetch(`http://localhost:5000/api/cart/${id}`, {
+  fetch(OPERuRL + "/" + id, {
     method: "PATCH",
     headers: {
       Accept: "application/json",
@@ -154,7 +150,6 @@ export function getSection(map) {
 }
 
 export function createTractor(map, res) {
-  console.log(res);
   fetch(TRACuRL, {
     method: "POST",
     headers: {
