@@ -256,8 +256,6 @@ const DevicePage = observer(() => {
           </thead>
           <tbody>
             {operData?.map((el) => {
-              console.log(el.costCars);
-              console.log(el.costFuel);
               akk +=
                 el.costHandWork ||
                 el.costMaterials ||
@@ -275,24 +273,44 @@ const DevicePage = observer(() => {
                 <tr key={el.id}>
                   <td
                     onClick={() => {
+                      setCell(el.cell);
                       setUpdate(true);
                       setSecondOpen(true);
-                      const [second] = map[el.cell].filter(
+                      const [second] = map[el.cell]?.filter(
                         (mat) => mat.techOperationId == el.id
                       );
+
+                      console.log(second);
                       setAkkum(
-                        akk - second.price * (second.consumptionPerHectare || 1)
+                        +akk -
+                          (+second.price *
+                            (+second.consumptionPerHectare || 1) ||
+                            el.costCars + el.costFuel)
                       );
-                      setRes({
-                        id: el.id,
-                        nameOper: el.nameOperation,
-                        price: second.price,
-                        unitsOfCost: second.unitsOfCost,
-                        amount: second.consumptionPerHectare,
-                        unitsOfConsumption: second.unitsOfConsumption,
-                      });
-                      console.log(el.cell);
-                      setCell(el.cell);
+                      if (el.cell == "costMechanical") {
+                        setRes({
+                          id: el.id,
+                          nameOper: el.nameOperation,
+                          fuelConsumption: second.fuelConsumption,
+                          idTractor: second.tractorId,
+                          idMachine: second.agriculturalMachineId,
+                          workingSpeed: second.workingSpeed,
+                          agriculturalMachineId: second.agriculturalMachineId,
+                          unitProductionAggregate:
+                            second.unitProductionAggregate,
+                          operId: el.id,
+                        });
+                      } else {
+                        setRes({
+                          id: el.id,
+                          nameOper: el.nameOperation,
+                          price: second.price,
+                          unitsOfCost: second.unitsOfCost,
+                          amount: second.consumptionPerHectare,
+                          unitsOfConsumption: second.unitsOfConsumption,
+                          operId: el.id,
+                        });
+                      }
                     }}
                   >
                     Ред

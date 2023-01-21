@@ -42,13 +42,21 @@ export type Icell =
   | "costMechanical"
   | "costTransport"
   | "costHandWork";
-interface Idata {
+interface IdataCreate {
   cartId: number;
-  sum: number;
+  akk: number;
   arr: {
     cell: Icell;
     res: Ires;
     section: number;
+  };
+}
+interface IdataPatch {
+  cartId: number;
+  akkum: number;
+  arr: {
+    cell: Icell;
+    res: Ires;
   };
 }
 
@@ -59,10 +67,10 @@ class OperService {
     });
     return techOperation;
   }
-  async createOper(data: Idata) {
+  async createOper(data: IdataCreate) {
     const {
       cartId,
-      sum,
+      akk,
       arr: {
         cell,
         res: {
@@ -79,6 +87,7 @@ class OperService {
         section,
       },
     } = data;
+    let sum: number;
     if (
       price === undefined ||
       amount === undefined ||
@@ -110,6 +119,7 @@ class OperService {
       if (cell == "costMaterials") {
         createOper()
           .then((data) => {
+            sum = akk + price * amount;
             const operId = data.id;
             cost_material.create({
               nameMaterials: nameOper,
@@ -127,6 +137,7 @@ class OperService {
         createOper()
           .then((data) => {
             const operId = data.id;
+            sum = akk + price;
             const costService = cost_service.create({
               nameService: nameOper,
               price: +price,
@@ -140,6 +151,7 @@ class OperService {
       } else if (cell == "costTransport") {
         createOper()
           .then((data) => {
+            sum = akk + price;
             const operId = data.id;
             const costTransport = cost_transport.create({
               nameTransport: nameOper,
@@ -195,22 +207,26 @@ class OperService {
             agriculturalMachineId: machine.id,
           });
           Aggregate.then((Aggregate) => {
+            const costFuel = Math.round(
+              (+fuelConsumption * +cart.priceDiesel) /
+                +Aggregate.unitProductionAggregate
+            );
+            const costCars = Math.round(
+              ((+Aggregate.amountOfTractorDepreciationPerHour +
+                +Aggregate.amountOfMachineDepreciationPerHour) *
+                1.05) /
+                +Aggregate.unitProductionAggregate
+            );
+            sum = akk + costCars + costFuel;
+
             const oper = tech_operation
               .update(
                 {
                   techCartId: cartId,
                   nameOperation: nameOper,
                   cell,
-                  costCars: Math.round(
-                    ((+Aggregate.amountOfTractorDepreciationPerHour +
-                      +Aggregate.amountOfMachineDepreciationPerHour) *
-                      1.05) /
-                      +Aggregate.unitProductionAggregate
-                  ),
-                  costFuel: Math.round(
-                    (+fuelConsumption * +cart.priceDiesel) /
-                      +Aggregate.unitProductionAggregate
-                  ),
+                  costCars: costCars,
+                  costFuel: costFuel,
                   sectionId: section,
                 },
                 { where: { id: operation.id } }
@@ -224,10 +240,10 @@ class OperService {
     }
     return "all good";
   }
-  patchOper(data: Idata) {
+  async patchOper(data: IdataPatch) {
     const {
       cartId,
-      sum,
+      akkum,
       arr: {
         cell,
         res: {
@@ -244,104 +260,129 @@ class OperService {
         },
       },
     } = data;
+    let sum: number;
+    function updateOper() {
+      //@ts-expect-error wrong-type-in-librery
+      const techOperation: Promise<tech_operation> = tech_operation.update(
+        {
+          nameOperation: nameOper,
+          [cell]: (+price || 1) * (+amount || 1),
+        },
+        { where: { id: operId } }
+      );
+    }
+    function updateCart(sum: number) {
+      tech_cart.update({ totalCost: +sum }, { where: { id: cartId } });
+    }
 
-    //@ts-expect-error wrong-type-in-librery
-    const techOperation: Promise<tech_operation> = tech_operation.update(
-      {
-        techCartId: cartId,
-        nameOperation: nameOper,
-        cell,
-        [cell]: (+price || 1) * (+amount || 1),
-      },
-      { where: { id: operId } }
-    );
-    techOperation
-      .then((data) => {
-        if (cell == "costMaterials") {
-          const costMaterial = cost_material.update(
-            {
-              nameMaterials: nameOper,
-              price: +price,
-              unitsOfCost,
-              consumptionPerHectare: +amount,
-              unitsOfConsumption,
-              techOperationId: operId,
-            },
-            { where: { techOperationId: operId } }
-          );
-        } else if (cell == "costServices") {
-          const costService = cost_service.update(
-            {
-              nameService: nameOper,
-              price: +price,
-              unitsOfCost,
-              techOperationId: operId,
-            },
-            { where: { techOperationId: operId } }
-          );
-        } else if (cell == "costTransport") {
-          const costTransport = cost_transport.update(
-            {
-              nameTransport: nameOper,
-              price: +price,
-              unitsOfCost,
-              techOperationId: operId,
-            },
-            { where: { techOperationId: operId } }
-          );
-        } else if (cell == "costMechanical") {
-          const Aggregate = aggregate.findOne({
-            where: {},
-          });
-          Aggregate.then((Aggreagate) => {
-            const Tractor = tractor
-              .findOne({ where: { id: idTractor } })
-              .then((Tractor) => {
-                if (!Tractor) {
-                  return "problem";
-                }
-                const machine = agricultural_machine
-                  .findOne({
-                    where: { id: idMachine },
-                  })
-                  .then((machine) => {
-                    if (!machine) {
-                      return "problem";
-                    }
+    if (cell == "costMaterials") {
+      sum = akkum + price * amount;
+      const costMaterial = cost_material.update(
+        {
+          nameMaterials: nameOper,
+          price: +price,
+          unitsOfCost,
+          consumptionPerHectare: +amount,
+          unitsOfConsumption,
+          techOperationId: operId,
+        },
+        { where: { techOperationId: operId } }
+      );
+      updateOper();
+      updateCart(sum);
+    } else if (cell == "costServices") {
+      sum = akkum + price;
+      const costService = cost_service.update(
+        {
+          nameService: nameOper,
+          price: +price,
+          unitsOfCost,
+          techOperationId: operId,
+        },
+        { where: { techOperationId: operId } }
+      );
+      updateOper();
+      updateCart(sum);
+    } else if (cell == "costTransport") {
+      sum = akkum + price;
+      const costTransport = cost_transport.update(
+        {
+          nameTransport: nameOper,
+          price: +price,
+          unitsOfCost,
+          techOperationId: operId,
+        },
+        { where: { techOperationId: operId } }
+      );
+      updateOper();
+      updateCart(sum);
+    } else if (cell == "costMechanical") {
+      console.log(operId);
 
-                    const costMechanical = aggregate.update(
-                      {
-                        amountOfTractorDepreciationPerHour: Math.round(
-                          +Tractor.marketCost /
-                            +Tractor.depreciationPeriod /
-                            220 /
-                            8
-                        ),
-                        fuelConsumption: +fuelConsumption,
-                        amountOfMachineDepreciationPerHour: Math.round(
-                          +machine.marketCost /
-                            +machine.depreciationPeriod /
-                            220 /
-                            8
-                        ),
-                        unitProductionAggregate: Math.round(
-                          (+machine.widthOfCapture * (+workingSpeed * 1000)) /
-                            10000
-                        ),
-                        workingSpeed: +workingSpeed,
-                        tractorId: idTractor,
-                        agriculturalMachineId: idMachine,
-                      },
-                      { where: { techOperationId: operId } }
-                    );
-                  });
-              });
-          });
-        }
-      })
-      .then(() => {
-        tech_cart.update({ totalCost: +sum }, { where: { id: cartId } });
+      const Tractor = await tractor.findOne({ where: { id: idTractor } });
+      if (!Tractor) {
+        return "problem";
+      }
+      const machine = await agricultural_machine.findOne({
+        where: { id: idMachine },
       });
+      if (!machine) {
+        return "problem";
+      }
+      const cart = await tech_cart.findOne({ where: { id: cartId } });
+      if (!cart) {
+        return "problem";
+      }
+
+      const costMechanical = await aggregate.update(
+        {
+          amountOfTractorDepreciationPerHour: Math.round(
+            +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
+          ),
+          fuelConsumption: +fuelConsumption,
+          amountOfMachineDepreciationPerHour: Math.round(
+            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
+          ),
+          unitProductionAggregate: Math.round(
+            (+machine.widthOfCapture * (+workingSpeed * 1000)) / 10000
+          ),
+          workingSpeed: +workingSpeed,
+          tractorId: idTractor,
+          agriculturalMachineId: idMachine,
+        },
+        { where: { techOperationId: operId } }
+      );
+      const Aggregate = await aggregate.findOne({
+        where: { techOperationId: operId },
+      });
+      if (!Aggregate) {
+        throw new Error("");
+      }
+      console.log(Aggregate);
+
+      const costFuel = Math.round(
+        (+fuelConsumption * +cart.priceDiesel) /
+          +Aggregate.unitProductionAggregate
+      );
+      const costCars = Math.round(
+        ((+Aggregate.amountOfTractorDepreciationPerHour +
+          +Aggregate.amountOfMachineDepreciationPerHour) *
+          1.05) /
+          +Aggregate.unitProductionAggregate
+      );
+      sum = akkum + costCars + costFuel;
+
+      const oper = tech_operation.update(
+        {
+          techCartId: cartId,
+          nameOperation: nameOper,
+          costCars: costCars,
+          costFuel: costFuel,
+        },
+        { where: { id: operId } }
+      );
+      updateCart(sum);
+    }
 
     return "all good";
   }
@@ -384,7 +425,7 @@ class OperService {
       where: { id: operId },
     });
 
-    await tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
+    tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
 
     return "all good";
   }

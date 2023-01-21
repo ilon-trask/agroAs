@@ -35,6 +35,10 @@ export default class MapStore {
   set costMechanical(mech) {
     this._costMechanical = mech;
   }
+  set newCostMechanical(mech) {
+    console.log(mech);
+    this._costMechanical.push(mech);
+  }
   set newCostTransport(trans) {
     this._costTransport.push(trans);
   }

@@ -34,7 +34,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             type="number"
             value={res?.marketCost}
             onChange={(e) => {
-              setRes({ ...res, marketCost: e.target.value });
+              setRes({ ...res, marketCost: +e.target.value });
             }}
           />
         </div>
@@ -45,7 +45,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             type="number"
             value={res?.depreciationPeriod}
             onChange={(e) => {
-              setRes({ ...res, depreciationPeriod: e.target.value });
+              setRes({ ...res, depreciationPeriod: +e.target.value });
             }}
           />
         </div>
@@ -57,7 +57,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             step="0.01"
             value={res?.widthOfCapture}
             onChange={(e) => {
-              setRes({ ...res, widthOfCapture: e.target.value });
+              setRes({ ...res, widthOfCapture: +e.target.value });
             }}
           />
         </div>
@@ -68,7 +68,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             type="number"
             value={res?.workingSpeed}
             onChange={(e) => {
-              setRes({ ...res, workingSpeed: e.target.value });
+              setRes({ ...res, workingSpeed: +e.target.value });
             }}
           />
         </div>
@@ -83,7 +83,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             type="number"
             value={res?.numberOfServicePersonnel}
             onChange={(e) => {
-              setRes({ ...res, numberOfServicePersonnel: e.target.value });
+              setRes({ ...res, numberOfServicePersonnel: +e.target.value });
             }}
           />
         </div>
@@ -94,7 +94,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             type="number"
             value={res?.typeOfWork}
             onChange={(e) => {
-              setRes({ ...res, typeOfWork: e.target.value });
+              setRes({ ...res, typeOfWork: +e.target.value });
             }}
           />
         </div>

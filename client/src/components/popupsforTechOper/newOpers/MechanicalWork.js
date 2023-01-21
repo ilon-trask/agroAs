@@ -52,17 +52,23 @@ const MechanicalWork = ({ res, setRes }) => {
           <div>
             <p>Марка трактора</p>
             <select
+              value={res.idTractor}
               onChange={(e) => {
-                setRes((prev) => ({
-                  ...prev,
-                  fuelConsumption: +e.target.value,
-                }));
+                setRes(() => {
+                  const tractor = map.tractor.filter(
+                    (el) => el.id == e.target.value
+                  );
+                  return {
+                    ...res,
+                    fuelConsumption: tractor[0].fuelConsumption,
+                  };
+                });
                 setRes((prev) => ({ ...prev, idTractor: +e.target.value }));
               }}
             >
               <option value="">вибрати трактор</option>
               {map.tractor.map((el) => (
-                <option key={el.id} value={el.id}>
+                <option key={el.id} value={el.id} label>
                   {el.nameTractor}
                 </option>
               ))}
@@ -76,7 +82,6 @@ const MechanicalWork = ({ res, setRes }) => {
               value={res?.fuelConsumption}
               onChange={(e) => {
                 setRes(() => {
-                  console.log(res);
                   return { ...res, fuelConsumption: +e.target.value };
                 });
               }}
@@ -97,13 +102,15 @@ const MechanicalWork = ({ res, setRes }) => {
           <div>
             <p>Марка СГ машини</p>
             <select
+              value={res.idMachine}
               onChange={(e) => {
-                // setRes(
-                //   !res?.workingSpeed
-                //     ? { ...res, workingSpeed: e.target.value }
-                //     : res
-                // );
-                setRes({ ...res, idMachine: +e.target.value });
+                setRes(() => {
+                  const machine = map.machine.filter(
+                    (el) => el.id == e.target.value
+                  );
+                  return { ...res, workingSpeed: machine[0].workingSpeed };
+                });
+                setRes((prev) => ({ ...prev, idMachine: +e.target.value }));
               }}
             >
               <option value="">вибрати СГ машину</option>

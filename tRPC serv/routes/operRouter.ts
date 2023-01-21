@@ -19,7 +19,7 @@ export const operRouter = router({
     .input(
       z.object({
         cartId: z.number(),
-        sum: z.number(),
+        akk: z.number(),
         arr: z.object({
           cell: z.enum([
             "costMaterials",
@@ -51,7 +51,7 @@ export const operRouter = router({
     .input(
       z.object({
         cartId: z.number(),
-        sum: z.number(),
+        akkum: z.number(),
         arr: z.object({
           cell: z.enum([
             "costMaterials",
@@ -71,7 +71,6 @@ export const operRouter = router({
             idMachine: z.number().optional(),
             idTractor: z.number().optional(),
           }),
-          section: z.number(),
         }),
       })
     )

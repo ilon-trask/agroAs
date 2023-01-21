@@ -36,7 +36,7 @@ function FormOper({
           <div>
             <select
               onChange={(e) => {
-                setSection(e.target.value);
+                setSection(+e.target.value);
               }}
               value={section}
             >

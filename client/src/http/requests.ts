@@ -14,6 +14,10 @@ export async function getCarts(map) {
     console.log(res);
 
     map.opers = [];
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
     map.maps = res;
     let ids = map.maps.map((el) => el.id);
 
@@ -43,6 +47,7 @@ export function getProps(map, id, cell) {
     } else if (cell === "costTransport") {
       map.newCostTransport = el[0];
     } else if (cell === "costMechanical") {
+      map.newCostMechanical = el[0];
     }
   });
 }
@@ -87,7 +92,7 @@ export function createOperation(map, arr, id, akk) {
     .query({
       arr: arr,
       cartId: +id,
-      sum: +akk + (+arr.res.price * +arr.res.amount || +arr.res.price),
+      akk,
     })
     .then(() => {
       getCarts(map);
@@ -98,8 +103,8 @@ export function patchOperation(map, arr, id, akkum) {
   client.oper.patch
     .query({
       arr: arr,
-      cartId: id,
-      sum: +akkum + (+arr.res.price * +arr.res.amount || +arr.res.price),
+      cartId: +id,
+      akkum,
     })
     .then(() => {
       getCarts(map);
