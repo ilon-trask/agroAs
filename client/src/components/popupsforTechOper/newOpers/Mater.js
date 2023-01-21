@@ -24,7 +24,7 @@ const Easy = observer(({ res, setRes }) => {
             type="number"
             value={res?.price}
             onChange={(e) => {
-              setRes({ ...res, price: e.target.value });
+              setRes({ ...res, price: +e.target.value });
             }}
           />
         </div>
@@ -46,7 +46,7 @@ const Easy = observer(({ res, setRes }) => {
             type="number"
             value={res?.amount}
             onChange={(e) => {
-              setRes({ ...res, amount: e.target.value });
+              setRes({ ...res, amount: +e.target.value });
             }}
           />
         </div>

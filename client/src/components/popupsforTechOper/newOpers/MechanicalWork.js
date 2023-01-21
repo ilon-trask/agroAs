@@ -53,16 +53,11 @@ const MechanicalWork = ({ res, setRes }) => {
             <p>Марка трактора</p>
             <select
               onChange={(e) => {
-                console.log(res);
-                // setRes(() => {
-                //   console.log(e.target);
-                //   console.log(e.target.value);
-                //   return !res.fuelConsumption
-                //     ? { ...res, fuelConsumption: e.target.value[2] }
-                //     : res;
-                // });
-
-                setRes({ ...res, idTractor: e.target.value });
+                setRes((prev) => ({
+                  ...prev,
+                  fuelConsumption: +e.target.value,
+                }));
+                setRes((prev) => ({ ...prev, idTractor: +e.target.value }));
               }}
             >
               <option value="">вибрати трактор</option>
@@ -82,7 +77,7 @@ const MechanicalWork = ({ res, setRes }) => {
               onChange={(e) => {
                 setRes(() => {
                   console.log(res);
-                  return { ...res, fuelConsumption: e.target.value };
+                  return { ...res, fuelConsumption: +e.target.value };
                 });
               }}
             />
@@ -108,7 +103,7 @@ const MechanicalWork = ({ res, setRes }) => {
                 //     ? { ...res, workingSpeed: e.target.value }
                 //     : res
                 // );
-                setRes({ ...res, idMachine: e.target.value });
+                setRes({ ...res, idMachine: +e.target.value });
               }}
             >
               <option value="">вибрати СГ машину</option>
@@ -126,7 +121,7 @@ const MechanicalWork = ({ res, setRes }) => {
               type="number"
               value={res?.workingSpeed}
               onChange={(e) => {
-                setRes({ ...res, workingSpeed: e.target.value });
+                setRes({ ...res, workingSpeed: +e.target.value });
               }}
             />
           </div>

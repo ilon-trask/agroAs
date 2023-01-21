@@ -56,7 +56,7 @@ export default function MapInputs({
               placeholder="Вкажіть дату"
               type="number"
               onChange={(e) => {
-                setRes({ ...res, area: e.target.value });
+                setRes({ ...res, area: +e.target.value });
               }}
               value={res.area}
             />
@@ -67,7 +67,7 @@ export default function MapInputs({
               placeholder="Вкажіть дату"
               type="number"
               onChange={(e) => {
-                setRes({ ...res, salary: e.target.value });
+                setRes({ ...res, salary: +e.target.value });
               }}
               value={res.salary}
             />
@@ -78,7 +78,7 @@ export default function MapInputs({
               placeholder="Вкажіть дату"
               type="number"
               onChange={(e) => {
-                setRes({ ...res, priceDiesel: e.target.value });
+                setRes({ ...res, priceDiesel: +e.target.value });
               }}
               value={res.priceDiesel}
             />

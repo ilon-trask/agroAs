@@ -78,7 +78,7 @@ const Table = observer(({ data, setRes, setOpen, setUpdate }) => {
             <td
               className="delet"
               onClick={() => {
-                deleteCart(map, e.id);
+                deleteCart(map, +e.id);
               }}
             >
               видалити

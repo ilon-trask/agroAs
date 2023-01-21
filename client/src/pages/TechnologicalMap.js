@@ -318,7 +318,7 @@ const DevicePage = observer(() => {
                   <td
                     className="delet"
                     onClick={() => {
-                      deleteOper(map, el.id, el, id, akk);
+                      deleteOper(map, el.id, id, akk);
                     }}
                   >
                     видалити
