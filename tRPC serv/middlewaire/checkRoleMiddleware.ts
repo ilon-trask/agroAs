@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = function (role) {
+export default function (role) {
   return function (req, res, next) {
     if (req.method === "OPTION") {
       next();
@@ -20,4 +20,4 @@ module.exports = function (role) {
       res.status(401).json({ message: "Не авторизований" });
     }
   };
-};
+}

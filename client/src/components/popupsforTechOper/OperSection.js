@@ -31,54 +31,62 @@ function FormOper({
           e.stopPropagation();
         }}
       >
-        <h4>Виберіть розділ</h4>
-        <div className="d-flex gap-3 ">
-          <div>
-            <select
-              onChange={(e) => {
-                setSection(+e.target.value);
-              }}
-              value={section}
-            >
-              <option selected disabled hidden value="">
-                Виберіть розділ
-              </option>
-              {map.section?.map((el) => (
-                <option ket={el.id} value={el.id}>
-                  {el.name}
-                </option>
-              ))}
-              {/* <option value="Підготовка ґрунту">Підготовка ґрунту</option>
-              <option value="Посадка">Посадка</option>
-              <option value="Догляд">Догляд</option>
-              <option value="Живлення">Живлення</option>
-              <option value="Моріторинг">Моріторинг</option>
-              <option value="Захист">Захист</option>
-              <option value="Збір">Збір</option>
-              <option value="Зберігання">Зберігання</option> */}
-            </select>
+        <div className="d-flex gap-5">
+          <div className="">
+            <h4>Виберіть розділ</h4>
+            <div className="d-flex gap-3 ">
+              <div>
+                <select
+                  onChange={(e) => {
+                    setSection(+e.target.value);
+                  }}
+                  value={section}
+                >
+                  <option selected disabled hidden value="">
+                    Виберіть розділ
+                  </option>
+                  {map.section?.map((el) => (
+                    <option ket={el.id} value={el.id}>
+                      {el.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-        <div>
-          <h4>Виберіть тип</h4>
-          <div className="d-flex gap-3 ">
-            <div>
-              <select
-                onChange={(e) => {
-                  setCell(e.target.value);
-                }}
-                value={cell}
-                defaultValue={""}
-              >
-                <option disabled hidden value="">
-                  Виберіть тип
-                </option>
-                <option value="costMechanical">Механізовані роботи</option>
-                <option value="costHandWork">Ручні роботи</option>
-                <option value="costMaterials">Матеріали</option>
-                <option value="costServices">Послуги</option>
-                <option value="costTransport">Транспортування</option>
-              </select>
+          <div>
+            <h4>Виберіть тип</h4>
+            <div className="d-flex gap-3 ">
+              <div>
+                <select
+                  onChange={(e) => {
+                    setCell(e.target.value);
+                  }}
+                  value={cell}
+                  defaultValue={""}
+                >
+                  <option disabled hidden value="">
+                    Виберіть тип
+                  </option>
+                  <option value="costMechanical">Механізовані роботи</option>
+                  <option value="costHandWork">Ручні роботи</option>
+                  <option value="costMaterials">Матеріали</option>
+                  <option value="costServices">Послуги</option>
+                  <option value="costTransport">Транспортування</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4>Одиниці виміру</h4>
+            <div className="d-flex gap-3 ">
+              <div>
+                <select onChange={(e) => {}} value={cell} defaultValue={""}>
+                  <option disabled hidden value="">
+                    грн/га
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

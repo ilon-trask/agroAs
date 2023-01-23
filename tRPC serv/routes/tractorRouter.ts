@@ -6,8 +6,6 @@ import TractorService from "../controllers/TractorService";
 export const tractorRouter = router({
   get: publicProcedure.query(async () => {
     const tractor = await TractorService.getAll();
-    tractor.forEach((el) => console.log(el));
-
     return tractor;
   }),
   create: publicProcedure

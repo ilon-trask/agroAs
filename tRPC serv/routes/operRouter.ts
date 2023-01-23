@@ -2,6 +2,8 @@ import { router, publicProcedure } from "../trpc";
 import z from "zod";
 
 import OperService from "../controllers/OperService";
+import { Ires, Ioper } from "../controllers/OperService";
+import { Itech_operation } from "../models/models";
 
 export const operRouter = router({
   get: publicProcedure
@@ -26,6 +28,7 @@ export const operRouter = router({
             "costServices",
             "costMechanical",
             "costTransport",
+            "costHandWork",
           ]),
           res: z.object({
             nameOper: z.string(),
@@ -58,6 +61,7 @@ export const operRouter = router({
             "costServices",
             "costMechanical",
             "costTransport",
+            "costHandWork",
           ]),
           res: z.object({
             operId: z.number(),

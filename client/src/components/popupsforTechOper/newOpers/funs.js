@@ -34,7 +34,7 @@ export function fiveInputs(
       unitsOfConsumption: "",
     });
     setIsErr(false);
-    res.amount = res + amount;
+    res.amount = +res.amount;
     res.price = +res.price;
     const request = { cell, res, section };
     if (update) {

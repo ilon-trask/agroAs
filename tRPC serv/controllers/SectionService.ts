@@ -1,9 +1,9 @@
-import Section from "../models/models";
+import { Isection, section } from "../models/models";
 
 class SectionService {
   async getAll() {
-    const section = await Section.findAll();
-    return section;
+    const Section: Isection[] = await section.findAll();
+    return Section;
   }
 }
 export = new SectionService();

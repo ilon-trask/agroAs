@@ -1,17 +1,5 @@
-import { tractor } from "../models/models";
+import { tractor, Itractor } from "../models/models";
 
-interface Itractor {
-  id?: number;
-  nameTractor: string;
-  brand: string;
-  marketCost: number;
-  depreciationPeriod: number;
-  enginePower: number;
-  fuelConsumption: number;
-  numberOfPersonnel: number;
-  typeOfWork: number;
-  userId?: number;
-}
 interface Idata {
   res: Itractor;
 }

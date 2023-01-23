@@ -6,17 +6,21 @@ import {
   Model,
 } from "sequelize";
 
-import Icell from "../controllers/OperService";
+import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 
-export class user extends Model<
-  InferAttributes<user>,
-  InferCreationAttributes<user>
-> {
+export interface Iuser {
+  id?: number;
+  email: string;
+  password: string;
+  role: number;
+}
+
+export class user extends Model<Iuser> {
   declare id: number;
   declare email: string;
-  declare password: number;
-  declare role?: number;
+  declare password: string;
+  declare role: number;
 }
 
 user.init(
@@ -29,18 +33,7 @@ user.init(
   { sequelize }
 );
 
-// export const User = sequelize.define(
-//   "user",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     email: { type: DataTypes.STRING, unique: true },
-//     password: { type: DataTypes.STRING },
-//     role: { type: DataTypes.STRING, defaultValue: "USER" },
-//   },
-//   { timestamps: false }
-// );
-
-interface Itech_cart {
+export interface Itech_cart {
   id?: number;
   nameCart: string;
   area: number;
@@ -70,26 +63,26 @@ tech_cart.init(
   },
   { sequelize }
 );
-// export const TechCart = sequelize.define(
-//   "tech_cart",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameCart: { type: DataTypes.STRING, allowNull: false },
-//     area: { type: DataTypes.INTEGER, allowNull: false },
-//     totalCost: { type: DataTypes.INTEGER },
-//     salary: { type: DataTypes.INTEGER, allowNull: false },
-//     priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
-//   }
-//   // { timestamps: false }
-// );
 
-export class tech_operation extends Model<
-  InferAttributes<tech_operation>,
-  InferCreationAttributes<tech_operation>
-> {
+export interface Itech_operation {
+  id?: number;
+  nameOperation: string;
+  cell: Icell;
+  costCars?: number;
+  costFuel?: number;
+  costMachineWork?: number;
+  costHandWork?: number;
+  costMaterials?: number;
+  costTransport?: number;
+  costServices?: number;
+  techCartId?: number;
+  sectionId?: number;
+}
+
+export class tech_operation extends Model<Itech_operation> {
   declare id?: number;
   declare nameOperation: string;
-  declare cell: Icell | string;
+  declare cell: Icell;
   declare costCars?: number;
   declare costFuel?: number;
   declare costMachineWork?: number;
@@ -116,29 +109,18 @@ tech_operation.init(
   },
   { sequelize }
 );
-// export const tech_operation = sequelize.define(
-//   "tech_operation",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameOperation: { type: DataTypes.STRING },
-//     // amountWork: { type: DataTypes.INTEGER },
-//     // unitOfWork: { type: DataTypes.STRING },
-//     cell: { type: DataTypes.STRING, allowNull: false },
-//     costCars: { type: DataTypes.INTEGER },
-//     costFuel: { type: DataTypes.INTEGER },
-//     costMachineWork: { type: DataTypes.INTEGER },
-//     costHandWork: { type: DataTypes.INTEGER },
-//     cost_materials: { type: DataTypes.INTEGER },
-//     costTransport: { type: DataTypes.INTEGER },
-//     costServices: { type: DataTypes.INTEGER },
-//   }
-//   // { timestamps: false }
-// );
 
-export class cost_material extends Model<
-  InferAttributes<cost_material>,
-  InferCreationAttributes<cost_material>
-> {
+export interface Icost_material {
+  id?: number;
+  nameMaterials: string;
+  price: number;
+  unitsOfCost: string;
+  consumptionPerHectare: number;
+  unitsOfConsumption: string;
+  techOperationId?: number;
+}
+
+export class cost_material extends Model<Icost_material> {
   declare id?: number;
   declare nameMaterials: string;
   declare price: number;
@@ -160,24 +142,15 @@ cost_material.init(
   { sequelize }
 );
 
-// export const cost_material = sequelize.define(
-//   "cost_material",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameMaterials: { type: DataTypes.STRING, allowNull: false },
-//     price: { type: DataTypes.INTEGER, allowNull: false },
-//     unitsOfCost: { type: DataTypes.STRING },
-//     consumptionPerHectare: { type: DataTypes.INTEGER, allowNull: false },
-//     unitsOfConsumption: { type: DataTypes.STRING },
-//     cell: { type: DataTypes.STRING, allowNull: false },
-//   }
-//   // { timestamps: false }
-// );
+export interface Icost_service {
+  id?: number;
+  nameService: string;
+  price: number;
+  unitsOfCost: string;
+  techOperationId?: number;
+}
 
-export class cost_service extends Model<
-  InferAttributes<cost_service>,
-  InferCreationAttributes<cost_service>
-> {
+export class cost_service extends Model<Icost_service> {
   declare id?: number;
   declare nameService: string;
   declare price: number;
@@ -195,22 +168,15 @@ cost_service.init(
   { sequelize }
 );
 
-// export const CostService = sequelize.define(
-//   "cost_service",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameService: { type: DataTypes.STRING, allowNull: false },
-//     price: { type: DataTypes.INTEGER, allowNull: false },
-//     unitsOfCost: { type: DataTypes.STRING },
-//     cell: { type: DataTypes.STRING, allowNull: false },
-//   }
-//   // { timestamps: false }
-// );
+export interface Icost_transport {
+  id?: number;
+  nameTransport: string;
+  price: number;
+  unitsOfCost: string;
+  techOperationId?: number;
+}
 
-export class cost_transport extends Model<
-  InferAttributes<cost_transport>,
-  InferCreationAttributes<cost_transport>
-> {
+export class cost_transport extends Model<Icost_transport> {
   declare id?: number;
   declare nameTransport: string;
   declare price: number;
@@ -228,29 +194,49 @@ cost_transport.init(
   { sequelize }
 );
 
-// export const CostTransport = sequelize.define(
-//   "cost_transport",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameTransport: { type: DataTypes.STRING, allowNull: false },
-//     price: { type: DataTypes.INTEGER, allowNull: false },
-//     unitsOfCost: { type: DataTypes.STRING },
-//     cell: { type: DataTypes.STRING, allowNull: false },
-//   }
-//   // { timestamps: false }
-// );
+export interface Isection {
+  id: number;
+  myId: number;
+  name: string;
+}
 
-const Section = sequelize.define(
-  "section",
+export class section extends Model<Isection> {
+  declare id: number;
+  declare myId: number;
+  declare name: string;
+}
+
+section.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    myId: { type: DataTypes.INTEGER, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
   },
-  { timestamps: false }
+  { sequelize }
 );
-export default Section;
 
-interface Itractor {
+export interface Igrade {
+  id: number;
+  indicator: string;
+  coefficient: number;
+}
+
+export class grade extends Model<Igrade> {
+  declare id: number;
+  declare indicator: string;
+  declare coefficient: number;
+}
+
+grade.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    indicator: { type: DataTypes.STRING, primaryKey: true },
+    coefficient: { type: DataTypes.FLOAT, allowNull: false },
+  },
+  { sequelize }
+);
+
+export interface Itractor {
   id?: number;
   nameTractor: string;
   brand: string;
@@ -290,7 +276,7 @@ tractor.init(
   { sequelize }
 );
 
-interface Imachine {
+export interface Imachine {
   id?: number;
   nameMachine: string;
   brand: string;
@@ -329,26 +315,22 @@ agricultural_machine.init(
   },
   { sequelize }
 );
-// export const AgriculturalMachine = sequelize.define(
-//   "agricultural_machine",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     nameMachine: { type: DataTypes.STRING, allowNull: false },
-//     brand: { type: DataTypes.STRING, allowNull: false },
-//     marketCost: { type: DataTypes.INTEGER, allowNull: false },
-//     depreciationPeriod: { type: DataTypes.INTEGER, allowNull: false },
-//     widthOfCapture: { type: DataTypes.FLOAT, allowNull: false },
-//     workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
-//     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
-//     typeOfWork: { type: DataTypes.INTEGER, allowNull: false },
-//   },
-//   { timestamps: false }
-// );
 
-export class aggregate extends Model<
-  InferAttributes<aggregate>,
-  InferCreationAttributes<aggregate>
-> {
+export interface Iaggregate {
+  id?: number;
+  amountOfTractorDepreciationPerHour: number;
+  fuelConsumption: number;
+  pricePerHourServicePersonnel?: number;
+  amountOfMachineDepreciationPerHour: number;
+  unitProductionAggregate: number;
+  workingSpeed: number;
+  pricePerHourDiesel?: number;
+  techOperationId?: number;
+  tractorId?: number;
+  agriculturalMachineId?: number;
+}
+
+export class aggregate extends Model<Iaggregate> {
   declare id?: number;
   declare amountOfTractorDepreciationPerHour: number;
   declare fuelConsumption: number;
@@ -382,26 +364,6 @@ aggregate.init(
   { sequelize }
 );
 
-// export const Aggregate = sequelize.define(
-//   "aggregate",
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     amountOfTractorDepreciationPerHour: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     fuelConsumption: { type: DataTypes.INTEGER, allowNull: false },
-//     pricePerHourServicePersonnel: { type: DataTypes.INTEGER },
-//     amountOfMachineDepreciationPerHour: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     unitProductionAggregate: { type: DataTypes.INTEGER, allowNull: false },
-//     workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
-//     pricePerHourDiesel: { type: DataTypes.INTEGER },
-//   },
-//   { timestamps: false }
-// );
 user.hasMany(tech_cart);
 tech_cart.belongsTo(user);
 
@@ -417,8 +379,8 @@ cost_service.belongsTo(tech_operation);
 tech_operation.hasOne(cost_transport, { onDelete: "CASCADE" });
 cost_transport.belongsTo(tech_operation);
 
-Section.hasMany(tech_operation);
-tech_operation.belongsTo(Section);
+section.hasMany(tech_operation);
+tech_operation.belongsTo(section);
 
 user.hasMany(tractor);
 tractor.belongsTo(user);

@@ -4,6 +4,8 @@ import { publicProcedure, router } from "./trpc";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import sequelize from "./db";
+
 import * as trpcExpress from "@trpc/server/adapters/express";
 
 export type AppRouter = typeof appRouter;
@@ -13,6 +15,7 @@ import { tractorRouter } from "./routes/tractorRouter";
 import { machineRouter } from "./routes/machineRouter";
 import { sectionRouter } from "./routes/sectionRouter";
 import { operRouter } from "./routes/operRouter";
+import { userRouter } from "./routes/userRouter";
 
 let users = [{ id: 1, name: "bob" }];
 
@@ -22,6 +25,7 @@ const appRouter = router({
   machine: machineRouter,
   section: sectionRouter,
   oper: operRouter,
+  user: userRouter,
   "": publicProcedure.query(() => "some text"),
   getUser: publicProcedure.query(() => {
     console.log(users);
@@ -57,6 +61,9 @@ app.use(
 );
 
 const port = 5000;
-app.listen(port, () => {
+app.listen(port, async () => {
+  // console.log(new Error("Не коректний Email або пароль"));
+
+  await sequelize.sync();
   console.log(`🚀 Server listening on port ${port}`);
 });

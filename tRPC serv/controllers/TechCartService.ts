@@ -1,6 +1,6 @@
 import { tech_cart } from "../models/models";
 
-interface Idata {
+export interface Idata {
   id?: number;
   nameCart: string;
   area: number;
@@ -42,4 +42,4 @@ class TechCartService {
   }
 }
 
-export = new TechCartService();
+export default new TechCartService();

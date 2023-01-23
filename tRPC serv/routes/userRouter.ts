@@ -1,9 +1,31 @@
-const Router = require("express");
-const router = new Router();
-const userController = require("../controllers/userController");
-const authMiddleware = require("../middlewaire/authMiddleware");
+import { publicProcedure, router } from "../trpc";
+import z from "zod";
+import userService from "../controllers/userService";
+export const userRouter = router({
+  registration: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string(),
+        role: z.number().nullable(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { email, password, role } = input;
+      console.log(email);
 
-router.post("/registration", userController.registration);
-router.post("/login", userController.login);
-router.get("/auth", authMiddleware, userController.check);
-export default router;
+      const user = await userService.registration(email, password, role);
+      console.log(123);
+      console.log(user);
+
+      return user;
+    }),
+  login: publicProcedure
+    .input(z.object({ email: z.string().email(), password: z.string() }))
+    .query(({ input }) => {
+      const { email, password } = input;
+      const user = userService.login(email, password);
+      return user;
+    }),
+  //   check: publicProcedure,
+});

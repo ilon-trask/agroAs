@@ -9,8 +9,20 @@ import {
   cost_transport,
 } from "../models/models";
 
-type Ires = {
-  operId?: number;
+export type prope = cost_material | cost_service | cost_transport | aggregate;
+export type Ires = {
+  nameOper: string;
+  price?: number;
+  amount?: number;
+  unitsOfCost?: string;
+  unitsOfConsumption?: string;
+  fuelConsumption?: number;
+  workingSpeed?: number;
+  idMachine?: number;
+  idTractor?: number;
+};
+export type IresPatch = {
+  operId: number;
   nameOper: string;
   price?: number;
   amount?: number;
@@ -22,10 +34,10 @@ type Ires = {
   idTractor?: number;
 };
 
-interface Ioper {
+export interface Ioper {
   id?: number;
   nameOperation: string;
-  cell: number;
+  cell: Icell;
   costCars?: number;
   costFuel?: number;
   costMachineWork?: number;
@@ -56,7 +68,7 @@ interface IdataPatch {
   akkum: number;
   arr: {
     cell: Icell;
-    res: Ires;
+    res: IresPatch;
   };
 }
 
@@ -75,12 +87,12 @@ class OperService {
         cell,
         res: {
           nameOper,
-          price = null,
-          amount = null,
-          unitsOfCost = null,
-          unitsOfConsumption = null,
-          fuelConsumption = null,
-          workingSpeed = null,
+          price,
+          amount,
+          unitsOfCost,
+          unitsOfConsumption,
+          fuelConsumption,
+          workingSpeed,
           idMachine,
           idTractor,
         },
@@ -88,156 +100,159 @@ class OperService {
       },
     } = data;
     let sum: number;
-    if (
-      price === undefined ||
-      amount === undefined ||
-      unitsOfConsumption === undefined ||
-      unitsOfCost === undefined ||
-      workingSpeed === undefined ||
-      fuelConsumption === undefined
-    ) {
-      throw new Error("");
-    } else {
-      function createOper() {
-        if (price === undefined || amount === undefined) {
-          throw new Error("");
-        }
-        const techOperation: Promise<tech_operation> = tech_operation.create({
-          techCartId: cartId,
-          nameOperation: nameOper,
-          cell,
-          [cell]: +price * +amount || +price,
-          sectionId: section,
-        });
-        return techOperation;
+
+    function createOper() {
+      if (price === undefined || amount === undefined) {
+        throw new Error("");
       }
-
-      function tehcCartUpdate() {
-        tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
-      }
-
-      if (cell == "costMaterials") {
-        createOper()
-          .then((data) => {
-            sum = akk + price * amount;
-            const operId = data.id;
-            cost_material.create({
-              nameMaterials: nameOper,
-              price: +price,
-              unitsOfCost,
-              consumptionPerHectare: +amount,
-              unitsOfConsumption,
-              techOperationId: operId,
-            });
-          })
-          .then(() => {
-            tehcCartUpdate();
-          });
-      } else if (cell == "costServices") {
-        createOper()
-          .then((data) => {
-            const operId = data.id;
-            sum = akk + price;
-            const costService = cost_service.create({
-              nameService: nameOper,
-              price: +price,
-              unitsOfCost,
-              techOperationId: operId,
-            });
-          })
-          .then(() => {
-            tehcCartUpdate();
-          });
-      } else if (cell == "costTransport") {
-        createOper()
-          .then((data) => {
-            sum = akk + price;
-            const operId = data.id;
-            const costTransport = cost_transport.create({
-              nameTransport: nameOper,
-              price: +price,
-              unitsOfCost,
-              techOperationId: operId,
-            });
-          })
-          .then(() => {
-            tehcCartUpdate();
-          });
-      } else if (cell == "costMechanical") {
-        console.log(123);
-
-        const cart = await tech_cart.findOne({ where: { id: cartId } });
-        if (!cart) {
-          return "problem";
-        }
-        const Tractor = await tractor.findOne({ where: { id: idTractor } });
-        if (!Tractor) {
-          return "problem";
-        }
-        const machine = await agricultural_machine.findOne({
-          where: { id: idMachine },
-        });
-        if (!machine) {
-          return "problem";
-        }
-
-        const operation = tech_operation.create({
-          techCartId: cartId,
-          nameOperation: nameOper,
-          cell,
-          costCars: 0,
-          costFuel: 0,
-          sectionId: section,
-        });
-        operation.then((operation) => {
-          const Aggregate = aggregate.create({
-            amountOfTractorDepreciationPerHour: Math.round(
-              +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
-            ),
-            fuelConsumption: +fuelConsumption,
-            amountOfMachineDepreciationPerHour: Math.round(
-              +machine.marketCost / +machine.depreciationPeriod / 220 / 8
-            ),
-            unitProductionAggregate: Math.round(
-              (+machine.widthOfCapture * (+workingSpeed * 1000)) / 10000
-            ),
-            workingSpeed: +workingSpeed,
-            techOperationId: operation.id,
-            tractorId: Tractor.id,
-            agriculturalMachineId: machine.id,
-          });
-          Aggregate.then((Aggregate) => {
-            const costFuel = Math.round(
-              (+fuelConsumption * +cart.priceDiesel) /
-                +Aggregate.unitProductionAggregate
-            );
-            const costCars = Math.round(
-              ((+Aggregate.amountOfTractorDepreciationPerHour +
-                +Aggregate.amountOfMachineDepreciationPerHour) *
-                1.05) /
-                +Aggregate.unitProductionAggregate
-            );
-            sum = akk + costCars + costFuel;
-
-            const oper = tech_operation
-              .update(
-                {
-                  techCartId: cartId,
-                  nameOperation: nameOper,
-                  cell,
-                  costCars: costCars,
-                  costFuel: costFuel,
-                  sectionId: section,
-                },
-                { where: { id: operation.id } }
-              )
-              .then((operation) => {
-                tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
-              });
-          });
-        });
-      }
+      const techOperation: Promise<tech_operation> = tech_operation.create({
+        techCartId: cartId,
+        nameOperation: nameOper,
+        cell,
+        [cell]: +price * +amount || +price,
+        sectionId: section,
+      });
+      return techOperation;
     }
+
+    function tehcCartUpdate() {
+      tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
+    }
+
+    if (cell == "costMaterials") {
+      if (
+        price === undefined ||
+        amount === undefined ||
+        unitsOfConsumption === undefined ||
+        unitsOfCost === undefined
+      ) {
+        throw new Error("");
+      }
+      createOper()
+        .then((data) => {
+          sum = akk + price * amount;
+          const operId = data.id;
+          cost_material.create({
+            nameMaterials: nameOper,
+            price: +price,
+            unitsOfCost,
+            consumptionPerHectare: +amount,
+            unitsOfConsumption,
+            techOperationId: operId,
+          });
+        })
+        .then(() => {
+          tehcCartUpdate();
+        });
+    } else if (cell == "costServices") {
+      if (price === undefined || unitsOfCost === undefined) {
+        throw new Error("");
+      }
+      createOper()
+        .then((data) => {
+          const operId = data.id;
+          sum = akk + price;
+          const costService = cost_service.create({
+            nameService: nameOper,
+            price: +price,
+            unitsOfCost,
+            techOperationId: operId,
+          });
+        })
+        .then(() => {
+          tehcCartUpdate();
+        });
+    } else if (cell == "costTransport") {
+      if (price === undefined || unitsOfCost === undefined) {
+        throw new Error("");
+      }
+      createOper()
+        .then((data) => {
+          sum = akk + price;
+          const operId = data.id;
+          const costTransport = cost_transport.create({
+            nameTransport: nameOper,
+            price: +price,
+            unitsOfCost,
+            techOperationId: operId,
+          });
+        })
+        .then(() => {
+          tehcCartUpdate();
+        });
+    } else if (cell == "costMechanical") {
+      const cart = await tech_cart.findOne({ where: { id: cartId } });
+      const Tractor = await tractor.findOne({ where: { id: idTractor } });
+      const machine = await agricultural_machine.findOne({
+        where: { id: idMachine },
+      });
+      if (
+        workingSpeed === undefined ||
+        fuelConsumption === undefined ||
+        !machine ||
+        !Tractor ||
+        !cart
+      ) {
+        throw new Error("");
+      }
+
+      const operation = tech_operation.create({
+        techCartId: cartId,
+        nameOperation: nameOper,
+        cell,
+        costCars: 0,
+        costFuel: 0,
+        sectionId: section,
+      });
+      operation.then((operation) => {
+        const Aggregate = aggregate.create({
+          amountOfTractorDepreciationPerHour: Math.round(
+            +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
+          ),
+          fuelConsumption: +fuelConsumption,
+          amountOfMachineDepreciationPerHour: Math.round(
+            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
+          ),
+          unitProductionAggregate: Math.round(
+            (+machine.widthOfCapture * (+workingSpeed * 1000)) / 10000
+          ),
+          workingSpeed: +workingSpeed,
+          techOperationId: operation.id,
+          tractorId: Tractor.id,
+          agriculturalMachineId: machine.id,
+        });
+        Aggregate.then((Aggregate) => {
+          const costFuel = Math.round(
+            (+fuelConsumption * +cart.priceDiesel) /
+              +Aggregate.unitProductionAggregate
+          );
+          const costCars = Math.round(
+            ((+Aggregate.amountOfTractorDepreciationPerHour +
+              +Aggregate.amountOfMachineDepreciationPerHour) *
+              1.05) /
+              +Aggregate.unitProductionAggregate
+          );
+          sum = akk + costCars + costFuel;
+
+          const oper = tech_operation
+            .update(
+              {
+                techCartId: cartId,
+                nameOperation: nameOper,
+                cell,
+                costCars: costCars,
+                costFuel: costFuel,
+                sectionId: section,
+              },
+              { where: { id: operation.id } }
+            )
+            .then((operation) => {
+              tech_cart.update({ totalCost: sum }, { where: { id: cartId } });
+            });
+        });
+      });
+    }
+
     return "all good";
   }
   async patchOper(data: IdataPatch) {
@@ -262,11 +277,19 @@ class OperService {
     } = data;
     let sum: number;
     function updateOper() {
+      if (
+        price === undefined ||
+        amount === undefined ||
+        unitsOfConsumption === undefined ||
+        unitsOfCost === undefined
+      ) {
+        throw new Error("");
+      }
       //@ts-expect-error wrong-type-in-librery
       const techOperation: Promise<tech_operation> = tech_operation.update(
         {
           nameOperation: nameOper,
-          [cell]: (+price || 1) * (+amount || 1),
+          [cell]: price * amount,
         },
         { where: { id: operId } }
       );
@@ -276,11 +299,19 @@ class OperService {
     }
 
     if (cell == "costMaterials") {
+      if (
+        price === undefined ||
+        amount === undefined ||
+        unitsOfConsumption === undefined ||
+        unitsOfCost === undefined
+      ) {
+        throw new Error("");
+      }
       sum = akkum + price * amount;
       const costMaterial = cost_material.update(
         {
           nameMaterials: nameOper,
-          price: +price,
+          price,
           unitsOfCost,
           consumptionPerHectare: +amount,
           unitsOfConsumption,
@@ -291,6 +322,9 @@ class OperService {
       updateOper();
       updateCart(sum);
     } else if (cell == "costServices") {
+      if (price === undefined || unitsOfCost === undefined) {
+        throw new Error("");
+      }
       sum = akkum + price;
       const costService = cost_service.update(
         {
@@ -304,6 +338,9 @@ class OperService {
       updateOper();
       updateCart(sum);
     } else if (cell == "costTransport") {
+      if (price === undefined || unitsOfCost === undefined) {
+        throw new Error("");
+      }
       sum = akkum + price;
       const costTransport = cost_transport.update(
         {
@@ -320,18 +357,18 @@ class OperService {
       console.log(operId);
 
       const Tractor = await tractor.findOne({ where: { id: idTractor } });
-      if (!Tractor) {
-        return "problem";
-      }
       const machine = await agricultural_machine.findOne({
         where: { id: idMachine },
       });
-      if (!machine) {
-        return "problem";
-      }
       const cart = await tech_cart.findOne({ where: { id: cartId } });
-      if (!cart) {
-        return "problem";
+      if (
+        workingSpeed === undefined ||
+        fuelConsumption === undefined ||
+        !cart ||
+        !machine ||
+        !Tractor
+      ) {
+        throw new Error("");
       }
 
       const costMechanical = await aggregate.update(
@@ -463,5 +500,4 @@ class OperService {
     return get();
   }
 }
-type prope = cost_material | cost_service | cost_transport | aggregate;
 export default new OperService();
