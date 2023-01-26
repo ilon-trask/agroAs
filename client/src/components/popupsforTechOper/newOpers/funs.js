@@ -2,8 +2,18 @@ import {
   createTractor,
   createMachine,
   getMachine,
+  getTractor,
+  patchOperation,
+  createOperation,
 } from "../../../http/requests";
 
+export const fiveInputsProps = {
+  nameOper: "",
+  price: "",
+  amount: "",
+  unitsOfCost: "",
+  unitsOfConsumption: "",
+};
 export function fiveInputs(
   id,
   map,
@@ -16,9 +26,7 @@ export function fiveInputs(
   setCell,
   setRes,
   akk,
-  section,
-  patchOperation,
-  createOperation
+  section
 ) {
   if (res.nameOper == "" || res.price == "" || res.amount == "") {
     setIsErr(true);
@@ -26,13 +34,7 @@ export function fiveInputs(
     console.log(update);
     setOpen(false);
     setCell("");
-    setRes({
-      nameOper: "",
-      price: "",
-      amount: "",
-      unitsOfCost: "",
-      unitsOfConsumption: "",
-    });
+    setRes(fiveInputsProps);
     setIsErr(false);
     res.amount = +res.amount;
     res.price = +res.price;
@@ -44,7 +46,13 @@ export function fiveInputs(
     }
   }
 }
-
+export const threeInputsProps = {
+  nameOper: "",
+  price: "",
+  amount: "",
+  unitsOfCost: "",
+  unitsOfConsumption: "",
+};
 export function threeInputs(
   id,
   map,
@@ -57,9 +65,7 @@ export function threeInputs(
   setCell,
   setRes,
   akk,
-  section,
-  patchOperation,
-  createOperation
+  section
 ) {
   if (res.nameOper == "" || res.price == "") {
     setIsErr(true);
@@ -67,13 +73,7 @@ export function threeInputs(
     console.log(update);
     setOpen(false);
     setCell("");
-    setRes({
-      nameOper: "",
-      price: "",
-      amount: "",
-      unitsOfCost: "",
-      unitsOfConsumption: "",
-    });
+    setRes(threeInputsProps);
     setIsErr(false);
     res.amount = 0;
     res.price = +res.price;
@@ -86,6 +86,14 @@ export function threeInputs(
     }
   }
 }
+
+export const MechanicalWorkProps = {
+  nameOper: "",
+  idMachine: "",
+  idTractor: "",
+  workingSpeed: "",
+  fuelConsumption: "",
+};
 
 export function MechanicalWorkFunc(
   id,
@@ -99,26 +107,18 @@ export function MechanicalWorkFunc(
   setCell,
   setRes,
   akk,
-  section,
-  patchOperation,
-  createOperation
+  section
 ) {
   if (res.nameOper == "") {
     setIsErr(true);
   } else {
     setOpen(false);
     setCell("");
-    setRes({
-      nameOper: "",
-    });
+    setRes(MechanicalWorkProps);
     setIsErr(false);
     res.price = 0;
     res.amount = 0;
     const request = { cell, res, section };
-    console.log(request);
-    console.log(akk);
-    console.log(akkum);
-    console.log(id);
     if (update) {
       patchOperation(map, request, id, akkum);
     } else {
@@ -127,6 +127,16 @@ export function MechanicalWorkFunc(
   }
 }
 
+export const createTracProps = {
+  nameTractor: "",
+  brand: "",
+  marketCost: "",
+  depreciationPeriod: "",
+  enginePower: "",
+  fuelConsumption: "",
+  numberOfPersonnel: "",
+  gradeId: "",
+};
 export function createTrac(
   id,
   map,
@@ -139,29 +149,28 @@ export function createTrac(
   setCell,
   setRes,
   akk,
-  section,
-  patchOperation,
-  createOperation
+  section
 ) {
-  console.log(3);
   if (res.nameTractor == "") {
     setIsErr(true);
   } else {
     setOpen(false);
-    setRes({
-      nameTractor: "",
-      brand: "",
-      marketCost: "",
-      depreciationPeriod: "",
-      enginePower: "",
-      fuelConsumption: "",
-      numberOfPersonnel: "",
-      typeOfWork: "",
-    });
+    setRes(createTracProps);
     setIsErr(false);
     createTractor(map, res);
   }
 }
+
+export const createMachineProps = {
+  nameMachine: "",
+  brand: "",
+  marketCost: "",
+  depreciationPeriod: "",
+  widthOfCapture: "",
+  workingSpeed: "",
+  numberOfServicePersonnel: "",
+  gradeId: "",
+};
 
 export function createMachineFunc(
   id,
@@ -175,26 +184,80 @@ export function createMachineFunc(
   setCell,
   setRes,
   akk,
-  section,
-  patchOperation,
-  createOperation
+  section
 ) {
-  console.log(3);
   if (res.nameMachine == "") {
     setIsErr(true);
   } else {
     setOpen(false);
-    setRes({
-      nameMachine: "",
-      brand: "",
-      marketCost: "",
-      depreciationPeriod: "",
-      widthOfCapture: "",
-      workingSpeed: "",
-      numberOfServicePersonnel: "",
-      typeOfWork: "",
-    });
+    setRes(createMachineProps);
     setIsErr(false);
     createMachine(map, res);
+  }
+}
+
+export const costHandWorkProps = {
+  nameOper: "",
+  gradeId: "",
+  productionRateAmount: "",
+  productionRateWeight: "",
+  yield: "",
+  spending: "",
+  productionRateTime: "",
+};
+
+export function createCostHandWork(
+  id,
+  map,
+  akkum,
+  update,
+  res,
+  setIsErr,
+  setOpen,
+  cell,
+  setCell,
+  setRes,
+  akk,
+  section
+) {
+  if (res.nameOper == "") {
+    setIsErr(true);
+  } else {
+    setOpen(false);
+    setCell("");
+    setRes({});
+    setIsErr(false);
+    res.price = 0;
+    res.amount = 0;
+    console.log(res.type);
+    res.spending = +res.spending;
+    res.productionRateAmount = +res.productionRateAmount;
+    res.yieldСapacity = +res.yieldСapacity;
+    res.gradeId = +res.gradeId;
+    res.productionRateTime = +res.productionRateTime;
+    res.productionRateWeight = +res.productionRateWeight;
+    res.productionPerShift = +res.productionPerShift;
+
+    if (res.type == 1) {
+      res.productionRateAmount = 0;
+      res.productionRateWeight = 0;
+      res.yieldСapacity = 0;
+      res.spending = 0;
+    } else if (res.type == 2) {
+      res.productionRateAmount = 0;
+      res.productionRateTime = 0;
+      res.spending = 0;
+    } else if (res.type == 3) {
+      res.productionRateTime = 0;
+      res.productionRateWeight = 0;
+      res.yieldСapacity = 0;
+    }
+    console.log("do some");
+    const request = { cell, res, section };
+    if (update) {
+      patchOperation(map, request, id, akkum);
+    } else {
+      createOperation(map, request, id, akk);
+    }
   }
 }

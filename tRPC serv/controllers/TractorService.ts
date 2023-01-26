@@ -19,7 +19,7 @@ class TractorService {
       enginePower,
       fuelConsumption,
       numberOfPersonnel,
-      typeOfWork,
+      gradeId,
     } = data;
 
     const Tractor = await tractor.create({
@@ -30,7 +30,7 @@ class TractorService {
       enginePower,
       fuelConsumption,
       numberOfPersonnel,
-      typeOfWork,
+      gradeId,
     });
 
     return Tractor;

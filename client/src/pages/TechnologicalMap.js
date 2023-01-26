@@ -10,11 +10,17 @@ import MapInputs from "../components/MapInputs";
 import MechanicalWork from "../components/popupsforTechOper/newOpers/MechanicalWork";
 import Transport from "../components/popupsforTechOper/newOpers/Transport";
 import PopupField from "../components/popupsforTechOper/newOpers/PopupField";
+import HandWork from "../components/popupsforTechOper/newOpers/HandWork";
 
 import {
   fiveInputs,
   threeInputs,
   MechanicalWorkFunc,
+  threeInputsProps,
+  MechanicalWorkProps,
+  createCostHandWork,
+  costHandWorkProps,
+  fiveInputsProps,
 } from "../components/popupsforTechOper/newOpers/funs";
 import { Context } from "../index";
 import { deleteOper, getOnlyCart } from "../http/requests";
@@ -257,25 +263,28 @@ const DevicePage = observer(() => {
           <tbody>
             {operData?.map((el) => {
               akk +=
-                el.costHandWork ||
                 el.costMaterials ||
                 el.costServices ||
                 el.costTransport ||
-                el.costCars + el.costFuel;
+                +el.costCars +
+                  +el.costFuel +
+                  +el.costHandWork +
+                  +el.costMachineWork ||
+                el.costHandWork;
               sum +=
                 mapData.area *
-                (el.costHandWork ||
-                  el.costMaterials ||
+                (el.costMaterials ||
                   el.costServices ||
                   el.costTransport ||
-                  el.costCars + el.costFuel);
+                  +el.costCars +
+                    +el.costFuel +
+                    +el.costHandWork +
+                    +el.costMachineWork ||
+                  el.costHandWork);
               return (
                 <tr key={el.id}>
                   <td
                     onClick={() => {
-                      setCell(el.cell);
-                      setUpdate(true);
-                      setSecondOpen(true);
                       const [second] = map[el.cell]?.filter(
                         (mat) => mat.techOperationId == el.id
                       );
@@ -285,7 +294,11 @@ const DevicePage = observer(() => {
                         +akk -
                           (+second.price *
                             (+second.consumptionPerHectare || 1) ||
-                            el.costCars + el.costFuel)
+                            +el.costCars +
+                              +el.costFuel +
+                              +el.costHandWork +
+                              +el.costMachineWork ||
+                            el.costHandWork)
                       );
                       if (el.cell == "costMechanical") {
                         setRes({
@@ -300,6 +313,26 @@ const DevicePage = observer(() => {
                             second.unitProductionAggregate,
                           operId: el.id,
                         });
+                      } else if (el.cell == "costHandWork") {
+                        setRes({
+                          id: el.id,
+                          gradeId: second.gradeId || "",
+                          nameOper: second.nameOper || "",
+                          pricePerHourPersonnel:
+                            +second.pricePerHourPersonnel || "",
+                          productionPerShift: +second.productionPerShift || "",
+                          productionRateAmount:
+                            +second.productionRateAmount || "",
+                          productionRateTime: +second.productionRateTime || "",
+                          productionRateWeight:
+                            +second.productionRateWeight || "",
+                          salaryPerShift: +second.salaryPerShift,
+                          spending: +second.spending || "",
+                          type: +second.type,
+                          unitOfMeasurement: second.unitOfMeasurement || "",
+                          yieldСapacity: +second.yieldСapacity || "",
+                          operId: el.id,
+                        });
                       } else {
                         setRes({
                           id: el.id,
@@ -311,6 +344,9 @@ const DevicePage = observer(() => {
                           operId: el.id,
                         });
                       }
+                      setSecondOpen(true);
+                      setCell(el.cell);
+                      setUpdate(true);
                     }}
                   >
                     Ред
@@ -320,18 +356,20 @@ const DevicePage = observer(() => {
                   <td>{"0"}</td>
                   <td>{el.costCars * mapData.area || "0"}</td>
                   <td>{el.costFuel * mapData.area || "0"}</td>
-                  <td>{"0"}</td>
+                  <td>{el.costMachineWork * mapData.area || "0"}</td>
                   <td>{el.costHandWork * mapData.area || "0"}</td>
                   <td>{el.costMaterials * mapData.area || "0"}</td>
                   <td>{el.costTransport * mapData.area || "0"}</td>
                   <td>{el.costServices * mapData.area || "0"}</td>
                   <td>
                     {+mapData.area *
-                      (el.costHandWork ||
-                        el.costMaterials ||
+                      (el.costMaterials ||
                         el.costServices ||
                         el.costTransport ||
-                        +el.costCars + +el.costFuel)}
+                        +el.costCars +
+                          +el.costFuel +
+                          +el.costHandWork +
+                          +el.costMachineWork)}
                   </td>
                   <td
                     className="delet"
@@ -398,6 +436,7 @@ const DevicePage = observer(() => {
           update={update}
           setUpdate={setUpdate}
           func={fiveInputs}
+          props={fiveInputsProps}
         >
           <Mater res={res} setRes={setRes} />
         </PopupField>
@@ -416,6 +455,7 @@ const DevicePage = observer(() => {
           update={update}
           setUpdate={setUpdate}
           func={threeInputs}
+          props={threeInputsProps}
         >
           <Service res={res} setRes={setRes} />
         </PopupField>
@@ -434,6 +474,7 @@ const DevicePage = observer(() => {
           update={update}
           setUpdate={setUpdate}
           func={threeInputs}
+          props={threeInputsProps}
         >
           <Transport res={res} setRes={setRes} />
         </PopupField>
@@ -452,8 +493,28 @@ const DevicePage = observer(() => {
           update={update}
           setUpdate={setUpdate}
           func={MechanicalWorkFunc}
+          props={MechanicalWorkProps}
         >
           <MechanicalWork res={res} setRes={setRes} />
+        </PopupField>
+      ) : cell == "costHandWork" ? (
+        <PopupField
+          open={secondOpen}
+          setOpen={setSecondOpen}
+          cell={cell}
+          setCell={setCell}
+          section={section}
+          setSection={setSection}
+          akk={akk}
+          akkum={akkum}
+          res={res}
+          setRes={setRes}
+          update={update}
+          setUpdate={setUpdate}
+          func={createCostHandWork}
+          props={costHandWorkProps}
+        >
+          <HandWork res={res} setRes={setRes} />
         </PopupField>
       ) : (
         ""

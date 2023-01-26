@@ -9,6 +9,8 @@ import {
   Isection,
   Itractor,
   Imachine,
+  Igrade,
+  Icost_hand_work,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -21,6 +23,8 @@ export default class MapStore {
   private _tractor: Itractor[] = [];
   private _machine: Imachine[] = [];
   private _costMechanical: Iaggregate[] = [];
+  private _costHandWork: Icost_hand_work[] = [];
+  private _grade: Igrade[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -61,6 +65,12 @@ export default class MapStore {
   public set costServices(serv) {
     this._costServices = serv;
   }
+  public set newCostHandWork(hand: Icost_hand_work) {
+    this._costHandWork.push(hand);
+  }
+  public set costHandWork(hand) {
+    this._costHandWork = hand;
+  }
   public set section(sec) {
     this._section = sec;
   }
@@ -69,6 +79,9 @@ export default class MapStore {
   }
   public set machine(machine) {
     this._machine = machine;
+  }
+  public set grade(grade: Igrade[]) {
+    this._grade = grade;
   }
   public get maps() {
     return this._maps;
@@ -88,6 +101,9 @@ export default class MapStore {
   get costTransport() {
     return this._costTransport;
   }
+  get costHandWork() {
+    return this._costHandWork;
+  }
   get section() {
     return this._section;
   }
@@ -96,5 +112,8 @@ export default class MapStore {
   }
   get machine() {
     return this._machine;
+  }
+  get grade() {
+    return this._grade;
   }
 }

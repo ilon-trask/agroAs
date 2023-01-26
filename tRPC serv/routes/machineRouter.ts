@@ -18,7 +18,7 @@ export const machineRouter = router({
         widthOfCapture: z.number(),
         workingSpeed: z.number(),
         numberOfServicePersonnel: z.number(),
-        typeOfWork: z.number(),
+        gradeId: z.number().optional(),
       })
     )
     .query(async ({ input }) => {

@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Context } from "../../index.js";
 
 function CreateAgriculturalMachine({ res, setRes }) {
+  const { map } = useContext(Context);
   return (
     <>
       <h4>Внесіть данні для СГ машини</h4>
@@ -89,14 +91,19 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Розряд роботи</p>
-          <input
-            placeholder="Вкажіть розряд"
-            type="number"
-            value={res?.typeOfWork}
+          <select
+            value={res.gradeId}
             onChange={(e) => {
-              setRes({ ...res, typeOfWork: +e.target.value });
+              setRes({ ...res, gradeId: +e.target.value });
             }}
-          />
+          >
+            <option selected disabled hidden value="">
+              Виберіть тип роботи
+            </option>
+            {map.grade.map((el) => (
+              <option value={el.id}>{el.indicator}</option>
+            ))}
+          </select>
         </div>
       </div>
     </>

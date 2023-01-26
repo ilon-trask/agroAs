@@ -10,6 +10,7 @@ import {
   getSection,
   getTractor,
   getMachine,
+  getGrades,
 } from "./http/requests.ts";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     getSection(map);
     getTractor(map);
     getMachine(map);
+    getGrades(map);
   }, []);
 
   return (

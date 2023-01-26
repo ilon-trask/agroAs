@@ -18,7 +18,7 @@ class MachineService {
       widthOfCapture,
       workingSpeed,
       numberOfServicePersonnel,
-      typeOfWork,
+      gradeId,
     } = data;
     const machine = await agricultural_machine.create({
       nameMachine,
@@ -28,7 +28,7 @@ class MachineService {
       widthOfCapture: +widthOfCapture,
       workingSpeed: +workingSpeed,
       numberOfServicePersonnel: +numberOfServicePersonnel,
-      typeOfWork: +typeOfWork,
+      gradeId: +gradeId!,
     });
     return machine;
   }

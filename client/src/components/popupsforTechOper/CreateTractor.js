@@ -1,6 +1,14 @@
+import { observer } from "mobx-react-lite";
 import React from "react";
+import { useContext } from "react";
+import { Context } from "../../index.js";
 
-const CreateTraktor = ({ res, setRes }) => {
+const CreateTractor = ({ res, setRes }) => {
+  const { map } = useContext(Context);
+
+  console.log(res);
+  console.log(res.nameTractor);
+  console.log(res.brand);
   return (
     <>
       <h4>Внесіть данні для трактора</h4>
@@ -84,18 +92,23 @@ const CreateTraktor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Розряд роботи</p>
-          <input
-            placeholder="Вкажіть розряд"
-            type="number"
-            value={res?.typeOfWork}
+          <select
+            value={res.gradeId}
             onChange={(e) => {
-              setRes({ ...res, typeOfWork: +e.target.value });
+              setRes({ ...res, gradeId: +e.target.value });
             }}
-          />
+          >
+            <option selected disabled hidden value="">
+              Виберіть тип роботи
+            </option>
+            {map.grade.map((el) => (
+              <option value={el.id}>{el.indicator}</option>
+            ))}
+          </select>
         </div>
       </div>
     </>
   );
 };
 
-export default CreateTraktor;
+export default CreateTractor;

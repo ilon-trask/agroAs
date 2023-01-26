@@ -245,8 +245,8 @@ export interface Itractor {
   enginePower: number;
   fuelConsumption: number;
   numberOfPersonnel: number;
-  typeOfWork: number;
   userId?: number;
+  gradeId?: number;
 }
 export class tractor extends Model<Itractor> {
   declare id: number;
@@ -257,8 +257,8 @@ export class tractor extends Model<Itractor> {
   declare enginePower: number;
   declare fuelConsumption: number;
   declare numberOfPersonnel: number;
-  declare typeOfWork: number;
   declare userId?: number;
+  declare gradeId?: number;
 }
 
 tractor.init(
@@ -271,7 +271,6 @@ tractor.init(
     enginePower: { type: DataTypes.INTEGER, allowNull: false },
     fuelConsumption: { type: DataTypes.INTEGER, allowNull: false },
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
-    typeOfWork: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
 );
@@ -285,8 +284,8 @@ export interface Imachine {
   widthOfCapture: number;
   workingSpeed: number;
   numberOfServicePersonnel: number;
-  typeOfWork: number;
   userId?: number;
+  gradeId?: number;
 }
 export class agricultural_machine extends Model<Imachine> {
   declare id: number;
@@ -297,8 +296,8 @@ export class agricultural_machine extends Model<Imachine> {
   declare widthOfCapture: number;
   declare workingSpeed: number;
   declare numberOfServicePersonnel: number;
-  declare typeOfWork: number;
   declare userId?: number;
+  declare gradeId?: number;
 }
 
 agricultural_machine.init(
@@ -311,7 +310,6 @@ agricultural_machine.init(
     widthOfCapture: { type: DataTypes.FLOAT, allowNull: false },
     workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
-    typeOfWork: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
 );
@@ -364,6 +362,58 @@ aggregate.init(
   { sequelize }
 );
 
+export interface Icost_hand_work {
+  id?: number;
+  nameOper: string;
+  pricePerHourPersonnel: number;
+  salaryPerShift?: number;
+  productionPerShift?: number;
+  unitOfMeasurement?: string;
+  productionRateTime?: number;
+  productionRateWeight?: number;
+  productionRateAmount?: number;
+  yieldСapacity?: number;
+  spending?: number;
+  type: number;
+  techOperationId?: number;
+  gradeId?: number;
+}
+
+export class cost_hand_work extends Model<Icost_hand_work> {
+  declare id?: number;
+  declare nameOper: string;
+  declare pricePerHourPersonnel: number;
+  declare salaryPerShift?: number;
+  declare productionPerShift?: number;
+  declare unitOfMeasurement?: string;
+  declare productionRateTime?: number;
+  declare productionRateWeight?: number;
+  declare productionRateAmount?: number;
+  declare yieldСapacity?: number;
+  declare spending?: number;
+  declare type: number;
+  declare techOperationId?: number;
+  declare gradeId?: number;
+}
+
+cost_hand_work.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    nameOper: { type: DataTypes.STRING, allowNull: false },
+    pricePerHourPersonnel: { type: DataTypes.INTEGER, allowNull: false },
+    salaryPerShift: { type: DataTypes.INTEGER },
+    productionPerShift: { type: DataTypes.INTEGER },
+    unitOfMeasurement: { type: DataTypes.STRING },
+    productionRateTime: { type: DataTypes.INTEGER },
+    productionRateWeight: { type: DataTypes.INTEGER },
+    productionRateAmount: { type: DataTypes.INTEGER },
+    yieldСapacity: { type: DataTypes.INTEGER },
+    spending: { type: DataTypes.INTEGER },
+    type: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
+
 user.hasMany(tech_cart);
 tech_cart.belongsTo(user);
 
@@ -396,3 +446,11 @@ aggregate.belongsTo(tractor);
 
 agricultural_machine.hasMany(aggregate);
 aggregate.belongsTo(agricultural_machine);
+
+grade.hasMany(tractor);
+
+grade.hasMany(agricultural_machine);
+
+grade.hasMany(cost_hand_work);
+
+tech_operation.hasMany(cost_hand_work);

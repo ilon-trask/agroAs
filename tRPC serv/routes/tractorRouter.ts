@@ -18,7 +18,7 @@ export const tractorRouter = router({
         enginePower: z.number(),
         fuelConsumption: z.number(),
         numberOfPersonnel: z.number(),
-        typeOfWork: z.number(),
+        gradeId: z.number().optional(),
       })
     )
     .query(async ({ input }) => {

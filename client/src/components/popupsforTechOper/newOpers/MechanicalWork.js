@@ -1,37 +1,43 @@
 import React, { useState, useContext } from "react";
-import { useParams } from "react-router-dom";
 import { Context } from "../../..";
 import css from "../../../components/Dialog.module.css";
-import { createOperation, patchOperation } from "../../../http/requests";
 import PopupField from "./PopupField";
-import CreateTraktor from "../CreateTraktor";
+import CreateTractor from "../CreateTractor";
 import CreateAgriculturalMachine from "../CreateAgriculturalMachine";
-import { createTrac, createMachineFunc } from "./funs";
+import {
+  createTrac,
+  createMachineFunc,
+  createMachineProps,
+  createTracProps,
+} from "./funs";
+import { observer } from "mobx-react-lite";
 
-const MechanicalWork = ({ res, setRes }) => {
-  const [tractorRes, setTractorRes] = useState({
-    nameTractor: "",
-    brand: "",
-    marketCost: "",
-    depreciationPeriod: "",
-    enginePower: "",
-    fuelConsumption: "",
-    numberOfPersonnel: "",
-    typeOfWork: "",
-  });
-  const [machineRes, setMachineRes] = useState({
-    nameMachine: "",
-    brand: "",
-    marketCost: "",
-    depreciationPeriod: "",
-    widthOfCapture: "",
-    workingSpeed: "",
-    numberOfServicePersonnel: "",
-    typeOfWork: "",
-  });
+const MechanicalWork = observer(({ res, setRes }) => {
+  const [inRes, setInRes] = useState({});
+  //   {
+  //   nameTractor: "",
+  //   brand: "",
+  //   marketCost: "",
+  //   depreciationPeriod: "",
+  //   enginePower: "",
+  //   fuelConsumption: "",
+  //   numberOfPersonnel: "",
+  //   gradeId: "",
+  // }
+  // const [machineRes, setMachineRes] = useState({});
+  //   {
+  //   nameMachine: "",
+  //   brand: "",
+  //   marketCost: "",
+  //   depreciationPeriod: "",
+  //   widthOfCapture: "",
+  //   workingSpeed: "",
+  //   numberOfServicePersonnel: "",
+  //   gradeId: "",
+  // }
   const [tractorOpen, setTractorOpen] = useState(false);
   const [agriculturalOpen, setAgriculturalOpen] = useState(false);
-  const [updateTractor, setUpdateTractor] = useState(false);
+  const [update, setUpdate] = useState(false);
   const { map } = useContext(Context);
   return (
     <>
@@ -49,18 +55,31 @@ const MechanicalWork = ({ res, setRes }) => {
           />
         </div>
         <div className="d-flex gap-3">
-          <div>
-            <p>Марка трактора</p>
+          <div style={{ height: "min-content", margin: "auto 0 0" }}>
+            <button
+              onClick={() => {
+                if (res.idTractor) {
+                  let [second] = map.tractor.filter(
+                    (el) => el.id == res.idTractor
+                  );
+                  setInRes(second);
+                  setUpdate(true);
+                  setTractorOpen(true);
+                }
+              }}
+            >
+              Ред вибраний трактор
+            </button>
             <select
               value={res.idTractor}
               onChange={(e) => {
                 setRes(() => {
-                  const tractor = map.tractor.filter(
+                  const [tractor] = map.tractor.filter(
                     (el) => el.id == e.target.value
                   );
                   return {
                     ...res,
-                    fuelConsumption: tractor[0].fuelConsumption,
+                    fuelConsumption: tractor.fuelConsumption,
                   };
                 });
                 setRes((prev) => ({ ...prev, idTractor: +e.target.value }));
@@ -76,6 +95,7 @@ const MechanicalWork = ({ res, setRes }) => {
           </div>
           <div>
             <p>Розхід палива на 1 год</p>
+
             <input
               placeholder={"Вкажіть ціну"}
               type="number"
@@ -99,8 +119,21 @@ const MechanicalWork = ({ res, setRes }) => {
           </div>
         </div>
         <div className="d-flex gap-3">
-          <div>
-            <p>Марка СГ машини</p>
+          <div style={{ height: "min-content", margin: "auto 0 0" }}>
+            <button
+              onClick={() => {
+                if (res.idMachine) {
+                  let [second] = map.machine.filter(
+                    (el) => el.id == res.idMachine
+                  );
+                  setInRes(second);
+                  setUpdate(true);
+                  setAgriculturalOpen(true);
+                }
+              }}
+            >
+              Ред вибрану СГ машину
+            </button>
             <select
               value={res.idMachine}
               onChange={(e) => {
@@ -148,31 +181,33 @@ const MechanicalWork = ({ res, setRes }) => {
         <PopupField
           open={tractorOpen}
           setOpen={setTractorOpen}
-          res={tractorRes}
-          setRes={setTractorRes}
-          update={updateTractor}
-          setUpdate={setUpdateTractor}
+          res={inRes}
+          setRes={setInRes}
+          update={update}
+          setUpdate={setUpdate}
           func={createTrac}
+          props={createTracProps}
         >
-          <CreateTraktor res={tractorRes} setRes={setTractorRes} />
+          <CreateTractor res={inRes} setRes={setInRes} />
         </PopupField>
       ) : agriculturalOpen ? (
         <PopupField
           open={agriculturalOpen}
           setOpen={setAgriculturalOpen}
-          res={machineRes}
-          setRes={setMachineRes}
-          update={updateTractor}
-          setUpdate={setUpdateTractor}
+          res={inRes}
+          setRes={setInRes}
+          update={update}
+          setUpdate={setUpdate}
           func={createMachineFunc}
+          props={createMachineProps}
         >
-          <CreateAgriculturalMachine res={machineRes} setRes={setMachineRes} />
+          <CreateAgriculturalMachine res={inRes} setRes={setInRes} />
         </PopupField>
       ) : (
         <></>
       )}
     </>
   );
-};
+});
 
 export default MechanicalWork;

@@ -8,6 +8,8 @@ import {
 import { Idata } from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
 import {
+  Icost_hand_work,
+  Igrade,
   Imachine,
   Itractor,
   tech_operation,
@@ -51,6 +53,7 @@ export function getOpers(map: MapStore, id: number) {
     map.costMaterials = [];
     map.costServices = [];
     map.costTransport = [];
+    map.costHandWork = [];
     res.forEach((el) => {
       getProps(map, el.id!, el.cell);
     });
@@ -62,7 +65,12 @@ export function getProps(map: MapStore, id: number, cell: Icell) {
   client.oper.getProps.query({ operId: id }).then(
     //@ts-ignore some_err_in_sequelize_mb
     (
-      el: Iaggregate[] | Icost_material[] | Icost_service[] | Icost_transport[]
+      el:
+        | Iaggregate[]
+        | Icost_material[]
+        | Icost_service[]
+        | Icost_transport[]
+        | Icost_hand_work[]
     ) => {
       if (cell === "costMaterials") {
         let elem = el as Icost_material[];
@@ -76,6 +84,9 @@ export function getProps(map: MapStore, id: number, cell: Icell) {
       } else if (cell === "costMechanical") {
         let elem = el as Iaggregate[];
         map.newCostMechanical = elem[0];
+      } else if (cell === "costHandWork") {
+        let elem = el as Icost_hand_work[];
+        map.newCostHandWork = elem[0];
       }
     }
   );
@@ -132,6 +143,8 @@ export function createOperation(
   id: number,
   akk: number
 ) {
+  console.log(arr.cell);
+
   client.oper.create
     .query({
       arr: arr,
@@ -184,5 +197,10 @@ export function createMachine(map: MapStore, res: Imachine) {
 export function getMachine(map: MapStore) {
   client.machine.get.query().then((res) => {
     map.machine = res;
+  });
+}
+export function getGrades(map: MapStore) {
+  client.grade.get.query().then((data) => {
+    map.grade = data;
   });
 }
