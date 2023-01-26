@@ -5,6 +5,7 @@ import {
   getTractor,
   patchOperation,
   createOperation,
+  patchMachine,
 } from "../../../http/requests";
 
 export const fiveInputsProps = {
@@ -192,7 +193,11 @@ export function createMachineFunc(
     setOpen(false);
     setRes(createMachineProps);
     setIsErr(false);
-    createMachine(map, res);
+    if (update) {
+      patchMachine(map, res);
+    } else {
+      createMachine(map, res);
+    }
   }
 }
 
@@ -255,7 +260,8 @@ export function createCostHandWork(
     console.log("do some");
     const request = { cell, res, section };
     if (update) {
-      patchOperation(map, request, id, akkum);
+      console.log(111);
+      // patchOperation(map, request, id, akkum);
     } else {
       createOperation(map, request, id, akk);
     }

@@ -7,7 +7,8 @@ const CreateTractor = ({ res, setRes }) => {
   const { map } = useContext(Context);
 
   console.log(res);
-  console.log(res.nameTractor);
+  console.log(res.id);
+  console.log(res.operId);
   console.log(res.brand);
   return (
     <>

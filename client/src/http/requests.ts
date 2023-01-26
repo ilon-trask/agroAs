@@ -185,6 +185,7 @@ export function createTractor(map: MapStore, res: Itractor) {
     getTractor(map);
   });
 }
+
 export function getTractor(map: MapStore) {
   client.tractor.get.query().then((res: Itractor[]) => (map.tractor = res));
 }
@@ -194,6 +195,14 @@ export function createMachine(map: MapStore, res: Imachine) {
     getMachine(map);
   });
 }
+
+export function patchMachine(map: MapStore, res: Imachine) {
+  client.machine.patch.query(res).then((data) => {
+    map.machine = [];
+    map.machine = data;
+  });
+}
+
 export function getMachine(map: MapStore) {
   client.machine.get.query().then((res) => {
     map.machine = res;

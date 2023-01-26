@@ -32,5 +32,33 @@ class MachineService {
     });
     return machine;
   }
+  async patch(data: Imachine) {
+    const {
+      id,
+      nameMachine,
+      brand,
+      marketCost,
+      depreciationPeriod,
+      widthOfCapture,
+      workingSpeed,
+      numberOfServicePersonnel,
+      gradeId,
+    } = data;
+    await agricultural_machine.update(
+      {
+        nameMachine,
+        brand,
+        marketCost,
+        depreciationPeriod,
+        widthOfCapture,
+        workingSpeed,
+        numberOfServicePersonnel,
+        gradeId,
+      },
+      { where: { id: id } }
+    );
+    const machine: Imachine[] = await agricultural_machine.findAll();
+    return machine;
+  }
 }
-export = new MachineService();
+export default new MachineService();
