@@ -35,5 +35,34 @@ class TractorService {
 
     return Tractor;
   }
+  async patch(data: Itractor) {
+    const {
+      id,
+      nameTractor,
+      brand,
+      marketCost,
+      depreciationPeriod,
+      enginePower,
+      fuelConsumption,
+      numberOfPersonnel,
+      gradeId,
+    } = data;
+
+    const Tractor = await tractor.update(
+      {
+        nameTractor,
+        brand,
+        marketCost,
+        depreciationPeriod,
+        enginePower,
+        fuelConsumption,
+        numberOfPersonnel,
+        gradeId,
+      },
+      { where: { id: id } }
+    );
+
+    return Tractor;
+  }
 }
 export = new TractorService();

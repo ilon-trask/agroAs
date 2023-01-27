@@ -44,7 +44,7 @@ class MachineService {
       numberOfServicePersonnel,
       gradeId,
     } = data;
-    await agricultural_machine.update(
+    const machine = await agricultural_machine.update(
       {
         nameMachine,
         brand,
@@ -57,7 +57,6 @@ class MachineService {
       },
       { where: { id: id } }
     );
-    const machine: Imachine[] = await agricultural_machine.findAll();
     return machine;
   }
 }

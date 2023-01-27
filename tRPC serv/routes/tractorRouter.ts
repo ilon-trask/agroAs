@@ -25,4 +25,19 @@ export const tractorRouter = router({
       const tractor = await TractorService.create(input);
       return tractor;
     }),
+  patch: publicProcedure
+    .input(
+      z.object({
+        id: z.number().optional(),
+        nameTractor: z.string(),
+        brand: z.string(),
+        marketCost: z.number(),
+        depreciationPeriod: z.number(),
+        enginePower: z.number(),
+        fuelConsumption: z.number(),
+        numberOfPersonnel: z.number(),
+        gradeId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => await TractorService.patch(input)),
 });

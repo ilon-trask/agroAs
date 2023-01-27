@@ -6,6 +6,7 @@ import {
   patchOperation,
   createOperation,
   patchMachine,
+  patchTractor,
 } from "../../../http/requests";
 
 export const fiveInputsProps = {
@@ -158,7 +159,11 @@ export function createTrac(
     setOpen(false);
     setRes(createTracProps);
     setIsErr(false);
-    createTractor(map, res);
+    if (update) {
+      patchTractor(map, res);
+    } else {
+      createTractor(map, res);
+    }
   }
 }
 

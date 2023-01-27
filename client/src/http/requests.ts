@@ -186,8 +186,15 @@ export function createTractor(map: MapStore, res: Itractor) {
   });
 }
 
+export function patchTractor(map: MapStore, res: Itractor) {
+  client.tractor.patch.query(res).then(() => getTractor(map));
+}
+
 export function getTractor(map: MapStore) {
-  client.tractor.get.query().then((res: Itractor[]) => (map.tractor = res));
+  client.tractor.get.query().then((res: Itractor[]) => {
+    map.tractor = [];
+    map.tractor = res;
+  });
 }
 
 export function createMachine(map: MapStore, res: Imachine) {
@@ -198,13 +205,13 @@ export function createMachine(map: MapStore, res: Imachine) {
 
 export function patchMachine(map: MapStore, res: Imachine) {
   client.machine.patch.query(res).then((data) => {
-    map.machine = [];
-    map.machine = data;
+    getMachine(map);
   });
 }
 
 export function getMachine(map: MapStore) {
   client.machine.get.query().then((res) => {
+    map.machine = [];
     map.machine = res;
   });
 }
