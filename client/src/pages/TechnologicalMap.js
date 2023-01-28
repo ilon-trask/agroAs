@@ -47,7 +47,7 @@ const DevicePage = observer(() => {
   const { map } = useContext(Context);
   let { id } = useParams();
 
-  let [operData] = map.opers.filter((el) => el[0]?.techCartId == id);
+  let operData = map.opers.filter((el) => el?.techCartId == id);
 
   let [mapData] = map.maps.filter((el) => el.id == id);
 
@@ -285,6 +285,7 @@ const DevicePage = observer(() => {
                 <tr key={el.id}>
                   <td
                     onClick={() => {
+                      console.log(map[el.cell]);
                       const [second] = map[el.cell]?.filter(
                         (mat) => mat.techOperationId == el.id
                       );
@@ -339,7 +340,7 @@ const DevicePage = observer(() => {
                           nameOper: el.nameOperation,
                           price: second.price,
                           unitsOfCost: second.unitsOfCost,
-                          amount: second.consumptionPerHectare,
+                          consumptionPerHectare: second.consumptionPerHectare,
                           unitsOfConsumption: second.unitsOfConsumption,
                           operId: el.id,
                         });

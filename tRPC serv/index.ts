@@ -64,8 +64,6 @@ app.use(
 
 const port = 5000;
 app.listen(port, async () => {
-  // console.log(new Error("Не коректний Email або пароль"));
-
   await sequelize.sync();
   console.log(`🚀 Server listening on port ${port}`);
 });

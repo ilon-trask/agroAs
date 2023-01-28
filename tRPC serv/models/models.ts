@@ -112,6 +112,7 @@ tech_operation.init(
 
 export interface Icost_material {
   id?: number;
+  nameOper?: string;
   nameMaterials: string;
   price: number;
   unitsOfCost: string;

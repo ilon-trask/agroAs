@@ -12,7 +12,7 @@ import {
 export const fiveInputsProps = {
   nameOper: "",
   price: "",
-  amount: "",
+  consumptionPerHectare: "",
   unitsOfCost: "",
   unitsOfConsumption: "",
 };
@@ -38,7 +38,7 @@ export function fiveInputs(
     setCell("");
     setRes(fiveInputsProps);
     setIsErr(false);
-    res.amount = +res.amount;
+    res.consumptionPerHectare = +res.consumptionPerHectare;
     res.price = +res.price;
     const request = { cell, res, section };
     if (update) {
@@ -51,9 +51,7 @@ export function fiveInputs(
 export const threeInputsProps = {
   nameOper: "",
   price: "",
-  amount: "",
   unitsOfCost: "",
-  unitsOfConsumption: "",
 };
 export function threeInputs(
   id,
@@ -77,7 +75,6 @@ export function threeInputs(
     setCell("");
     setRes(threeInputsProps);
     setIsErr(false);
-    res.amount = 0;
     res.price = +res.price;
     const request = { cell, res, section };
 
@@ -118,8 +115,6 @@ export function MechanicalWorkFunc(
     setCell("");
     setRes(MechanicalWorkProps);
     setIsErr(false);
-    res.price = 0;
-    res.amount = 0;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id, akkum);
@@ -265,8 +260,7 @@ export function createCostHandWork(
     console.log("do some");
     const request = { cell, res, section };
     if (update) {
-      console.log(111);
-      // patchOperation(map, request, id, akkum);
+      patchOperation(map, request, id, akkum);
     } else {
       createOperation(map, request, id, akk);
     }

@@ -44,9 +44,9 @@ const Easy = observer(({ res, setRes }) => {
           <input
             placeholder="Вкажіть розхід"
             type="number"
-            value={res?.amount}
+            value={res?.consumptionPerHectare}
             onChange={(e) => {
-              setRes({ ...res, amount: +e.target.value });
+              setRes({ ...res, consumptionPerHectare: +e.target.value });
             }}
           />
         </div>

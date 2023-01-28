@@ -1,16 +1,13 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { AppRouter } from "../../../tRPC serv/index";
-import {
-  Icell,
-  Ires,
-  IresPatch,
-} from "../../../tRPC serv/controllers/OperService";
+import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
 import { Idata } from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
 import {
   Icost_hand_work,
   Igrade,
   Imachine,
+  Itech_operation,
   Itractor,
   tech_operation,
 } from "../../../tRPC serv/models/models";
@@ -48,17 +45,18 @@ export async function getCarts(map: MapStore) {
 }
 
 export function getOpers(map: MapStore, id: number) {
-  //@ts-ignore some_err_in_sequelize_mb
-  client.oper.get.query({ id: id }).then((res: tech_operation[]) => {
+  // @ts-ignore some_err_in_sequelize_mb
+  client.oper.get.query({ id: id }).then((res: Itech_operation[]) => {
     map.costMaterials = [];
     map.costServices = [];
     map.costTransport = [];
     map.costHandWork = [];
+
     res.forEach((el) => {
       getProps(map, el.id!, el.cell);
     });
 
-    map.newOper = res;
+    map.opers = res;
   });
 }
 export function getProps(map: MapStore, id: number, cell: Icell) {
@@ -124,12 +122,35 @@ export function deleteOper(
 ) {
   client.oper.delete
     .query({ akk: akk, cartId: +cartId, operId: operId })
-    .then(() => {
+    .then((data) => {
       map.opers = [];
-      let ids = map.maps.map((el) => el.id);
-      for (let i = 0; i < ids.length; i++) {
-        getOpers(map, ids[i]!);
-      }
+      map.maps = data.carts;
+      map.opers = data.opers;
+      data.props?.forEach((el) => {
+        let [oper] = data.opers.filter(
+          //@ts-ignore
+          (oper) => oper.id == el.techOperationId
+        );
+        console.log(oper);
+
+        let cell = oper.cell;
+        if (cell == "costMaterials") {
+          let elem = el as Icost_material;
+          map.newCostMaterials = elem;
+        } else if (cell == "costServices") {
+          let elem = el as Icost_service;
+          map.newCostServices = elem;
+        } else if (cell == "costTransport") {
+          let elem = el as Icost_transport;
+          map.newCostTransport = elem;
+        } else if (cell == "costMechanical") {
+          let elem = el as Iaggregate;
+          map.newCostMechanical = elem;
+        } else if (cell == "costHandWork") {
+          let elem = el as Icost_hand_work;
+          map.newCostHandWork = elem;
+        }
+      });
     });
 }
 
@@ -137,7 +158,7 @@ export function createOperation(
   map: MapStore,
   arr: {
     cell: Icell;
-    res: Ires;
+    res: any;
     section: number;
   },
   id: number,
@@ -145,14 +166,40 @@ export function createOperation(
 ) {
   console.log(arr.cell);
 
-  client.oper.create
+  client.oper.create[arr.cell]
     .query({
       arr: arr,
       cartId: +id,
       akk,
     })
-    .then(() => {
-      getCarts(map);
+    .then((data) => {
+      data.props?.forEach((el) => {
+        let [oper] = data.opers.filter(
+          //@ts-ignore
+          (oper) => oper.id == el.techOperationId
+        );
+        console.log(oper);
+
+        let cell = oper.cell;
+        if (cell == "costMaterials") {
+          let elem = el as Icost_material;
+          map.newCostMaterials = elem;
+        } else if (cell == "costServices") {
+          let elem = el as Icost_service;
+          map.newCostServices = elem;
+        } else if (cell == "costTransport") {
+          let elem = el as Icost_transport;
+          map.newCostTransport = elem;
+        } else if (cell == "costMechanical") {
+          let elem = el as Iaggregate;
+          map.newCostMechanical = elem;
+        } else if (cell == "costHandWork") {
+          let elem = el as Icost_hand_work;
+          map.newCostHandWork = elem;
+        }
+      });
+      map.opers = data.opers;
+      map.maps = data.carts;
     });
 }
 
@@ -160,19 +207,45 @@ export function patchOperation(
   map: MapStore,
   arr: {
     cell: Icell;
-    res: IresPatch;
+    res: any;
   },
   id: number,
   akkum: number
 ) {
-  client.oper.patch
+  client.oper.patch[arr.cell]
     .query({
-      arr: arr,
       cartId: +id,
       akkum,
+      arr: arr,
     })
-    .then(() => {
-      getCarts(map);
+    .then((data) => {
+      data.props?.forEach((el) => {
+        let [oper] = data.opers.filter(
+          //@ts-ignore
+          (oper) => oper.id == el.techOperationId
+        );
+        console.log(oper);
+
+        let cell = oper.cell;
+        if (cell == "costMaterials") {
+          let elem = el as Icost_material;
+          map.newCostMaterials = elem;
+        } else if (cell == "costServices") {
+          let elem = el as Icost_service;
+          map.newCostServices = elem;
+        } else if (cell == "costTransport") {
+          let elem = el as Icost_transport;
+          map.newCostTransport = elem;
+        } else if (cell == "costMechanical") {
+          let elem = el as Iaggregate;
+          map.newCostMechanical = elem;
+        } else if (cell == "costHandWork") {
+          let elem = el as Icost_hand_work;
+          map.newCostHandWork = elem;
+        }
+      });
+      map.opers = data.opers;
+      map.maps = data.carts;
     });
 }
 

@@ -15,7 +15,7 @@ import {
 
 export default class MapStore {
   private _maps: Itech_cart[] = [];
-  private _opers: Itech_operation[][] = [];
+  private _opers: Itech_operation[] = [];
   private _costMaterials: Icost_material[] = [];
   private _costServices: Icost_service[] = [];
   private _costTransport: Icost_transport[] = [];
@@ -35,10 +35,10 @@ export default class MapStore {
   public set newMaps(maps: Itech_cart) {
     this._maps.push(maps);
   }
-  public set opers(opers) {
+  public set opers(opers: Itech_operation[]) {
     this._opers = opers;
   }
-  public set newOper(opers: Itech_operation[]) {
+  public set newOper(opers: Itech_operation) {
     this._opers.push(opers);
   }
   public set newCostMaterials(mat: Icost_material) {
