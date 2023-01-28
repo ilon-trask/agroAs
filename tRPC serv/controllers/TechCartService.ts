@@ -1,4 +1,9 @@
-import { aggregate, tech_cart, tech_operation } from "../models/models";
+import {
+  aggregate,
+  Itech_cart,
+  tech_cart,
+  tech_operation,
+} from "../models/models";
 
 export interface Idata {
   id?: number;
@@ -8,6 +13,11 @@ export interface Idata {
   salary: number;
   priceDiesel: number;
   userId?: number;
+}
+
+async function getCart() {
+  const carts: Itech_cart[] = await tech_cart.findAll();
+  return carts;
 }
 
 class TechCartService {
@@ -21,7 +31,7 @@ class TechCartService {
       priceDiesel,
     });
 
-    return techCart;
+    return getCart();
   }
   async getAll() {
     const techCart = await tech_cart.findAll();
@@ -34,7 +44,7 @@ class TechCartService {
       { where: { id: id } }
     );
     const cart = await tech_cart.findOne({ where: { id: id } });
-    if (!cart) return "карти нєма";
+    if (!cart) throw new Error("");
     const Oper = await tech_operation.findAll({ where: { techCartId: id } });
 
     Oper.forEach(async (el) => {
@@ -44,12 +54,12 @@ class TechCartService {
       );
     });
 
-    return techCart;
+    return getCart();
   }
 
   delete(id: number) {
     const techCart = tech_cart.destroy({ where: { id: id } });
-    return techCart;
+    return getCart();
   }
 }
 

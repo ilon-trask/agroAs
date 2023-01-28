@@ -34,9 +34,10 @@ export const cartRouter = router({
         id: z.number(),
       })
     )
-    .query(({ input }) => {
+    .query(async ({ input }) => {
       const { id } = input;
-      TechCartService.delete(id);
+      let data = await TechCartService.delete(id);
+      return data;
     }),
   patch: publicProcedure
     .input(

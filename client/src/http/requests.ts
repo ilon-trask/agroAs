@@ -96,21 +96,21 @@ export function getOnlyCart(map: MapStore) {
   });
 }
 export function deleteCart(map: MapStore, id: number) {
-  client.cart.delete.query({ id: id }).then(() => {
-    getCarts(map);
+  client.cart.delete.query({ id: id }).then((data) => {
+    map.maps = data;
   });
 }
 
 export function createCart(map: MapStore, data: Idata) {
-  client.cart.create.query(data).then(() => {
-    getCarts(map);
+  client.cart.create.query(data).then((data) => {
+    map.maps = data;
   });
 }
 
 export function updateMap(map: MapStore, data: Idata) {
-  //@ts-ignore
-  client.cart.patch.query(data).then(() => {
-    getOnlyCart(map);
+  // @ts-ignore
+  client.cart.patch.query(data).then((data) => {
+    map.maps = data;
   });
 }
 
