@@ -204,6 +204,7 @@ export function createMachineFunc(
 export const costHandWorkProps = {
   nameOper: "",
   gradeId: "",
+  type: 1,
   productionRateAmount: "",
   productionRateWeight: "",
   yield: "",
@@ -257,7 +258,6 @@ export function createCostHandWork(
       res.productionRateWeight = 0;
       res.yieldСapacity = 0;
     }
-    console.log("do some");
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id, akkum);

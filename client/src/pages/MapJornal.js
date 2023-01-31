@@ -8,8 +8,6 @@ import Table from "../components/Table";
 import { getMaps, deleteCart, createCart, getOnlyCart } from "../http/requests";
 
 export default function MapJornal() {
-  let { map } = useContext(Context);
-  const URL = "http://localhost:5000/api/cart";
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
   const [data, setData] = useState([]);

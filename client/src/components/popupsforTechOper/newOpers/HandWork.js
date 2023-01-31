@@ -6,6 +6,7 @@ import { Context } from "../../../index.js";
 
 const HandWork = observer(({ res, setRes }) => {
   const { map } = useContext(Context);
+  // setRes({...res, res.type:1})
   return (
     <>
       <div className="d-flex gap-4">
@@ -64,7 +65,7 @@ const HandWork = observer(({ res, setRes }) => {
                 type="number"
                 disabled={res.type !== 1}
               />
-              <p>га/год</p>
+              <p>м²/год</p>
             </div>
           </div>
         </div>

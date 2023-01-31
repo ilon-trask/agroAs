@@ -1,9 +1,12 @@
 import {
   aggregate,
   Itech_cart,
+  Itech_operation,
   tech_cart,
   tech_operation,
 } from "../models/models";
+
+import { getOper, prope, prope2 } from "./OperService";
 
 export interface Idata {
   id?: number;
@@ -17,7 +20,32 @@ export interface Idata {
 
 async function getCart() {
   const carts: Itech_cart[] = await tech_cart.findAll();
-  return carts;
+
+  let sum = 0;
+  let res: { carts: Itech_cart[]; opers: Itech_operation[]; props: prope[] };
+
+  carts.sort((a, b) => a.id! - b.id!);
+  for (let i = 0; i < carts.length; i++) {
+    let el = carts[i];
+    let { opers, props } = await getOper(el.id!);
+    opers.forEach((el) => {
+      sum +=
+        el.costMaterials! ||
+        el.costServices! ||
+        el.costTransport! ||
+        +el.costCars! +
+          +el.costFuel! +
+          +el.costHandWork! +
+          +el.costMachineWork! ||
+        el.costHandWork!;
+    });
+
+    el.totalCost = sum;
+
+    res = { carts, opers, props };
+  }
+  //@ts-ignore
+  return res;
 }
 
 class TechCartService {
@@ -34,8 +62,7 @@ class TechCartService {
     return getCart();
   }
   async getAll() {
-    const techCart = await tech_cart.findAll();
-    return techCart;
+    return getCart();
   }
   async patchCart(data: Idata) {
     const { id, nameCart, area, salary, priceDiesel } = data;

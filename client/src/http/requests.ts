@@ -7,8 +7,10 @@ import {
   Icost_hand_work,
   Igrade,
   Imachine,
+  Itech_cart,
   Itech_operation,
   Itractor,
+  tech_cart,
   tech_operation,
 } from "../../../tRPC serv/models/models";
 import {
@@ -27,38 +29,75 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 export async function getCarts(map: MapStore) {
-  client.cart.get.query().then((res) => {
-    console.log(res);
+  await client.cart.get.query().then(
+    // @ts-ignore
+    (res: {
+      carts: Itech_cart[];
+      opers: Itech_operation[];
+      props: prope[];
+    }) => {
+      console.log(res);
 
-    map.opers = [];
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.maps = res;
-    let ids = map.maps.map((el) => el.id);
+      map.opers = [];
+      map.costMechanical = [];
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.maps = res.carts;
+      map.opers = res.opers;
+      console.log(map.opers);
 
-    for (let i = 0; i < ids.length; i++) {
-      getOpers(map, ids[i]!);
+      let ids = map.maps.map((el) => el.id);
+
+      res.props.forEach((el) => {
+        if ("nameMaterials" in el) {
+          map.newCostMaterials = el;
+        } else if ("nameService" in el) {
+          map.newCostServices = el;
+        } else if ("nameTransport" in el) {
+          map.newCostTransport = el;
+        } else if ("productionRateAmount" in el) {
+          map.newCostHandWork = el;
+        } else if ("fuelConsumption" in el) {
+          map.newCostMechanical = el;
+        }
+      });
     }
-  });
+  );
 }
 
 export function getOpers(map: MapStore, id: number) {
   // @ts-ignore some_err_in_sequelize_mb
-  client.oper.get.query({ id: id }).then((res: Itech_operation[]) => {
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.costHandWork = [];
+  client.oper.get
+    .query({ id: id })
+    // @ts-ignore
+    .then((res: { opers: tech_operation[]; props: prope[] }) => {
+      console.log("opers");
 
-    res.forEach((el) => {
-      getProps(map, el.id!, el.cell);
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.costHandWork = [];
+      map.costMechanical = [];
+      res.props.forEach((el) => {
+        if ("nameMaterials" in el) {
+          map.newCostMaterials = el;
+        } else if ("nameService" in el) {
+          map.newCostServices = el;
+        } else if ("nameTransport" in el) {
+          map.newCostTransport = el;
+        } else if ("productionRateAmount" in el) {
+          map.newCostHandWork = el;
+        } else if ("fuelConsumption" in el) {
+          map.newCostMechanical = el;
+        }
+      });
+
+      map.opers = res.opers;
+      console.log(map.opers);
     });
-
-    map.opers = res;
-  });
 }
+
 export function getProps(map: MapStore, id: number, cell: Icell) {
   client.oper.getProps.query({ operId: id }).then(
     //@ts-ignore some_err_in_sequelize_mb
@@ -92,26 +131,54 @@ export function getProps(map: MapStore, id: number, cell: Icell) {
 export function getOnlyCart(map: MapStore) {
   client.cart.get.query().then((res) => {
     map.maps = [];
-    map.maps = res;
+    map.maps = res.carts;
   });
 }
 export function deleteCart(map: MapStore, id: number) {
   client.cart.delete.query({ id: id }).then((data) => {
-    map.maps = data;
+    map.maps = data.carts;
   });
 }
 
 export function createCart(map: MapStore, data: Idata) {
   client.cart.create.query(data).then((data) => {
-    map.maps = data;
+    map.maps = data.carts;
   });
 }
 
-export function updateMap(map: MapStore, data: Idata) {
-  // @ts-ignore
-  client.cart.patch.query(data).then((data) => {
-    map.maps = data;
-  });
+export function updateMap(map: MapStore, data: any) {
+  client.cart.patch.query(data).then(
+    // @ts-ignore
+    (res: {
+      carts: Itech_cart[];
+      opers: Itech_operation[];
+      props: prope[];
+    }) => {
+      map.opers = [];
+      map.costMechanical = [];
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.maps = res.carts;
+      let ids = map.maps.map((el) => el.id);
+
+      res.props.forEach((el) => {
+        if ("nameMaterials" in el) {
+          map.newCostMaterials = el;
+        } else if ("nameService" in el) {
+          map.newCostServices = el;
+        } else if ("nameTransport" in el) {
+          map.newCostTransport = el;
+        } else if ("productionRateAmount" in el) {
+          map.newCostHandWork = el;
+        } else if ("fuelConsumption" in el) {
+          map.newCostMechanical = el;
+        }
+      });
+
+      map.opers = res.opers;
+    }
+  );
 }
 
 export function deleteOper(
@@ -219,12 +286,19 @@ export function patchOperation(
       arr: arr,
     })
     .then((data) => {
+      map.costMechanical = [];
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.costHandWork = [];
       data.props?.forEach((el) => {
         let [oper] = data.opers.filter(
           //@ts-ignore
           (oper) => oper.id == el.techOperationId
         );
         console.log(oper);
+        console.log(el);
+        console.log(map.costHandWork);
 
         let cell = oper.cell;
         if (cell == "costMaterials") {

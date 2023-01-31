@@ -8,9 +8,8 @@ import { Idata } from "../controllers/TechCartService";
 
 export const cartRouter = router({
   get: publicProcedure.query(async () => {
-    const cart: Array<Idata> = await TechCartService.getAll();
+    const cart = await TechCartService.getAll();
 
-    cart.sort((a, b) => a.id! - b.id!);
     return cart;
   }),
 

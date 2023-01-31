@@ -85,7 +85,9 @@ const MechanicalWork = observer(({ res, setRes }) => {
                 setRes((prev) => ({ ...prev, idTractor: +e.target.value }));
               }}
             >
-              <option value="">вибрати трактор</option>
+              <option value="" hidden>
+                вибрати трактор
+              </option>
               {map.tractor.map((el) => (
                 <option key={el.id} value={el.id} label>
                   {el.nameTractor}
@@ -146,7 +148,9 @@ const MechanicalWork = observer(({ res, setRes }) => {
                 setRes((prev) => ({ ...prev, idMachine: +e.target.value }));
               }}
             >
-              <option value="">вибрати СГ машину</option>
+              <option value="" hidden>
+                вибрати СГ машину
+              </option>
               {map?.machine?.map((el) => (
                 <option key={el.id} value={el.id}>
                   {el.nameMachine}

@@ -14,7 +14,10 @@ export const operRouter = router({
     )
     .query(async ({ input }) => {
       const oper = await OperService.getOper(input.id);
-      oper.sort((a, b) => a.id! - b.id!);
+      // console.log(oper.props);
+      console.log(oper.props[0].id);
+
+      // oper.sort((a, b) => a.id! - b.id!);
       return oper;
     }),
   create: router({
@@ -42,7 +45,7 @@ export const operRouter = router({
           }),
         })
       )
-      .query(async ({ input }) => OperService.creteCostMechanical(input)),
+      .query(async ({ input }) => OperService.createCostMechanical(input)),
     costHandWork: publicProcedure
       .input(
         z.object({

@@ -317,11 +317,11 @@ agricultural_machine.init(
 
 export interface Iaggregate {
   id?: number;
-  amountOfTractorDepreciationPerHour: number;
+  amountOfTractorDepreciationPerHour?: number;
   fuelConsumption: number;
   pricePerHourServicePersonnel?: number;
-  amountOfMachineDepreciationPerHour: number;
-  unitProductionAggregate: number;
+  amountOfMachineDepreciationPerHour?: number;
+  unitProductionAggregate?: number;
   workingSpeed: number;
   pricePerHourDiesel?: number;
   techOperationId?: number;
@@ -331,11 +331,11 @@ export interface Iaggregate {
 
 export class aggregate extends Model<Iaggregate> {
   declare id?: number;
-  declare amountOfTractorDepreciationPerHour: number;
+  declare amountOfTractorDepreciationPerHour?: number;
   declare fuelConsumption: number;
   declare pricePerHourServicePersonnel?: number;
-  declare amountOfMachineDepreciationPerHour: number;
-  declare unitProductionAggregate: number;
+  declare amountOfMachineDepreciationPerHour?: number;
+  declare unitProductionAggregate?: number;
   declare workingSpeed: number;
   declare pricePerHourDiesel?: number;
   declare techOperationId?: number;
@@ -348,15 +348,13 @@ aggregate.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     amountOfTractorDepreciationPerHour: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
     fuelConsumption: { type: DataTypes.INTEGER, allowNull: false },
     pricePerHourServicePersonnel: { type: DataTypes.INTEGER },
     amountOfMachineDepreciationPerHour: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
-    unitProductionAggregate: { type: DataTypes.INTEGER, allowNull: false },
+    unitProductionAggregate: { type: DataTypes.INTEGER },
     workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
     pricePerHourDiesel: { type: DataTypes.INTEGER },
   },
@@ -366,7 +364,7 @@ aggregate.init(
 export interface Icost_hand_work {
   id?: number;
   nameOper: string;
-  pricePerHourPersonnel: number;
+  pricePerHourPersonnel?: number;
   salaryPerShift?: number;
   productionPerShift?: number;
   unitOfMeasurement?: string;
@@ -383,7 +381,7 @@ export interface Icost_hand_work {
 export class cost_hand_work extends Model<Icost_hand_work> {
   declare id?: number;
   declare nameOper: string;
-  declare pricePerHourPersonnel: number;
+  declare pricePerHourPersonnel?: number;
   declare salaryPerShift?: number;
   declare productionPerShift?: number;
   declare unitOfMeasurement?: string;
@@ -401,7 +399,7 @@ cost_hand_work.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameOper: { type: DataTypes.STRING, allowNull: false },
-    pricePerHourPersonnel: { type: DataTypes.INTEGER, allowNull: false },
+    pricePerHourPersonnel: { type: DataTypes.INTEGER },
     salaryPerShift: { type: DataTypes.INTEGER },
     productionPerShift: { type: DataTypes.INTEGER },
     unitOfMeasurement: { type: DataTypes.STRING },
