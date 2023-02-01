@@ -43,7 +43,7 @@ const CreateTractor = ({ res, setRes }) => {
             type="number"
             value={res?.marketCost}
             onChange={(e) => {
-              setRes({ ...res, marketCost: +e.target.value });
+              setRes({ ...res, marketCost: e.target.value });
             }}
           />
         </div>
@@ -54,7 +54,7 @@ const CreateTractor = ({ res, setRes }) => {
             type="number"
             value={res?.depreciationPeriod}
             onChange={(e) => {
-              setRes({ ...res, depreciationPeriod: +e.target.value });
+              setRes({ ...res, depreciationPeriod: e.target.value });
             }}
           />
         </div>
@@ -65,7 +65,7 @@ const CreateTractor = ({ res, setRes }) => {
             type="number"
             value={res?.enginePower}
             onChange={(e) => {
-              setRes({ ...res, enginePower: +e.target.value });
+              setRes({ ...res, enginePower: e.target.value });
             }}
           />
         </div>
@@ -76,7 +76,7 @@ const CreateTractor = ({ res, setRes }) => {
             type="number"
             value={res?.fuelConsumption}
             onChange={(e) => {
-              setRes({ ...res, fuelConsumption: +e.target.value });
+              setRes({ ...res, fuelConsumption: e.target.value });
             }}
           />
         </div>
@@ -87,7 +87,7 @@ const CreateTractor = ({ res, setRes }) => {
             type="number"
             value={res?.numberOfPersonnel}
             onChange={(e) => {
-              setRes({ ...res, numberOfPersonnel: +e.target.value });
+              setRes({ ...res, numberOfPersonnel: e.target.value });
             }}
           />
         </div>
@@ -96,7 +96,7 @@ const CreateTractor = ({ res, setRes }) => {
           <select
             value={res.gradeId}
             onChange={(e) => {
-              setRes({ ...res, gradeId: +e.target.value });
+              setRes({ ...res, gradeId: e.target.value });
             }}
           >
             <option selected disabled hidden value="">

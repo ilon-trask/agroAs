@@ -6,4 +6,4 @@ class SectionService {
     return Section;
   }
 }
-export = new SectionService();
+export default new SectionService();

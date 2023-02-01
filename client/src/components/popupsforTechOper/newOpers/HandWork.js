@@ -54,7 +54,18 @@ const HandWork = observer(({ res, setRes }) => {
               });
             }}
           />
-          <div>
+          <div
+            onClick={() => {
+              setRes({
+                ...res,
+                type: 1,
+                productionRateAmount: "",
+                productionRateWeight: "",
+                yieldСapacity: "",
+                spending: "",
+              });
+            }}
+          >
             <p>Норма виробітку годин</p>
             <div className="d-flex">
               <input
@@ -69,7 +80,18 @@ const HandWork = observer(({ res, setRes }) => {
             </div>
           </div>
         </div>
-        <div className="d-flex">
+        <div
+          className="d-flex"
+          onClick={() => {
+            setRes({
+              ...res,
+              type: 2,
+              productionRateAmount: "",
+              productionRateTime: "",
+              spending: "",
+            });
+          }}
+        >
           <input
             type="radio"
             checked={res.type == 2}
@@ -116,7 +138,18 @@ const HandWork = observer(({ res, setRes }) => {
             </div>
           </div>
         </div>
-        <div className="d-flex">
+        <div
+          className="d-flex"
+          onClick={() => {
+            setRes({
+              ...res,
+              type: 3,
+              productionRateTime: "",
+              productionRateWeight: "",
+              yieldСapacity: "",
+            });
+          }}
+        >
           <input
             type="radio"
             checked={res.type == 3}

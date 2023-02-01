@@ -135,9 +135,9 @@ cost_material.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameMaterials: { type: DataTypes.STRING },
-    price: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.FLOAT },
     unitsOfCost: { type: DataTypes.STRING },
-    consumptionPerHectare: { type: DataTypes.INTEGER },
+    consumptionPerHectare: { type: DataTypes.FLOAT },
     unitsOfConsumption: { type: DataTypes.STRING },
   },
   { sequelize }
@@ -163,7 +163,7 @@ cost_service.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameService: { type: DataTypes.STRING, allowNull: false },
-    price: { type: DataTypes.INTEGER, allowNull: false },
+    price: { type: DataTypes.FLOAT, allowNull: false },
     unitsOfCost: { type: DataTypes.STRING },
   },
   { sequelize }
@@ -189,7 +189,7 @@ cost_transport.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameTransport: { type: DataTypes.STRING, allowNull: false },
-    price: { type: DataTypes.INTEGER, allowNull: false },
+    price: { type: DataTypes.FLOAT, allowNull: false },
     unitsOfCost: { type: DataTypes.STRING },
   },
   { sequelize }
@@ -269,8 +269,8 @@ tractor.init(
     brand: { type: DataTypes.STRING, allowNull: false },
     marketCost: { type: DataTypes.INTEGER, allowNull: false },
     depreciationPeriod: { type: DataTypes.INTEGER, allowNull: false },
-    enginePower: { type: DataTypes.INTEGER, allowNull: false },
-    fuelConsumption: { type: DataTypes.INTEGER, allowNull: false },
+    enginePower: { type: DataTypes.FLOAT, allowNull: false },
+    fuelConsumption: { type: DataTypes.FLOAT, allowNull: false },
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
@@ -307,9 +307,9 @@ agricultural_machine.init(
     nameMachine: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
     brand: { type: DataTypes.STRING, allowNull: false },
     marketCost: { type: DataTypes.INTEGER, allowNull: false },
-    depreciationPeriod: { type: DataTypes.INTEGER, allowNull: false },
+    depreciationPeriod: { type: DataTypes.FLOAT, allowNull: false },
     widthOfCapture: { type: DataTypes.FLOAT, allowNull: false },
-    workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
+    workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
@@ -346,17 +346,8 @@ export class aggregate extends Model<Iaggregate> {
 aggregate.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    amountOfTractorDepreciationPerHour: {
-      type: DataTypes.INTEGER,
-    },
-    fuelConsumption: { type: DataTypes.INTEGER, allowNull: false },
-    pricePerHourServicePersonnel: { type: DataTypes.INTEGER },
-    amountOfMachineDepreciationPerHour: {
-      type: DataTypes.INTEGER,
-    },
-    unitProductionAggregate: { type: DataTypes.INTEGER },
-    workingSpeed: { type: DataTypes.INTEGER, allowNull: false },
-    pricePerHourDiesel: { type: DataTypes.INTEGER },
+    fuelConsumption: { type: DataTypes.FLOAT, allowNull: false },
+    workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
   },
   { sequelize }
 );
@@ -403,11 +394,11 @@ cost_hand_work.init(
     salaryPerShift: { type: DataTypes.INTEGER },
     productionPerShift: { type: DataTypes.INTEGER },
     unitOfMeasurement: { type: DataTypes.STRING },
-    productionRateTime: { type: DataTypes.INTEGER },
-    productionRateWeight: { type: DataTypes.INTEGER },
-    productionRateAmount: { type: DataTypes.INTEGER },
-    yieldСapacity: { type: DataTypes.INTEGER },
-    spending: { type: DataTypes.INTEGER },
+    productionRateTime: { type: DataTypes.FLOAT },
+    productionRateWeight: { type: DataTypes.FLOAT },
+    productionRateAmount: { type: DataTypes.FLOAT },
+    yieldСapacity: { type: DataTypes.FLOAT },
+    spending: { type: DataTypes.FLOAT },
     type: { type: DataTypes.INTEGER },
   },
   { sequelize }

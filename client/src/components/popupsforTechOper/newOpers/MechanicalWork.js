@@ -82,7 +82,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
                     fuelConsumption: tractor.fuelConsumption,
                   };
                 });
-                setRes((prev) => ({ ...prev, idTractor: +e.target.value }));
+                setRes((prev) => ({ ...prev, idTractor: e.target.value }));
               }}
             >
               <option value="" hidden>
@@ -104,7 +104,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
               value={res?.fuelConsumption}
               onChange={(e) => {
                 setRes(() => {
-                  return { ...res, fuelConsumption: +e.target.value };
+                  return { ...res, fuelConsumption: e.target.value };
                 });
               }}
             />
@@ -145,7 +145,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
                   );
                   return { ...res, workingSpeed: machine[0].workingSpeed };
                 });
-                setRes((prev) => ({ ...prev, idMachine: +e.target.value }));
+                setRes((prev) => ({ ...prev, idMachine: e.target.value }));
               }}
             >
               <option value="" hidden>
@@ -165,7 +165,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
               type="number"
               value={res?.workingSpeed}
               onChange={(e) => {
-                setRes({ ...res, workingSpeed: +e.target.value });
+                setRes({ ...res, workingSpeed: e.target.value });
               }}
             />
           </div>

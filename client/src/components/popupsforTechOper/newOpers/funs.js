@@ -108,12 +108,22 @@ export function MechanicalWorkFunc(
   akk,
   section
 ) {
-  if (res.nameOper == "") {
+  if (
+    res.nameOper == "" ||
+    res.idMachine == "" ||
+    res.idTractor == "" ||
+    res.workingSpeed == "" ||
+    res.fuelConsumption == ""
+  ) {
     setIsErr(true);
   } else {
     setOpen(false);
     setCell("");
     setRes(MechanicalWorkProps);
+    res.idMachine = +res.idMachine;
+    res.idTractor = +res.idTractor;
+    res.workingSpeed = +res.workingSpeed;
+    res.fuelConsumption = +res.fuelConsumption;
     setIsErr(false);
     const request = { cell, res, section };
     if (update) {
@@ -148,9 +158,22 @@ export function createTrac(
   akk,
   section
 ) {
-  if (res.nameTractor == "") {
+  if (
+    res.nameTractor == "" ||
+    res.marketCost == "" ||
+    res.depreciationPeriod == "" ||
+    res.enginePower == "" ||
+    res.fuelConsumption == "" ||
+    res.numberOfPersonnel == ""
+  ) {
     setIsErr(true);
   } else {
+    res.marketCost = +res.marketCost;
+    res.depreciationPeriod = +res.depreciationPeriod;
+    res.enginePower = +res.enginePower;
+    res.fuelConsumption = +res.fuelConsumption;
+    res.numberOfPersonnel = +res.numberOfPersonnel;
+    res.gradeId = +res.gradeId;
     setOpen(false);
     setRes(createTracProps);
     setIsErr(false);
@@ -193,6 +216,12 @@ export function createMachineFunc(
     setOpen(false);
     setRes(createMachineProps);
     setIsErr(false);
+    res.marketCost = +res.marketCost;
+    res.depreciationPeriod = +res.depreciationPeriod;
+    res.widthOfCapture = +res.widthOfCapture;
+    res.workingSpeed = +res.workingSpeed;
+    res.numberOfServicePersonnel = +res.numberOfServicePersonnel;
+    res.gradeId = +res.gradeId;
     if (update) {
       patchMachine(map, res);
     } else {

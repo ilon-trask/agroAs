@@ -26,22 +26,26 @@ async function getCart() {
 
   carts.sort((a, b) => a.id! - b.id!);
   for (let i = 0; i < carts.length; i++) {
+    sum = 0;
     let el = carts[i];
+
     let { opers, props } = await getOper(el.id!);
-    opers.forEach((el) => {
-      sum +=
-        el.costMaterials! ||
-        el.costServices! ||
-        el.costTransport! ||
-        +el.costCars! +
-          +el.costFuel! +
-          +el.costHandWork! +
-          +el.costMachineWork! ||
-        el.costHandWork!;
-    });
 
-    el.totalCost = sum;
+    if (opers) {
+      opers.forEach((el) => {
+        sum +=
+          el.costMaterials! ||
+          el.costServices! ||
+          el.costTransport! ||
+          +el.costCars! +
+            +el.costFuel! +
+            +el.costHandWork! +
+            +el.costMachineWork! ||
+          el.costHandWork!;
+      });
 
+      el.totalCost = sum;
+    }
     res = { carts, opers, props };
   }
   //@ts-ignore
@@ -51,6 +55,8 @@ async function getCart() {
 class TechCartService {
   async create(data: Idata) {
     const { nameCart, area, salary, priceDiesel, totalCost = 0 } = data;
+    console.log();
+
     const techCart = await tech_cart.create({
       nameCart,
       area,

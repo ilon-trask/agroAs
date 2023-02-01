@@ -204,6 +204,8 @@ export async function getOper(cartid: number) {
     where: { techCartId: cartid },
   });
 
+  if (!techOperation) return { opers: [], props: [] };
+
   techOperation.sort((a, b) => a.id! - b.id!);
   let props: prope[] = [];
 
@@ -252,15 +254,11 @@ export async function getOper(cartid: number) {
       const machine = await agricultural_machine.findOne({
         where: { id: aggregateData.agriculturalMachineId },
       });
-      if (Tractor == null || machine == null || cart == null)
+      const Grade = await grade.findAll();
+      if (Tractor == null || machine == null || cart == null || Grade == null)
         throw new Error("");
-
-      const gradeTractor = await grade.findOne({
-        where: { id: Tractor.gradeId },
-      });
-      const gradeMachine = await grade.findOne({
-        where: { id: machine.gradeId },
-      });
+      const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
+      const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) /
@@ -430,6 +428,7 @@ class OperService {
     const oper = await createOper(cartId, nameOper, cell, section);
     sum = akk + price * consumptionPerHectare;
     const operId = oper.id;
+
     cost_material.create({
       nameMaterials: nameOper,
       price,
@@ -453,10 +452,8 @@ class OperService {
         section,
       },
     } = data;
-    let sum: number;
     let oper = await createOper(cartId, nameOper, cell, section);
     const operId = oper.id;
-    sum = akk + price;
     const costService = cost_service.create({
       nameService: nameOper,
       price: +price,
@@ -464,7 +461,6 @@ class OperService {
       techOperationId: operId,
     });
 
-    techCartUpdate(sum, cartId);
     let res = await getCart(cartId, operId!);
     return res;
   }
@@ -478,9 +474,7 @@ class OperService {
         section,
       },
     } = data;
-    let sum: number;
     let oper = await createOper(cartId, nameOper, cell, section);
-    sum = akk + price;
     const operId = oper.id;
     const costTransport = cost_transport.create({
       nameTransport: nameOper,
@@ -488,8 +482,6 @@ class OperService {
       unitsOfCost,
       techOperationId: operId,
     });
-
-    techCartUpdate(sum, cartId);
 
     let res = await getCart(cartId, operId!);
     return res;
@@ -562,6 +554,7 @@ class OperService {
       techCartId: cartId,
       sectionId: section,
     });
+
     const handWork = await cost_hand_work.create({
       nameOper,
       productionPerShift: undefined,
@@ -597,8 +590,6 @@ class OperService {
         },
       },
     } = data;
-    let sum: number;
-    sum = akkum + price * consumptionPerHectare;
 
     const costMaterial = cost_material.update(
       {
@@ -624,10 +615,8 @@ class OperService {
         res: { operId, nameOper, price, unitsOfCost },
       },
     } = data;
-    let sum: number;
 
     if (price === undefined || unitsOfCost === undefined) throw new Error("");
-    sum = akkum + price;
     const costService = cost_service.update(
       {
         nameService: nameOper,

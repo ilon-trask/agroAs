@@ -29,6 +29,8 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 export async function getCarts(map: MapStore) {
+  console.log("start");
+
   await client.cart.get.query().then(
     // @ts-ignore
     (res: {
@@ -37,7 +39,7 @@ export async function getCarts(map: MapStore) {
       props: prope[];
     }) => {
       console.log(res);
-
+      console.log("end");
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
@@ -190,7 +192,6 @@ export function deleteOper(
   client.oper.delete
     .query({ akk: akk, cartId: +cartId, operId: operId })
     .then((data) => {
-      map.opers = [];
       map.maps = data.carts;
       map.opers = data.opers;
       data.props?.forEach((el) => {
