@@ -20,7 +20,7 @@ class MachineService {
       numberOfServicePersonnel,
       gradeId,
     } = data;
-    const machine = await agricultural_machine.create({
+    await agricultural_machine.create({
       nameMachine,
       brand,
       marketCost: +marketCost,
@@ -30,6 +30,7 @@ class MachineService {
       numberOfServicePersonnel: +numberOfServicePersonnel,
       gradeId: +gradeId!,
     });
+    const machine: Imachine[] = await agricultural_machine.findAll();
     return machine;
   }
   async patch(data: Imachine) {
@@ -44,7 +45,7 @@ class MachineService {
       numberOfServicePersonnel,
       gradeId,
     } = data;
-    const machine = await agricultural_machine.update(
+    await agricultural_machine.update(
       {
         nameMachine,
         brand,
@@ -57,6 +58,7 @@ class MachineService {
       },
       { where: { id: id } }
     );
+    const machine: Imachine[] = await agricultural_machine.findAll();
     return machine;
   }
 }

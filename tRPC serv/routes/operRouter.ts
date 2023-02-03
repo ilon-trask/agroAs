@@ -6,20 +6,6 @@ import { Ioper } from "../controllers/OperService";
 import { Itech_operation } from "../models/models";
 
 export const operRouter = router({
-  get: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      })
-    )
-    .query(async ({ input }) => {
-      const oper = await OperService.getOper(input.id);
-      // console.log(oper.props);
-      console.log(oper.props[0].id);
-
-      // oper.sort((a, b) => a.id! - b.id!);
-      return oper;
-    }),
   create: router({
     costMechanical: publicProcedure
       .input(

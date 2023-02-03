@@ -25,6 +25,7 @@ export default class MapStore {
   private _costMechanical: Iaggregate[] = [];
   private _costHandWork: Icost_hand_work[] = [];
   private _grade: Igrade[] = [];
+  public isLoading: boolean = true;
   constructor() {
     makeAutoObservable(this);
   }

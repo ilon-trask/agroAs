@@ -310,8 +310,6 @@ export async function getOper(cartid: number) {
 
       const pricePerHourPersonnel = Math.round(cart.salary / 176);
 
-      let sum: number;
-
       if (handWork.type == 1) {
         costHandWork = Math.round(
           (pricePerHourPersonnel / handWork.productionRateTime!) *
@@ -404,10 +402,6 @@ async function getCart(cartId: number, operId: number) {
   return res;
 }
 class OperService {
-  async getOper(id: number) {
-    return getOper(id);
-  }
-
   async createCostMaterials(data: IdataCreateCostMaterials) {
     const {
       cartId,

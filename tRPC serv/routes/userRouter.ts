@@ -12,12 +12,7 @@ export const userRouter = router({
     )
     .query(async ({ input }) => {
       const { email, password, role } = input;
-      console.log(email);
-
       const user = await userService.registration(email, password, role);
-      console.log(123);
-      console.log(user);
-
       return user;
     }),
   login: publicProcedure

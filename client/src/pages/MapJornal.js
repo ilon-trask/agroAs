@@ -4,10 +4,11 @@ import { Context } from "../index";
 
 import MapInputs from "../components/MapInputs";
 import Table from "../components/Table";
+import { observer } from "mobx-react-lite";
+import Loader from "../components/Loader";
 
-import { getMaps, deleteCart, createCart, getOnlyCart } from "../http/requests";
-
-export default function MapJornal() {
+function MapJornal() {
+  const { map } = useContext(Context);
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
   const [data, setData] = useState([]);
@@ -17,36 +18,40 @@ export default function MapJornal() {
     salary: "",
     priceDiesel: "",
   });
-
   return (
-    <Container>
-      <p style={{ textAlign: "center", fontSize: "25px" }}>
-        Журнал технологічних карт
-      </p>
-      <Table
-        data={data}
-        setRes={setRes}
-        setOpen={setOpen}
-        setUpdate={setUpdate}
-      ></Table>
-      <button
-        style={{ marginTop: "15px", marginLeft: "20px" }}
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        Добавити технологічну карту
-      </button>
-      <MapInputs
-        open={open}
-        setOpen={setOpen}
-        data={data}
-        setData={setData}
-        update={update}
-        setUpdate={setUpdate}
-        res={res}
-        setRes={setRes}
-      ></MapInputs>
-    </Container>
+    <>
+      {map.isLoading ? <Loader /> : <></>}
+      <Container>
+        <p style={{ textAlign: "center", fontSize: "25px" }}>
+          Журнал технологічних карт
+        </p>
+        <Table
+          data={data}
+          setRes={setRes}
+          setOpen={setOpen}
+          setUpdate={setUpdate}
+        ></Table>
+        <button
+          style={{ marginTop: "15px", marginLeft: "20px" }}
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Добавити технологічну карту
+        </button>
+        <MapInputs
+          open={open}
+          setOpen={setOpen}
+          data={data}
+          setData={setData}
+          update={update}
+          setUpdate={setUpdate}
+          res={res}
+          setRes={setRes}
+        ></MapInputs>
+      </Container>
+    </>
   );
 }
+
+export default observer(MapJornal);

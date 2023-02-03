@@ -29,127 +29,62 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 export async function getCarts(map: MapStore) {
-  console.log("start");
+  map.isLoading = true;
+  let data;
+  await client.cart.get.query().then((res) => {
+    map.opers = [];
+    data = res;
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
+    map.maps = res.carts;
+    for (let i = 0; i < res.carts.length; i++) {
+      const opers = res.carts[i].tech_operations;
+      for (let j = 0; j < opers.length; j++) {
+        const oper = opers[j];
+        map.newOper = opers[j];
+        console.log(oper);
 
-  await client.cart.get.query().then(
-    // @ts-ignore
-    (res: {
-      carts: Itech_cart[];
-      opers: Itech_operation[];
-      props: prope[];
-    }) => {
-      console.log(res);
-      console.log("end");
-      map.opers = [];
-      map.costMechanical = [];
-      map.costMaterials = [];
-      map.costServices = [];
-      map.costTransport = [];
-      map.maps = res.carts;
-      map.opers = res.opers;
-      console.log(map.opers);
+        if (oper.aggregate) {
+          console.log(oper.aggregate);
 
-      let ids = map.maps.map((el) => el.id);
-
-      res.props.forEach((el) => {
-        if ("nameMaterials" in el) {
-          map.newCostMaterials = el;
-        } else if ("nameService" in el) {
-          map.newCostServices = el;
-        } else if ("nameTransport" in el) {
-          map.newCostTransport = el;
-        } else if ("productionRateAmount" in el) {
-          map.newCostHandWork = el;
-        } else if ("fuelConsumption" in el) {
-          map.newCostMechanical = el;
+          map.newCostMechanical = oper.aggregate;
+        } else if (oper.cost_service) {
+          map.newCostServices = oper.cost_service;
+        } else if (oper.cost_transport) {
+          map.newCostTransport = oper.cost_transport;
+        } else if (oper.cost_material) {
+          map.newCostMaterials = oper.cost_material;
+        } else if (oper.cost_hand_work) {
+          map.newCostHandWork = oper.cost_hand_work;
         }
-      });
-    }
-  );
-}
-
-export function getOpers(map: MapStore, id: number) {
-  // @ts-ignore some_err_in_sequelize_mb
-  client.oper.get
-    .query({ id: id })
-    // @ts-ignore
-    .then((res: { opers: tech_operation[]; props: prope[] }) => {
-      console.log("opers");
-
-      map.costMaterials = [];
-      map.costServices = [];
-      map.costTransport = [];
-      map.costHandWork = [];
-      map.costMechanical = [];
-      res.props.forEach((el) => {
-        if ("nameMaterials" in el) {
-          map.newCostMaterials = el;
-        } else if ("nameService" in el) {
-          map.newCostServices = el;
-        } else if ("nameTransport" in el) {
-          map.newCostTransport = el;
-        } else if ("productionRateAmount" in el) {
-          map.newCostHandWork = el;
-        } else if ("fuelConsumption" in el) {
-          map.newCostMechanical = el;
-        }
-      });
-
-      map.opers = res.opers;
-      console.log(map.opers);
-    });
-}
-
-export function getProps(map: MapStore, id: number, cell: Icell) {
-  client.oper.getProps.query({ operId: id }).then(
-    //@ts-ignore some_err_in_sequelize_mb
-    (
-      el:
-        | Iaggregate[]
-        | Icost_material[]
-        | Icost_service[]
-        | Icost_transport[]
-        | Icost_hand_work[]
-    ) => {
-      if (cell === "costMaterials") {
-        let elem = el as Icost_material[];
-        map.newCostMaterials = elem[0];
-      } else if (cell === "costServices") {
-        let elem = el as Icost_service[];
-        map.newCostServices = elem[0];
-      } else if (cell === "costTransport") {
-        let elem = el as Icost_transport[];
-        map.newCostTransport = elem[0];
-      } else if (cell === "costMechanical") {
-        let elem = el as Iaggregate[];
-        map.newCostMechanical = elem[0];
-      } else if (cell === "costHandWork") {
-        let elem = el as Icost_hand_work[];
-        map.newCostHandWork = elem[0];
       }
     }
-  );
-}
-export function getOnlyCart(map: MapStore) {
-  client.cart.get.query().then((res) => {
-    map.maps = [];
-    map.maps = res.carts;
   });
-}
-export function deleteCart(map: MapStore, id: number) {
-  client.cart.delete.query({ id: id }).then((data) => {
-    map.maps = data.carts;
-  });
+  map.isLoading = false;
+  return data;
 }
 
-export function createCart(map: MapStore, data: Idata) {
-  client.cart.create.query(data).then((data) => {
+export async function deleteCart(map: MapStore, id: number) {
+  map.isLoading = true;
+  await client.cart.delete.query({ id: id }).then((data) => {
     map.maps = data.carts;
   });
+  map.isLoading = false;
 }
 
-export function updateMap(map: MapStore, data: any) {
-  client.cart.patch.query(data).then(
+export async function createCart(map: MapStore, data: Idata) {
+  map.isLoading = true;
+  await client.cart.create.query(data).then((res) => {
+    map.newMaps = res;
+  });
+  map.isLoading = false;
+}
+
+export async function updateMap(map: MapStore, data: any) {
+  map.isLoading = true;
+  await client.cart.patch.query(data).then(
     // @ts-ignore
     (res: {
       carts: Itech_cart[];
@@ -177,19 +112,20 @@ export function updateMap(map: MapStore, data: any) {
           map.newCostMechanical = el;
         }
       });
-
       map.opers = res.opers;
     }
   );
+  map.isLoading = false;
 }
 
-export function deleteOper(
+export async function deleteOper(
   map: MapStore,
   operId: number,
   cartId: number,
   akk: number
 ) {
-  client.oper.delete
+  map.isLoading = true;
+  await client.oper.delete
     .query({ akk: akk, cartId: +cartId, operId: operId })
     .then((data) => {
       map.maps = data.carts;
@@ -220,9 +156,10 @@ export function deleteOper(
         }
       });
     });
+  map.isLoading = false;
 }
 
-export function createOperation(
+export async function createOperation(
   map: MapStore,
   arr: {
     cell: Icell;
@@ -232,9 +169,9 @@ export function createOperation(
   id: number,
   akk: number
 ) {
-  console.log(arr.cell);
+  map.isLoading = true;
 
-  client.oper.create[arr.cell]
+  await client.oper.create[arr.cell]
     .query({
       arr: arr,
       cartId: +id,
@@ -269,9 +206,10 @@ export function createOperation(
       map.opers = data.opers;
       map.maps = data.carts;
     });
+  map.isLoading = false;
 }
 
-export function patchOperation(
+export async function patchOperation(
   map: MapStore,
   arr: {
     cell: Icell;
@@ -280,7 +218,8 @@ export function patchOperation(
   id: number,
   akkum: number
 ) {
-  client.oper.patch[arr.cell]
+  map.isLoading = true;
+  await client.oper.patch[arr.cell]
     .query({
       cartId: +id,
       akkum,
@@ -322,6 +261,7 @@ export function patchOperation(
       map.opers = data.opers;
       map.maps = data.carts;
     });
+  map.isLoading = false;
 }
 
 export function getSection(map: MapStore) {
@@ -340,26 +280,24 @@ export function patchTractor(map: MapStore, res: Itractor) {
 
 export function getTractor(map: MapStore) {
   client.tractor.get.query().then((res: Itractor[]) => {
-    map.tractor = [];
     map.tractor = res;
   });
 }
 
 export function createMachine(map: MapStore, res: Imachine) {
-  client.machine.create.query(res).then(() => {
-    getMachine(map);
+  client.machine.create.query(res).then((data: Imachine[]) => {
+    map.machine = data;
   });
 }
 
 export function patchMachine(map: MapStore, res: Imachine) {
-  client.machine.patch.query(res).then((data) => {
-    getMachine(map);
+  client.machine.patch.query(res).then((data: Imachine[]) => {
+    map.machine = data;
   });
 }
 
 export function getMachine(map: MapStore) {
   client.machine.get.query().then((res) => {
-    map.machine = [];
     map.machine = res;
   });
 }

@@ -23,7 +23,8 @@ import {
   fiveInputsProps,
 } from "../components/popupsforTechOper/newOpers/funs";
 import { Context } from "../index";
-import { deleteOper, getOnlyCart } from "../http/requests";
+import { deleteOper, getCarts, getOnlyCart } from "../http/requests";
+import Loader from "../components/Loader";
 
 const DevicePage = observer(() => {
   const [open, setOpen] = useState(false);
@@ -56,77 +57,34 @@ const DevicePage = observer(() => {
   let akk = 0;
   const [akkum, setAkkum] = useState(0);
   return (
-    <Container>
-      <div style={{ fontSize: "20px" }}>
-        <Link
-          to="/"
-          onClick={() => {
-            getOnlyCart(map);
-          }}
-        >
-          {"<НА ГОЛОВНУ"}
-        </Link>
-      </div>
-      <p style={{ textAlign: "center", fontSize: "25px" }}>
-        Технологічна карта
-      </p>
-      <div>
-        <table style={{ marginTop: "15px", marginBottom: "15px" }}>
-          <thead>
-            <tr>
-              <th style={{ ...th }}></th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Назва культури
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Площа
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Розрахункова ЗП
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість ДП
-              </th>
-              <th style={{ ...th }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              <tr key={mapData?.id}>
+    <>
+      {map.isLoading ? <Loader /> : <></>}
+      <Container>
+        <div style={{ fontSize: "20px" }}>
+          <Link
+            to="/"
+            // onClick={() => {
+            //   getCarts(map);
+            // }}
+          >
+            {"<НА ГОЛОВНУ"}
+          </Link>
+        </div>
+        <p style={{ textAlign: "center", fontSize: "25px" }}>
+          Технологічна карта
+        </p>
+        <div>
+          <table style={{ marginTop: "15px", marginBottom: "15px" }}>
+            <thead>
+              <tr>
+                <th style={{ ...th }}></th>
                 <th
-                  onClick={() => {
-                    setMapOpen(true);
-                    setUpdate(true);
-                    setMapRes({
-                      id: mapData.id,
-                      nameCart: mapData.nameCart,
-                      area: mapData.area,
-                      salary: mapData.salary,
-                      priceDiesel: mapData.priceDiesel,
-                    });
+                  style={{
+                    border: "1px solid",
+                    ...th,
                   }}
                 >
-                  ред
+                  Назва культури
                 </th>
                 <th
                   style={{
@@ -134,7 +92,7 @@ const DevicePage = observer(() => {
                     ...th,
                   }}
                 >
-                  {mapData?.nameCart}
+                  Площа
                 </th>
                 <th
                   style={{
@@ -142,7 +100,7 @@ const DevicePage = observer(() => {
                     ...th,
                   }}
                 >
-                  {mapData?.area}
+                  Розрахункова ЗП
                 </th>
                 <th
                   style={{
@@ -150,385 +108,433 @@ const DevicePage = observer(() => {
                     ...th,
                   }}
                 >
-                  {mapData?.salary}
+                  Вартість ДП
                 </th>
-                <th
-                  style={{
-                    border: "1px solid",
-                    ...th,
-                  }}
-                >
-                  {mapData?.priceDiesel}
-                </th>
-                <th></th>
+                <th style={{ ...th }}></th>
               </tr>
-            }
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            <tr>
-              <th style={{ ...th }}>Р</th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Технологічна операція
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Обсяг робіт
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Одиниця виміру
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість Техніки
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість палива
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                ЗП механізована
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                ЗП ручна
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість матеріалів
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість транспорту
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Вартість послуг
-              </th>
-              <th
-                style={{
-                  border: "1px solid",
-                  ...th,
-                }}
-              >
-                Разом
-              </th>
-              <th style={{ ...th }}>В</th>
-            </tr>
-          </thead>
-          <tbody>
-            {operData?.map((el) => {
-              akk +=
-                el.costMaterials ||
-                el.costServices ||
-                el.costTransport ||
-                +el.costCars +
-                  +el.costFuel +
-                  +el.costHandWork +
-                  +el.costMachineWork ||
-                el.costHandWork;
-              sum +=
-                mapData.area *
-                (el.costMaterials ||
+            </thead>
+            <tbody>
+              {
+                <tr key={mapData?.id}>
+                  <th
+                    onClick={() => {
+                      setMapOpen(true);
+                      setUpdate(true);
+                      setMapRes({
+                        id: mapData.id,
+                        nameCart: mapData.nameCart,
+                        area: mapData.area,
+                        salary: mapData.salary,
+                        priceDiesel: mapData.priceDiesel,
+                      });
+                    }}
+                  >
+                    ред
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid",
+                      ...th,
+                    }}
+                  >
+                    {mapData?.nameCart}
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid",
+                      ...th,
+                    }}
+                  >
+                    {mapData?.area}
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid",
+                      ...th,
+                    }}
+                  >
+                    {mapData?.salary}
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid",
+                      ...th,
+                    }}
+                  >
+                    {mapData?.priceDiesel}
+                  </th>
+                  <th></th>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th style={{ ...th }}>Р</th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Технологічна операція
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Обсяг робіт
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Одиниця виміру
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Вартість Техніки
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Вартість палива
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  ЗП механізована
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  ЗП ручна
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Вартість матеріалів
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Вартість транспорту
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Вартість послуг
+                </th>
+                <th
+                  style={{
+                    border: "1px solid",
+                    ...th,
+                  }}
+                >
+                  Разом
+                </th>
+                <th style={{ ...th }}>В</th>
+              </tr>
+            </thead>
+            <tbody>
+              {operData?.map((el) => {
+                akk +=
+                  el.costMaterials ||
                   el.costServices ||
                   el.costTransport ||
                   +el.costCars +
                     +el.costFuel +
                     +el.costHandWork +
                     +el.costMachineWork ||
-                  el.costHandWork);
-              return (
-                <tr key={el.id}>
-                  <td
-                    onClick={() => {
-                      console.log(map[el.cell]);
-                      const [second] = map[el.cell]?.filter(
-                        (mat) => mat.techOperationId == el.id
-                      );
+                  el.costHandWork;
+                sum +=
+                  mapData.area *
+                  (el.costMaterials ||
+                    el.costServices ||
+                    el.costTransport ||
+                    +el.costCars +
+                      +el.costFuel +
+                      +el.costHandWork +
+                      +el.costMachineWork ||
+                    el.costHandWork);
+                return (
+                  <tr key={el.id}>
+                    <td
+                      onClick={() => {
+                        console.log(map[el.cell]);
+                        const [second] = map[el.cell]?.filter(
+                          (mat) => mat.techOperationId == el.id
+                        );
 
-                      console.log(second);
-                      setAkkum(
-                        +akk -
-                          (+second.price *
-                            (+second.consumptionPerHectare || 1) ||
-                            +el.costCars +
-                              +el.costFuel +
-                              +el.costHandWork +
-                              +el.costMachineWork ||
-                            el.costHandWork)
-                      );
-                      if (el.cell == "costMechanical") {
-                        setRes({
-                          id: el.id,
-                          nameOper: el.nameOperation,
-                          fuelConsumption: second.fuelConsumption,
-                          idTractor: second.tractorId,
-                          idMachine: second.agriculturalMachineId,
-                          workingSpeed: second.workingSpeed,
-                          agriculturalMachineId: second.agriculturalMachineId,
-                          unitProductionAggregate:
-                            second.unitProductionAggregate,
-                          operId: el.id,
-                        });
-                      } else if (el.cell == "costHandWork") {
-                        setRes({
-                          id: el.id,
-                          gradeId: second.gradeId || "",
-                          nameOper: second.nameOper || "",
-                          pricePerHourPersonnel:
-                            +second.pricePerHourPersonnel || "",
-                          productionPerShift: +second.productionPerShift || "",
-                          productionRateAmount:
-                            +second.productionRateAmount || "",
-                          productionRateTime: +second.productionRateTime || "",
-                          productionRateWeight:
-                            +second.productionRateWeight || "",
-                          salaryPerShift: +second.salaryPerShift,
-                          spending: +second.spending || "",
-                          type: +second.type,
-                          unitOfMeasurement: second.unitOfMeasurement || "",
-                          yieldСapacity: +second.yieldСapacity || "",
-                          operId: el.id,
-                        });
-                      } else {
-                        setRes({
-                          id: el.id,
-                          nameOper: el.nameOperation,
-                          price: second.price,
-                          unitsOfCost: second.unitsOfCost,
-                          consumptionPerHectare: second.consumptionPerHectare,
-                          unitsOfConsumption: second.unitsOfConsumption,
-                          operId: el.id,
-                        });
-                      }
-                      setSecondOpen(true);
-                      setCell(el.cell);
-                      setUpdate(true);
-                    }}
-                  >
-                    Ред
-                  </td>
-                  <td>{el.nameOperation}</td>
-                  <td>{mapData.area}</td>
-                  <td>{"0"}</td>
-                  <td>{el.costCars * mapData.area || "0"}</td>
-                  <td>{el.costFuel * mapData.area || "0"}</td>
-                  <td>{el.costMachineWork * mapData.area || "0"}</td>
-                  <td>{el.costHandWork * mapData.area || "0"}</td>
-                  <td>{el.costMaterials * mapData.area || "0"}</td>
-                  <td>{el.costTransport * mapData.area || "0"}</td>
-                  <td>{el.costServices * mapData.area || "0"}</td>
-                  <td>
-                    {+mapData.area *
-                      (el.costMaterials ||
-                        el.costServices ||
-                        el.costTransport ||
-                        +el.costCars +
-                          +el.costFuel +
-                          +el.costHandWork +
-                          +el.costMachineWork)}
-                  </td>
-                  <td
-                    className="delet"
-                    onClick={() => {
-                      deleteOper(map, el.id, id, akk);
-                    }}
-                  >
-                    видалити
-                  </td>
-                </tr>
-              );
-            })}
+                        console.log(second);
+                        setAkkum(
+                          +akk -
+                            (+second.price *
+                              (+second.consumptionPerHectare || 1) ||
+                              +el.costCars +
+                                +el.costFuel +
+                                +el.costHandWork +
+                                +el.costMachineWork ||
+                              el.costHandWork)
+                        );
+                        if (el.cell == "costMechanical") {
+                          setRes({
+                            id: el.id,
+                            nameOper: el.nameOperation,
+                            fuelConsumption: second.fuelConsumption,
+                            idTractor: second.tractorId,
+                            idMachine: second.agriculturalMachineId,
+                            workingSpeed: second.workingSpeed,
+                            agriculturalMachineId: second.agriculturalMachineId,
+                            unitProductionAggregate:
+                              second.unitProductionAggregate,
+                            operId: el.id,
+                          });
+                        } else if (el.cell == "costHandWork") {
+                          setRes({
+                            id: el.id,
+                            gradeId: second.gradeId || "",
+                            nameOper: second.nameOper || "",
+                            pricePerHourPersonnel:
+                              +second.pricePerHourPersonnel || "",
+                            productionPerShift:
+                              +second.productionPerShift || "",
+                            productionRateAmount:
+                              +second.productionRateAmount || "",
+                            productionRateTime:
+                              +second.productionRateTime || "",
+                            productionRateWeight:
+                              +second.productionRateWeight || "",
+                            salaryPerShift: +second.salaryPerShift,
+                            spending: +second.spending || "",
+                            type: +second.type,
+                            unitOfMeasurement: second.unitOfMeasurement || "",
+                            yieldСapacity: +second.yieldСapacity || "",
+                            operId: el.id,
+                          });
+                        } else {
+                          setRes({
+                            id: el.id,
+                            nameOper: el.nameOperation,
+                            price: second.price,
+                            unitsOfCost: second.unitsOfCost,
+                            consumptionPerHectare: second.consumptionPerHectare,
+                            unitsOfConsumption: second.unitsOfConsumption,
+                            operId: el.id,
+                          });
+                        }
+                        setSecondOpen(true);
+                        setCell(el.cell);
+                        setUpdate(true);
+                      }}
+                    >
+                      Ред
+                    </td>
+                    <td>{el.nameOperation}</td>
+                    <td>{mapData.area}</td>
+                    <td>{"0"}</td>
+                    <td>{el.costCars * mapData.area || "0"}</td>
+                    <td>{el.costFuel * mapData.area || "0"}</td>
+                    <td>{el.costMachineWork * mapData.area || "0"}</td>
+                    <td>{el.costHandWork * mapData.area || "0"}</td>
+                    <td>{el.costMaterials * mapData.area || "0"}</td>
+                    <td>{el.costTransport * mapData.area || "0"}</td>
+                    <td>{el.costServices * mapData.area || "0"}</td>
+                    <td>
+                      {+mapData.area *
+                        (el.costMaterials ||
+                          el.costServices ||
+                          el.costTransport ||
+                          +el.costCars +
+                            +el.costFuel +
+                            +el.costHandWork +
+                            +el.costMachineWork)}
+                    </td>
+                    <td
+                      className="delet"
+                      onClick={() => {
+                        deleteOper(map, el.id, id, akk);
+                      }}
+                    >
+                      видалити
+                    </td>
+                  </tr>
+                );
+              })}
 
-            <tr>
-              <td></td>
-              <td style={{ fontWeight: "bold" }}>Загальні витрати</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{sum}</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+              <tr>
+                <td></td>
+                <td style={{ fontWeight: "bold" }}>Загальні витрати</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{sum}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
 
-        <button
-          style={{ marginTop: "15px", marginLeft: "31px" }}
-          onClick={() => {
-            setUpdate(false);
-            setOpen(true);
-          }}
-        >
-          Додати технологічну операцію
-        </button>
-      </div>
-      <OperSection
-        open={open}
-        setOpen={setOpen}
-        setSecondOpen={setSecondOpen}
-        cell={cell}
-        setCell={setCell}
-        section={section}
-        setSection={setSection}
-      />
+          <button
+            style={{ marginTop: "15px", marginLeft: "31px" }}
+            onClick={() => {
+              setUpdate(false);
+              setOpen(true);
+            }}
+          >
+            Додати технологічну операцію
+          </button>
+        </div>
+        <OperSection
+          open={open}
+          setOpen={setOpen}
+          setSecondOpen={setSecondOpen}
+          cell={cell}
+          setCell={setCell}
+          section={section}
+          setSection={setSection}
+        />
 
-      {cell === "costMaterials" ? (
-        <PopupField
-          open={secondOpen}
-          setOpen={setSecondOpen}
-          cell={cell}
-          setCell={setCell}
-          section={section}
-          setSection={setSection}
-          akk={akk}
-          akkum={akkum}
-          res={res}
-          setRes={setRes}
+        {cell === "costMaterials" ? (
+          <PopupField
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            cell={cell}
+            setCell={setCell}
+            section={section}
+            setSection={setSection}
+            akk={akk}
+            akkum={akkum}
+            res={res}
+            setRes={setRes}
+            update={update}
+            setUpdate={setUpdate}
+            func={fiveInputs}
+            props={fiveInputsProps}
+          >
+            <Mater res={res} setRes={setRes} />
+          </PopupField>
+        ) : cell === "costServices" ? (
+          <PopupField
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            cell={cell}
+            setCell={setCell}
+            section={section}
+            setSection={setSection}
+            akk={akk}
+            akkum={akkum}
+            res={res}
+            setRes={setRes}
+            update={update}
+            setUpdate={setUpdate}
+            func={threeInputs}
+            props={threeInputsProps}
+          >
+            <Service res={res} setRes={setRes} />
+          </PopupField>
+        ) : cell === "costTransport" ? (
+          <PopupField
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            cell={cell}
+            setCell={setCell}
+            section={section}
+            setSection={setSection}
+            akk={akk}
+            akkum={akkum}
+            res={res}
+            setRes={setRes}
+            update={update}
+            setUpdate={setUpdate}
+            func={threeInputs}
+            props={threeInputsProps}
+          >
+            <Transport res={res} setRes={setRes} />
+          </PopupField>
+        ) : cell === "costMechanical" ? (
+          <PopupField
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            cell={cell}
+            setCell={setCell}
+            section={section}
+            setSection={setSection}
+            akk={akk}
+            akkum={akkum}
+            res={res}
+            setRes={setRes}
+            update={update}
+            setUpdate={setUpdate}
+            func={MechanicalWorkFunc}
+            props={MechanicalWorkProps}
+          >
+            <MechanicalWork res={res} setRes={setRes} />
+          </PopupField>
+        ) : cell == "costHandWork" ? (
+          <PopupField
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            cell={cell}
+            setCell={setCell}
+            section={section}
+            setSection={setSection}
+            akk={akk}
+            akkum={akkum}
+            res={res}
+            setRes={setRes}
+            update={update}
+            setUpdate={setUpdate}
+            func={createCostHandWork}
+            props={costHandWorkProps}
+          >
+            <HandWork res={res} setRes={setRes} />
+          </PopupField>
+        ) : (
+          ""
+        )}
+        <MapInputs
+          open={mapOpen}
+          setOpen={setMapOpen}
           update={update}
           setUpdate={setUpdate}
-          func={fiveInputs}
-          props={fiveInputsProps}
-        >
-          <Mater res={res} setRes={setRes} />
-        </PopupField>
-      ) : cell === "costServices" ? (
-        <PopupField
-          open={secondOpen}
-          setOpen={setSecondOpen}
-          cell={cell}
-          setCell={setCell}
-          section={section}
-          setSection={setSection}
-          akk={akk}
-          akkum={akkum}
-          res={res}
-          setRes={setRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={threeInputs}
-          props={threeInputsProps}
-        >
-          <Service res={res} setRes={setRes} />
-        </PopupField>
-      ) : cell === "costTransport" ? (
-        <PopupField
-          open={secondOpen}
-          setOpen={setSecondOpen}
-          cell={cell}
-          setCell={setCell}
-          section={section}
-          setSection={setSection}
-          akk={akk}
-          akkum={akkum}
-          res={res}
-          setRes={setRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={threeInputs}
-          props={threeInputsProps}
-        >
-          <Transport res={res} setRes={setRes} />
-        </PopupField>
-      ) : cell === "costMechanical" ? (
-        <PopupField
-          open={secondOpen}
-          setOpen={setSecondOpen}
-          cell={cell}
-          setCell={setCell}
-          section={section}
-          setSection={setSection}
-          akk={akk}
-          akkum={akkum}
-          res={res}
-          setRes={setRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={MechanicalWorkFunc}
-          props={MechanicalWorkProps}
-        >
-          <MechanicalWork res={res} setRes={setRes} />
-        </PopupField>
-      ) : cell == "costHandWork" ? (
-        <PopupField
-          open={secondOpen}
-          setOpen={setSecondOpen}
-          cell={cell}
-          setCell={setCell}
-          section={section}
-          setSection={setSection}
-          akk={akk}
-          akkum={akkum}
-          res={res}
-          setRes={setRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={createCostHandWork}
-          props={costHandWorkProps}
-        >
-          <HandWork res={res} setRes={setRes} />
-        </PopupField>
-      ) : (
-        ""
-      )}
-      <MapInputs
-        open={mapOpen}
-        setOpen={setMapOpen}
-        update={update}
-        setUpdate={setUpdate}
-        res={mapRes}
-        setRes={setMapRes}
-      />
-    </Container>
+          res={mapRes}
+          setRes={setMapRes}
+        />
+      </Container>
+    </>
   );
 });
 export default DevicePage;

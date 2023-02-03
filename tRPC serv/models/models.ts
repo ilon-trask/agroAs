@@ -62,6 +62,7 @@ tech_cart.init(
     priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Itech_operation {
@@ -108,6 +109,7 @@ tech_operation.init(
     costServices: { type: DataTypes.INTEGER },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Icost_material {
@@ -141,6 +143,7 @@ cost_material.init(
     unitsOfConsumption: { type: DataTypes.STRING },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Icost_service {
@@ -167,6 +170,7 @@ cost_service.init(
     unitsOfCost: { type: DataTypes.STRING },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Icost_transport {
@@ -193,6 +197,7 @@ cost_transport.init(
     unitsOfCost: { type: DataTypes.STRING },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Isection {
@@ -214,6 +219,7 @@ section.init(
     name: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Igrade {
@@ -235,6 +241,7 @@ grade.init(
     coefficient: { type: DataTypes.FLOAT, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Itractor {
@@ -274,6 +281,7 @@ tractor.init(
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Imachine {
@@ -313,6 +321,7 @@ agricultural_machine.init(
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Iaggregate {
@@ -350,6 +359,7 @@ aggregate.init(
     workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 export interface Icost_hand_work {
@@ -402,6 +412,7 @@ cost_hand_work.init(
     type: { type: DataTypes.INTEGER },
   },
   { sequelize }
+  // { sequelize, timestamps: false }
 );
 
 user.hasMany(tech_cart);
@@ -443,4 +454,4 @@ grade.hasMany(agricultural_machine);
 
 grade.hasMany(cost_hand_work);
 
-tech_operation.hasMany(cost_hand_work);
+tech_operation.hasOne(cost_hand_work);

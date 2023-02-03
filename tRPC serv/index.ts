@@ -18,6 +18,8 @@ import { operRouter } from "./routes/operRouter";
 import { userRouter } from "./routes/userRouter";
 import { gradesRouter } from "./routes/gradesRouter";
 
+import OS from "os";
+
 let users = [{ id: 1, name: "bob" }];
 
 const appRouter = router({
