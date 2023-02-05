@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE } from "../utils/consts";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
-import { supabase } from "../App";
+import { supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
 import { Context } from "..";

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import style from "./NavBar.module.css";
-import { supabase } from "../App";
+import { supabase } from "../http/requests";
 
 const NavBar = observer(() => {
   const { user } = useContext(Context);

@@ -7,7 +7,9 @@ import TechCartService from "../controllers/TechCartService";
 import { Idata } from "../controllers/TechCartService";
 
 export const cartRouter = router({
-  get: publicProcedure.query(async () => {
+  get: publicProcedure.query(async ({ ctx }) => {
+    console.log(ctx.req.headers.authorization);
+
     const cart = await TechCartService.getAll();
 
     return cart;

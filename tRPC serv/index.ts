@@ -56,11 +56,17 @@ const appRouter = router({
 const app = express();
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
 
+const createContext = ({
+  req,
+  res,
+}: trpcExpress.CreateExpressContextOptions) => ({ req }); // no context
+
 app.use(cors());
 app.use(
   "",
   trpcExpress.createExpressMiddleware({
     router: appRouter,
+    createContext,
   })
 );
 

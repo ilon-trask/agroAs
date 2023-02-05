@@ -17,17 +17,34 @@ import {
   tech_cart,
   tech_operation,
 } from "../../../tRPC serv/models/models";
-import {
-  Iaggregate,
-  Icost_material,
-  Icost_service,
-  Icost_transport,
-} from "../../../tRPC serv/models/models";
+
+import { createClient } from "@supabase/supabase-js";
+
+export const supabase = createClient(
+  "https://bicofnobkczquxvztyzl.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY29mbm9ia2N6cXV4dnp0eXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzQ5MjQ5MTIsImV4cCI6MTk5MDUwMDkxMn0.jEd8pHzVzlqZxf-ioqC_QKoda_xqfD2nh4niJ1mea9s"
+);
+(async () => {
+  console.log(
+    await (
+      await supabase.auth.getSession()
+    ).data.session?.access_token
+  );
+})();
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
       url: "http://localhost:5000",
+      async headers() {
+        return {
+          authorization:
+            "Bearer " +
+            (await (
+              await supabase.auth.getSession()
+            ).data.session?.access_token),
+        };
+      },
     }),
   ],
 });
@@ -61,7 +78,6 @@ export async function getCarts(map: MapStore) {
         for (let j = 0; j < opers.length; j++) {
           const oper = opers[j];
           map.newOper = opers[j];
-          console.log(oper);
 
           if (oper.aggregate) {
             map.newCostMechanical = oper.aggregate;
