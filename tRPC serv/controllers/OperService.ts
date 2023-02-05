@@ -13,7 +13,7 @@ import {
   cost_transport,
 } from "../models/models";
 
-import { getCart } from "./TechCartService";
+import { getCart, resTechOperation } from "./TechCartService";
 
 export type prope =
   | cost_material
@@ -188,14 +188,144 @@ async function createOper(
   return oper;
 }
 
-function updateOper(nameOper: string, cell: Icell, operId: number) {
-  const techOperation = tech_operation.update(
+async function changeOper(
+  elem: tech_operation | resTechOperation,
+  cartId: number
+) {
+  if (elem.cell == "costMaterials") {
+    //@ts-ignore sequelize-znov
+    let costMaterials = await cost_material.findOne({
+      where: { techOperationId: elem.id },
+    });
+    if (!costMaterials) return;
+    elem.costMaterials =
+      costMaterials.price * costMaterials.consumptionPerHectare;
+  } else if (elem.cell == "costTransport") {
+    //@ts-ignore sequelize-znov
+    let costTransport = await cost_transport.findOne({
+      where: { techOperationId: elem.id },
+    });
+    if (!costTransport) return;
+
+    elem.costTransport = costTransport.price;
+  } else if (elem.cell == "costServices") {
+    //@ts-ignore sequelize-znov
+    let costServices = await cost_service.findOne({
+      where: { techOperationId: elem.id },
+    });
+    if (!costServices) return;
+    elem.costServices = costServices.price;
+  } else if (elem.cell == "costMechanical") {
+    //@ts-ignore sequelize-znov
+    const aggregateData = await aggregate.findOne({
+      where: { techOperationId: elem.id },
+    });
+    if (aggregateData == null) throw new Error("");
+
+    const Tractor = await tractor.findOne({
+      where: { id: aggregateData.tractorId },
+    });
+    const machine = await agricultural_machine.findOne({
+      where: { id: aggregateData.agriculturalMachineId },
+    });
+    const Grade = await grade.findAll();
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    if (Tractor == null || machine == null || cart == null || Grade == null)
+      throw new Error("");
+    const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
+    const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
+    const pricePerHourPersonnel = Math.round(cart?.salary / 176);
+    const costFuel = Math.round(
+      (+aggregateData.fuelConsumption * +cart.priceDiesel) /
+        Math.round(
+          (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
+            10000
+        )
+    );
+    const costCars = Math.round(
+      ((Math.round(
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
+      ) +
+        Math.round(
+          +machine.marketCost / +machine.depreciationPeriod / 220 / 8
+        )) *
+        1.05) /
+        Math.round(
+          (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
+            10000
+        )
+    );
+    const costMachineWork = Math.round(
+      pricePerHourPersonnel *
+        (Tractor.numberOfPersonnel ?? 0) *
+        gradeTractor?.coefficient!
+    );
+    const costHandWork = Math.round(
+      pricePerHourPersonnel *
+        (machine.numberOfServicePersonnel ?? 0) *
+        gradeMachine?.coefficient!
+    );
+
+    elem.costMachineWork = costMachineWork;
+    elem.costCars = costCars;
+    elem.costFuel = costFuel;
+    elem.costHandWork = costHandWork;
+  } else if (elem.cell == "costHandWork") {
+    //@ts-ignore sequelize-znov
+    const handWork = await cost_hand_work.findOne({
+      where: { techOperationId: elem.id },
+    });
+    let costHandWork;
+    if (!handWork) return;
+    const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    if (!Grade || !cart) throw new Error("нема карти або типу роботи");
+
+    const pricePerHourPersonnel = Math.round(cart.salary / 176);
+
+    if (handWork.type == 1) {
+      costHandWork = Math.round(
+        (pricePerHourPersonnel / handWork.productionRateTime!) *
+          Grade.coefficient *
+          10000
+      );
+    } else if (handWork.type == 2) {
+      costHandWork = Math.round(
+        pricePerHourPersonnel *
+          (handWork.yieldСapacity! / handWork.productionRateWeight!) *
+          Grade.coefficient
+      );
+    } else if (handWork.type == 3) {
+      costHandWork = Math.round(
+        pricePerHourPersonnel *
+          (handWork.spending! / handWork.productionRateAmount!) *
+          Grade.coefficient
+      );
+    }
+    elem.costHandWork = costHandWork;
+  }
+}
+
+async function updateOper(nameOper: string, cell: Icell, operId: number) {
+  const techOperation = await tech_operation.update(
     {
       nameOperation: nameOper,
       cell,
     },
     { where: { id: operId } }
   );
+  //@ts-ignore
+  const oper: resTechOperation = await tech_operation.findOne({
+    where: { id: operId },
+    include: [
+      cost_material,
+      cost_service,
+      cost_transport,
+      cost_hand_work,
+      aggregate,
+    ],
+  });
+  return oper;
 }
 
 class OperService {
@@ -410,7 +540,6 @@ class OperService {
   async patchCostMaterials(data: IdataPatchCostMaterial) {
     const {
       cartId,
-
       arr: {
         cell,
         res: {
@@ -435,14 +564,15 @@ class OperService {
       },
       { where: { techOperationId: operId } }
     );
-    updateOper(nameOper, cell, operId);
-    let res = await getCart();
-    return res;
+    let oper = await updateOper(nameOper, cell, operId);
+    if (!oper) return;
+
+    await changeOper(oper, oper.techCartId!);
+    return oper;
   }
   async patchCostService(data: IdataPatchCostServices) {
     const {
       cartId,
-
       arr: {
         cell,
         res: { operId, nameOper, price, unitsOfCost },
@@ -459,9 +589,11 @@ class OperService {
       },
       { where: { techOperationId: operId } }
     );
-    updateOper(nameOper, cell, operId);
-    let res = await getCart();
-    return res;
+    let oper = await updateOper(nameOper, cell, operId);
+    if (!oper) return;
+
+    await changeOper(oper, oper.techCartId!);
+    return oper;
   }
   async patchCostTransport(data: IdataPatchCostTransport) {
     const {
@@ -482,9 +614,11 @@ class OperService {
       },
       { where: { techOperationId: operId } }
     );
-    updateOper(nameOper, cell, operId);
-    let res = await getCart();
-    return res;
+    let oper = await updateOper(nameOper, cell, operId);
+    if (!oper) return;
+
+    await changeOper(oper, oper.techCartId!);
+    return oper;
   }
   async patchCostMechanical(data: IdataPatchCostMachine) {
     const {
@@ -517,10 +651,11 @@ class OperService {
       },
       { where: { techOperationId: operId } }
     );
-    updateOper(nameOper, cell, operId);
+    let oper = await updateOper(nameOper, cell, operId);
+    if (!oper) return;
 
-    let res = await getCart();
-    return res;
+    await changeOper(oper, oper.techCartId!);
+    return oper;
   }
   async patchCostHandWork(data: IdataPatchCostHandWork) {
     const {
@@ -559,10 +694,11 @@ class OperService {
       { where: { techOperationId: operId } }
     );
 
-    updateOper(nameOper, cell, operId);
+    let oper = await updateOper(nameOper, cell, operId);
+    if (!oper) return;
 
-    let res = await getCart();
-    return res;
+    await changeOper(oper, oper.techCartId!);
+    return oper;
   }
 
   async deleteOper(data: { cartId: number; operId: number }) {
@@ -570,119 +706,7 @@ class OperService {
 
     const elem = await tech_operation.findOne({ where: { id: operId } });
     if (!elem) throw new Error("");
-
-    if (elem.cell == "costMaterials") {
-      //@ts-ignore sequelize-znov
-      let costMaterials = await cost_material.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (!costMaterials) return;
-      elem.costMaterials =
-        costMaterials.price * costMaterials.consumptionPerHectare;
-    } else if (elem.cell == "costTransport") {
-      //@ts-ignore sequelize-znov
-      let costTransport = await cost_transport.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (!costTransport) return;
-
-      elem.costTransport = costTransport.price;
-    } else if (elem.cell == "costServices") {
-      //@ts-ignore sequelize-znov
-      let costServices = await cost_service.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (!costServices) return;
-      elem.costServices = costServices.price;
-    } else if (elem.cell == "costMechanical") {
-      //@ts-ignore sequelize-znov
-      const aggregateData = await aggregate.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (aggregateData == null) throw new Error("");
-
-      const Tractor = await tractor.findOne({
-        where: { id: aggregateData.tractorId },
-      });
-      const machine = await agricultural_machine.findOne({
-        where: { id: aggregateData.agriculturalMachineId },
-      });
-      const Grade = await grade.findAll();
-      const cart = await tech_cart.findOne({ where: { id: cartId } });
-      if (Tractor == null || machine == null || cart == null || Grade == null)
-        throw new Error("");
-      const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
-      const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
-      const pricePerHourPersonnel = Math.round(cart?.salary / 176);
-      const costFuel = Math.round(
-        (+aggregateData.fuelConsumption * +cart.priceDiesel) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
-      );
-      const costCars = Math.round(
-        ((Math.round(
-          +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
-        ) +
-          Math.round(
-            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
-          )) *
-          1.05) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
-      );
-      const costMachineWork = Math.round(
-        pricePerHourPersonnel *
-          (Tractor.numberOfPersonnel ?? 0) *
-          gradeTractor?.coefficient!
-      );
-      const costHandWork = Math.round(
-        pricePerHourPersonnel *
-          (machine.numberOfServicePersonnel ?? 0) *
-          gradeMachine?.coefficient!
-      );
-
-      elem.costMachineWork = costMachineWork;
-      elem.costCars = costCars;
-      elem.costFuel = costFuel;
-      elem.costHandWork = costHandWork;
-    } else if (elem.cell == "costHandWork") {
-      //@ts-ignore sequelize-znov
-      const handWork = await cost_hand_work.findOne({
-        where: { techOperationId: elem.id },
-      });
-      let costHandWork;
-      if (!handWork) return;
-      const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
-      const cart = await tech_cart.findOne({ where: { id: cartId } });
-      if (!Grade || !cart) throw new Error("нема карти або типу роботи");
-
-      const pricePerHourPersonnel = Math.round(cart.salary / 176);
-
-      if (handWork.type == 1) {
-        costHandWork = Math.round(
-          (pricePerHourPersonnel / handWork.productionRateTime!) *
-            Grade.coefficient *
-            10000
-        );
-      } else if (handWork.type == 2) {
-        costHandWork = Math.round(
-          pricePerHourPersonnel *
-            (handWork.yieldСapacity! / handWork.productionRateWeight!) *
-            Grade.coefficient
-        );
-      } else if (handWork.type == 3) {
-        costHandWork = Math.round(
-          pricePerHourPersonnel *
-            (handWork.spending! / handWork.productionRateAmount!) *
-            Grade.coefficient
-        );
-      }
-      elem.costHandWork = costHandWork;
-    }
+    changeOper(elem, cartId);
     await cost_material.destroy({
       where: { techOperationId: operId },
     });

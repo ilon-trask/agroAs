@@ -28,7 +28,7 @@ export interface Idata {
   userId?: number;
 }
 
-interface resTechOperation extends Itech_operation {
+export interface resTechOperation extends Itech_operation {
   aggregate: Iaggregate | null;
   cost_hand_work: Icost_hand_work | null;
   cost_material: Icost_material | null;
