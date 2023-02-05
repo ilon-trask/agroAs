@@ -18,8 +18,6 @@ import {
   tractor,
 } from "../models/models";
 
-import { getOper, Icell, prope, prope2 } from "./OperService";
-
 export interface Idata {
   id?: number;
   nameCart: string;
@@ -54,7 +52,7 @@ let cellNames: {
   costTransport: "cost_transport",
 };
 
-async function getCart() {
+export async function getCart() {
   let res: { carts: resTechCartsWithOpers[] } = {
     carts: [],
   };
@@ -236,7 +234,6 @@ class TechCartService {
 
   async delete(id: number) {
     const techCart = await tech_cart.destroy({ where: { id: id } });
-
     return getCart();
   }
 }

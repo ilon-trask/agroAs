@@ -33,12 +33,10 @@ const client = createTRPCProxyClient<AppRouter>({
 
 export async function getCarts(map: MapStore) {
   map.isLoading = true;
-  let data;
   await client.cart.get
     .query()
     .then((res: { carts: resTechCartsWithOpers[] }) => {
       map.opers = [];
-      data = res;
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
@@ -68,7 +66,6 @@ export async function getCarts(map: MapStore) {
       }
     });
   map.isLoading = false;
-  return data;
 }
 
 export async function deleteCart(map: MapStore, id: number) {
@@ -133,34 +130,21 @@ export async function deleteOper(
   map.isLoading = true;
   await client.oper.delete
     .query({ cartId: +cartId, operId: operId })
-    .then((data) => {
-      map.maps = data.carts;
-      map.opers = data.opers;
-      data.props?.forEach((el) => {
-        let [oper] = data.opers.filter(
-          //@ts-ignore
-          (oper) => oper.id == el.techOperationId
-        );
-        console.log(oper);
+    //@ts-ignore
+    .then((data: Itech_operation) => {
+      map.opers = map.opers.filter((el) => el.id != data.id);
+      let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
 
-        let cell = oper.cell;
-        if (cell == "costMaterials") {
-          let elem = el as Icost_material;
-          map.newCostMaterials = elem;
-        } else if (cell == "costServices") {
-          let elem = el as Icost_service;
-          map.newCostServices = elem;
-        } else if (cell == "costTransport") {
-          let elem = el as Icost_transport;
-          map.newCostTransport = elem;
-        } else if (cell == "costMechanical") {
-          let elem = el as Iaggregate;
-          map.newCostMechanical = elem;
-        } else if (cell == "costHandWork") {
-          let elem = el as Icost_hand_work;
-          map.newCostHandWork = elem;
-        }
-      });
+      mapData.totalCost! -=
+        data.costMachineWork! +
+          data.costCars! +
+          data.costFuel! +
+          data.costHandWork! ||
+        data.costHandWork ||
+        data.costServices ||
+        data.costTransport ||
+        data.costMaterials ||
+        0;
     });
   map.isLoading = false;
 }
@@ -181,34 +165,34 @@ export async function createOperation(
       arr: arr,
       cartId: +id,
     })
-    .then((data) => {
-      data.props?.forEach((el) => {
-        let [oper] = data.opers.filter(
-          //@ts-ignore
-          (oper) => oper.id == el.techOperationId
-        );
-        console.log(oper);
+    //@ts-ignore
+    .then((data: { oper: tech_operation; prope: prope }) => {
+      console.log(data);
 
-        let cell = oper.cell;
-        if (cell == "costMaterials") {
-          let elem = el as Icost_material;
-          map.newCostMaterials = elem;
-        } else if (cell == "costServices") {
-          let elem = el as Icost_service;
-          map.newCostServices = elem;
-        } else if (cell == "costTransport") {
-          let elem = el as Icost_transport;
-          map.newCostTransport = elem;
-        } else if (cell == "costMechanical") {
-          let elem = el as Iaggregate;
-          map.newCostMechanical = elem;
-        } else if (cell == "costHandWork") {
-          let elem = el as Icost_hand_work;
-          map.newCostHandWork = elem;
-        }
-      });
-      map.opers = data.opers;
-      map.maps = data.carts;
+      const { oper, prope } = data;
+      map.newOper = oper;
+      let [mapData] = map.maps.filter((el) => el.id == oper.techCartId);
+      mapData.totalCost! +=
+        oper.costMachineWork! +
+          oper.costCars! +
+          oper.costFuel! +
+          oper.costHandWork! ||
+        oper.costHandWork ||
+        oper.costServices ||
+        oper.costTransport ||
+        oper.costMaterials ||
+        0;
+      if ("nameMaterials" in prope) {
+        map.newCostMaterials = prope;
+      } else if ("nameService" in prope) {
+        map.newCostServices = prope;
+      } else if ("nameTransport" in prope) {
+        map.newCostTransport = prope;
+      } else if ("productionRateAmount" in prope) {
+        map.newCostHandWork = prope;
+      } else if ("fuelConsumption" in prope) {
+        map.newCostMechanical = prope;
+      }
     });
   map.isLoading = false;
 }
@@ -225,44 +209,41 @@ export async function patchOperation(
   await client.oper.patch[arr.cell]
     .query({
       cartId: +id,
-
       arr: arr,
     })
-    .then((data) => {
+    //@ts-ignore
+    .then((res: { carts: resTechCartsWithOpers[] }) => {
+      console.log(map.opers);
+
+      map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
       map.costTransport = [];
-      map.costHandWork = [];
-      data.props?.forEach((el) => {
-        let [oper] = data.opers.filter(
-          //@ts-ignore
-          (oper) => oper.id == el.techOperationId
-        );
-        console.log(oper);
-        console.log(el);
-        console.log(map.costHandWork);
+      map.maps = res.carts;
+      for (let i = 0; i < res.carts.length; i++) {
+        const opers = res.carts[i].tech_operations;
+        for (let j = 0; j < opers.length; j++) {
+          const oper = opers[j];
+          map.newOper = opers[j];
+          console.log(oper);
 
-        let cell = oper.cell;
-        if (cell == "costMaterials") {
-          let elem = el as Icost_material;
-          map.newCostMaterials = elem;
-        } else if (cell == "costServices") {
-          let elem = el as Icost_service;
-          map.newCostServices = elem;
-        } else if (cell == "costTransport") {
-          let elem = el as Icost_transport;
-          map.newCostTransport = elem;
-        } else if (cell == "costMechanical") {
-          let elem = el as Iaggregate;
-          map.newCostMechanical = elem;
-        } else if (cell == "costHandWork") {
-          let elem = el as Icost_hand_work;
-          map.newCostHandWork = elem;
+          if (oper.aggregate) {
+            console.log(oper.aggregate);
+
+            map.newCostMechanical = oper.aggregate;
+          } else if (oper.cost_service) {
+            map.newCostServices = oper.cost_service;
+          } else if (oper.cost_transport) {
+            map.newCostTransport = oper.cost_transport;
+          } else if (oper.cost_material) {
+            map.newCostMaterials = oper.cost_material;
+          } else if (oper.cost_hand_work) {
+            map.newCostHandWork = oper.cost_hand_work;
+          }
         }
-      });
-      map.opers = data.opers;
-      map.maps = data.carts;
+      }
+      console.log(map.opers);
     });
   map.isLoading = false;
 }

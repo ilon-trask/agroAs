@@ -13,6 +13,8 @@ import {
   cost_transport,
 } from "../models/models";
 
+import { getCart } from "./TechCartService";
+
 export type prope =
   | cost_material
   | cost_service
@@ -177,15 +179,13 @@ async function createOper(
   cell: Icell,
   section: number
 ) {
-  return await tech_operation.create({
+  let oper = await tech_operation.create({
     techCartId: cartId,
     nameOperation: nameOper,
     cell,
     sectionId: section,
   });
-}
-function techCartUpdate(sum: number, cartId: number) {
-  tech_cart.update({ totalCost: sum || 0 }, { where: { id: cartId } });
+  return oper;
 }
 
 function updateOper(nameOper: string, cell: Icell, operId: number) {
@@ -197,208 +197,7 @@ function updateOper(nameOper: string, cell: Icell, operId: number) {
     { where: { id: operId } }
   );
 }
-export async function getOper(cartid: number) {
-  const techOperation: tech_operation[] = await tech_operation.findAll({
-    where: { techCartId: cartid },
-  });
 
-  if (!techOperation) return { opers: [], props: [] };
-
-  techOperation.sort((a, b) => a.id! - b.id!);
-  let props: prope[] = [];
-
-  for (let i = 0; i < techOperation.length; i++) {
-    let el = techOperation[i];
-
-    if (el.cell == "costMaterials") {
-      let costMaterials = await cost_material.findOne({
-        where: { techOperationId: el.id },
-      });
-      if (!costMaterials) {
-        el.costMaterials = 0;
-        continue;
-      }
-      el.costMaterials =
-        costMaterials.price * costMaterials.consumptionPerHectare;
-    } else if (el.cell == "costTransport") {
-      let costTransport = await cost_transport.findOne({
-        where: { techOperationId: el.id },
-      });
-      if (!costTransport) {
-        el.costTransport = 0;
-        continue;
-      }
-      el.costTransport = costTransport.price;
-    } else if (el.cell == "costServices") {
-      let costServices = await cost_service.findOne({
-        where: { techOperationId: el.id },
-      });
-      if (!costServices) {
-        el.costServices = 0;
-        continue;
-      }
-
-      el.costServices = costServices.price;
-    } else if (el.cell == "costMechanical") {
-      const aggregateData = await aggregate.findOne({
-        where: { techOperationId: el.id },
-      });
-      if (aggregateData == null) throw new Error("");
-
-      const cart = await tech_cart.findOne({ where: { id: el.techCartId } });
-      const Tractor = await tractor.findOne({
-        where: { id: aggregateData.tractorId },
-      });
-      const machine = await agricultural_machine.findOne({
-        where: { id: aggregateData.agriculturalMachineId },
-      });
-      const Grade = await grade.findAll();
-      if (Tractor == null || machine == null || cart == null || Grade == null)
-        throw new Error("");
-      const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
-      const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
-      const pricePerHourPersonnel = Math.round(cart?.salary / 176);
-      const costFuel = Math.round(
-        (+aggregateData.fuelConsumption * +cart.priceDiesel) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
-      );
-      const costCars = Math.round(
-        ((Math.round(
-          +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
-        ) +
-          Math.round(
-            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
-          )) *
-          1.05) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
-      );
-      const costMachineWork = Math.round(
-        pricePerHourPersonnel *
-          (Tractor.numberOfPersonnel ?? 0) *
-          gradeTractor?.coefficient!
-      );
-      const costHandWork = Math.round(
-        pricePerHourPersonnel *
-          (machine.numberOfServicePersonnel ?? 0) *
-          gradeMachine?.coefficient!
-      );
-
-      el.costMachineWork = costMachineWork;
-      el.costCars = costCars;
-      el.costFuel = costFuel;
-      el.costHandWork = costHandWork;
-    } else if (el.cell == "costHandWork") {
-      const handWork = await cost_hand_work.findOne({
-        where: { techOperationId: el.id },
-      });
-      let costHandWork;
-      if (!handWork) {
-        el.costHandWork = 0;
-        continue;
-      }
-      const cart = await tech_cart.findOne({ where: { id: el.techCartId } });
-      const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
-      if (!Grade || !cart) throw new Error("нема карти або типу роботи");
-
-      const pricePerHourPersonnel = Math.round(cart.salary / 176);
-
-      if (handWork.type == 1) {
-        costHandWork = Math.round(
-          (pricePerHourPersonnel / handWork.productionRateTime!) *
-            Grade.coefficient *
-            10000
-        );
-      } else if (handWork.type == 2) {
-        costHandWork = Math.round(
-          pricePerHourPersonnel *
-            (handWork.yieldСapacity! / handWork.productionRateWeight!) *
-            Grade.coefficient
-        );
-      } else if (handWork.type == 3) {
-        costHandWork = Math.round(
-          pricePerHourPersonnel *
-            (handWork.spending! / handWork.productionRateAmount!) *
-            Grade.coefficient
-        );
-      }
-      el.costHandWork = costHandWork;
-    }
-
-    let data = await getProps(el.id!);
-
-    props.push(data);
-  }
-
-  return { opers: techOperation, props };
-}
-async function getProps(operId: number) {
-  const oper = await tech_operation.findOne({ where: { id: operId } });
-  if (!oper) throw new Error("");
-
-  let props: prope;
-
-  const cell: Icell = oper.cell;
-
-  if (cell == "costMaterials") {
-    const costMaterials = await cost_material.findOne({
-      where: { techOperationId: operId },
-    });
-    if (!costMaterials) throw new Error("");
-    props = costMaterials;
-  } else if (cell == "costServices") {
-    const costServices = await cost_service.findOne({
-      where: { techOperationId: operId },
-    });
-    if (!costServices) throw new Error("");
-    props = costServices;
-  } else if (cell == "costTransport") {
-    const costTransport = await cost_transport.findOne({
-      where: { techOperationId: operId },
-    });
-    if (!costTransport) throw new Error("");
-    props = costTransport;
-  } else if (cell == "costMechanical") {
-    const costMechanical = await aggregate.findOne({
-      where: { techOperationId: operId },
-    });
-    if (!costMechanical) throw new Error("");
-    props = costMechanical;
-  } else if (cell == "costHandWork") {
-    const costHandWork = await cost_hand_work.findOne({
-      where: { techOperationId: operId },
-    });
-    if (!costHandWork) throw new Error("");
-    props = costHandWork;
-  } else {
-    throw new Error("");
-  }
-
-  return props;
-}
-async function getCart(cartId: number, operId: number) {
-  const carts: Itech_cart[] = await tech_cart.findAll();
-  let res: { opers: Itech_operation[]; carts: Itech_cart[]; props: prope[] };
-  let get: { opers: Itech_operation[]; props: prope[] } = {
-    opers: [],
-    props: [],
-  };
-  for (let i = 0; i < carts.length; i++) {
-    let el = carts[i];
-    let data = await getOper(el.id!);
-    get.opers.push(...data.opers);
-    get.props.push(...data.props);
-  }
-
-  res = { ...get, carts };
-
-  return res;
-}
 class OperService {
   async createCostMaterials(data: IdataCreateCostMaterials) {
     const {
@@ -416,11 +215,10 @@ class OperService {
         section,
       },
     } = data;
-    let sum: number;
     const oper = await createOper(cartId, nameOper, cell, section);
     const operId = oper.id;
 
-    cost_material.create({
+    const costMaterial = await cost_material.create({
       nameMaterials: nameOper,
       price,
       unitsOfCost,
@@ -428,9 +226,9 @@ class OperService {
       unitsOfConsumption,
       techOperationId: operId,
     });
-
-    let res = await getCart(cartId, operId!);
-    return res;
+    oper.costMaterials =
+      costMaterial.price * costMaterial.consumptionPerHectare;
+    return { oper, prope: costMaterial };
   }
   async createCostServices(data: IdataCreateCostServices) {
     const {
@@ -444,15 +242,14 @@ class OperService {
     } = data;
     let oper = await createOper(cartId, nameOper, cell, section);
     const operId = oper.id;
-    const costService = cost_service.create({
+    const costService = await cost_service.create({
       nameService: nameOper,
-      price: +price,
+      price,
       unitsOfCost,
       techOperationId: operId,
     });
-
-    let res = await getCart(cartId, operId!);
-    return res;
+    oper.costServices = costService.price;
+    return { oper, prope: costService };
   }
   async createCostTransport(data: IdataCreateCostTransport) {
     const {
@@ -466,15 +263,14 @@ class OperService {
     } = data;
     let oper = await createOper(cartId, nameOper, cell, section);
     const operId = oper.id;
-    const costTransport = cost_transport.create({
+    const costTransport = await cost_transport.create({
       nameTransport: nameOper,
       price: +price,
       unitsOfCost,
       techOperationId: operId,
     });
-
-    let res = await getCart(cartId, operId!);
-    return res;
+    oper.costTransport = costTransport.price;
+    return { oper, prope: costTransport };
   }
 
   async createCostMechanical(data: IdataCreateCostMechanical) {
@@ -494,24 +290,54 @@ class OperService {
       where: { id: idMachine },
     });
 
-    const operation = await tech_operation.create({
-      techCartId: cartId,
-      nameOperation: nameOper,
-      cell,
-      sectionId: section,
-    });
-    if (!machine || !Tractor || !cart || !operation) throw new Error("");
+    let oper = await createOper(cartId, nameOper, cell, section);
+    if (!machine || !Tractor || !cart || !oper) throw new Error("");
     const Aggregate = await aggregate.create({
       fuelConsumption: +fuelConsumption,
       workingSpeed: +workingSpeed,
-      techOperationId: operation.id,
+      techOperationId: oper.id,
       tractorId: Tractor.id,
       agriculturalMachineId: machine.id,
     });
+    const Grade = await grade.findAll();
+    if (Grade == null) throw new Error("");
+    const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
+    const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
+    const pricePerHourPersonnel = Math.round(cart?.salary / 176);
+    const costFuel = Math.round(
+      (+Aggregate.fuelConsumption * +cart.priceDiesel) /
+        Math.round(
+          (+machine.widthOfCapture * (+Aggregate.workingSpeed * 1000)) / 10000
+        )
+    );
+    const costCars = Math.round(
+      ((Math.round(
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
+      ) +
+        Math.round(
+          +machine.marketCost / +machine.depreciationPeriod / 220 / 8
+        )) *
+        1.05) /
+        Math.round(
+          (+machine.widthOfCapture * (+Aggregate.workingSpeed * 1000)) / 10000
+        )
+    );
+    const costMachineWork = Math.round(
+      pricePerHourPersonnel *
+        (Tractor.numberOfPersonnel ?? 0) *
+        gradeTractor?.coefficient!
+    );
+    const costHandWork = Math.round(
+      pricePerHourPersonnel *
+        (machine.numberOfServicePersonnel ?? 0) *
+        gradeMachine?.coefficient!
+    );
 
-    let operId = operation.id;
-    let res = await getCart(cartId, operId!);
-    return res;
+    oper.costMachineWork = costMachineWork;
+    oper.costCars = costCars;
+    oper.costFuel = costFuel;
+    oper.costHandWork = costHandWork;
+    return { oper, prope: Aggregate };
   }
   async createCostHandWork(data: IdataCreateCostHandWork) {
     const {
@@ -538,14 +364,9 @@ class OperService {
     const Grade = await grade.findOne({ where: { id: gradeId } });
     if (!Grade || !cart) throw new Error("");
 
-    const oper = await tech_operation.create({
-      nameOperation: nameOper,
-      cell,
-      techCartId: cartId,
-      sectionId: section,
-    });
+    let oper = await createOper(cartId, nameOper, cell, section);
 
-    const handWork = await cost_hand_work.create({
+    const costHandWork = await cost_hand_work.create({
       nameOper,
       productionPerShift: undefined,
       productionRateAmount,
@@ -560,9 +381,31 @@ class OperService {
       techOperationId: oper.id,
     });
 
-    const operId = oper.id!;
-    let res = await getCart(cartId, operId!);
-    return res;
+    let cost = 0;
+    const pricePerHourPersonnel = Math.round(cart.salary / 176);
+
+    if (costHandWork.type == 1) {
+      cost = Math.round(
+        (pricePerHourPersonnel / costHandWork.productionRateTime!) *
+          Grade.coefficient *
+          10000
+      );
+    } else if (costHandWork.type == 2) {
+      cost = Math.round(
+        pricePerHourPersonnel *
+          (costHandWork.yieldСapacity! / costHandWork.productionRateWeight!) *
+          Grade.coefficient
+      );
+    } else if (costHandWork.type == 3) {
+      cost = Math.round(
+        pricePerHourPersonnel *
+          (costHandWork.spending! / costHandWork.productionRateAmount!) *
+          Grade.coefficient
+      );
+    }
+    oper.costHandWork = cost;
+
+    return { oper, prope: costHandWork };
   }
   async patchCostMaterials(data: IdataPatchCostMaterial) {
     const {
@@ -581,7 +424,7 @@ class OperService {
       },
     } = data;
 
-    const costMaterial = cost_material.update(
+    const costMaterial = await cost_material.update(
       {
         nameMaterials: nameOper,
         price,
@@ -593,7 +436,7 @@ class OperService {
       { where: { techOperationId: operId } }
     );
     updateOper(nameOper, cell, operId);
-    let res = await getCart(cartId, operId!);
+    let res = await getCart();
     return res;
   }
   async patchCostService(data: IdataPatchCostServices) {
@@ -607,7 +450,7 @@ class OperService {
     } = data;
 
     if (price === undefined || unitsOfCost === undefined) throw new Error("");
-    const costService = cost_service.update(
+    const costService = await cost_service.update(
       {
         nameService: nameOper,
         price: +price,
@@ -617,7 +460,7 @@ class OperService {
       { where: { techOperationId: operId } }
     );
     updateOper(nameOper, cell, operId);
-    let res = await getCart(cartId, operId!);
+    let res = await getCart();
     return res;
   }
   async patchCostTransport(data: IdataPatchCostTransport) {
@@ -630,7 +473,7 @@ class OperService {
       },
     } = data;
     if (price === undefined || unitsOfCost === undefined) throw new Error("");
-    const costTransport = cost_transport.update(
+    const costTransport = await cost_transport.update(
       {
         nameTransport: nameOper,
         price: +price,
@@ -640,7 +483,7 @@ class OperService {
       { where: { techOperationId: operId } }
     );
     updateOper(nameOper, cell, operId);
-    let res = await getCart(cartId, operId!);
+    let res = await getCart();
     return res;
   }
   async patchCostMechanical(data: IdataPatchCostMachine) {
@@ -676,7 +519,7 @@ class OperService {
     );
     updateOper(nameOper, cell, operId);
 
-    let res = await getCart(cartId, operId!);
+    let res = await getCart();
     return res;
   }
   async patchCostHandWork(data: IdataPatchCostHandWork) {
@@ -718,7 +561,7 @@ class OperService {
 
     updateOper(nameOper, cell, operId);
 
-    let res = await getCart(cartId, operId!);
+    let res = await getCart();
     return res;
   }
 
@@ -727,6 +570,119 @@ class OperService {
 
     const elem = await tech_operation.findOne({ where: { id: operId } });
     if (!elem) throw new Error("");
+
+    if (elem.cell == "costMaterials") {
+      //@ts-ignore sequelize-znov
+      let costMaterials = await cost_material.findOne({
+        where: { techOperationId: elem.id },
+      });
+      if (!costMaterials) return;
+      elem.costMaterials =
+        costMaterials.price * costMaterials.consumptionPerHectare;
+    } else if (elem.cell == "costTransport") {
+      //@ts-ignore sequelize-znov
+      let costTransport = await cost_transport.findOne({
+        where: { techOperationId: elem.id },
+      });
+      if (!costTransport) return;
+
+      elem.costTransport = costTransport.price;
+    } else if (elem.cell == "costServices") {
+      //@ts-ignore sequelize-znov
+      let costServices = await cost_service.findOne({
+        where: { techOperationId: elem.id },
+      });
+      if (!costServices) return;
+      elem.costServices = costServices.price;
+    } else if (elem.cell == "costMechanical") {
+      //@ts-ignore sequelize-znov
+      const aggregateData = await aggregate.findOne({
+        where: { techOperationId: elem.id },
+      });
+      if (aggregateData == null) throw new Error("");
+
+      const Tractor = await tractor.findOne({
+        where: { id: aggregateData.tractorId },
+      });
+      const machine = await agricultural_machine.findOne({
+        where: { id: aggregateData.agriculturalMachineId },
+      });
+      const Grade = await grade.findAll();
+      const cart = await tech_cart.findOne({ where: { id: cartId } });
+      if (Tractor == null || machine == null || cart == null || Grade == null)
+        throw new Error("");
+      const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
+      const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
+      const pricePerHourPersonnel = Math.round(cart?.salary / 176);
+      const costFuel = Math.round(
+        (+aggregateData.fuelConsumption * +cart.priceDiesel) /
+          Math.round(
+            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
+              10000
+          )
+      );
+      const costCars = Math.round(
+        ((Math.round(
+          +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
+        ) +
+          Math.round(
+            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
+          )) *
+          1.05) /
+          Math.round(
+            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
+              10000
+          )
+      );
+      const costMachineWork = Math.round(
+        pricePerHourPersonnel *
+          (Tractor.numberOfPersonnel ?? 0) *
+          gradeTractor?.coefficient!
+      );
+      const costHandWork = Math.round(
+        pricePerHourPersonnel *
+          (machine.numberOfServicePersonnel ?? 0) *
+          gradeMachine?.coefficient!
+      );
+
+      elem.costMachineWork = costMachineWork;
+      elem.costCars = costCars;
+      elem.costFuel = costFuel;
+      elem.costHandWork = costHandWork;
+    } else if (elem.cell == "costHandWork") {
+      //@ts-ignore sequelize-znov
+      const handWork = await cost_hand_work.findOne({
+        where: { techOperationId: elem.id },
+      });
+      let costHandWork;
+      if (!handWork) return;
+      const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
+      const cart = await tech_cart.findOne({ where: { id: cartId } });
+      if (!Grade || !cart) throw new Error("нема карти або типу роботи");
+
+      const pricePerHourPersonnel = Math.round(cart.salary / 176);
+
+      if (handWork.type == 1) {
+        costHandWork = Math.round(
+          (pricePerHourPersonnel / handWork.productionRateTime!) *
+            Grade.coefficient *
+            10000
+        );
+      } else if (handWork.type == 2) {
+        costHandWork = Math.round(
+          pricePerHourPersonnel *
+            (handWork.yieldСapacity! / handWork.productionRateWeight!) *
+            Grade.coefficient
+        );
+      } else if (handWork.type == 3) {
+        costHandWork = Math.round(
+          pricePerHourPersonnel *
+            (handWork.spending! / handWork.productionRateAmount!) *
+            Grade.coefficient
+        );
+      }
+      elem.costHandWork = costHandWork;
+    }
     await cost_material.destroy({
       where: { techOperationId: operId },
     });
@@ -750,8 +706,7 @@ class OperService {
     await tech_operation.destroy({
       where: { id: operId },
     });
-    let res = await getCart(cartId, operId!);
-    return res;
+    return elem;
   }
   async getProps({ operId }: { operId: number }) {
     const oper = await tech_operation.findOne({ where: { id: operId } });

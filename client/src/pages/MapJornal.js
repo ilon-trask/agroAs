@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../index";
 import MapInputs from "../components/MapInputs";
-import Table from "../components/Table";
+import Table from "../modules/CartsTable";
 import { observer } from "mobx-react-lite";
 import Loader from "../components/Loader";
 import style from "./map.module.css";
