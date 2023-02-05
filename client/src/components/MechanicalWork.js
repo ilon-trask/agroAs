@@ -1,16 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Context } from "../../..";
-import css from "../../../components/Dialog.module.css";
-import PopupField from "./PopupField";
-import CreateTractor from "../CreateTractor";
-import CreateAgriculturalMachine from "../CreateAgriculturalMachine";
-import {
-  createTrac,
-  createMachineFunc,
-  createMachineProps,
-  createTracProps,
-} from "./funs";
+import { Context } from "..";
+import css from "./Dialog.module.css";
+import CreateTractor from "../modules/CreateTractor";
+import CreateMachine from "../modules/CreateMachine";
 import { observer } from "mobx-react-lite";
+import Input from "../ui/Input/Input";
 
 const MechanicalWork = observer(({ res, setRes }) => {
   const [inRes, setInRes] = useState({});
@@ -45,7 +39,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
       <div className="">
         <div className="d-flex ">
           <p>Назва операції</p>
-          <input
+          <Input
             placeholder="Вкажіть назву"
             type="text"
             value={res?.nameOper}
@@ -98,8 +92,8 @@ const MechanicalWork = observer(({ res, setRes }) => {
           <div>
             <p>Розхід палива на 1 год</p>
 
-            <input
-              placeholder={"Вкажіть ціну"}
+            <Input
+              placeholder="Вкажіть ціну"
               type="number"
               value={res?.fuelConsumption}
               onChange={(e) => {
@@ -160,7 +154,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
           </div>
           <div>
             <p>Робоча швидкість км/год</p>
-            <input
+            <Input
               placeholder="Вкажіть швидкість"
               type="number"
               value={res?.workingSpeed}
@@ -181,35 +175,22 @@ const MechanicalWork = observer(({ res, setRes }) => {
           </div>
         </div>
       </div>
-      {tractorOpen ? (
-        <PopupField
-          open={tractorOpen}
-          setOpen={setTractorOpen}
-          res={inRes}
-          setRes={setInRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={createTrac}
-          props={createTracProps}
-        >
-          <CreateTractor res={inRes} setRes={setInRes} />
-        </PopupField>
-      ) : agriculturalOpen ? (
-        <PopupField
-          open={agriculturalOpen}
-          setOpen={setAgriculturalOpen}
-          res={inRes}
-          setRes={setInRes}
-          update={update}
-          setUpdate={setUpdate}
-          func={createMachineFunc}
-          props={createMachineProps}
-        >
-          <CreateAgriculturalMachine res={inRes} setRes={setInRes} />
-        </PopupField>
-      ) : (
-        <></>
-      )}
+      <CreateTractor
+        open={tractorOpen}
+        setOpen={setTractorOpen}
+        res={inRes}
+        setRes={setInRes}
+        update={update}
+        setUpdate={setUpdate}
+      />
+      <CreateMachine
+        open={agriculturalOpen}
+        setOpen={setAgriculturalOpen}
+        res={inRes}
+        setRes={setInRes}
+        update={update}
+        setUpdate={setUpdate}
+      />
     </>
   );
 });

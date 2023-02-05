@@ -1,14 +1,15 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import { observer } from "mobx-react-lite";
+import Input from "../ui/Input/Input";
 
 const Easy = observer(({ res, setRes }) => {
   return (
     <>
-      <h4>Внесіть данні для розрахунку</h4>
+      <h4>Внесіть данні для розрахунку транспортування</h4>
       <div className="d-flex gap-3">
         <div>
-          <p>Назва операції</p>
-          <input
+          <p>Назва робіт</p>
+          <Input
             placeholder="Вкажіть назву"
             type="text"
             value={res?.nameOper}
@@ -19,7 +20,7 @@ const Easy = observer(({ res, setRes }) => {
         </div>
         <div>
           <p>Ціна</p>
-          <input
+          <Input
             placeholder="Вкажіть ціну"
             type="number"
             value={res?.price}
@@ -30,34 +31,12 @@ const Easy = observer(({ res, setRes }) => {
         </div>
         <div>
           <p>Одиниці виміру ціни</p>
-          <input
+          <Input
             placeholder="Вкажіть одиниці"
             type="text"
             value={res?.unitsOfCost}
             onChange={(e) => {
               setRes({ ...res, unitsOfCost: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Розхід/кількість на 1 га</p>
-          <input
-            placeholder="Вкажіть розхід"
-            type="number"
-            value={res?.consumptionPerHectare}
-            onChange={(e) => {
-              setRes({ ...res, consumptionPerHectare: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Одиниці виміру розходу</p>
-          <input
-            placeholder="Вкажіть одиниці"
-            type="text"
-            value={res?.unitsOfConsumption}
-            onChange={(e) => {
-              setRes({ ...res, unitsOfConsumption: e.target.value });
             }}
           />
         </div>

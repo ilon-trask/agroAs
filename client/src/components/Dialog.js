@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Context } from "../../../index";
-import css from "../../../components/Dialog.module.css";
+import { Context } from "../index";
+import css from "./Dialog.module.css";
 import { observer } from "mobx-react-lite";
+import Button from "../ui/Button/Button";
 
-const PopupField = observer(
+const Dialog = observer(
   ({
     open,
     setOpen,
     cell,
     setCell,
     section,
-    akk,
-    akkum,
+    setSection,
     res,
     setRes,
     update,
@@ -20,6 +20,7 @@ const PopupField = observer(
     children,
     func,
     props,
+    errMess,
   }) => {
     const { map } = useContext(Context);
     const { id } = useParams();
@@ -34,7 +35,6 @@ const PopupField = observer(
         setRes(props);
       }
     }, [props]);
-
     return (
       <div
         style={open ? { display: "flex" } : { display: "none" }}
@@ -55,13 +55,12 @@ const PopupField = observer(
           {children}
           {isErr ? "Ви не заповнили поля" : ""}
           <div>
-            <button
-              className={css.button}
+            <Button
+              style={{ marginTop: "10px" }}
               onClick={() => {
                 func(
                   id,
                   map,
-                  akkum,
                   update,
                   res,
                   setIsErr,
@@ -69,26 +68,29 @@ const PopupField = observer(
                   cell,
                   setCell,
                   setRes,
-                  akk,
-                  section
+                  section,
+                  setSection
                 );
               }}
             >
               Зберегти
-            </button>
+            </Button>
           </div>
-          <p>
-            Увага!
-            <br />
-            Одиниці виміру "ціни" повинні відповідати одиницям виміру "розходу"
-            <br />
-            Наприклад (грн/кг) відповідає (кг/га) або (грн/шт) відповідає
-            (шт/га)
-          </p>
+          {errMess || (
+            <p>
+              Увага!
+              <br />
+              Одиниці виміру "ціни" повинні відповідати одиницям виміру
+              "розходу"
+              <br />
+              Наприклад (грн/кг) відповідає (кг/га) або (грн/шт) відповідає
+              (шт/га)
+            </p>
+          )}
         </div>
       </div>
     );
   }
 );
 
-export default PopupField;
+export default Dialog;

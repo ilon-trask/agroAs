@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext, useState } from "react";
-import { Context } from "../../index";
-import css from "../Dialog.module.css";
+import { Context } from "../index";
+import css from "./Dialog.module.css";
 
-function FormOper({
+function OperSection({
   open,
   setOpen,
   setSecondOpen,
@@ -111,4 +111,4 @@ function FormOper({
     </div>
   );
 }
-export default observer(FormOper);
+export default observer(OperSection);

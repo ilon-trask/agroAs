@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
-import { Context } from "../../index.js";
+import { Context } from "../index.js";
+import Input from "../ui/Input/Input.js";
 
 function CreateAgriculturalMachine({ res, setRes }) {
   const { map } = useContext(Context);
@@ -9,7 +10,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
       <div className=" gap-3">
         <div>
           <p>Назва СГ машини</p>
-          <input
+          <Input
             placeholder="Вкажіть назву"
             type="text"
             value={res?.nameMachine}
@@ -20,7 +21,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Марка СГ машини</p>
-          <input
+          <Input
             placeholder="Вкажіть марку"
             type="text"
             value={res?.brand}
@@ -31,7 +32,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Ціна СГ машини грн</p>
-          <input
+          <Input
             placeholder="Вкажіть ціну"
             type="number"
             value={res?.marketCost}
@@ -42,7 +43,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Термін амортизації в роках </p>
-          <input
+          <Input
             placeholder="Вкажіть термін"
             type="number"
             value={res?.depreciationPeriod}
@@ -53,7 +54,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Ширина захвату</p>
-          <input
+          <Input
             placeholder="Вкажіть потіжність"
             type="number"
             step="0.01"
@@ -65,7 +66,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
         </div>
         <div>
           <p>Робоча швидкість</p>
-          <input
+          <Input
             placeholder="Вкажіть потіжність"
             type="number"
             value={res?.workingSpeed}
@@ -80,7 +81,7 @@ function CreateAgriculturalMachine({ res, setRes }) {
             Кількість обслуговуючого
             <br /> персоналу
           </p>
-          <input
+          <Input
             placeholder="Вкажіть кількість"
             type="number"
             value={res?.numberOfServicePersonnel}

@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
 import { Context } from "../index";
-
 import MapInputs from "../components/MapInputs";
 import Table from "../components/Table";
 import { observer } from "mobx-react-lite";
 import Loader from "../components/Loader";
+import style from "./map.module.css";
+import CreateCart from "../modules/CreateCart";
+import Button from "../ui/Button/Button";
 
 function MapJornal() {
   const { map } = useContext(Context);
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
   const [data, setData] = useState([]);
-  let [res, setRes] = useState({
+  const [res, setRes] = useState({
     nameCart: "",
     area: "",
     salary: "",
@@ -21,7 +22,7 @@ function MapJornal() {
   return (
     <>
       {map.isLoading ? <Loader /> : <></>}
-      <Container>
+      <div className={style.container}>
         <p style={{ textAlign: "center", fontSize: "25px" }}>
           Журнал технологічних карт
         </p>
@@ -31,25 +32,23 @@ function MapJornal() {
           setOpen={setOpen}
           setUpdate={setUpdate}
         ></Table>
-        <button
+        <Button
           style={{ marginTop: "15px", marginLeft: "20px" }}
           onClick={() => {
             setOpen(true);
           }}
         >
           Добавити технологічну карту
-        </button>
-        <MapInputs
+        </Button>
+        <CreateCart
           open={open}
           setOpen={setOpen}
-          data={data}
-          setData={setData}
           update={update}
           setUpdate={setUpdate}
           res={res}
           setRes={setRes}
-        ></MapInputs>
-      </Container>
+        />
+      </div>
     </>
   );
 }

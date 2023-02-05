@@ -1,5 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
+import Input from "../ui/Input/Input";
 
 const Easy = observer(({ res, setRes }) => {
   return (
@@ -8,7 +9,7 @@ const Easy = observer(({ res, setRes }) => {
       <div className="d-flex gap-3">
         <div>
           <p>Назва послуги</p>
-          <input
+          <Input
             placeholder="Вкажіть назву"
             type="text"
             value={res?.nameOper}
@@ -19,7 +20,7 @@ const Easy = observer(({ res, setRes }) => {
         </div>
         <div>
           <p>Ціна</p>
-          <input
+          <Input
             placeholder="Вкажіть ціну"
             type="number"
             value={res?.price}
@@ -30,7 +31,7 @@ const Easy = observer(({ res, setRes }) => {
         </div>
         <div>
           <p>Одиниці виміру ціни</p>
-          <input
+          <Input
             placeholder="Вкажіть одиниці"
             type="text"
             value={res?.unitsOfCost}

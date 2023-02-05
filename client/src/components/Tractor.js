@@ -1,22 +1,19 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
 import { useContext } from "react";
-import { Context } from "../../index.js";
+import { Context } from "../index.js";
+import Input from "../ui/Input/Input.js";
 
 const CreateTractor = ({ res, setRes }) => {
   const { map } = useContext(Context);
 
-  console.log(res);
-  console.log(res.id);
-  console.log(res.operId);
-  console.log(res.brand);
   return (
     <>
       <h4>Внесіть данні для трактора</h4>
       <div className=" gap-3">
         <div>
           <p>Назва трактора</p>
-          <input
+          <Input
             placeholder="Вкажіть назву"
             type="text"
             value={res?.nameTractor}
@@ -27,7 +24,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Марка трактора</p>
-          <input
+          <Input
             placeholder="Вкажіть марку"
             type="text"
             value={res?.brand}
@@ -38,7 +35,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Ціна трактора грн</p>
-          <input
+          <Input
             placeholder="Вкажіть ціну"
             type="number"
             value={res?.marketCost}
@@ -49,7 +46,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Термін амортизації в роках</p>
-          <input
+          <Input
             placeholder="Вкажіть термін"
             type="number"
             value={res?.depreciationPeriod}
@@ -60,7 +57,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Потужність двигуна кВт</p>
-          <input
+          <Input
             placeholder="Вкажіть потіжність"
             type="number"
             value={res?.enginePower}
@@ -71,7 +68,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Розхід палива на 1 год</p>
-          <input
+          <Input
             placeholder="Вкажіть розхід"
             type="number"
             value={res?.fuelConsumption}
@@ -82,7 +79,7 @@ const CreateTractor = ({ res, setRes }) => {
         </div>
         <div>
           <p>Кількість персоналу</p>
-          <input
+          <Input
             placeholder="Вкажіть кількість"
             type="number"
             value={res?.numberOfPersonnel}

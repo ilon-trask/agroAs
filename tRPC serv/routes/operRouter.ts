@@ -11,7 +11,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akk: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -36,7 +35,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akk: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -66,7 +64,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akk: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -91,7 +88,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akk: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -114,7 +110,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akk: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -140,7 +135,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akkum: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -165,7 +159,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akkum: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -188,7 +181,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akkum: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -213,7 +205,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akkum: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -236,7 +227,6 @@ export const operRouter = router({
       .input(
         z.object({
           cartId: z.number(),
-          akkum: z.number(),
           arr: z.object({
             cell: z.enum([
               "costMaterials",
@@ -265,9 +255,7 @@ export const operRouter = router({
   }),
 
   delete: publicProcedure
-    .input(
-      z.object({ cartId: z.number(), operId: z.number(), akk: z.number() })
-    )
+    .input(z.object({ cartId: z.number(), operId: z.number() }))
     .query(async ({ input }) => {
       const oper = await OperService.deleteOper(input);
 

@@ -7,7 +7,7 @@ p {
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: calc(100vh - 54px);
+  height: calc(100vh - 7vh);
   background-color: rgba(59, 59, 59, 0.7);
   align-items: center;
   justify-content: center;

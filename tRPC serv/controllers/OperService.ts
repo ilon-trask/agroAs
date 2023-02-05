@@ -74,7 +74,6 @@ export type Icell =
 
 interface Idata<T> {
   cartId: number;
-  akk: number;
   arr: {
     cell: Icell;
     res: T;
@@ -118,7 +117,6 @@ interface IdataCreateCostHandWork
 
 interface IdataPatch<T> {
   cartId: number;
-  akkum: number;
   arr: {
     cell: Icell;
     res: T;
@@ -405,7 +403,7 @@ class OperService {
   async createCostMaterials(data: IdataCreateCostMaterials) {
     const {
       cartId,
-      akk,
+
       arr: {
         cell,
         res: {
@@ -420,7 +418,6 @@ class OperService {
     } = data;
     let sum: number;
     const oper = await createOper(cartId, nameOper, cell, section);
-    sum = akk + price * consumptionPerHectare;
     const operId = oper.id;
 
     cost_material.create({
@@ -432,14 +429,13 @@ class OperService {
       techOperationId: operId,
     });
 
-    techCartUpdate(sum, cartId);
     let res = await getCart(cartId, operId!);
     return res;
   }
   async createCostServices(data: IdataCreateCostServices) {
     const {
       cartId,
-      akk,
+
       arr: {
         cell,
         res: { nameOper, price, unitsOfCost },
@@ -461,7 +457,7 @@ class OperService {
   async createCostTransport(data: IdataCreateCostTransport) {
     const {
       cartId,
-      akk,
+
       arr: {
         cell,
         res: { nameOper, price, unitsOfCost },
@@ -484,7 +480,7 @@ class OperService {
   async createCostMechanical(data: IdataCreateCostMechanical) {
     const {
       cartId,
-      akk,
+
       arr: {
         cell,
         res: { nameOper, fuelConsumption, workingSpeed, idTractor, idMachine },
@@ -520,7 +516,7 @@ class OperService {
   async createCostHandWork(data: IdataCreateCostHandWork) {
     const {
       cartId,
-      akk,
+
       arr: {
         cell,
         res: {
@@ -571,7 +567,7 @@ class OperService {
   async patchCostMaterials(data: IdataPatchCostMaterial) {
     const {
       cartId,
-      akkum,
+
       arr: {
         cell,
         res: {
@@ -603,7 +599,7 @@ class OperService {
   async patchCostService(data: IdataPatchCostServices) {
     const {
       cartId,
-      akkum,
+
       arr: {
         cell,
         res: { operId, nameOper, price, unitsOfCost },
@@ -627,7 +623,7 @@ class OperService {
   async patchCostTransport(data: IdataPatchCostTransport) {
     const {
       cartId,
-      akkum,
+
       arr: {
         cell,
         res: { operId, nameOper, price, unitsOfCost },
@@ -650,7 +646,7 @@ class OperService {
   async patchCostMechanical(data: IdataPatchCostMachine) {
     const {
       cartId,
-      akkum,
+
       arr: {
         cell,
         res: {
@@ -678,6 +674,7 @@ class OperService {
       },
       { where: { techOperationId: operId } }
     );
+    updateOper(nameOper, cell, operId);
 
     let res = await getCart(cartId, operId!);
     return res;
@@ -685,7 +682,6 @@ class OperService {
   async patchCostHandWork(data: IdataPatchCostHandWork) {
     const {
       cartId,
-      akkum,
       arr: {
         cell,
         res: {
@@ -726,8 +722,8 @@ class OperService {
     return res;
   }
 
-  async deleteOper(data: { cartId: number; operId: number; akk: number }) {
-    const { cartId, operId, akk } = data;
+  async deleteOper(data: { cartId: number; operId: number }) {
+    const { cartId, operId } = data;
 
     const elem = await tech_operation.findOne({ where: { id: operId } });
     if (!elem) throw new Error("");

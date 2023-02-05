@@ -1,7 +1,10 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { AppRouter } from "../../../tRPC serv/index";
 import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
-import { Idata } from "../../../tRPC serv/controllers/TechCartService";
+import {
+  Idata,
+  resTechCartsWithOpers,
+} from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
 import {
   Icost_hand_work,
@@ -31,52 +34,56 @@ const client = createTRPCProxyClient<AppRouter>({
 export async function getCarts(map: MapStore) {
   map.isLoading = true;
   let data;
-  await client.cart.get.query().then((res) => {
-    map.opers = [];
-    data = res;
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.maps = res.carts;
-    for (let i = 0; i < res.carts.length; i++) {
-      const opers = res.carts[i].tech_operations;
-      for (let j = 0; j < opers.length; j++) {
-        const oper = opers[j];
-        map.newOper = opers[j];
-        console.log(oper);
+  await client.cart.get
+    .query()
+    .then((res: { carts: resTechCartsWithOpers[] }) => {
+      map.opers = [];
+      data = res;
+      map.costMechanical = [];
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.maps = res.carts;
+      for (let i = 0; i < res.carts.length; i++) {
+        const opers = res.carts[i].tech_operations;
+        for (let j = 0; j < opers.length; j++) {
+          const oper = opers[j];
+          map.newOper = opers[j];
+          console.log(oper);
 
-        if (oper.aggregate) {
-          console.log(oper.aggregate);
+          if (oper.aggregate) {
+            console.log(oper.aggregate);
 
-          map.newCostMechanical = oper.aggregate;
-        } else if (oper.cost_service) {
-          map.newCostServices = oper.cost_service;
-        } else if (oper.cost_transport) {
-          map.newCostTransport = oper.cost_transport;
-        } else if (oper.cost_material) {
-          map.newCostMaterials = oper.cost_material;
-        } else if (oper.cost_hand_work) {
-          map.newCostHandWork = oper.cost_hand_work;
+            map.newCostMechanical = oper.aggregate;
+          } else if (oper.cost_service) {
+            map.newCostServices = oper.cost_service;
+          } else if (oper.cost_transport) {
+            map.newCostTransport = oper.cost_transport;
+          } else if (oper.cost_material) {
+            map.newCostMaterials = oper.cost_material;
+          } else if (oper.cost_hand_work) {
+            map.newCostHandWork = oper.cost_hand_work;
+          }
         }
       }
-    }
-  });
+    });
   map.isLoading = false;
   return data;
 }
 
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
-  await client.cart.delete.query({ id: id }).then((data) => {
-    map.maps = data.carts;
-  });
+  await client.cart.delete
+    .query({ id: id })
+    .then((data: { carts: resTechCartsWithOpers[] }) => {
+      map.maps = data.carts;
+    });
   map.isLoading = false;
 }
 
 export async function createCart(map: MapStore, data: Idata) {
   map.isLoading = true;
-  await client.cart.create.query(data).then((res) => {
+  await client.cart.create.query(data).then((res: Itech_cart) => {
     map.newMaps = res;
   });
   map.isLoading = false;
@@ -121,12 +128,11 @@ export async function updateMap(map: MapStore, data: any) {
 export async function deleteOper(
   map: MapStore,
   operId: number,
-  cartId: number,
-  akk: number
+  cartId: number
 ) {
   map.isLoading = true;
   await client.oper.delete
-    .query({ akk: akk, cartId: +cartId, operId: operId })
+    .query({ cartId: +cartId, operId: operId })
     .then((data) => {
       map.maps = data.carts;
       map.opers = data.opers;
@@ -166,8 +172,7 @@ export async function createOperation(
     res: any;
     section: number;
   },
-  id: number,
-  akk: number
+  id: number
 ) {
   map.isLoading = true;
 
@@ -175,7 +180,6 @@ export async function createOperation(
     .query({
       arr: arr,
       cartId: +id,
-      akk,
     })
     .then((data) => {
       data.props?.forEach((el) => {
@@ -215,14 +219,13 @@ export async function patchOperation(
     cell: Icell;
     res: any;
   },
-  id: number,
-  akkum: number
+  id: number
 ) {
   map.isLoading = true;
   await client.oper.patch[arr.cell]
     .query({
       cartId: +id,
-      akkum,
+
       arr: arr,
     })
     .then((data) => {

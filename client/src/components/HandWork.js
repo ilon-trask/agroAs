@@ -2,17 +2,17 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { useContext } from "react";
 import { useState } from "react";
-import { Context } from "../../../index.js";
+import { Context } from "../index.js";
+import Input from "../ui/Input/Input";
 
 const HandWork = observer(({ res, setRes }) => {
   const { map } = useContext(Context);
-  // setRes({...res, res.type:1})
   return (
     <>
       <div className="d-flex gap-4">
         <div>
           <p>Назва операції</p>
-          <input
+          <Input
             type="text"
             onChange={(e) => {
               setRes({ ...res, nameOper: e.target.value });
@@ -68,7 +68,7 @@ const HandWork = observer(({ res, setRes }) => {
           >
             <p>Норма виробітку годин</p>
             <div className="d-flex">
-              <input
+              <Input
                 value={res.productionRateTime}
                 onChange={(e) => {
                   setRes({ ...res, productionRateTime: e.target.value });
@@ -110,7 +110,7 @@ const HandWork = observer(({ res, setRes }) => {
               <div>
                 <p>Норма виробітку ваги</p>
                 <div className="d-flex">
-                  <input
+                  <Input
                     value={res.productionRateWeight}
                     onChange={(e) => {
                       setRes({ ...res, productionRateWeight: e.target.value });
@@ -124,7 +124,7 @@ const HandWork = observer(({ res, setRes }) => {
               <div>
                 <p>Урожайність з 1 га</p>
                 <div className="d-flex">
-                  <input
+                  <Input
                     value={res.yieldСapacity}
                     onChange={(e) => {
                       setRes({ ...res, yieldСapacity: e.target.value });
@@ -168,7 +168,7 @@ const HandWork = observer(({ res, setRes }) => {
               <div>
                 <p>Норма виробітку кількість</p>
                 <div className="d-flex">
-                  <input
+                  <Input
                     value={res.productionRateAmount}
                     onChange={(e) => {
                       setRes({ ...res, productionRateAmount: e.target.value });
@@ -182,7 +182,7 @@ const HandWork = observer(({ res, setRes }) => {
               <div>
                 <p>Розхід на 1 га</p>
                 <div className="d-flex">
-                  <input
+                  <Input
                     value={res.spending}
                     onChange={(e) => {
                       setRes({ ...res, spending: e.target.value });

@@ -37,7 +37,7 @@ interface resTechOperation extends Itech_operation {
   cost_service: Icost_service | null;
   cost_transport: Icost_transport | null;
 }
-interface resTechCartsWithOpers extends Itech_cart {
+export interface resTechCartsWithOpers extends Itech_cart {
   tech_operations: resTechOperation[];
 }
 let cellNames: {
@@ -75,9 +75,8 @@ async function getCart() {
     ],
   });
   carts.sort((a, b) => a.id! - b.id!);
-  let normData = JSON.parse(JSON.stringify(carts));
-  for (let i = 0; i < normData.length; i++) {
-    let cart = normData[i];
+  for (let i = 0; i < carts.length; i++) {
+    let cart = carts[i];
     let sum: number = 0;
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: Itech_operation = cart.tech_operations[j];
@@ -200,7 +199,7 @@ async function getCart() {
         sum += costHandWork || 0;
       }
     }
-    carts[i].totalCost = sum;
+    cart.totalCost = sum;
   }
 
   res = { carts };

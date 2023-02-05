@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Context } from "../index";
 import css from "./Dialog.module.css";
 import { createCart, updateMap } from "../http/requests";
+import Input from "../ui/Input/Input";
 
 export default function MapInputs({
   open,
@@ -13,110 +14,56 @@ export default function MapInputs({
 }) {
   let { map } = useContext(Context);
   let [err, setErr] = useState(false);
-
+  console.log(res);
   return (
-    <div
-      style={open ? { display: "flex" } : { display: "none" }}
-      className={css.dialog}
-      onClick={() => {
-        setOpen(false);
-        if (update) {
-          setUpdate(false);
-          setRes({
-            nameCart: "",
-            area: "",
-            salary: "",
-            priceDiesel: "",
-          });
-        }
-      }}
-    >
-      <div
-        className={css.container}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        <h4>Загальні показники для розрахунку</h4>
-        <div className="d-flex gap-3 ">
-          <div>
-            <p>Назва культури</p>
-            <input
-              placeholder="Вкажіть дату"
-              type="text"
-              value={res.nameCart}
-              onChange={(e) => {
-                setRes({ ...res, nameCart: e.target.value });
-              }}
-            />
-          </div>
-          <div>
-            <p>Площа, га</p>
-            <input
-              placeholder="Вкажіть дату"
-              type="number"
-              onChange={(e) => {
-                setRes({ ...res, area: e.target.value });
-              }}
-              value={res.area}
-            />
-          </div>
-          <div>
-            <p>Розрахункова ЗП, грн</p>
-            <input
-              placeholder="Вкажіть дату"
-              type="number"
-              onChange={(e) => {
-                setRes({ ...res, salary: e.target.value });
-              }}
-              value={res.salary}
-            />
-          </div>
-          <div>
-            <p>Ціна ДП, грн</p>
-            <input
-              placeholder="Вкажіть дату"
-              type="number"
-              onChange={(e) => {
-                setRes({ ...res, priceDiesel: e.target.value });
-              }}
-              value={res.priceDiesel}
-            />
-          </div>
-        </div>
-        {err ? "Ви не заповнили поля!" : ""}
+    <>
+      <h4>Загальні показники для розрахунку</h4>
+      <div className="d-flex gap-3 ">
         <div>
-          <button
-            className={css.button}
-            onClick={() => {
-              if (
-                res.nameCart == "" ||
-                res.area == "" ||
-                res.salary == "" ||
-                res.priceDiesel == ""
-              ) {
-                setErr(true);
-              } else {
-                setErr(false);
-                setOpen(false);
-                res.area = +res.area;
-                res.salary = +res.salary;
-                res.priceDiesel = +res.priceDiesel;
-                setRes({ nameCart: "", area: "", salary: "", priceDiesel: "" });
-                if (update) {
-                  updateMap(map, res);
-                  console.log("upd");
-                } else {
-                  createCart(map, res);
-                }
-                setUpdate(false);
-              }
+          <p>Назва культури</p>
+          <Input
+            placeholder="Вкажіть дату"
+            type="text"
+            value={res.nameCart}
+            onChange={(e) => {
+              setRes({ ...res, nameCart: e.target.value });
             }}
-          >
-            Зберегти
-          </button>
+          />
+        </div>
+        <div>
+          <p>Площа, га</p>
+          <Input
+            placeholder="Вкажіть дату"
+            type="number"
+            onChange={(e) => {
+              setRes({ ...res, area: e.target.value });
+            }}
+            value={res.area}
+          />
+        </div>
+        <div>
+          <p>Розрахункова ЗП, грн</p>
+          <Input
+            placeholder="Вкажіть дату"
+            type="number"
+            onChange={(e) => {
+              setRes({ ...res, salary: e.target.value });
+            }}
+            value={res.salary}
+          />
+        </div>
+        <div>
+          <p>Ціна ДП, грн</p>
+          <Input
+            placeholder="Вкажіть дату"
+            type="number"
+            onChange={(e) => {
+              setRes({ ...res, priceDiesel: e.target.value });
+            }}
+            value={res.priceDiesel}
+          />
         </div>
       </div>
-    </div>
+    </>
   );
 }
