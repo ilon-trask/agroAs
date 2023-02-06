@@ -1,0 +1,12 @@
+.container {
+  max-width: 80%;
+  height: 7vh;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bg {
+  background: rgb(15, 16, 20);
+}

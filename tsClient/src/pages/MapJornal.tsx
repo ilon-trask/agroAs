@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Context } from "../index";
+import { Context } from "../main";
 import CartsTable from "../modules/CartsTable";
 import { observer } from "mobx-react-lite";
 import Loader from "../components/Loader";
