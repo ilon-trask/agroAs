@@ -1,9 +1,20 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import Machine from "../components/Machine";
 import { createMachine, patchMachine } from "../http/requests";
 
-const machineProps = {
+export type MachineProps = {
+  nameMachine: string;
+  brand: string;
+  marketCost: number | string;
+  depreciationPeriod: number | string;
+  widthOfCapture: number | string;
+  workingSpeed: number | string;
+  numberOfServicePersonnel: number | string;
+  gradeId: number | string;
+};
+
+const machineProps: MachineProps = {
   nameMachine: "",
   brand: "",
   marketCost: "",
@@ -14,7 +25,7 @@ const machineProps = {
   gradeId: "",
 };
 
-function createMachineFunc(
+const createMachineFunc: func<MachineProps> = function (
   id,
   map,
   update,
@@ -45,8 +56,17 @@ function createMachineFunc(
       createMachine(map, res);
     }
   }
-}
-
+};
+type props = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  res: MachineProps;
+  setRes: (
+    res: MachineProps | ((res: MachineProps) => MachineProps) | {}
+  ) => void;
+  update: boolean;
+  setUpdate: (update: boolean) => void;
+};
 export default function CreateMachine({
   open,
   setOpen,
@@ -54,8 +74,9 @@ export default function CreateMachine({
   setRes,
   update,
   setUpdate,
-}) {
+}: props) {
   console.log(open);
+
   return (
     <Dialog
       open={open}

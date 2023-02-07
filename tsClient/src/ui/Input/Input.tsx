@@ -1,5 +1,14 @@
 import React from "react";
 
+type props = {
+  placeholder?: string;
+  type: "text" | "number";
+  value: number | string;
+  onChange: (e: any) => void;
+  step?: string;
+  disabled?: boolean;
+};
+
 export default function Input({
   placeholder,
   type,
@@ -7,7 +16,7 @@ export default function Input({
   onChange,
   step,
   disabled,
-}) {
+}: props) {
   return (
     <input
       placeholder={placeholder}

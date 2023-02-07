@@ -1,16 +1,23 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import MapInputs from "../components/MapInputs";
 import { createCart, updateMap } from "../http/requests";
-
-const cartProps = {
+import { Icart } from "../pages/MapJornal";
+export type cartProps = {
+  id?: number;
+  nameCart: string;
+  area: number | "";
+  salary: number | "";
+  priceDiesel: number | "";
+};
+const cartProps: cartProps = {
   nameCart: "",
   area: "",
   salary: "",
   priceDiesel: "",
 };
 
-function createCartFunc(
+const createCartFunc: func<cartProps> = (
   id,
   map,
   update,
@@ -22,7 +29,7 @@ function createCartFunc(
   setRes,
   section,
   setSection
-) {
+) => {
   if (
     res.nameCart == "" ||
     res.area == "" ||
@@ -43,8 +50,15 @@ function createCartFunc(
       createCart(map, res);
     }
   }
+};
+interface props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  update: boolean;
+  setUpdate: (update: boolean) => void;
+  res: cartProps;
+  setRes: (res: cartProps | ((res: cartProps) => cartProps)) => void;
 }
-
 export default function CreateCart({
   open,
   setOpen,
@@ -52,9 +66,7 @@ export default function CreateCart({
   setUpdate,
   res,
   setRes,
-}) {
-  console.log(open);
-  console.log(res);
+}: props) {
   return (
     <Dialog
       open={open}
@@ -67,14 +79,7 @@ export default function CreateCart({
       props={cartProps}
       errMess={" "}
     >
-      <MapInputs
-        open={open}
-        setOpen={setOpen}
-        update={update}
-        setUpdate={setUpdate}
-        res={res}
-        setRes={setRes}
-      />
+      <MapInputs res={res} setRes={setRes} />
     </Dialog>
   );
 }

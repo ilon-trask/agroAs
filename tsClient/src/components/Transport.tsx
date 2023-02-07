@@ -1,8 +1,14 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
+import { TransportProps } from "../modules/CreateCostTransport";
 
-const Easy = observer(({ res, setRes }) => {
+type props = {
+  res: TransportProps;
+  setRes: (res: TransportProps) => void;
+};
+
+const Easy = observer(({ res, setRes }: props) => {
   return (
     <>
       <h4>Внесіть данні для розрахунку транспортування</h4>

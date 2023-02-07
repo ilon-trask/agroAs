@@ -1,13 +1,23 @@
-import React, { useState, useContext } from "react";
-import { Context } from "..";
+import React, { useState, useContext, ChangeEvent } from "react";
+import { Context } from "../main";
 import css from "./Dialog.module.css";
-import CreateTractor from "../modules/CreateTractor";
-import CreateMachine from "../modules/CreateMachine";
+import CreateTractor, { TracProps } from "../modules/CreateTractor";
+import CreateMachine, { MachineProps } from "../modules/CreateMachine";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
+import { MechanicalWorkProps } from "../modules/CreateCostMechanical";
 
-const MechanicalWork = observer(({ res, setRes }) => {
-  const [inRes, setInRes] = useState({});
+type props = {
+  res: MechanicalWorkProps;
+  setRes: (
+    res:
+      | MechanicalWorkProps
+      | ((res: MechanicalWorkProps) => MechanicalWorkProps)
+  ) => void;
+};
+
+const MechanicalWork = observer(({ res, setRes }: props) => {
+  const [inRes, setInRes] = useState<TracProps | MachineProps | {}>({});
   //   {
   //   nameTractor: "",
   //   brand: "",
@@ -66,10 +76,10 @@ const MechanicalWork = observer(({ res, setRes }) => {
             </button>
             <select
               value={res.idTractor}
-              onChange={(e) => {
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setRes(() => {
                   const [tractor] = map.tractor.filter(
-                    (el) => el.id == e.target.value
+                    (el) => el.id! == +e.target.value
                   );
                   return {
                     ...res,
@@ -83,7 +93,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
                 вибрати трактор
               </option>
               {map.tractor.map((el) => (
-                <option key={el.id} value={el.id} label>
+                <option key={el.id} value={el.id}>
                   {el.nameTractor}
                 </option>
               ))}
@@ -122,6 +132,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
                   let [second] = map.machine.filter(
                     (el) => el.id == res.idMachine
                   );
+                  //@ts-ignore
                   setInRes(second);
                   setUpdate(true);
                   setAgriculturalOpen(true);
@@ -132,10 +143,10 @@ const MechanicalWork = observer(({ res, setRes }) => {
             </button>
             <select
               value={res.idMachine}
-              onChange={(e) => {
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setRes(() => {
                   const machine = map.machine.filter(
-                    (el) => el.id == e.target.value
+                    (el) => el.id! == +e.target.value
                   );
                   return { ...res, workingSpeed: machine[0].workingSpeed };
                 });
@@ -178,7 +189,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
       <CreateTractor
         open={tractorOpen}
         setOpen={setTractorOpen}
-        res={inRes}
+        res={inRes as TracProps}
         setRes={setInRes}
         update={update}
         setUpdate={setUpdate}
@@ -186,7 +197,7 @@ const MechanicalWork = observer(({ res, setRes }) => {
       <CreateMachine
         open={agriculturalOpen}
         setOpen={setAgriculturalOpen}
-        res={inRes}
+        res={inRes as MachineProps}
         setRes={setInRes}
         update={update}
         setUpdate={setUpdate}

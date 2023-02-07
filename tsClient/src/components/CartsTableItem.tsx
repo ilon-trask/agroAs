@@ -1,10 +1,27 @@
-import React from "react";
+import React, { FC } from "react";
 import { Link } from "react-router-dom";
+import { Itech_cart } from "../../../tRPC serv/models/models";
 import { deleteCart } from "../http/requests";
+import { Icart } from "../pages/MapJornal";
+import MapStore from "../store/MapStore";
 import { TEHMAP_ROUTER } from "../utils/consts";
 import style from "./TableItem.module.css";
 
-export default function CartsTableItem({ e, setUpdate, setOpen, setRes, map }) {
+interface props {
+  e: Icart;
+  setUpdate: (update: boolean) => void;
+  setOpen: (open: boolean) => void;
+  setRes: (res: Icart) => void;
+  map: MapStore;
+}
+
+export default function CartsTableItem({
+  e,
+  setUpdate,
+  setOpen,
+  setRes,
+  map,
+}: props) {
   return (
     <>
       <div
@@ -30,13 +47,13 @@ export default function CartsTableItem({ e, setUpdate, setOpen, setRes, map }) {
 
       <div className={style.item}>{e.area}</div>
       <div className={style.item}>
-        {Math.round(10 * (e.totalCost * e.area)) / 10 || "0"}
+        {Math.round(10 * (e.totalCost! * e.area)) / 10 || "0"}
       </div>
       <div className={style.item}>{e.totalCost || "0"}</div>
       <div
         className={(style.item, style.delete)}
         onClick={() => {
-          deleteCart(map, +e.id);
+          deleteCart(map, e.id!);
         }}
       >
         видалити

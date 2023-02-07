@@ -75,3 +75,5 @@ app.listen(port, async () => {
   await sequelize.sync();
   console.log(`🚀 Server listening on port ${port}`);
 });
+let b = {};
+let a = b as AppRouter;

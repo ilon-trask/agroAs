@@ -1,9 +1,18 @@
 import React from "react";
 import { useContext } from "react";
-import { Context } from "../index";
+import { Context } from "../main";
 import { deleteOper } from "../http/requests";
 import style from "./Table.module.css";
 import OpersTableItem from "../components/OpersTableItem";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+
+type props = {
+  id: number;
+  setRes: (res: any) => void;
+  setSecondOpen: (open: boolean) => void;
+  setCell: (cell: Icell | "") => void;
+  setUpdate: (update: boolean) => void;
+};
 
 export default function OpersTable({
   id,
@@ -11,10 +20,10 @@ export default function OpersTable({
   setSecondOpen,
   setCell,
   setUpdate,
-}) {
+}: props) {
   const { map } = useContext(Context);
   let operData = map.opers.filter((el) => el?.techCartId == id);
-  operData.sort((a, b) => a.id - b.id);
+  operData.sort((a, b) => a.id! - b.id!);
   let [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
   return (
@@ -38,11 +47,12 @@ export default function OpersTable({
           (el.costMaterials ||
             el.costServices ||
             el.costTransport ||
-            +el.costCars +
-              +el.costFuel +
-              +el.costHandWork +
-              +el.costMachineWork ||
-            el.costHandWork);
+            +el.costCars! +
+              +el.costFuel! +
+              +el.costHandWork! +
+              +el.costMachineWork! ||
+            el.costHandWork ||
+            0);
         return (
           <OpersTableItem
             id={id}

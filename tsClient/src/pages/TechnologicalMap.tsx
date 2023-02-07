@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import OperSection from "../components/OperSection";
 
-import { Context } from "../index";
+import { Context } from "../main";
 import Loader from "../components/Loader";
 import style from "./map.module.css";
 import CreateCostHandWork from "../modules/CreateCostHandWork";
@@ -16,19 +16,28 @@ import CreateCart from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
 import Button from "../ui/Button/Button";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+
+export type createOperProps<T> = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  setCell: (cell: Icell | "") => void;
+  section: number | "";
+  setSection: (section: number) => void;
+  res: T;
+  setRes: (res: T | ((res: T) => T) | {}) => void;
+  update: boolean;
+  setUpdate: (update: boolean) => void;
+};
 
 const DevicePage = observer(() => {
   const [open, setOpen] = useState(false);
   const [secondOpen, setSecondOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
-  const [cell, setCell] = useState("");
-  const [section, setSection] = useState("");
+  const [cell, setCell] = useState<Icell | "">("");
+  const [section, setSection] = useState<number | "">("");
   const [update, setUpdate] = useState(false);
-  const [res, setRes] = useState({
-    nameOper: "",
-    price: "",
-    amount: "",
-  });
+  const [res, setRes] = useState({});
 
   const { map } = useContext(Context);
   let { id } = useParams();
@@ -45,13 +54,13 @@ const DevicePage = observer(() => {
         </p>
         <div>
           <GeneralDataTable
-            id={id}
+            id={+id!}
             setMapOpen={setMapOpen}
             setRes={setRes}
             setUpdate={setUpdate}
           />
           <OpersTable
-            id={id}
+            id={+id!}
             setRes={setRes}
             setSecondOpen={setSecondOpen}
             setCell={setCell}

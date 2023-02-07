@@ -8,14 +8,12 @@ import {
 } from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
 import {
-  Icost_hand_work,
   Igrade,
   Imachine,
   Isection,
   Itech_cart,
   Itech_operation,
   Itractor,
-  tech_cart,
   tech_operation,
 } from "../../../tRPC serv/models/models";
 

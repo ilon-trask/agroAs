@@ -2,10 +2,17 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { useContext } from "react";
 import { useState } from "react";
-import { Context } from "../index.js";
+import { Icost_hand_work } from "../../../tRPC serv/models/models";
+import { Context } from "../main";
+import { CostHandWorkProps } from "../modules/CreateCostHandWork";
 import Input from "../ui/Input/Input";
 
-const HandWork = observer(({ res, setRes }) => {
+type props = {
+  res: CostHandWorkProps;
+  setRes: (res: CostHandWorkProps) => void;
+};
+
+const HandWork = observer(({ res, setRes }: props) => {
   const { map } = useContext(Context);
   return (
     <>
@@ -14,7 +21,7 @@ const HandWork = observer(({ res, setRes }) => {
           <p>Назва операції</p>
           <Input
             type="text"
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setRes({ ...res, nameOper: e.target.value });
             }}
             value={res.nameOper}
@@ -26,7 +33,7 @@ const HandWork = observer(({ res, setRes }) => {
           <select
             value={res.gradeId}
             onChange={(e) => {
-              setRes({ ...res, gradeId: e.target.value });
+              setRes({ ...res, gradeId: +e.target.value });
             }}
           >
             <option value="" selected disabled hidden>
@@ -70,7 +77,7 @@ const HandWork = observer(({ res, setRes }) => {
             <div className="d-flex">
               <Input
                 value={res.productionRateTime}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setRes({ ...res, productionRateTime: e.target.value });
                 }}
                 type="number"
@@ -112,7 +119,7 @@ const HandWork = observer(({ res, setRes }) => {
                 <div className="d-flex">
                   <Input
                     value={res.productionRateWeight}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setRes({ ...res, productionRateWeight: e.target.value });
                     }}
                     type="number"
@@ -126,7 +133,7 @@ const HandWork = observer(({ res, setRes }) => {
                 <div className="d-flex">
                   <Input
                     value={res.yieldСapacity}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setRes({ ...res, yieldСapacity: e.target.value });
                     }}
                     type="number"
@@ -170,7 +177,7 @@ const HandWork = observer(({ res, setRes }) => {
                 <div className="d-flex">
                   <Input
                     value={res.productionRateAmount}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setRes({ ...res, productionRateAmount: e.target.value });
                     }}
                     type="number"
@@ -184,7 +191,7 @@ const HandWork = observer(({ res, setRes }) => {
                 <div className="d-flex">
                   <Input
                     value={res.spending}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setRes({ ...res, spending: e.target.value });
                     }}
                     type="number"

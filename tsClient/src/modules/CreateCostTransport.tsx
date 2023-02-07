@@ -1,14 +1,21 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import Transport from "../components/Transport";
 import { createOperation, patchOperation } from "../http/requests";
+import { createOperProps } from "../pages/TechnologicalMap";
+
+export type TransportProps = {
+  nameOper: string;
+  price: string | number;
+  unitsOfCost: string | number;
+};
 
 const transportProps = {
   nameOper: "",
   price: "",
   unitsOfCost: "",
 };
-function createTransport(
+const createTransport: func<TransportProps> = function (
   id,
   map,
   update,
@@ -28,6 +35,7 @@ function createTransport(
     setRes(transportProps);
     setIsErr(false);
     res.price = +res.price;
+    if (cell == "") return;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id);
@@ -35,7 +43,7 @@ function createTransport(
       createOperation(map, request, id);
     }
   }
-}
+};
 
 const cell = "costTransport";
 
@@ -49,7 +57,7 @@ export default function CreateCostTransport({
   setRes,
   update,
   setUpdate,
-}) {
+}: createOperProps<TransportProps>) {
   return (
     <Dialog
       open={open}

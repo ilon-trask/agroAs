@@ -1,9 +1,13 @@
 import React, { useContext } from "react";
-import { Context } from "../index.js";
+import { Context } from "../main";
+import { MachineProps } from "../modules/CreateMachine";
 import Input from "../ui/Input/Input.js";
 
-function CreateAgriculturalMachine({ res, setRes }) {
+type props = { res: MachineProps; setRes: (rse: MachineProps) => void };
+
+function CreateAgriculturalMachine({ res, setRes }: props) {
   const { map } = useContext(Context);
+
   return (
     <>
       <h4>Внесіть данні для СГ машини</h4>

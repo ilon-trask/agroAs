@@ -1,7 +1,18 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext, useState } from "react";
-import { Context } from "../index";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+import { Context } from "../main";
 import css from "./Dialog.module.css";
+
+type props = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  setSecondOpen: (open: boolean) => void;
+  cell: Icell | "";
+  setCell: (cell: Icell | "") => void;
+  section: number | "";
+  setSection: (section: number | "") => void;
+};
 
 function OperSection({
   open,
@@ -11,7 +22,7 @@ function OperSection({
   setCell,
   section,
   setSection,
-}) {
+}: props) {
   const [isErr, setIsErr] = useState(false);
   const { map } = useContext(Context);
   return (
@@ -46,7 +57,7 @@ function OperSection({
                     Виберіть розділ
                   </option>
                   {map.section?.map((el) => (
-                    <option ket={el.id} value={el.id}>
+                    <option key={el.id} value={el.id}>
                       {el.name}
                     </option>
                   ))}
@@ -60,7 +71,7 @@ function OperSection({
               <div>
                 <select
                   onChange={(e) => {
-                    setCell(e.target.value);
+                    setCell(e.target.value as Icell);
                   }}
                   value={cell}
                   defaultValue={""}

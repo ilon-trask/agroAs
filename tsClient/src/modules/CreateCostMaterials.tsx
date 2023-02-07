@@ -1,7 +1,17 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+import Dialog, { func } from "../components/Dialog";
 import Materials from "../components/Materials";
 import { createOperation, patchOperation } from "../http/requests";
+import { createOperProps } from "../pages/TechnologicalMap";
+
+export type MaterialsProps = {
+  nameOper: string;
+  price: string | number;
+  consumptionPerHectare: string | number;
+  unitsOfCost: string;
+  unitsOfConsumption: string;
+};
 
 const materialsProps = {
   nameOper: "",
@@ -10,7 +20,8 @@ const materialsProps = {
   unitsOfCost: "",
   unitsOfConsumption: "",
 };
-function createMaterials(
+
+const createMaterials: func<MaterialsProps> = function (
   id,
   map,
   update,
@@ -23,7 +34,11 @@ function createMaterials(
   section,
   setSection
 ) {
-  if (res.nameOper == "" || res.price == "" || res.amount == "") {
+  if (
+    res.nameOper == "" ||
+    res.price == "" ||
+    res.consumptionPerHectare == ""
+  ) {
     setIsErr(true);
   } else {
     console.log(update);
@@ -33,6 +48,7 @@ function createMaterials(
     setIsErr(false);
     res.consumptionPerHectare = +res.consumptionPerHectare;
     res.price = +res.price;
+    if (cell == "") return;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id);
@@ -40,7 +56,7 @@ function createMaterials(
       createOperation(map, request, id);
     }
   }
-}
+};
 
 const cell = "costMaterials";
 
@@ -54,7 +70,7 @@ export default function CreateCostMaterials({
   setRes,
   update,
   setUpdate,
-}) {
+}: createOperProps<MaterialsProps>) {
   return (
     <Dialog
       open={open}

@@ -1,8 +1,11 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
+import { ServiceProps } from "../modules/CreateCostServices";
 
-const Easy = observer(({ res, setRes }) => {
+type props = { res: ServiceProps; setRes: (res: ServiceProps) => void };
+
+const Easy = observer(({ res, setRes }: props) => {
   return (
     <>
       <h4>Внесіть данні для розрахунку</h4>

@@ -2,11 +2,18 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
-import { Context } from "../index";
+import { Context } from "../main";
 import CartsTableItem from "../components/CartsTableItem";
 import style from "./Table.module.css";
+import { Icart } from "../pages/MapJornal";
 
-const Table = observer(({ setRes, setOpen, setUpdate }) => {
+interface props {
+  setRes: (res: Icart) => void;
+  setOpen: (open: boolean) => void;
+  setUpdate: (update: boolean) => void;
+}
+
+const Table = observer(({ setRes, setOpen, setUpdate }: props) => {
   const { map } = useContext(Context);
 
   return (

@@ -1,8 +1,14 @@
 import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
+import { MaterialsProps } from "../modules/CreateCostMaterials";
 
-const Easy = observer(({ res, setRes }) => {
+type props = {
+  res: MaterialsProps;
+  setRes: (res: MaterialsProps) => void;
+};
+
+const Easy = observer(({ res, setRes }: props) => {
   return (
     <>
       <h4>Внесіть данні для розрахунку</h4>

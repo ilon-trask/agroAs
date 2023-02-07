@@ -1,14 +1,21 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import Service from "../components/Service";
 import { createOperation, patchOperation } from "../http/requests";
+import { createOperProps } from "../pages/TechnologicalMap";
+
+export type ServiceProps = {
+  nameOper: string;
+  price: string | number;
+  unitsOfCost: string | number;
+};
 
 const servicesProps = {
   nameOper: "",
   price: "",
   unitsOfCost: "",
 };
-function createServices(
+const createServices: func<ServiceProps> = function (
   id,
   map,
   update,
@@ -28,6 +35,7 @@ function createServices(
     setRes(servicesProps);
     setIsErr(false);
     res.price = +res.price;
+    if (cell == "") return;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id);
@@ -35,7 +43,7 @@ function createServices(
       createOperation(map, request, id);
     }
   }
-}
+};
 
 const cell = "costServices";
 
@@ -49,7 +57,7 @@ export default function CreateCostServices({
   setRes,
   update,
   setUpdate,
-}) {
+}: createOperProps<ServiceProps>) {
   return (
     <Dialog
       open={open}

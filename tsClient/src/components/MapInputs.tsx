@@ -1,20 +1,18 @@
 import React, { useContext, useState } from "react";
-import { Context } from "../index";
+import { Context } from "../main";
 import css from "./Dialog.module.css";
 import { createCart, updateMap } from "../http/requests";
 import Input from "../ui/Input/Input";
+import { cartProps } from "../modules/CreateCart";
 
-export default function MapInputs({
-  open,
-  setOpen,
-  update,
-  setUpdate,
-  res,
-  setRes,
-}) {
-  let { map } = useContext(Context);
-  let [err, setErr] = useState(false);
+type props = {
+  res: cartProps;
+  setRes: (res: cartProps) => void;
+};
+
+export default function MapInputs({ res, setRes }: props) {
   console.log(res);
+
   return (
     <>
       <h4>Загальні показники для розрахунку</h4>

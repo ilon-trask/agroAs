@@ -198,8 +198,11 @@ async function changeOper(
       where: { techOperationId: elem.id },
     });
     if (!costMaterials) return;
+    console.log(elem.costMaterials);
+
     elem.costMaterials =
       costMaterials.price * costMaterials.consumptionPerHectare;
+    console.log(elem.costMaterials);
   } else if (elem.cell == "costTransport") {
     //@ts-ignore sequelize-znov
     let costTransport = await cost_transport.findOne({
@@ -706,7 +709,7 @@ class OperService {
 
     const elem = await tech_operation.findOne({ where: { id: operId } });
     if (!elem) throw new Error("");
-    changeOper(elem, cartId);
+    await changeOper(elem, cartId);
     await cost_material.destroy({
       where: { techOperationId: operId },
     });

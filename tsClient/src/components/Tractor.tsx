@@ -1,10 +1,16 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
 import { useContext } from "react";
-import { Context } from "../index.js";
+import { Context } from "../main";
+import { TracProps } from "../modules/CreateTractor";
 import Input from "../ui/Input/Input.js";
 
-const CreateTractor = ({ res, setRes }) => {
+type props = {
+  res: TracProps;
+  setRes: (res: TracProps) => void;
+};
+
+const CreateTractor = ({ res, setRes }: props) => {
   const { map } = useContext(Context);
 
   return (

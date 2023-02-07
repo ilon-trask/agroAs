@@ -1,9 +1,21 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import Tractor from "../components/Tractor";
 import { createTractor, patchTractor } from "../http/requests";
+import { createOperProps } from "../pages/TechnologicalMap";
 
-const tracProps = {
+export type TracProps = {
+  nameTractor: string;
+  brand: string;
+  marketCost: string | number;
+  depreciationPeriod: string | number;
+  enginePower: string | number;
+  fuelConsumption: string | number;
+  numberOfPersonnel: string | number;
+  gradeId: string | number;
+};
+
+const tracProps: TracProps = {
   nameTractor: "",
   brand: "",
   marketCost: "",
@@ -13,7 +25,7 @@ const tracProps = {
   numberOfPersonnel: "",
   gradeId: "",
 };
-function createTrac(
+const createTrac: func<TracProps> = function (
   id,
   map,
   update,
@@ -51,8 +63,15 @@ function createTrac(
       createTractor(map, res);
     }
   }
-}
-
+};
+type props = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  res: TracProps;
+  setRes: (res: TracProps | ((res: TracProps) => TracProps) | {}) => void;
+  update: boolean;
+  setUpdate: (update: boolean) => void;
+};
 export default function CreateTractor({
   open,
   setOpen,
@@ -60,7 +79,7 @@ export default function CreateTractor({
   setRes,
   update,
   setUpdate,
-}) {
+}: props) {
   console.log(setOpen);
   return (
     <Dialog

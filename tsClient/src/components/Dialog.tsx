@@ -1,11 +1,63 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  ReactChild,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useParams } from "react-router-dom";
-import { Context } from "../index";
+import { Context } from "../main";
 import css from "./Dialog.module.css";
 import { observer } from "mobx-react-lite";
 import Button from "../ui/Button/Button";
+import { FC } from "react";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+import MapStore from "../store/MapStore";
+import { cartProps } from "../modules/CreateCart";
+import { TracProps } from "../modules/CreateTractor";
+import { MachineProps } from "../modules/CreateMachine";
+import { CostHandWorkProps } from "../modules/CreateCostHandWork";
+import { MaterialsProps } from "../modules/CreateCostMaterials";
+export type func<T> = (
+  id: number,
+  map: MapStore,
+  update: boolean,
+  res: T,
+  setIsErr: (isErr: boolean) => void,
+  setOpen: (open: boolean) => void,
+  cell: Icell | "",
+  seCell: (cell: Icell | "") => void,
+  setRes: (res: T | ((res: T) => T) | {}) => void,
+  section: number | "" | undefined,
+  setSection: (section: number) => void
+) => void;
 
-const Dialog = observer(
+type resType =
+  | cartProps
+  | TracProps
+  | MachineProps
+  | CostHandWorkProps
+  | MaterialsProps
+  | MachineProps
+  | {};
+
+interface props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  cell?: Icell | "";
+  setCell?: (cell: Icell | "") => void;
+  section?: number | "";
+  setSection?: (section: number) => void;
+  res: resType;
+  setRes: (res: resType | ((res: resType) => resType)) => void;
+  update: boolean;
+  setUpdate: (update: boolean) => void;
+  children: ReactChild | ReactNode;
+  func: func<resType>;
+  props: resType;
+  errMess: " " | JSX.Element;
+}
+const Dialog: FC<props> = observer(
   ({
     open,
     setOpen,
@@ -24,7 +76,7 @@ const Dialog = observer(
   }) => {
     const { map } = useContext(Context);
     const { id } = useParams();
-    const [isErr, setIsErr] = useState(false);
+    const [isErr, setIsErr] = useState<boolean>(false);
     console.log(res);
     useEffect(() => {
       console.log(res);
@@ -59,17 +111,17 @@ const Dialog = observer(
               style={{ marginTop: "10px" }}
               onClick={() => {
                 func(
-                  id,
+                  +id!,
                   map,
                   update,
                   res,
                   setIsErr,
                   setOpen,
-                  cell,
-                  setCell,
+                  cell!,
+                  setCell!,
                   setRes,
                   section,
-                  setSection
+                  setSection!
                 );
               }}
             >

@@ -5,7 +5,7 @@ import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
 import { supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
-import { Context } from "..";
+import { Context } from "../main";
 export default function AuthPage() {
   const location = useLocation().pathname;
   const isLoginPage = location === LOGIN_ROUTE;

@@ -1,20 +1,33 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import { Icell } from "../../../tRPC serv/controllers/OperService";
+import { Icost_hand_work } from "../../../tRPC serv/models/models";
+import Dialog, { func } from "../components/Dialog";
 import HandWork from "../components/HandWork";
 import { createOperation, patchOperation } from "../http/requests";
+import { createOperProps } from "../pages/TechnologicalMap";
+export type CostHandWorkProps = {
+  nameOper: string;
+  gradeId: number | string;
+  type: number | string;
+  productionRateAmount: number | string;
+  productionRateWeight: number | string;
+  yieldСapacity: number | string;
+  spending: number | string;
+  productionRateTime: number | string;
+};
 
-const costHandWorkProps = {
+const costHandWorkProps: CostHandWorkProps = {
   nameOper: "",
   gradeId: "",
   type: 1,
   productionRateAmount: "",
   productionRateWeight: "",
-  yield: "",
+  yieldСapacity: "",
   spending: "",
   productionRateTime: "",
 };
 
-function createCostHandWork(
+const createCostHandWorkFunc: func<CostHandWorkProps> = (
   id,
   map,
   update,
@@ -26,7 +39,7 @@ function createCostHandWork(
   setRes,
   section,
   setSection
-) {
+) => {
   if (res.nameOper == "") {
     setIsErr(true);
   } else {
@@ -34,16 +47,13 @@ function createCostHandWork(
     setCell("");
     setRes({});
     setIsErr(false);
-    res.price = 0;
-    res.amount = 0;
     console.log(res.type);
-    res.spending = +res.spending;
-    res.productionRateAmount = +res.productionRateAmount;
-    res.yieldСapacity = +res.yieldСapacity;
-    res.gradeId = +res.gradeId;
-    res.productionRateTime = +res.productionRateTime;
-    res.productionRateWeight = +res.productionRateWeight;
-    res.productionPerShift = +res.productionPerShift;
+    res.spending = +res.spending!;
+    res.yieldСapacity = +res.yieldСapacity!;
+    res.gradeId = +res.gradeId!;
+    res.productionRateAmount = +res.productionRateAmount!;
+    res.productionRateTime = +res.productionRateTime!;
+    res.productionRateWeight = +res.productionRateWeight!;
 
     if (res.type == 1) {
       res.productionRateAmount = 0;
@@ -59,6 +69,7 @@ function createCostHandWork(
       res.productionRateWeight = 0;
       res.yieldСapacity = 0;
     }
+    if (cell == "") return;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id);
@@ -66,7 +77,7 @@ function createCostHandWork(
       createOperation(map, request, id);
     }
   }
-}
+};
 
 const cell = "costHandWork";
 
@@ -80,7 +91,7 @@ function CreateCostHandWork({
   setRes,
   update,
   setUpdate,
-}) {
+}: createOperProps<CostHandWorkProps>) {
   return (
     <Dialog
       open={open}
@@ -93,7 +104,7 @@ function CreateCostHandWork({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createCostHandWork}
+      func={createCostHandWorkFunc}
       props={costHandWorkProps}
     >
       <HandWork res={res} setRes={setRes} />

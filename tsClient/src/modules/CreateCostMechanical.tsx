@@ -1,8 +1,15 @@
 import React from "react";
-import Dialog from "../components/Dialog";
+import Dialog, { func } from "../components/Dialog";
 import MechanicalWork from "../components/MechanicalWork";
 import { createOperation, patchOperation } from "../http/requests";
-
+import { createOperProps } from "../pages/TechnologicalMap";
+export type MechanicalWorkProps = {
+  nameOper: string;
+  idMachine: string | number;
+  idTractor: string | number;
+  workingSpeed: string | number;
+  fuelConsumption: string | number;
+};
 const mechanicalWorkProps = {
   nameOper: "",
   idMachine: "",
@@ -11,7 +18,7 @@ const mechanicalWorkProps = {
   fuelConsumption: "",
 };
 
-function mechanicalWorkFunc(
+const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
   id,
   map,
   update,
@@ -40,6 +47,7 @@ function mechanicalWorkFunc(
     res.workingSpeed = +res.workingSpeed;
     res.fuelConsumption = +res.fuelConsumption;
     setIsErr(false);
+    if (cell == "") return;
     const request = { cell, res, section };
     if (update) {
       patchOperation(map, request, id);
@@ -47,8 +55,8 @@ function mechanicalWorkFunc(
       createOperation(map, request, id);
     }
   }
-}
-let cell = "costMechanical";
+};
+let cell: "costMechanical" = "costMechanical";
 
 export default function CreateCostMechanical({
   open,
@@ -60,7 +68,7 @@ export default function CreateCostMechanical({
   setRes,
   update,
   setUpdate,
-}) {
+}: createOperProps<MechanicalWorkProps>) {
   return (
     <Dialog
       open={open}

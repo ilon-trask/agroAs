@@ -1,13 +1,21 @@
 import React from "react";
 import { useContext } from "react";
-import { Context } from "../index";
+import { Context } from "../main";
+import { cartProps } from "./CreateCart";
+
+type props = {
+  id: number;
+  setMapOpen: (open: boolean) => void;
+  setUpdate: (update: boolean) => void;
+  setRes: (res: cartProps) => void;
+};
 
 export default function GeneralDataTable({
   id,
   setMapOpen,
   setUpdate,
   setRes,
-}) {
+}: props) {
   let th = { fontSize: "18px", padding: "0 10px " };
   const { map } = useContext(Context);
   let [mapData] = map.maps.filter((el) => el.id == id);
@@ -59,7 +67,7 @@ export default function GeneralDataTable({
                 setMapOpen(true);
                 setUpdate(true);
                 setRes({
-                  id: mapData.id,
+                  id: mapData.id!,
                   nameCart: mapData.nameCart,
                   area: mapData.area,
                   salary: mapData.salary,
