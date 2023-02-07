@@ -4,10 +4,12 @@ import loader from "../assets/loader.gif";
 
 export default function Loader() {
   return (
-    <img
-      src={loader}
-      alt="loading..."
-      style={{ height: "50px", position: "absolute" }}
-    />
+    <div style={{ height: "30px", position: "absolute" }}>
+      <img
+        style={{ height: "30px", position: "absolute" }}
+        src={loader}
+        alt="loading..."
+      />
+    </div>
   );
 }

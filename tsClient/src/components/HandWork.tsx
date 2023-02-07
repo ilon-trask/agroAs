@@ -6,6 +6,7 @@ import { Icost_hand_work } from "../../../tRPC serv/models/models";
 import { Context } from "../main";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork";
 import Input from "../ui/Input/Input";
+import style from "./Input.module.css";
 
 type props = {
   res: CostHandWorkProps;
@@ -16,7 +17,7 @@ const HandWork = observer(({ res, setRes }: props) => {
   const { map } = useContext(Context);
   return (
     <>
-      <div className="d-flex gap-4">
+      <div className={style.mechanical}>
         <div>
           <p>Назва операції</p>
           <Input
@@ -46,7 +47,7 @@ const HandWork = observer(({ res, setRes }: props) => {
         </div>
       </div>
       <form>
-        <div className="d-flex">
+        <div className={style.hand}>
           <input
             type="radio"
             checked={res.type == 1}
@@ -74,7 +75,7 @@ const HandWork = observer(({ res, setRes }: props) => {
             }}
           >
             <p>Норма виробітку годин</p>
-            <div className="d-flex">
+            <div className={style.hand}>
               <Input
                 value={res.productionRateTime}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +89,7 @@ const HandWork = observer(({ res, setRes }: props) => {
           </div>
         </div>
         <div
-          className="d-flex"
+          className={style.hand}
           onClick={() => {
             setRes({
               ...res,
@@ -113,10 +114,10 @@ const HandWork = observer(({ res, setRes }: props) => {
             }}
           />
           <div>
-            <div className="d-flex">
+            <div className={style.hand}>
               <div>
                 <p>Норма виробітку ваги</p>
-                <div className="d-flex">
+                <div className={style.hand}>
                   <Input
                     value={res.productionRateWeight}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +131,7 @@ const HandWork = observer(({ res, setRes }: props) => {
               </div>
               <div>
                 <p>Урожайність з 1 га</p>
-                <div className="d-flex">
+                <div className={style.hand}>
                   <Input
                     value={res.yieldСapacity}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +147,7 @@ const HandWork = observer(({ res, setRes }: props) => {
           </div>
         </div>
         <div
-          className="d-flex"
+          className={style.hand}
           onClick={() => {
             setRes({
               ...res,
@@ -171,10 +172,10 @@ const HandWork = observer(({ res, setRes }: props) => {
             }}
           />
           <div>
-            <div className="d-flex">
+            <div className={style.hand}>
               <div>
                 <p>Норма виробітку кількість</p>
-                <div className="d-flex">
+                <div className={style.hand}>
                   <Input
                     value={res.productionRateAmount}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +189,7 @@ const HandWork = observer(({ res, setRes }: props) => {
               </div>
               <div>
                 <p>Розхід на 1 га</p>
-                <div className="d-flex">
+                <div className={style.hand}>
                   <Input
                     value={res.spending}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

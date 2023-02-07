@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
 import { MaterialsProps } from "../modules/CreateCostMaterials";
-
+import style from "./Input.module.css";
 type props = {
   res: MaterialsProps;
   setRes: (res: MaterialsProps) => void;
@@ -12,7 +12,7 @@ const Easy = observer(({ res, setRes }: props) => {
   return (
     <>
       <h4>Внесіть данні для розрахунку</h4>
-      <div className="d-flex gap-3">
+      <div className={style.mechanical}>
         <div>
           <p>Назва операції</p>
           <Input

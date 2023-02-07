@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Context } from "../main";
 import { MachineProps } from "../modules/CreateMachine";
 import Input from "../ui/Input/Input.js";
+import style from "./input.module.css";
 
 type props = { res: MachineProps; setRes: (rse: MachineProps) => void };
 
@@ -11,7 +12,7 @@ function CreateAgriculturalMachine({ res, setRes }: props) {
   return (
     <>
       <h4>Внесіть данні для СГ машини</h4>
-      <div className=" gap-3">
+      <div className={style.machine}>
         <div>
           <p>Назва СГ машини</p>
           <Input

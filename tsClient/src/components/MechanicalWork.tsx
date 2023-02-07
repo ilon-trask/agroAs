@@ -1,6 +1,6 @@
 import React, { useState, useContext, ChangeEvent } from "react";
 import { Context } from "../main";
-import css from "./Dialog.module.css";
+import style from "./Input.module.css";
 import CreateTractor, { TracProps } from "../modules/CreateTractor";
 import CreateMachine, { MachineProps } from "../modules/CreateMachine";
 import { observer } from "mobx-react-lite";
@@ -44,10 +44,10 @@ const MechanicalWork = observer(({ res, setRes }: props) => {
   const [update, setUpdate] = useState(false);
   const { map } = useContext(Context);
   return (
-    <>
+    <div>
       <h4>Внесіть данні для розрахунку</h4>
-      <div className="">
-        <div className="d-flex ">
+      <div>
+        <div className={style.mechanical}>
           <p>Назва операції</p>
           <Input
             placeholder="Вкажіть назву"
@@ -58,7 +58,7 @@ const MechanicalWork = observer(({ res, setRes }: props) => {
             }}
           />
         </div>
-        <div className="d-flex gap-3">
+        <div className={style.mechanical}>
           <div style={{ height: "min-content", margin: "auto 0 0" }}>
             <button
               onClick={() => {
@@ -124,7 +124,7 @@ const MechanicalWork = observer(({ res, setRes }: props) => {
             </button>
           </div>
         </div>
-        <div className="d-flex gap-3">
+        <div className={style.mechanical}>
           <div style={{ height: "min-content", margin: "auto 0 0" }}>
             <button
               onClick={() => {
@@ -202,7 +202,7 @@ const MechanicalWork = observer(({ res, setRes }: props) => {
         update={update}
         setUpdate={setUpdate}
       />
-    </>
+    </div>
   );
 });
 

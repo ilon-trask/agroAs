@@ -1,0 +1,10 @@
+.machine {
+  text-align: center;
+}
+.mechanical {
+  display: flex;
+  gap: 10px;
+}
+.hand {
+  display: flex;
+}

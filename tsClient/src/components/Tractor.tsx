@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { Context } from "../main";
 import { TracProps } from "../modules/CreateTractor";
 import Input from "../ui/Input/Input.js";
-
+import style from "./input.module.css";
 type props = {
   res: TracProps;
   setRes: (res: TracProps) => void;
@@ -16,7 +16,7 @@ const CreateTractor = ({ res, setRes }: props) => {
   return (
     <>
       <h4>Внесіть данні для трактора</h4>
-      <div className=" gap-3">
+      <div className={style.machine}>
         <div>
           <p>Назва трактора</p>
           <Input
