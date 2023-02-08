@@ -10,7 +10,7 @@ export type ServiceProps = {
   unitsOfCost: string | number;
 };
 
-const servicesProps = {
+export const servicesProps: ServiceProps = {
   nameOper: "",
   price: "",
   unitsOfCost: "",

@@ -1,3 +1,4 @@
+import { Principal } from "..";
 import {
   aggregate,
   agricultural_machine,
@@ -52,13 +53,13 @@ let cellNames: {
   costTransport: "cost_transport",
 };
 
-export async function getCart() {
+export async function getCart(id: string | undefined) {
   let res: { carts: resTechCartsWithOpers[] } = {
     carts: [],
   };
 
   //@ts-ignore
-  const carts: resTechCartsWithOpers[] = await tech_cart.findAll({
+  const Scarts: resTechCartsWithOpers[] = await tech_cart.findAll({
     include: [
       {
         model: tech_operation,
@@ -72,7 +73,8 @@ export async function getCart() {
       },
     ],
   });
-  carts.sort((a, b) => a.id! - b.id!);
+  Scarts.sort((a, b) => a.id! - b.id!);
+  const carts = JSON.parse(JSON.stringify(Scarts));
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let sum: number = 0;
@@ -161,6 +163,7 @@ export async function getCart() {
         oper.costFuel = costFuel;
         oper.costHandWork = costHandWork;
         sum += costMachineWork + costCars + costFuel + costHandWork;
+        console.log(oper);
       } else if (oper.cell == "costHandWork") {
         //@ts-ignore sequelize-znov
         const handWork = oper[cellNames[oper.cell]];
@@ -207,34 +210,36 @@ export async function getCart() {
 }
 
 class TechCartService {
-  async create(data: Idata) {
+  async getAll(user: Principal | undefined) {
+    return getCart(user?.sub);
+  }
+  async create(data: Idata, user: Principal | undefined) {
     const { nameCart, area, salary, priceDiesel, totalCost = 0 } = data;
-
+    if (!user) return;
     const techCart: Itech_cart = await tech_cart.create({
       nameCart,
       area,
       totalCost,
       salary,
       priceDiesel,
+      userId: user?.sub,
     });
 
     return techCart;
   }
-  async getAll() {
-    return getCart();
-  }
-  async patchCart(data: Idata) {
+  async patchCart(data: Idata, user: Principal | undefined) {
     const { id, nameCart, area, salary, priceDiesel } = data;
     const techCart = await tech_cart.update(
       { nameCart, area, salary, priceDiesel },
       { where: { id: id } }
     );
-    return getCart();
+    return getCart(user?.sub);
   }
 
-  async delete(id: number) {
+  async delete(id: number, user: Principal | undefined) {
+    if (!user) return;
     const techCart = await tech_cart.destroy({ where: { id: id } });
-    return getCart();
+    return { id };
   }
 }
 

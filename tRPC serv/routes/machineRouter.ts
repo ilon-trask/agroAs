@@ -4,8 +4,8 @@ import { z } from "zod";
 import MachineService from "../controllers/MachineService";
 
 export const machineRouter = router({
-  get: publicProcedure.query(async () => {
-    const machine = await MachineService.getAll();
+  get: publicProcedure.query(async ({ ctx }) => {
+    const machine = await MachineService.getAll(ctx.user);
     return machine;
   }),
   create: publicProcedure
@@ -21,8 +21,8 @@ export const machineRouter = router({
         gradeId: z.number().optional(),
       })
     )
-    .query(async ({ input }) => {
-      const machine = await MachineService.create(input);
+    .query(async ({ input, ctx }) => {
+      const machine = await MachineService.create(input, ctx.user);
       return machine;
     }),
   patch: publicProcedure
@@ -39,5 +39,7 @@ export const machineRouter = router({
         gradeId: z.number().optional(),
       })
     )
-    .query(async ({ input }) => await MachineService.patch(input)),
+    .query(
+      async ({ input, ctx }) => await MachineService.patch(input, ctx.user)
+    ),
 });

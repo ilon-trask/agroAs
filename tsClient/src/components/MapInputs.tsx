@@ -3,11 +3,12 @@ import { Context } from "../main";
 import css from "./Dialog.module.css";
 import { createCart, updateMap } from "../http/requests";
 import Input from "../ui/Input/Input";
-import { cartProps } from "../modules/CreateCart";
+import { CartProps, cartProps } from "../modules/CreateCart";
 import style from "./Input.module.css";
 import Button from "../ui/Button/Button";
 import { func } from "./Dialog";
 import { useParams } from "react-router-dom";
+import { Itech_cart } from "../../../tRPC serv/models/models";
 const createCartFunc: func<cartProps> = (
   id,
   map,
@@ -30,11 +31,11 @@ const createCartFunc: func<cartProps> = (
     res.area = +res.area;
     res.salary = +res.salary;
     res.priceDiesel = +res.priceDiesel;
-    setRes({});
+    setRes(CartProps);
     if (update) {
       updateMap(map, res);
     } else {
-      createCart(map, res);
+      createCart(map, res as Itech_cart);
     }
   }
 };

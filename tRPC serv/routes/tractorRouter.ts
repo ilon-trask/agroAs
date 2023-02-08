@@ -21,8 +21,8 @@ export const tractorRouter = router({
         gradeId: z.number().optional(),
       })
     )
-    .query(async ({ input }) => {
-      const tractor = await TractorService.create(input);
+    .query(async ({ input, ctx }) => {
+      const tractor = await TractorService.create(input, ctx.user);
       return tractor;
     }),
   patch: publicProcedure
@@ -39,5 +39,7 @@ export const tractorRouter = router({
         gradeId: z.number().optional(),
       })
     )
-    .query(async ({ input }) => await TractorService.patch(input)),
+    .query(
+      async ({ input, ctx }) => await TractorService.patch(input, ctx.user)
+    ),
 });

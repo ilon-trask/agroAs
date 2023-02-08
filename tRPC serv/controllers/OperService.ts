@@ -179,17 +179,18 @@ async function createOper(
   cell: Icell,
   section: number
 ) {
-  let oper = await tech_operation.create({
+  let Soper: Itech_operation = await tech_operation.create({
     techCartId: cartId,
     nameOperation: nameOper,
     cell,
     sectionId: section,
   });
+  const oper = JSON.parse(JSON.stringify(Soper));
   return oper;
 }
 
 async function changeOper(
-  elem: tech_operation | resTechOperation,
+  elem: Itech_operation | resTechOperation,
   cartId: number
 ) {
   if (elem.cell == "costMaterials") {
@@ -198,11 +199,9 @@ async function changeOper(
       where: { techOperationId: elem.id },
     });
     if (!costMaterials) return;
-    console.log(elem.costMaterials);
 
     elem.costMaterials =
       costMaterials.price * costMaterials.consumptionPerHectare;
-    console.log(elem.costMaterials);
   } else if (elem.cell == "costTransport") {
     //@ts-ignore sequelize-znov
     let costTransport = await cost_transport.findOne({

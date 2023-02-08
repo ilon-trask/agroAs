@@ -9,29 +9,29 @@ import {
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 
-export interface Iuser {
-  id?: number;
-  email: string;
-  password: string;
-  role: number;
-}
+// export interface Iuser {
+//   id?: number;
+//   email: string;
+//   password: string;
+//   role: number;
+// }
 
-export class user extends Model<Iuser> {
-  declare id: number;
-  declare email: string;
-  declare password: string;
-  declare role: number;
-}
+// export class user extends Model<Iuser> {
+//   declare id: number;
+//   declare email: string;
+//   declare password: string;
+//   declare role: number;
+// }
 
-user.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    email: { type: DataTypes.STRING, unique: true },
-    password: { type: DataTypes.STRING },
-    role: { type: DataTypes.STRING, defaultValue: "USER" },
-  },
-  { sequelize }
-);
+// user.init(
+//   {
+//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+//     email: { type: DataTypes.STRING, unique: true },
+//     password: { type: DataTypes.STRING },
+//     role: { type: DataTypes.STRING, defaultValue: "USER" },
+//   },
+//   { sequelize }
+// );
 
 export interface Itech_cart {
   id?: number;
@@ -40,16 +40,15 @@ export interface Itech_cart {
   totalCost?: number;
   salary: number;
   priceDiesel: number;
-  userId?: number;
+  userId: string;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
   declare nameCart: string;
   declare area: number;
-  declare totalCost?: number;
   declare salary: number;
   declare priceDiesel: number;
-  declare userId?: number;
+  declare userId: string;
 }
 
 tech_cart.init(
@@ -57,9 +56,9 @@ tech_cart.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameCart: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
     area: { type: DataTypes.INTEGER, allowNull: false },
-    totalCost: { type: DataTypes.INTEGER, allowNull: false },
     salary: { type: DataTypes.INTEGER, allowNull: false },
     priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -84,13 +83,6 @@ export class tech_operation extends Model<Itech_operation> {
   declare id?: number;
   declare nameOperation: string;
   declare cell: Icell;
-  declare costCars?: number;
-  declare costFuel?: number;
-  declare costMachineWork?: number;
-  declare costHandWork?: number;
-  declare costMaterials?: number;
-  declare costTransport?: number;
-  declare costServices?: number;
   declare techCartId?: number;
   declare sectionId?: number;
 }
@@ -100,13 +92,6 @@ tech_operation.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameOperation: { type: DataTypes.STRING },
     cell: { type: DataTypes.STRING, allowNull: false },
-    costCars: { type: DataTypes.INTEGER },
-    costFuel: { type: DataTypes.INTEGER },
-    costMachineWork: { type: DataTypes.INTEGER },
-    costHandWork: { type: DataTypes.INTEGER },
-    costMaterials: { type: DataTypes.INTEGER },
-    costTransport: { type: DataTypes.INTEGER },
-    costServices: { type: DataTypes.INTEGER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -253,7 +238,7 @@ export interface Itractor {
   enginePower: number;
   fuelConsumption: number;
   numberOfPersonnel: number;
-  userId?: number;
+  userId?: string;
   gradeId?: number;
 }
 export class tractor extends Model<Itractor> {
@@ -265,7 +250,7 @@ export class tractor extends Model<Itractor> {
   declare enginePower: number;
   declare fuelConsumption: number;
   declare numberOfPersonnel: number;
-  declare userId?: number;
+  declare userId: string;
   declare gradeId?: number;
 }
 
@@ -279,6 +264,7 @@ tractor.init(
     enginePower: { type: DataTypes.FLOAT, allowNull: false },
     fuelConsumption: { type: DataTypes.FLOAT, allowNull: false },
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -293,7 +279,7 @@ export interface Imachine {
   widthOfCapture: number;
   workingSpeed: number;
   numberOfServicePersonnel: number;
-  userId?: number;
+  userId?: string;
   gradeId?: number;
 }
 export class agricultural_machine extends Model<Imachine> {
@@ -305,7 +291,7 @@ export class agricultural_machine extends Model<Imachine> {
   declare widthOfCapture: number;
   declare workingSpeed: number;
   declare numberOfServicePersonnel: number;
-  declare userId?: number;
+  declare userId: string;
   declare gradeId?: number;
 }
 
@@ -319,6 +305,7 @@ agricultural_machine.init(
     widthOfCapture: { type: DataTypes.FLOAT, allowNull: false },
     workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -415,9 +402,6 @@ cost_hand_work.init(
   // { sequelize, timestamps: false }
 );
 
-user.hasMany(tech_cart);
-tech_cart.belongsTo(user);
-
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -432,12 +416,6 @@ cost_transport.belongsTo(tech_operation);
 
 section.hasMany(tech_operation);
 tech_operation.belongsTo(section);
-
-user.hasMany(tractor);
-tractor.belongsTo(user);
-
-user.hasMany(agricultural_machine);
-agricultural_machine.belongsTo(user);
 
 tech_operation.hasOne(aggregate);
 aggregate.belongsTo(tech_operation);

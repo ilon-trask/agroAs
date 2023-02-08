@@ -14,7 +14,7 @@ export type MachineProps = {
   gradeId: number | string;
 };
 
-const machineProps: MachineProps = {
+export const machineProps: MachineProps = {
   nameMachine: "",
   brand: "",
   marketCost: "",

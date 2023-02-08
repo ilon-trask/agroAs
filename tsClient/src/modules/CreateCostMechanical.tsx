@@ -10,7 +10,7 @@ export type MechanicalWorkProps = {
   workingSpeed: string | number;
   fuelConsumption: string | number;
 };
-const mechanicalWorkProps = {
+export const mechanicalWorkProps: MechanicalWorkProps = {
   nameOper: "",
   idMachine: "",
   idTractor: "",

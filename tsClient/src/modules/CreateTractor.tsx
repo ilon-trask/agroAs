@@ -15,7 +15,7 @@ export type TracProps = {
   gradeId: number | "";
 };
 
-const tracProps: TracProps = {
+export const tracProps: TracProps = {
   nameTractor: "",
   brand: "",
   marketCost: "",

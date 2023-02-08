@@ -8,9 +8,7 @@ import { Idata } from "../controllers/TechCartService";
 
 export const cartRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
-    console.log(ctx.user);
-
-    const cart = await TechCartService.getAll();
+    const cart = await TechCartService.getAll(ctx.user);
 
     return cart;
   }),
@@ -24,8 +22,8 @@ export const cartRouter = router({
         priceDiesel: z.number(),
       })
     )
-    .query(async ({ input }) => {
-      const cart = await TechCartService.create(input);
+    .query(async ({ input, ctx }) => {
+      const cart = await TechCartService.create(input, ctx.user);
       return cart;
     }),
 
@@ -35,9 +33,9 @@ export const cartRouter = router({
         id: z.number(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { id } = input;
-      let data = await TechCartService.delete(id);
+      let data = await TechCartService.delete(id, ctx.user);
       return data;
     }),
   patch: publicProcedure
@@ -50,8 +48,8 @@ export const cartRouter = router({
         priceDiesel: z.number(),
       })
     )
-    .query(async ({ input }) => {
-      const cart = await TechCartService.patchCart(input);
+    .query(async ({ input, ctx }) => {
+      const cart = await TechCartService.patchCart(input, ctx.user);
       return cart;
     }),
 });

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { Itractor } from "../../../tRPC serv/models/models";
 import { createTractor, patchTractor } from "../http/requests";
 import { Context } from "../main";
-import { TracProps } from "../modules/CreateTractor";
+import { tracProps, TracProps } from "../modules/CreateTractor";
 import Button from "../ui/Button/Button";
 import Input from "../ui/Input/Input.js";
 import { func } from "./Dialog";
@@ -37,7 +37,7 @@ const createTrac: func<TracProps> = function (
     res.numberOfPersonnel = +res.numberOfPersonnel;
     res.gradeId = +res.gradeId;
     setOpen(false);
-    setRes({});
+    setRes(tracProps);
     setIsErr(false);
     if (update) {
       patchTractor(map, res as Itractor);

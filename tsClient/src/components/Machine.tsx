@@ -4,7 +4,7 @@ import { Imachine } from "../../../tRPC serv/models/models";
 import { createMachine, patchMachine } from "../http/requests";
 import { Context } from "../main";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork";
-import { MachineProps } from "../modules/CreateMachine";
+import { machineProps, MachineProps } from "../modules/CreateMachine";
 import Button from "../ui/Button/Button";
 import Input from "../ui/Input/Input.js";
 import { func, InputProps } from "./Dialog";
@@ -30,7 +30,7 @@ const createMachineFunc: func<MachineProps> = function (
     setIsErr(true);
   } else {
     setOpen(false);
-    setRes({});
+    setRes(machineProps);
     setIsErr(false);
     res.marketCost = +res.marketCost;
     res.depreciationPeriod = +res.depreciationPeriod;
@@ -96,7 +96,7 @@ function CreateAgriculturalMachine({
             type="number"
             value={res?.marketCost}
             onChange={(e) => {
-              setRes({ ...res, marketCost: +e.target.value });
+              setRes({ ...res, marketCost: e.target.value });
             }}
           />
         </div>
@@ -107,7 +107,7 @@ function CreateAgriculturalMachine({
             type="number"
             value={res?.depreciationPeriod}
             onChange={(e) => {
-              setRes({ ...res, depreciationPeriod: +e.target.value });
+              setRes({ ...res, depreciationPeriod: e.target.value });
             }}
           />
         </div>
@@ -119,7 +119,7 @@ function CreateAgriculturalMachine({
             step="0.01"
             value={res?.widthOfCapture}
             onChange={(e) => {
-              setRes({ ...res, widthOfCapture: +e.target.value });
+              setRes({ ...res, widthOfCapture: e.target.value });
             }}
           />
         </div>
@@ -130,7 +130,7 @@ function CreateAgriculturalMachine({
             type="number"
             value={res?.workingSpeed}
             onChange={(e) => {
-              setRes({ ...res, workingSpeed: +e.target.value });
+              setRes({ ...res, workingSpeed: e.target.value });
             }}
           />
         </div>
@@ -145,7 +145,7 @@ function CreateAgriculturalMachine({
             type="number"
             value={res?.numberOfServicePersonnel}
             onChange={(e) => {
-              setRes({ ...res, numberOfServicePersonnel: +e.target.value });
+              setRes({ ...res, numberOfServicePersonnel: e.target.value });
             }}
           />
         </div>
@@ -154,7 +154,7 @@ function CreateAgriculturalMachine({
           <select
             value={res.gradeId}
             onChange={(e) => {
-              setRes({ ...res, gradeId: +e.target.value });
+              setRes({ ...res, gradeId: e.target.value });
             }}
           >
             <option selected disabled hidden value="">

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
-import { ServiceProps } from "../modules/CreateCostServices";
+import { ServiceProps, servicesProps } from "../modules/CreateCostServices";
 import { func, InputProps } from "./Dialog";
 import Button from "../ui/Button/Button";
 import { Context } from "../main";
@@ -26,7 +26,7 @@ const createServices: func<ServiceProps> = function (
     if (cell == undefined) return;
     setOpen(false);
     setCell!("");
-    setRes({});
+    setRes(servicesProps);
     setIsErr(false);
     res.price = +res.price;
     if (cell == "") return;

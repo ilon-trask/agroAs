@@ -76,6 +76,8 @@ export async function getCarts(map: MapStore) {
   await client.cart.get
     .query()
     .then((res: { carts: resTechCartsWithOpers[] }) => {
+      console.log(res);
+
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
@@ -107,11 +109,9 @@ export async function getCarts(map: MapStore) {
 
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
-  await client.cart.delete
-    .query({ id: id })
-    .then((data: { carts: resTechCartsWithOpers[] }) => {
-      map.maps = data.carts;
-    });
+  await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
+    map.maps = map.maps.filter((el) => el.id != data.id);
+  });
   map.isLoading = false;
 }
 
@@ -282,9 +282,8 @@ export function getSection(map: MapStore) {
 }
 
 export function createTractor(map: MapStore, res: Itractor) {
-  res.gradeId;
-  client.tractor.create.query(res).then(() => {
-    map.newTractor = res;
+  client.tractor.create.query(res).then((data: Itractor) => {
+    map.newTractor = data;
   });
 }
 

@@ -44,7 +44,7 @@ export type InputProps<T> = {
   setIsErr: (isErr: boolean) => void;
 };
 
-type resType =
+export type resType =
   | cartProps
   | TracProps
   | MachineProps

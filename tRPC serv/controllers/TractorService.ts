@@ -1,3 +1,4 @@
+import { Principal } from "..";
 import { tractor, Itractor } from "../models/models";
 
 interface Idata {
@@ -10,7 +11,8 @@ class TractorService {
     return Tractor;
   }
 
-  async create(data: Itractor) {
+  async create(data: Itractor, user: Principal | undefined) {
+    if (!user) return;
     const {
       nameTractor,
       brand,
@@ -22,7 +24,7 @@ class TractorService {
       gradeId,
     } = data;
 
-    const Tractor = await tractor.create({
+    const Tractor: Itractor = await tractor.create({
       nameTractor,
       brand,
       marketCost,
@@ -31,11 +33,14 @@ class TractorService {
       fuelConsumption,
       numberOfPersonnel,
       gradeId,
+      userId: user.sub,
     });
+    console.log(123);
+    console.log(Tractor);
 
     return Tractor;
   }
-  async patch(data: Itractor) {
+  async patch(data: Itractor, user: Principal | undefined) {
     const {
       id,
       nameTractor,

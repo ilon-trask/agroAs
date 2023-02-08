@@ -59,7 +59,7 @@ const createCostHandWorkFunc: func<CostHandWorkProps> = (
     if (cell == undefined) return;
     setOpen(false);
     setCell!("");
-    setRes({});
+    setRes(costHandWorkProps);
     setSection!("");
     setIsErr(false);
     console.log(res.type);

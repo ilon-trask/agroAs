@@ -5,7 +5,10 @@ import CreateTractor, { TracProps } from "../modules/CreateTractor";
 import CreateMachine, { MachineProps } from "../modules/CreateMachine";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
-import { MechanicalWorkProps } from "../modules/CreateCostMechanical";
+import {
+  mechanicalWorkProps,
+  MechanicalWorkProps,
+} from "../modules/CreateCostMechanical";
 import { func, InputProps } from "./Dialog";
 import { createOperation, patchOperation } from "../http/requests";
 import Button from "../ui/Button/Button";
@@ -36,7 +39,7 @@ const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
     if (cell == undefined) return;
     setOpen(false);
     setCell!("");
-    setRes({});
+    setRes(mechanicalWorkProps);
     res.idMachine = +res.idMachine;
     res.idTractor = +res.idTractor;
     res.workingSpeed = +res.workingSpeed;
@@ -92,6 +95,7 @@ const MechanicalWork = observer(
     const [inIsErr, setInIsErr] = useState(false);
     const { map } = useContext(Context);
     const { id } = useParams();
+    console.log(map.tractor);
     return (
       <>
         <div>
@@ -113,9 +117,13 @@ const MechanicalWork = observer(
                 <button
                   onClick={() => {
                     if (res.idTractor) {
+                      console.log(map.tractor);
+
                       let [second] = map.tractor.filter(
                         (el) => el.id == res.idTractor
                       );
+                      console.log(second);
+
                       setInRes(second);
                       setInUpdate(true);
                       setTractorOpen(true);

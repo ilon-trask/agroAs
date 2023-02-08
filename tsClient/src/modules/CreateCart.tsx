@@ -10,44 +10,15 @@ export type cartProps = {
   area: number | "";
   salary: number | "";
   priceDiesel: number | "";
+  totalCost?: number;
 };
-const cartProps: cartProps = {
+export const CartProps: cartProps = {
   nameCart: "",
   area: "",
   salary: "",
   priceDiesel: "",
 };
 
-const createCartFunc: func<cartProps> = (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  setRes
-) => {
-  if (
-    res.nameCart == "" ||
-    res.area == "" ||
-    res.salary == "" ||
-    res.priceDiesel == ""
-  ) {
-    setIsErr(true);
-  } else {
-    setIsErr(false);
-    setOpen(false);
-    res.area = +res.area;
-    res.salary = +res.salary;
-    res.priceDiesel = +res.priceDiesel;
-    setRes({});
-    if (update) {
-      updateMap(map, res);
-    } else {
-      createCart(map, res as Itech_cart);
-    }
-  }
-};
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -73,7 +44,7 @@ export default function CreateCart({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      props={cartProps}
+      props={CartProps}
       errMess={" "}
       isErr={isErr}
       setIsErr={setIsErr}

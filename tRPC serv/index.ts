@@ -57,7 +57,7 @@ const appRouter = router({
 
 const app = express();
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
-type Principal = {
+export type Principal = {
   sub: string;
   role: string;
   email: string;
@@ -67,12 +67,7 @@ const createContext = ({
   res,
 }: trpcExpress.CreateExpressContextOptions) => {
   const token = req.headers.authorization?.split(" ")[1];
-  console.log(token);
-  console.log(typeof token);
-  console.log(!token);
   if (!token) return {};
-  console.log(123);
-
   const user = jwt.verify(
     token,
     "gdrlyeRGbmZa10k7HByehmz4MU4EnTrOBBSEWST1gA+Bz9IupfCNm59k98ckJKti3oiCPhuymM5B/6tPZhXbcA=="

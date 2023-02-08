@@ -11,7 +11,7 @@ export type MaterialsProps = {
   unitsOfConsumption: string;
 };
 
-const materialsProps = {
+export const materialsProps: MaterialsProps = {
   nameOper: "",
   price: "",
   consumptionPerHectare: "",

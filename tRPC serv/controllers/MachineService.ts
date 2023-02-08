@@ -1,3 +1,4 @@
+import { Principal } from "..";
 import { agricultural_machine } from "../models/models";
 import { Imachine } from "../models/models";
 
@@ -5,11 +6,15 @@ interface Idata {
   res: Imachine;
 }
 class MachineService {
-  async getAll() {
-    const machine: Imachine[] = await agricultural_machine.findAll();
+  async getAll(user: Principal | undefined) {
+    if (!user) return;
+    const machine: Imachine[] = await agricultural_machine.findAll({
+      where: { userId: user.sub },
+    });
     return machine;
   }
-  async create(data: Imachine) {
+  async create(data: Imachine, user: Principal | undefined) {
+    if (!user) return;
     const {
       nameMachine,
       brand,
@@ -29,6 +34,7 @@ class MachineService {
       workingSpeed: +workingSpeed,
       numberOfServicePersonnel: +numberOfServicePersonnel,
       gradeId: +gradeId!,
+      userId: user.sub,
     });
 
     return machine;

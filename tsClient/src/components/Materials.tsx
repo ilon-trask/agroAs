@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
-import { MaterialsProps } from "../modules/CreateCostMaterials";
+import { materialsProps, MaterialsProps } from "../modules/CreateCostMaterials";
 import style from "./Input.module.css";
 import { func, InputProps } from "./Dialog";
 import { createOperation, patchOperation } from "../http/requests";
@@ -34,7 +34,7 @@ const createMaterials: func<MaterialsProps> = function (
     console.log(update);
     setOpen(false);
     setCell!("");
-    setRes({});
+    setRes(materialsProps);
     setIsErr(false);
     res.consumptionPerHectare = +res.consumptionPerHectare;
     res.price = +res.price;

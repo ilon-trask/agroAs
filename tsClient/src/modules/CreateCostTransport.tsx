@@ -10,7 +10,7 @@ export type TransportProps = {
   unitsOfCost: string | number;
 };
 
-const transportProps = {
+export const transportProps: TransportProps = {
   nameOper: "",
   price: "",
   unitsOfCost: "",

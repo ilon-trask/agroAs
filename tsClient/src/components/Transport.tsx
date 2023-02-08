@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import Input from "../ui/Input/Input";
-import { TransportProps } from "../modules/CreateCostTransport";
+import { transportProps, TransportProps } from "../modules/CreateCostTransport";
 import { func, InputProps } from "./Dialog";
 import Button from "../ui/Button/Button";
 import { createOperation, patchOperation } from "../http/requests";
@@ -26,7 +26,7 @@ const createTransport: func<TransportProps> = function (
     if (cell == undefined) return;
     setOpen(false);
     setCell!("");
-    setRes({});
+    setRes(transportProps);
     setIsErr(false);
     res.price = +res.price;
     if (cell == "") return;
