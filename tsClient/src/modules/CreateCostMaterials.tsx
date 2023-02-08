@@ -1,8 +1,6 @@
 import React from "react";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
 import Dialog, { func } from "../components/Dialog";
 import Materials from "../components/Materials";
-import { createOperation, patchOperation } from "../http/requests";
 import { createOperProps } from "../pages/TechnologicalMap";
 
 export type MaterialsProps = {
@@ -21,43 +19,6 @@ const materialsProps = {
   unitsOfConsumption: "",
 };
 
-const createMaterials: func<MaterialsProps> = function (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  cell,
-  setCell,
-  setRes,
-  section,
-  setSection
-) {
-  if (
-    res.nameOper == "" ||
-    res.price == "" ||
-    res.consumptionPerHectare == ""
-  ) {
-    setIsErr(true);
-  } else {
-    console.log(update);
-    setOpen(false);
-    setCell("");
-    setRes(materialsProps);
-    setIsErr(false);
-    res.consumptionPerHectare = +res.consumptionPerHectare;
-    res.price = +res.price;
-    if (cell == "") return;
-    const request = { cell, res, section };
-    if (update) {
-      patchOperation(map, request, id);
-    } else {
-      createOperation(map, request, id);
-    }
-  }
-};
-
 const cell = "costMaterials";
 
 export default function CreateCostMaterials({
@@ -70,23 +31,32 @@ export default function CreateCostMaterials({
   setRes,
   update,
   setUpdate,
+  isErr,
+  setIsErr,
 }: createOperProps<MaterialsProps>) {
   return (
     <Dialog
       open={open}
       setOpen={setOpen}
-      cell={cell}
-      setCell={setCell}
-      section={section}
-      setSection={setSection}
       res={res}
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createMaterials}
       props={materialsProps}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <Materials res={res} setRes={setRes} />
+      <Materials
+        setOpen={setOpen}
+        res={res as MaterialsProps}
+        setRes={setRes}
+        cell={cell}
+        setCell={setCell}
+        section={section}
+        setSection={setSection}
+        setIsErr={setIsErr}
+        update={update}
+      />
     </Dialog>
   );
 }

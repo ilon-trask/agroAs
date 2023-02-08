@@ -1,14 +1,60 @@
 import React, { useContext } from "react";
+import { useParams } from "react-router-dom";
+import { createMachine, patchMachine } from "../http/requests";
 import { Context } from "../main";
+import { CostHandWorkProps } from "../modules/CreateCostHandWork";
 import { MachineProps } from "../modules/CreateMachine";
+import Button from "../ui/Button/Button";
 import Input from "../ui/Input/Input.js";
+import { func, InputProps } from "./Dialog";
 import style from "./input.module.css";
 
-type props = { res: MachineProps; setRes: (rse: MachineProps) => void };
-
-function CreateAgriculturalMachine({ res, setRes }: props) {
+const createMachineFunc: func<MachineProps> = function (
+  id,
+  map,
+  update,
+  res,
+  setIsErr,
+  setOpen,
+  setRes
+) {
+  if (res.nameMachine == "") {
+    setIsErr(true);
+  } else {
+    setOpen(false);
+    setRes({});
+    setIsErr(false);
+    res.marketCost = +res.marketCost;
+    res.depreciationPeriod = +res.depreciationPeriod;
+    res.widthOfCapture = +res.widthOfCapture;
+    res.workingSpeed = +res.workingSpeed;
+    res.numberOfServicePersonnel = +res.numberOfServicePersonnel;
+    res.gradeId = +res.gradeId;
+    if (update) {
+      patchMachine(map, res);
+    } else {
+      createMachine(map, res);
+    }
+  }
+};
+type props = {
+  res: MachineProps;
+  setRes: (
+    res: MachineProps | ((res: MachineProps) => MachineProps) | {}
+  ) => void;
+  setIsErr: (isErr: boolean) => void;
+  setOpen: (open: boolean) => void;
+  update: boolean;
+};
+function CreateAgriculturalMachine({
+  res,
+  setRes,
+  setIsErr,
+  setOpen,
+  update,
+}: props) {
   const { map } = useContext(Context);
-
+  const { id } = useParams();
   return (
     <>
       <h4>Внесіть данні для СГ машини</h4>
@@ -112,6 +158,13 @@ function CreateAgriculturalMachine({ res, setRes }: props) {
           </select>
         </div>
       </div>
+      <Button
+        onClick={() =>
+          createMachineFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
+        }
+      >
+        Зберегти
+      </Button>
     </>
   );
 }

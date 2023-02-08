@@ -15,35 +15,6 @@ const transportProps = {
   price: "",
   unitsOfCost: "",
 };
-const createTransport: func<TransportProps> = function (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  cell,
-  setCell,
-  setRes,
-  section
-) {
-  if (res.nameOper == "" || res.price == "") {
-    setIsErr(true);
-  } else {
-    setOpen(false);
-    setCell("");
-    setRes(transportProps);
-    setIsErr(false);
-    res.price = +res.price;
-    if (cell == "") return;
-    const request = { cell, res, section };
-    if (update) {
-      patchOperation(map, request, id);
-    } else {
-      createOperation(map, request, id);
-    }
-  }
-};
 
 const cell = "costTransport";
 
@@ -57,23 +28,32 @@ export default function CreateCostTransport({
   setRes,
   update,
   setUpdate,
+  isErr,
+  setIsErr,
 }: createOperProps<TransportProps>) {
   return (
     <Dialog
       open={open}
       setOpen={setOpen}
-      cell={cell}
-      setCell={setCell}
-      section={section}
-      setSection={setSection}
       res={res}
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createTransport}
       props={transportProps}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <Transport res={res} setRes={setRes} />
+      <Transport
+        res={res as TransportProps}
+        setRes={setRes}
+        cell={cell}
+        setCell={setCell}
+        section={section}
+        setSection={setSection}
+        setOpen={setOpen}
+        setIsErr={setIsErr}
+        update={update}
+      />
     </Dialog>
   );
 }

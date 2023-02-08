@@ -12,7 +12,7 @@ import CreateCostMaterials from "../modules/CreateCostMaterials";
 import CreateCostServices from "../modules/CreateCostServices";
 import CreateCostTransport from "../modules/CreateCostTransport";
 import CreateCostMechanical from "../modules/CreateCostMechanical";
-import CreateCart from "../modules/CreateCart";
+import CreateCart, { cartProps } from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
 import Button from "../ui/Button/Button";
@@ -23,11 +23,13 @@ export type createOperProps<T> = {
   setOpen: (open: boolean) => void;
   setCell: (cell: Icell | "") => void;
   section: number | "";
-  setSection: (section: number) => void;
-  res: T;
+  setSection: (section: number | "") => void;
+  res: T | {};
   setRes: (res: T | ((res: T) => T) | {}) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
+  isErr: boolean;
+  setIsErr: (isErr: boolean) => void;
 };
 
 const DevicePage = observer(() => {
@@ -38,12 +40,13 @@ const DevicePage = observer(() => {
   const [section, setSection] = useState<number | "">("");
   const [update, setUpdate] = useState(false);
   const [res, setRes] = useState({});
+  const [isErr, setIsErr] = useState<boolean>(false);
 
   const { map } = useContext(Context);
   let { id } = useParams();
 
   return (
-    <>
+    <div>
       {map.isLoading ? <Loader /> : <></>}
       <div className={style.container}>
         <div style={{ fontSize: "20px" }}>
@@ -97,6 +100,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             update={update}
             setUpdate={setUpdate}
+            isErr={isErr}
+            setIsErr={setIsErr}
           />
         ) : cell === "costServices" ? (
           <CreateCostServices
@@ -109,6 +114,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             update={update}
             setUpdate={setUpdate}
+            isErr={isErr}
+            setIsErr={setIsErr}
           />
         ) : cell === "costTransport" ? (
           <CreateCostTransport
@@ -121,6 +128,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             update={update}
             setUpdate={setUpdate}
+            isErr={isErr}
+            setIsErr={setIsErr}
           />
         ) : cell === "costMechanical" ? (
           <CreateCostMechanical
@@ -133,6 +142,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             update={update}
             setUpdate={setUpdate}
+            isErr={isErr}
+            setIsErr={setIsErr}
           />
         ) : cell == "costHandWork" ? (
           <CreateCostHandWork
@@ -145,6 +156,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             update={update}
             setUpdate={setUpdate}
+            isErr={isErr}
+            setIsErr={setIsErr}
           />
         ) : (
           ""
@@ -154,11 +167,11 @@ const DevicePage = observer(() => {
           setOpen={setMapOpen}
           update={update}
           setUpdate={setUpdate}
-          res={res}
+          res={res as cartProps}
           setRes={setRes}
         />
       </div>
-    </>
+    </div>
   );
 });
 export default DevicePage;

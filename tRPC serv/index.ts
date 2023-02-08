@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import sequelize from "./db";
+import jwt from "jsonwebtoken";
 
 import * as trpcExpress from "@trpc/server/adapters/express";
 
@@ -19,6 +20,7 @@ import { userRouter } from "./routes/userRouter";
 import { gradesRouter } from "./routes/gradesRouter";
 
 import OS from "os";
+import { inferAsyncReturnType } from "@trpc/server";
 
 let users = [{ id: 1, name: "bob" }];
 
@@ -55,12 +57,30 @@ const appRouter = router({
 
 const app = express();
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
-
+type Principal = {
+  sub: string;
+  role: string;
+  email: string;
+};
 const createContext = ({
   req,
   res,
-}: trpcExpress.CreateExpressContextOptions) => ({ req }); // no context
+}: trpcExpress.CreateExpressContextOptions) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  console.log(token);
+  console.log(typeof token);
+  console.log(!token);
+  if (!token) return {};
+  console.log(123);
 
+  const user = jwt.verify(
+    token,
+    "gdrlyeRGbmZa10k7HByehmz4MU4EnTrOBBSEWST1gA+Bz9IupfCNm59k98ckJKti3oiCPhuymM5B/6tPZhXbcA=="
+  ) as Principal;
+
+  return { user };
+};
+export type Context = inferAsyncReturnType<typeof createContext>;
 app.use(cors());
 app.use(
   "",

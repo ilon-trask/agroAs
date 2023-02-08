@@ -18,44 +18,6 @@ const mechanicalWorkProps = {
   fuelConsumption: "",
 };
 
-const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  cell,
-  setCell,
-  setRes,
-  section
-) {
-  if (
-    res.nameOper == "" ||
-    res.idMachine == "" ||
-    res.idTractor == "" ||
-    res.workingSpeed == "" ||
-    res.fuelConsumption == ""
-  ) {
-    setIsErr(true);
-  } else {
-    setOpen(false);
-    setCell("");
-    setRes(mechanicalWorkProps);
-    res.idMachine = +res.idMachine;
-    res.idTractor = +res.idTractor;
-    res.workingSpeed = +res.workingSpeed;
-    res.fuelConsumption = +res.fuelConsumption;
-    setIsErr(false);
-    if (cell == "") return;
-    const request = { cell, res, section };
-    if (update) {
-      patchOperation(map, request, id);
-    } else {
-      createOperation(map, request, id);
-    }
-  }
-};
 let cell: "costMechanical" = "costMechanical";
 
 export default function CreateCostMechanical({
@@ -68,23 +30,32 @@ export default function CreateCostMechanical({
   setRes,
   update,
   setUpdate,
+  isErr,
+  setIsErr,
 }: createOperProps<MechanicalWorkProps>) {
   return (
     <Dialog
+      res={res}
       open={open}
       setOpen={setOpen}
-      cell={cell}
-      setCell={setCell}
-      section={section}
-      setSection={setSection}
-      res={res}
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={mechanicalWorkFunc}
       props={mechanicalWorkProps}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <MechanicalWork res={res} setRes={setRes} />
+      <MechanicalWork
+        res={res as MechanicalWorkProps}
+        setRes={setRes}
+        cell={cell}
+        setCell={setCell}
+        section={section}
+        setSection={setSection}
+        setIsErr={setIsErr}
+        setOpen={setOpen}
+        update={update}
+      />
     </Dialog>
   );
 }

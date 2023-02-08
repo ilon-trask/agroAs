@@ -12,7 +12,7 @@ export type TracProps = {
   enginePower: string | number;
   fuelConsumption: string | number;
   numberOfPersonnel: string | number;
-  gradeId: string | number;
+  gradeId: number | "";
 };
 
 const tracProps: TracProps = {
@@ -25,45 +25,7 @@ const tracProps: TracProps = {
   numberOfPersonnel: "",
   gradeId: "",
 };
-const createTrac: func<TracProps> = function (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  cell,
-  setCell,
-  setRes,
-  section,
-  setSection
-) {
-  if (
-    res.nameTractor == "" ||
-    res.marketCost == "" ||
-    res.depreciationPeriod == "" ||
-    res.enginePower == "" ||
-    res.fuelConsumption == "" ||
-    res.numberOfPersonnel == ""
-  ) {
-    setIsErr(true);
-  } else {
-    res.marketCost = +res.marketCost;
-    res.depreciationPeriod = +res.depreciationPeriod;
-    res.enginePower = +res.enginePower;
-    res.fuelConsumption = +res.fuelConsumption;
-    res.numberOfPersonnel = +res.numberOfPersonnel;
-    res.gradeId = +res.gradeId;
-    setOpen(false);
-    setRes(tracProps);
-    setIsErr(false);
-    if (update) {
-      patchTractor(map, res);
-    } else {
-      createTractor(map, res);
-    }
-  }
-};
+
 type props = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -71,6 +33,8 @@ type props = {
   setRes: (res: TracProps | ((res: TracProps) => TracProps) | {}) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
+  isErr: boolean;
+  setIsErr: (isErr: boolean) => void;
 };
 export default function CreateTractor({
   open,
@@ -79,6 +43,8 @@ export default function CreateTractor({
   setRes,
   update,
   setUpdate,
+  isErr,
+  setIsErr,
 }: props) {
   console.log(setOpen);
   return (
@@ -89,10 +55,17 @@ export default function CreateTractor({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createTrac}
       props={tracProps}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <Tractor res={res} setRes={setRes} />
+      <Tractor
+        res={res}
+        setRes={setRes}
+        setIsErr={setIsErr}
+        setOpen={setOpen}
+        update={update}
+      />
     </Dialog>
   );
 }

@@ -78,8 +78,14 @@ export default class MapStore {
   public set tractor(trac) {
     this._tractor = trac;
   }
+  public set newTractor(trac: Itractor) {
+    this._tractor.push(trac);
+  }
   public set machine(machine) {
     this._machine = machine;
+  }
+  public set newMachine(machine: Imachine) {
+    this._machine.push(machine);
   }
   public set grade(grade: Igrade[]) {
     this._grade = grade;

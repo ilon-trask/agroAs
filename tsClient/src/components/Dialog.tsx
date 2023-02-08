@@ -25,12 +25,24 @@ export type func<T> = (
   res: T,
   setIsErr: (isErr: boolean) => void,
   setOpen: (open: boolean) => void,
-  cell: Icell | "",
-  seCell: (cell: Icell | "") => void,
   setRes: (res: T | ((res: T) => T) | {}) => void,
-  section: number | "" | undefined,
-  setSection: (section: number) => void
+  cell?: Icell | "",
+  seCell?: (cell: Icell | "") => void,
+  section?: number | "" | undefined,
+  setSection?: (section: number | "") => void
 ) => void;
+
+export type InputProps<T> = {
+  res: T;
+  setRes: (res: T | ((res: T) => T) | {}) => void;
+  update: boolean;
+  cell?: Icell;
+  setCell?: (cell: Icell | "") => void;
+  setOpen: (open: boolean) => void;
+  section: number | "";
+  setSection: (section: number | "") => void;
+  setIsErr: (isErr: boolean) => void;
+};
 
 type resType =
   | cartProps
@@ -44,42 +56,31 @@ type resType =
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
-  cell?: Icell | "";
-  setCell?: (cell: Icell | "") => void;
-  section?: number | "";
-  setSection?: (section: number) => void;
   res: resType;
   setRes: (res: resType | ((res: resType) => resType)) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
   children: ReactChild | ReactNode;
-  func: func<resType>;
   props: resType;
-  errMess: " " | JSX.Element;
+  errMess?: " " | JSX.Element;
+  isErr: boolean;
+  setIsErr: (isErr: boolean) => void;
 }
 const Dialog: FC<props> = observer(
   ({
     open,
     setOpen,
-    cell,
-    setCell,
-    section,
-    setSection,
     res,
     setRes,
     update,
     setUpdate,
     children,
-    func,
     props,
     errMess,
+    isErr,
+    setIsErr,
   }) => {
-    const { map } = useContext(Context);
-    const { id } = useParams();
-    const [isErr, setIsErr] = useState<boolean>(false);
-    console.log(res);
     useEffect(() => {
-      console.log(res);
       setRes(res);
     }, [res]);
     useEffect(() => {
@@ -106,28 +107,7 @@ const Dialog: FC<props> = observer(
         >
           {children}
           {isErr ? "Ви не заповнили поля" : ""}
-          <div>
-            <Button
-              style={{ marginTop: "10px" }}
-              onClick={() => {
-                func(
-                  +id!,
-                  map,
-                  update,
-                  res,
-                  setIsErr,
-                  setOpen,
-                  cell!,
-                  setCell!,
-                  setRes,
-                  section,
-                  setSection!
-                );
-              }}
-            >
-              Зберегти
-            </Button>
-          </div>
+
           {errMess || (
             <p>
               Увага!

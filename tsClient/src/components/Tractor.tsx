@@ -1,18 +1,62 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
 import { useContext } from "react";
+import { useParams } from "react-router-dom";
+import { Itractor } from "../../../tRPC serv/models/models";
+import { createTractor, patchTractor } from "../http/requests";
 import { Context } from "../main";
 import { TracProps } from "../modules/CreateTractor";
+import Button from "../ui/Button/Button";
 import Input from "../ui/Input/Input.js";
+import { func } from "./Dialog";
 import style from "./input.module.css";
-type props = {
-  res: TracProps;
-  setRes: (res: TracProps) => void;
+
+const createTrac: func<TracProps> = function (
+  id,
+  map,
+  update,
+  res,
+  setIsErr,
+  setOpen,
+  setRes
+) {
+  if (
+    res.nameTractor == "" ||
+    res.marketCost == "" ||
+    res.depreciationPeriod == "" ||
+    res.enginePower == "" ||
+    res.fuelConsumption == "" ||
+    res.numberOfPersonnel == ""
+  ) {
+    setIsErr(true);
+  } else {
+    res.marketCost = +res.marketCost;
+    res.depreciationPeriod = +res.depreciationPeriod;
+    res.enginePower = +res.enginePower;
+    res.fuelConsumption = +res.fuelConsumption;
+    res.numberOfPersonnel = +res.numberOfPersonnel;
+    res.gradeId = +res.gradeId;
+    setOpen(false);
+    setRes({});
+    setIsErr(false);
+    if (update) {
+      patchTractor(map, res as Itractor);
+    } else {
+      createTractor(map, res as Itractor);
+    }
+  }
 };
 
-const CreateTractor = ({ res, setRes }: props) => {
+type props = {
+  res: TracProps;
+  setRes: (res: TracProps | ((res: TracProps) => TracProps) | {}) => void;
+  setIsErr: (isErr: boolean) => void;
+  setOpen: (open: boolean) => void;
+  update: boolean;
+};
+const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
   const { map } = useContext(Context);
-
+  const { id } = useParams();
   return (
     <>
       <h4>Внесіть данні для трактора</h4>
@@ -111,6 +155,13 @@ const CreateTractor = ({ res, setRes }: props) => {
           </select>
         </div>
       </div>
+      <Button
+        onClick={() =>
+          createTrac(+id!, map, update, res, setIsErr, setOpen, setRes)
+        }
+      >
+        Зберегти
+      </Button>
     </>
   );
 };

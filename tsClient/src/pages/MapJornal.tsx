@@ -49,7 +49,7 @@ function MapJornal() {
           update={update}
           setUpdate={setUpdate}
           res={res}
-          setRes={setRes}
+          setRes={setRes as any}
         />
       </div>
     </>

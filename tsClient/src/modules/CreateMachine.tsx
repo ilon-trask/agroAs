@@ -25,38 +25,6 @@ const machineProps: MachineProps = {
   gradeId: "",
 };
 
-const createMachineFunc: func<MachineProps> = function (
-  id,
-  map,
-  update,
-  res,
-  setIsErr,
-  setOpen,
-  cell,
-  setCell,
-  setRes,
-  section,
-  setSection
-) {
-  if (res.nameMachine == "") {
-    setIsErr(true);
-  } else {
-    setOpen(false);
-    setRes(machineProps);
-    setIsErr(false);
-    res.marketCost = +res.marketCost;
-    res.depreciationPeriod = +res.depreciationPeriod;
-    res.widthOfCapture = +res.widthOfCapture;
-    res.workingSpeed = +res.workingSpeed;
-    res.numberOfServicePersonnel = +res.numberOfServicePersonnel;
-    res.gradeId = +res.gradeId;
-    if (update) {
-      patchMachine(map, res);
-    } else {
-      createMachine(map, res);
-    }
-  }
-};
 type props = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -66,6 +34,8 @@ type props = {
   ) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
+  isErr: boolean;
+  setIsErr: (isErr: boolean) => void;
 };
 export default function CreateMachine({
   open,
@@ -74,6 +44,8 @@ export default function CreateMachine({
   setRes,
   update,
   setUpdate,
+  isErr,
+  setIsErr,
 }: props) {
   console.log(open);
 
@@ -85,10 +57,17 @@ export default function CreateMachine({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createMachineFunc}
       props={machineProps}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <Machine res={res} setRes={setRes} />
+      <Machine
+        res={res as MachineProps}
+        setRes={setRes}
+        setOpen={setOpen}
+        update={update}
+        setIsErr={setIsErr}
+      />
     </Dialog>
   );
 }

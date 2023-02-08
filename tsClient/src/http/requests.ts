@@ -2,6 +2,7 @@ import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { type AppRouter } from "../../../tRPC serv/index";
 import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
 import {
+  Idata,
   resTechCartsWithOpers,
   resTechOperation,
 } from "../../../tRPC serv/controllers/TechCartService";
@@ -16,6 +17,7 @@ import {
   Itractor,
   tech_cart,
   tech_operation,
+  tractor,
 } from "../../../tRPC serv/models/models";
 
 import { createClient } from "@supabase/supabase-js";
@@ -40,12 +42,15 @@ const client = createTRPCProxyClient<AppRouter>({
     httpBatchLink({
       url: "http://localhost:5000",
       async headers() {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        console.log(session);
+
+        if (!session) return {};
         return {
-          authorization:
-            "Bearer " +
-            (await (
-              await supabase.auth.getSession()
-            ).data.session?.access_token),
+          authorization: "Bearer " + session.access_token,
         };
       },
     }),
@@ -110,7 +115,7 @@ export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = false;
 }
 
-export async function createCart(map: MapStore, data: cartProps) {
+export async function createCart(map: MapStore, data: Itech_cart) {
   map.isLoading = true;
   await client.cart.create.query(data).then((res: Itech_cart) => {
     map.newMaps = res;
@@ -185,6 +190,7 @@ export async function createOperation(
 ) {
   map.isLoading = true;
 
+  //@ts-ignore
   await client.oper.create[arr.cell]
     .query({
       arr: arr,
@@ -275,13 +281,14 @@ export function getSection(map: MapStore) {
   client.section.get.query().then((res: Isection[]) => (map.section = res));
 }
 
-export function createTractor(map: MapStore, res: TracProps) {
+export function createTractor(map: MapStore, res: Itractor) {
+  res.gradeId;
   client.tractor.create.query(res).then(() => {
-    getTractor(map);
+    map.newTractor = res;
   });
 }
 
-export function patchTractor(map: MapStore, res: TracProps) {
+export function patchTractor(map: MapStore, res: Itractor) {
   client.tractor.patch.query(res).then(() => getTractor(map));
 }
 
@@ -291,15 +298,15 @@ export function getTractor(map: MapStore) {
   });
 }
 
-export function createMachine(map: MapStore, res: MachineProps) {
-  client.machine.create.query(res).then((data: Imachine[]) => {
-    map.machine = data;
+export function createMachine(map: MapStore, res: Imachine) {
+  client.machine.create.query(res).then((data: Imachine) => {
+    map.newMachine = data;
   });
 }
 
-export function patchMachine(map: MapStore, res: MachineProps) {
-  client.machine.patch.query(res).then((data: Imachine[]) => {
-    map.machine = data;
+export function patchMachine(map: MapStore, res: Imachine) {
+  client.machine.patch.query(res).then((data: Imachine) => {
+    map.newMachine = data;
   });
 }
 

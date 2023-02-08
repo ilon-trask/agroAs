@@ -17,15 +17,13 @@ function App() {
   const { map, user } = useContext(Context);
   useEffect(() => {
     (async () => {
-      const session = await supabase.auth.refreshSession();
-      console.log(session.data.session);
-      console.log(session);
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
         user.setIsAuth(true);
       }
       console.log(error);
       console.log(data);
+      supabase.auth.getUser().then((data) => console.log(data));
     })();
   }, []);
 

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Itech_cart } from "../../../tRPC serv/models/models";
 import Dialog, { func } from "../components/Dialog";
 import MapInputs from "../components/MapInputs";
 import { createCart, updateMap } from "../http/requests";
@@ -24,11 +25,7 @@ const createCartFunc: func<cartProps> = (
   res,
   setIsErr,
   setOpen,
-  cell,
-  setCell,
-  setRes,
-  section,
-  setSection
+  setRes
 ) => {
   if (
     res.nameCart == "" ||
@@ -43,11 +40,11 @@ const createCartFunc: func<cartProps> = (
     res.area = +res.area;
     res.salary = +res.salary;
     res.priceDiesel = +res.priceDiesel;
-    setRes({ nameCart: "", area: "", salary: "", priceDiesel: "" });
+    setRes({});
     if (update) {
       updateMap(map, res);
     } else {
-      createCart(map, res);
+      createCart(map, res as Itech_cart);
     }
   }
 };
@@ -57,7 +54,7 @@ interface props {
   update: boolean;
   setUpdate: (update: boolean) => void;
   res: cartProps;
-  setRes: (res: cartProps | ((res: cartProps) => cartProps)) => void;
+  setRes: (res: cartProps | ((res: cartProps) => cartProps) | {}) => void;
 }
 export default function CreateCart({
   open,
@@ -67,6 +64,7 @@ export default function CreateCart({
   res,
   setRes,
 }: props) {
+  const [isErr, setIsErr] = useState<boolean>(false);
   return (
     <Dialog
       open={open}
@@ -75,11 +73,18 @@ export default function CreateCart({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      func={createCartFunc}
       props={cartProps}
       errMess={" "}
+      isErr={isErr}
+      setIsErr={setIsErr}
     >
-      <MapInputs res={res} setRes={setRes} />
+      <MapInputs
+        res={res}
+        setRes={setRes}
+        setIsErr={setIsErr}
+        setOpen={setOpen}
+        update={update}
+      />
     </Dialog>
   );
 }

@@ -78,7 +78,7 @@ export default function OpersTable({
       <td></td>
       <td></td>
       <td></td>
-      <td>{sum}</td>
+      <td className={style.headItem}>{sum}</td>
       <td></td>
     </div>
   );
