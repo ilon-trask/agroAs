@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
+import { Imachine } from "../../../tRPC serv/models/models";
 import { createMachine, patchMachine } from "../http/requests";
 import { Context } from "../main";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork";
@@ -18,7 +19,14 @@ const createMachineFunc: func<MachineProps> = function (
   setOpen,
   setRes
 ) {
-  if (res.nameMachine == "") {
+  if (
+    res.nameMachine == "" ||
+    res.brand == "" ||
+    res.marketCost == "" ||
+    res.depreciationPeriod == "" ||
+    res.widthOfCapture == "" ||
+    res.workingSpeed == ""
+  ) {
     setIsErr(true);
   } else {
     setOpen(false);
@@ -31,9 +39,9 @@ const createMachineFunc: func<MachineProps> = function (
     res.numberOfServicePersonnel = +res.numberOfServicePersonnel;
     res.gradeId = +res.gradeId;
     if (update) {
-      patchMachine(map, res);
+      patchMachine(map, res as Imachine);
     } else {
-      createMachine(map, res);
+      createMachine(map, res as Imachine);
     }
   }
 };
