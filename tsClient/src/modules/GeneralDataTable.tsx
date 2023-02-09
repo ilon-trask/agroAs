@@ -66,12 +66,9 @@ export default function GeneralDataTable({
               onClick={() => {
                 setMapOpen(true);
                 setUpdate(true);
+
                 setRes({
-                  id: mapData.id!,
-                  nameCart: mapData.nameCart,
-                  area: mapData.area,
-                  salary: mapData.salary,
-                  priceDiesel: mapData.priceDiesel,
+                  ...mapData,
                 });
               }}
             >

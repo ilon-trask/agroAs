@@ -19,13 +19,19 @@ function App() {
     (async () => {
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
-        user.setIsAuth(true);
+        user.isAuth = true;
+        user.role = data.session.user.role as
+          | "ADMIN"
+          | "authenticated"
+          | ""
+          | undefined;
       }
+      console.log(user.role);
       console.log(error);
       console.log(data);
       supabase.auth.getUser().then((data) => console.log(data));
     })();
-  }, []);
+  }, [user.isAuth]);
 
   useEffect(() => {
     getCarts(map);
@@ -33,6 +39,7 @@ function App() {
     getTractor(map);
     getMachine(map);
     getGrades(map);
+    console.log(3);
   }, []);
 
   return (

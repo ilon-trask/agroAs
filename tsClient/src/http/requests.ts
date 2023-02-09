@@ -29,13 +29,13 @@ export const supabase = createClient(
   "https://bicofnobkczquxvztyzl.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY29mbm9ia2N6cXV4dnp0eXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzQ5MjQ5MTIsImV4cCI6MTk5MDUwMDkxMn0.jEd8pHzVzlqZxf-ioqC_QKoda_xqfD2nh4niJ1mea9s"
 );
-(async () => {
-  console.log(
-    await (
-      await supabase.auth.getSession()
-    ).data.session?.access_token
-  );
-})();
+// (async () => {
+//   console.log(
+//     await (
+//       await supabase.auth.getSession()
+//     ).data.session?.access_token
+//   );
+// })();
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
@@ -47,7 +47,6 @@ const client = createTRPCProxyClient<AppRouter>({
           error,
         } = await supabase.auth.getSession();
         console.log(session);
-
         if (!session) return {};
         return {
           authorization: "Bearer " + session.access_token,
@@ -107,6 +106,43 @@ export async function getCarts(map: MapStore) {
   map.isLoading = false;
 }
 
+export async function setIsPublic(
+  map: MapStore,
+  data: { id: number; isPublic: boolean }
+) {
+  map.isLoading = true;
+  await client.cart.setIsPublic.query(data).then((res) => {
+    console.log(res);
+
+    map.opers = [];
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
+    map.maps = res.carts;
+    for (let i = 0; i < res.carts.length; i++) {
+      const opers = res.carts[i].tech_operations;
+      for (let j = 0; j < opers.length; j++) {
+        const oper = opers[j];
+        map.newOper = opers[j];
+
+        if (oper.aggregate) {
+          map.newCostMechanical = oper.aggregate;
+        } else if (oper.cost_service) {
+          map.newCostServices = oper.cost_service;
+        } else if (oper.cost_transport) {
+          map.newCostTransport = oper.cost_transport;
+        } else if (oper.cost_material) {
+          map.newCostMaterials = oper.cost_material;
+        } else if (oper.cost_hand_work) {
+          map.newCostHandWork = oper.cost_hand_work;
+        }
+      }
+    }
+  });
+  map.isLoading = false;
+}
+
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
   await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
@@ -117,43 +153,49 @@ export async function deleteCart(map: MapStore, id: number) {
 
 export async function createCart(map: MapStore, data: Itech_cart) {
   map.isLoading = true;
-  await client.cart.create.query(data).then((res: Itech_cart) => {
+  //@ts-ignore
+  await client.cart.create.query(data).then((res: resTechCartsWithOpers) => {
     map.newMaps = res;
   });
   map.isLoading = false;
 }
 
-export async function updateMap(map: MapStore, data: any) {
+export async function updateMap(map: MapStore, dat: any) {
   map.isLoading = true;
+  let data = JSON.parse(JSON.stringify(dat));
+  console.log(data);
+
   await client.cart.patch.query(data).then(
     // @ts-ignore
-    (res: {
-      carts: Itech_cart[];
-      opers: Itech_operation[];
-      props: prope[];
-    }) => {
+    (res: { carts: resTechCartsWithOpers[] }) => {
+      console.log(res);
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
       map.costTransport = [];
       map.maps = res.carts;
-      let ids = map.maps.map((el) => el.id);
+      for (let i = 0; i < res.carts.length; i++) {
+        const opers = res.carts[i].tech_operations;
+        for (let j = 0; j < opers.length; j++) {
+          const oper = opers[j];
+          console.log(oper);
 
-      res.props.forEach((el) => {
-        if ("nameMaterials" in el) {
-          map.newCostMaterials = el;
-        } else if ("nameService" in el) {
-          map.newCostServices = el;
-        } else if ("nameTransport" in el) {
-          map.newCostTransport = el;
-        } else if ("productionRateAmount" in el) {
-          map.newCostHandWork = el;
-        } else if ("fuelConsumption" in el) {
-          map.newCostMechanical = el;
+          map.newOper = opers[j];
+
+          if (oper.aggregate) {
+            map.newCostMechanical = oper.aggregate;
+          } else if (oper.cost_service) {
+            map.newCostServices = oper.cost_service;
+          } else if (oper.cost_transport) {
+            map.newCostTransport = oper.cost_transport;
+          } else if (oper.cost_material) {
+            map.newCostMaterials = oper.cost_material;
+          } else if (oper.cost_hand_work) {
+            map.newCostHandWork = oper.cost_hand_work;
+          }
         }
-      });
-      map.opers = res.opers;
+      }
     }
   );
   map.isLoading = false;
@@ -228,6 +270,7 @@ export async function patchOperation(
   id: number
 ) {
   map.isLoading = true;
+
   let [mapData] = map.maps.filter((el) => el.id == id);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   console.log(mapData);
@@ -241,10 +284,16 @@ export async function patchOperation(
     //@ts-ignore
     .then((res: resTechOperation) => {
       console.log(res);
+      console.log(arr.res.operId);
+      console.log(map.opers[2].id);
+      console.log(map.opers.filter((el) => el.id != arr.res.operId));
 
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
+
       map.newOper = res;
       let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
+      console.log(mapData);
+
       mapData.totalCost! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
         (el) => el.techOperationId != arr.res.operId
@@ -252,6 +301,27 @@ export async function patchOperation(
       map.costMaterials = map.costMaterials.filter(
         (el) => el.techOperationId != arr.res.operId
       );
+      console.log(map.maps);
+      let [thisMap] = map.maps.filter((el) => el.id == id);
+      console.log(thisMap);
+      for (let i = 0; i < thisMap.tech_operations.length; i++) {
+        const el = thisMap.tech_operations[i];
+        if (el?.cost_material?.id == res.cost_material?.id) {
+          el.cost_material = res.cost_material;
+        }
+        if (el?.cost_service?.id == res.cost_service?.id) {
+          el.cost_service = res.cost_service;
+        }
+        if (el?.aggregate?.id == res.aggregate?.id) {
+          el.aggregate = res.aggregate;
+        }
+        if (el.cost_hand_work?.id == res.cost_hand_work?.id) {
+          el.cost_hand_work = res.cost_hand_work;
+        }
+        if (el?.cost_transport?.id == res.cost_transport?.id) {
+          el.cost_transport = res.cost_transport;
+        }
+      }
       map.costMechanical = map.costMechanical.filter(
         (el) => el.techOperationId != arr.res.operId
       );

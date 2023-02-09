@@ -13,8 +13,8 @@ export interface Icart extends Itech_cart {
   priceDiesel: any;
 }
 
-function MapJornal() {
-  const { map } = useContext(Context);
+const MapJornal = observer(function () {
+  const { map, user } = useContext(Context);
   const [open, setOpen] = useState<boolean>(false);
   const [update, setUpdate] = useState<boolean>(false);
   const [res, setRes] = useState<cartProps>({
@@ -54,6 +54,6 @@ function MapJornal() {
       </div>
     </>
   );
-}
+});
 
-export default observer(MapJornal);
+export default MapJornal;

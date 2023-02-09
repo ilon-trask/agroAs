@@ -39,7 +39,7 @@ class MachineService {
 
     return machine;
   }
-  async patch(data: Imachine) {
+  async patch(data: Imachine, user: Principal | undefined) {
     const {
       id,
       nameMachine,

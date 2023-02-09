@@ -9,6 +9,7 @@ export type cartProps = {
   nameCart: string;
   area: number | "";
   salary: number | "";
+  isPublic?: boolean;
   priceDiesel: number | "";
   totalCost?: number;
 };
@@ -16,6 +17,7 @@ export const CartProps: cartProps = {
   nameCart: "",
   area: "",
   salary: "",
+  isPublic: false,
   priceDiesel: "",
 };
 

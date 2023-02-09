@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import {
   Itech_operation,
   Itech_cart,
@@ -14,7 +15,7 @@ import {
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
-  private _maps: Itech_cart[] = [];
+  private _maps: resTechCartsWithOpers[] = [];
   private _opers: Itech_operation[] = [];
   private _costMaterials: Icost_material[] = [];
   private _costServices: Icost_service[] = [];
@@ -33,7 +34,7 @@ export default class MapStore {
   public set maps(maps) {
     this._maps = maps;
   }
-  public set newMaps(maps: Itech_cart) {
+  public set newMaps(maps: resTechCartsWithOpers) {
     this._maps.push(maps);
   }
   public set opers(opers: Itech_operation[]) {

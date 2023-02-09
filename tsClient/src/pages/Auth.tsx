@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE } from "../utils/consts";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
-import { supabase } from "../http/requests";
+import { getCarts, supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
 import { Context } from "../main";
@@ -10,14 +10,23 @@ export default function AuthPage() {
   const location = useLocation().pathname;
   const isLoginPage = location === LOGIN_ROUTE;
   console.log(isLoginPage);
-  const { user } = useContext(Context);
+  const { map, user } = useContext(Context);
   const navigate = useNavigate();
   supabase.auth.onAuthStateChange(async (e) => {
     if (e == "SIGNED_IN") {
       navigate("/");
-      user.setIsAuth(true);
+      const { data, error } = await supabase.auth.getSession();
+      if (data.session) {
+        user.role = data.session.user.role as
+          | "ADMIN"
+          | "authenticated"
+          | ""
+          | undefined;
+        user.isAuth = true;
+        getCarts(map);
+      }
+      console.log(e);
     }
-    console.log(e);
   });
   return (
     <div className={style.auth}>

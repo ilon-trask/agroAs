@@ -154,7 +154,10 @@ export const operRouter = router({
           }),
         })
       )
-      .query(async ({ input }) => await OperService.patchCostMaterials(input)),
+      .query(
+        async ({ input, ctx }) =>
+          await OperService.patchCostMaterials(input, ctx.user)
+      ),
     costServices: publicProcedure
       .input(
         z.object({
@@ -176,7 +179,10 @@ export const operRouter = router({
           }),
         })
       )
-      .query(async ({ input }) => await OperService.patchCostService(input)),
+      .query(
+        async ({ input, ctx }) =>
+          await OperService.patchCostService(input, ctx.user)
+      ),
     costMechanical: publicProcedure
       .input(
         z.object({
@@ -196,11 +202,16 @@ export const operRouter = router({
               idMachine: z.number(),
               idTractor: z.number(),
               workingSpeed: z.number(),
+              salary: z.number().optional(),
+              priceDiesel: z.number().optional(),
             }),
           }),
         })
       )
-      .query(async ({ input }) => await OperService.patchCostMechanical(input)),
+      .query(
+        async ({ input, ctx }) =>
+          await OperService.patchCostMechanical(input, ctx.user)
+      ),
     costTransport: publicProcedure
       .input(
         z.object({
@@ -222,7 +233,10 @@ export const operRouter = router({
           }),
         })
       )
-      .query(async ({ input }) => await OperService.patchCostTransport(input)),
+      .query(
+        async ({ input, ctx }) =>
+          await OperService.patchCostTransport(input, ctx.user)
+      ),
     costHandWork: publicProcedure
       .input(
         z.object({
@@ -247,11 +261,15 @@ export const operRouter = router({
               salaryPerShift: z.number().optional(),
               spending: z.number().optional(),
               unitOfMeasurement: z.string().optional(),
+              salary: z.number().optional(),
             }),
           }),
         })
       )
-      .query(async ({ input }) => await OperService.patchCostHandWork(input)),
+      .query(
+        async ({ input, ctx }) =>
+          await OperService.patchCostHandWork(input, ctx.user)
+      ),
   }),
 
   delete: publicProcedure

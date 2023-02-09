@@ -40,6 +40,7 @@ export interface Itech_cart {
   totalCost?: number;
   salary: number;
   priceDiesel: number;
+  isPublic?: boolean;
   userId: string;
 }
 export class tech_cart extends Model<Itech_cart> {
@@ -48,6 +49,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare area: number;
   declare salary: number;
   declare priceDiesel: number;
+  declare isPublic?: boolean;
   declare userId: string;
 }
 
@@ -58,6 +60,7 @@ tech_cart.init(
     area: { type: DataTypes.INTEGER, allowNull: false },
     salary: { type: DataTypes.INTEGER, allowNull: false },
     priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
+    isPublic: { type: DataTypes.BOOLEAN },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }

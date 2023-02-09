@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
 import { Context } from "../main";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import style from "./NavBar.module.css";
-import { supabase } from "../http/requests";
+import { getCarts, supabase } from "../http/requests";
 
 const NavBar = observer(() => {
-  const { user } = useContext(Context);
+  const { map, user } = useContext(Context);
+  const navigate = useNavigate();
   return (
     <div className={style.bg}>
       <div className={style.container}>
@@ -15,14 +16,15 @@ const NavBar = observer(() => {
           калькулятор
         </Link>
         {user.isAuth ? (
-          <div className="ml-auto">
-            <button>Адмін панель</button>
+          <div>
             <Link to={MAP_ROUTE}>
               <button
-                style={{ marginLeft: "10px" }}
-                onClick={() => {
-                  supabase.auth.signOut();
-                  user.setIsAuth(false);
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  user.isAuth = false;
+                  user.role = "";
+                  console.log(user.isAuth);
+                  getCarts(map);
                 }}
               >
                 Вийти
