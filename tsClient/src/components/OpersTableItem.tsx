@@ -131,7 +131,8 @@ export default function OpersTableItem({
             +el.costCars! +
               +el.costFuel! +
               +el.costHandWork! +
-              +el.costMachineWork!)}
+              +el.costMachineWork! ||
+            el.costHandWork!)}
       </div>
       <div
         className={style.delete}
