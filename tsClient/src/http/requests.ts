@@ -210,13 +210,17 @@ export async function deleteOper(
   await client.oper.delete
     .query({ cartId: +cartId, operId: operId })
     //@ts-ignore
-    .then((data: Itech_operation) => {
+    .then((data: any) => {
+      console.log(data);
       map.opers = map.opers.filter((el) => el.id != data.id);
       let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
 
       console.log(operValue(data));
 
+      console.log(mapData);
+
       mapData.totalCost! -= operValue(data);
+      console.log(mapData);
     });
   map.isLoading = false;
 }

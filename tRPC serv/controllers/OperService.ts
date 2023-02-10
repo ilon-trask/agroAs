@@ -224,7 +224,6 @@ async function changeOper(
 
       elem.costMaterials =
         costMaterials.price * costMaterials.consumptionPerHectare;
-      console.log(elem);
       return elem;
     } else {
       elem.costMaterials =
@@ -1043,7 +1042,10 @@ class OperService {
   async deleteOper(data: { cartId: number; operId: number }) {
     const { cartId, operId } = data;
 
-    const elem = await tech_operation.findOne({ where: { id: operId } });
+    let elem: any | null = await tech_operation.findOne({
+      where: { id: operId },
+    });
+    elem = await changeOper(elem, elem.techCartId!);
     if (!elem) throw new Error("");
     await changeOper(elem, cartId);
     await cost_material.destroy({
