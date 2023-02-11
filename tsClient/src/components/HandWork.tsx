@@ -7,11 +7,19 @@ import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Icost_hand_work } from "../../../tRPC serv/models/models";
 import { createOperation, patchOperation } from "../http/requests";
 import { Context } from "../main";
-import Button from "../ui/Button/Button";
-import Input from "../ui/Input/Input";
 import { func, InputProps } from "./Dialog";
 import style from "./Input.module.css";
-
+import {
+  Box,
+  Heading,
+  Select,
+  ModalBody,
+  Button,
+  ModalFooter,
+  Text,
+  Input,
+  Radio,
+} from "@chakra-ui/react";
 export type CostHandWorkProps = {
   nameOper: string;
   gradeId: number | string;
@@ -108,82 +116,130 @@ const HandWork = observer(
   }: InputProps<CostHandWorkProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
-
+    console.log(res.type);
     return (
-      <>
-        <div className={style.mechanical}>
-          <div>
-            <p>Назва операції</p>
-            <Input
-              type="text"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setRes({ ...res, nameOper: e.target.value });
-              }}
-              value={res?.nameOper}
-              placeholder="Вкажіть назву операції"
-            />
-          </div>
-          <div>
-            <p>Розряд робіт</p>
-            <select
-              value={res?.gradeId}
-              onChange={(e) => {
-                setRes({ ...res, gradeId: +e.target.value });
-              }}
-            >
-              <option value="" selected disabled hidden>
-                Виберіть розряд робіт
-              </option>
-              {map.grade.map((el) => (
-                <option value={el.id}>{el.indicator}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <form>
-          <div className={style.hand}>
-            <input
-              type="radio"
-              checked={res?.type == 1}
-              onClick={() => {
-                setRes({
-                  ...res,
-                  type: 1,
-                  productionRateAmount: "",
-                  productionRateWeight: "",
-                  yieldСapacity: "",
-                  spending: "",
-                });
-              }}
-            />
-            <div
-              onClick={() => {
-                setRes({
-                  ...res,
-                  type: 1,
-                  productionRateAmount: "",
-                  productionRateWeight: "",
-                  yieldСapacity: "",
-                  spending: "",
-                });
-              }}
-            >
-              <p>Норма виробітку годин</p>
-              <div className={style.hand}>
-                <Input
-                  value={res.productionRateTime}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setRes({ ...res, productionRateTime: e.target.value });
-                  }}
-                  type="number"
-                  disabled={res.type !== 1}
-                />
-                <p>м²/год</p>
-              </div>
-            </div>
-          </div>
+      <ModalBody>
+        <Heading as={"h4"} size="md" textAlign={"center"}>
+          Внесіть данні для розрахунку
+        </Heading>
+        <Box
+          display={"flex"}
+          maxW={"490px"}
+          mx={"auto"}
+          mt={"10px"}
+          gap={3}
+          alignItems={"center"}
+          justifyContent={"center"}
+        >
+          <Heading as={"h4"} size="sm" minW={"max-content"} mx={"auto"}>
+            Назва операції
+          </Heading>
+          <Input
+            size={"sm"}
+            type="text"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setRes({ ...res, nameOper: e.target.value });
+            }}
+            value={res?.nameOper}
+            placeholder="Вкажіть назву операції"
+          />
+        </Box>
+        <Box
+          display={"flex"}
+          maxW={"490px"}
+          mx={"auto"}
+          mt={"10px"}
+          gap={3}
+          alignItems={"center"}
+          justifyContent={"center"}
+        >
+          <Heading as={"h4"} size="sm" minW={"max-content"} mx={"auto"}>
+            Розряд робіт
+          </Heading>
+          <Select
+            size={"sm"}
+            value={res?.gradeId}
+            onChange={(e) => {
+              setRes({ ...res, gradeId: +e.target.value });
+            }}
+          >
+            <option value="" selected disabled hidden>
+              Виберіть розряд робіт
+            </option>
+            {map.grade.map((el) => (
+              <option value={el.id}>{el.indicator}</option>
+            ))}
+          </Select>
+        </Box>
+
+        <Box display={"flex"} mt={"15px"} justifyContent={"center"}>
+          <Radio
+            color={"gray.400"}
+            mr={"5px"}
+            defaultChecked
+            size={"lg"}
+            isChecked={res?.type == 1}
+            onClick={() => {
+              setRes({
+                ...res,
+                type: 1,
+                productionRateAmount: "",
+                productionRateWeight: "",
+                yieldСapacity: "",
+                spending: "",
+              });
+            }}
+          />
           <div
-            className={style.hand}
+            onClick={() => {
+              setRes({
+                ...res,
+                type: 1,
+                productionRateAmount: "",
+                productionRateWeight: "",
+                yieldСapacity: "",
+                spending: "",
+              });
+            }}
+          >
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Норма виробітку годин
+            </Heading>
+            <Box display={"flex"}>
+              <Input
+                size={"sm"}
+                value={res.productionRateTime}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setRes({ ...res, productionRateTime: e.target.value });
+                }}
+                type="number"
+                disabled={res.type !== 1}
+              />
+              <Heading as={"h4"} size="sm" minW={"max-content"}>
+                м²/год
+              </Heading>
+            </Box>
+          </div>
+        </Box>
+        <Box
+          justifyContent={"center"}
+          mt={"15px"}
+          display={"flex"}
+          onClick={() => {
+            setRes({
+              ...res,
+              type: 2,
+              productionRateAmount: "",
+              productionRateTime: "",
+              spending: "",
+            });
+          }}
+        >
+          <Radio
+            color={"gray.400"}
+            mr={"5px"}
+            size={"lg"}
+            isChecked={res.type == 2}
             onClick={() => {
               setRes({
                 ...res,
@@ -193,58 +249,72 @@ const HandWork = observer(
                 spending: "",
               });
             }}
-          >
-            <input
-              type="radio"
-              checked={res.type == 2}
-              onClick={() => {
-                setRes({
-                  ...res,
-                  type: 2,
-                  productionRateAmount: "",
-                  productionRateTime: "",
-                  spending: "",
-                });
-              }}
-            />
-            <div>
-              <div className={style.hand}>
-                <div>
-                  <p>Норма виробітку ваги</p>
-                  <div className={style.hand}>
-                    <Input
-                      value={res.productionRateWeight}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setRes({
-                          ...res,
-                          productionRateWeight: e.target.value,
-                        });
-                      }}
-                      type="number"
-                      disabled={res.type !== 2}
-                    />
-                    <p>кг/год</p>
-                  </div>
-                </div>
-                <div>
-                  <p>Урожайність з 1 га</p>
-                  <div className={style.hand}>
-                    <Input
-                      value={res.yieldСapacity}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setRes({ ...res, yieldСapacity: e.target.value });
-                      }}
-                      type="number"
-                      disabled={res.type !== 2}
-                    />
-                    <p>кг/га</p>
-                  </div>
-                </div>
+          />
+          <div>
+            <Box display={"flex"}>
+              <div>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Норма виробітку ваги
+                </Heading>
+                <Box display={"flex"}>
+                  <Input
+                    size={"sm"}
+                    value={res.productionRateWeight}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setRes({
+                        ...res,
+                        productionRateWeight: e.target.value,
+                      });
+                    }}
+                    type="number"
+                    disabled={res.type !== 2}
+                  />
+                  <Heading as={"h4"} size="sm" minW={"max-content"}>
+                    кг/год
+                  </Heading>
+                </Box>
               </div>
-            </div>
+              <div>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Урожайність з 1 га
+                </Heading>
+                <Box display={"flex"}>
+                  <Input
+                    size={"sm"}
+                    value={res.yieldСapacity}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setRes({ ...res, yieldСapacity: e.target.value });
+                    }}
+                    type="number"
+                    disabled={res.type !== 2}
+                  />
+                  <Heading as={"h4"} size="sm" minW={"max-content"}>
+                    кг/га
+                  </Heading>
+                </Box>
+              </div>
+            </Box>
           </div>
-          <div
-            className={style.hand}
+        </Box>
+        <Box
+          justifyContent={"center"}
+          mt={"10px"}
+          display={"flex"}
+          onClick={() => {
+            setRes({
+              ...res,
+              type: 3,
+              productionRateTime: "",
+              productionRateWeight: "",
+              yieldСapacity: "",
+            });
+          }}
+        >
+          <Radio
+            color={"gray.400"}
+            mr={"5px"}
+            size={"lg"}
+            isChecked={res.type == 3}
             onClick={() => {
               setRes({
                 ...res,
@@ -254,77 +324,75 @@ const HandWork = observer(
                 yieldСapacity: "",
               });
             }}
-          >
-            <input
-              type="radio"
-              checked={res.type == 3}
-              onClick={() => {
-                setRes({
-                  ...res,
-                  type: 3,
-                  productionRateTime: "",
-                  productionRateWeight: "",
-                  yieldСapacity: "",
-                });
-              }}
-            />
-            <div>
-              <div className={style.hand}>
-                <div>
-                  <p>Норма виробітку кількість</p>
-                  <div className={style.hand}>
-                    <Input
-                      value={res.productionRateAmount}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setRes({
-                          ...res,
-                          productionRateAmount: e.target.value,
-                        });
-                      }}
-                      type="number"
-                      disabled={res.type !== 3}
-                    />
-                    <p>шт/год</p>
-                  </div>
-                </div>
-                <div>
-                  <p>Розхід на 1 га</p>
-                  <div className={style.hand}>
-                    <Input
-                      value={res.spending}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setRes({ ...res, spending: e.target.value });
-                      }}
-                      type="number"
-                      disabled={res.type !== 3}
-                    />
-                    <p>шт/га</p>
-                  </div>
-                </div>
+          />
+          <div>
+            <Box display={"flex"}>
+              <div>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Норма виробітку кількість
+                </Heading>
+                <Box display={"flex"}>
+                  <Input
+                    size={"sm"}
+                    value={res.productionRateAmount}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setRes({
+                        ...res,
+                        productionRateAmount: e.target.value,
+                      });
+                    }}
+                    type="number"
+                    disabled={res.type !== 3}
+                  />
+                  <Heading as={"h4"} size="sm" minW={"max-content"}>
+                    шт/год
+                  </Heading>
+                </Box>
               </div>
-            </div>
+              <div>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Розхід на 1 га
+                </Heading>
+                <Box display={"flex"}>
+                  <Input
+                    size={"sm"}
+                    value={res.spending}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setRes({ ...res, spending: e.target.value });
+                    }}
+                    type="number"
+                    disabled={res.type !== 3}
+                  />
+                  <Heading as={"h4"} size="sm" minW={"max-content"}>
+                    шт/га
+                  </Heading>
+                </Box>
+              </div>
+            </Box>
           </div>
-        </form>
-        <Button
-          onClick={() =>
-            createCostHandWorkFunc(
-              +id!,
-              map,
-              update,
-              res,
-              setIsErr,
-              setOpen,
-              setRes,
-              cell!,
-              setCell!,
-              section,
-              setSection
-            )
-          }
-        >
-          Зберегти
-        </Button>
-      </>
+        </Box>
+        <ModalFooter p={"15px 67px"}>
+          <Button
+            onClick={() =>
+              createCostHandWorkFunc(
+                +id!,
+                map,
+                update,
+                res,
+                setIsErr,
+                setOpen,
+                setRes,
+                cell!,
+                setCell!,
+                section,
+                setSection
+              )
+            }
+          >
+            Зберегти
+          </Button>
+        </ModalFooter>
+      </ModalBody>
     );
   }
 );

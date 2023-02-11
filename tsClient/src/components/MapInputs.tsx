@@ -1,14 +1,20 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../main";
-import css from "./Dialog.module.css";
 import { createCart, updateMap } from "../http/requests";
-import Input from "../ui/Input/Input";
 import { CartProps, cartProps } from "../modules/CreateCart";
 import style from "./Input.module.css";
-import Button from "../ui/Button/Button";
 import { func } from "./Dialog";
 import { useParams } from "react-router-dom";
 import { Itech_cart } from "../../../tRPC serv/models/models";
+import {
+  Box,
+  Heading,
+  Select,
+  ModalBody,
+  Button,
+  ModalFooter,
+  Input,
+} from "@chakra-ui/react";
 const createCartFunc: func<cartProps> = (
   id,
   map,
@@ -58,22 +64,34 @@ export default function MapInputs({
   const { map } = useContext(Context);
   const { id } = useParams();
   return (
-    <>
-      <h4>Загальні показники для розрахунку</h4>
-      <div className={style.mechanical}>
+    <ModalBody>
+      <Heading as={"h4"} size="md" textAlign={"center"}>
+        Загальні показники для розрахунку
+      </Heading>
+      <Box
+        display={"flex"}
+        alignItems={"center"}
+        maxW={"490px"}
+        mx={"auto"}
+        mt={"15px"}
+      >
+        <Heading as={"h4"} size="sm" minW={"max-content"}>
+          Назва культури
+        </Heading>
+        <Input
+          placeholder="Вкажіть дату"
+          type="text"
+          value={res?.nameCart}
+          onChange={(e) => {
+            setRes({ ...res, nameCart: e.target.value });
+          }}
+        />
+      </Box>
+      <Box display={"flex"} gap={3} mt={"15px"}>
         <div>
-          <p>Назва культури</p>
-          <Input
-            placeholder="Вкажіть дату"
-            type="text"
-            value={res?.nameCart}
-            onChange={(e) => {
-              setRes({ ...res, nameCart: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Площа, га</p>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Площа, га
+          </Heading>
           <Input
             placeholder="Вкажіть дату"
             type="number"
@@ -84,7 +102,9 @@ export default function MapInputs({
           />
         </div>
         <div>
-          <p>Розрахункова ЗП, грн</p>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Розрахункова ЗП, грн
+          </Heading>
           <Input
             placeholder="Вкажіть дату"
             type="number"
@@ -95,7 +115,9 @@ export default function MapInputs({
           />
         </div>
         <div>
-          <p>Ціна ДП, грн</p>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Ціна ДП, грн
+          </Heading>
           <Input
             placeholder="Вкажіть дату"
             type="number"
@@ -105,14 +127,16 @@ export default function MapInputs({
             value={res?.priceDiesel}
           />
         </div>
-      </div>
-      <Button
-        onClick={() =>
-          createCartFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
-        }
-      >
-        Зберегти
-      </Button>
-    </>
+      </Box>
+      <ModalFooter p={"15px 5px"}>
+        <Button
+          onClick={() =>
+            createCartFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
+          }
+        >
+          Зберегти
+        </Button>
+      </ModalFooter>
+    </ModalBody>
   );
 }

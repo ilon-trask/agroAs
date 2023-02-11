@@ -4,7 +4,7 @@ import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartSe
 import { Context } from "../main";
 import OpersTableItem from "./OpersTableItem";
 import style from "./Table.module.css";
-
+import { Tr, Td, Divider, Heading } from "@chakra-ui/react";
 type props = {
   arr: any[];
   title: string;
@@ -15,6 +15,7 @@ type props = {
   setOpen: (open: boolean) => void;
   setCell: (cell: Icell | "") => void;
   setUpdate: (update: boolean) => void;
+  setShowAlert: (showAlert: boolean) => void;
 };
 
 export default function OperTableSection({
@@ -27,8 +28,8 @@ export default function OperTableSection({
   setOpen,
   setCell,
   setUpdate,
+  setShowAlert,
 }: props) {
-  const { map } = useContext(Context);
   const line: {} = {
     display: "flex",
     flexDirection: "column",
@@ -38,57 +39,59 @@ export default function OperTableSection({
   return (
     <>
       {arr[0] && (
-        <>
-          <th style={line}>
-            <hr />
-          </th>
-          <th>{title}</th>
-          <th style={line}>
-            <hr />
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />{" "}
-          </th>
-          <th style={line}>
-            <hr />
-          </th>
-          <th style={line}>
-            <hr />
-          </th>
-        </>
+        <Tr>
+          <Td h={"auto"} padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td>
+            <b>{title}</b>
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+          <Td padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
+        </Tr>
       )}
       {arr.map((el) => {
         return (
           <OpersTableItem
             id={id}
             el={el}
-            map={map}
             setRes={setRes}
             setSecondOpen={setOpen}
             setCell={setCell}
             setUpdate={setUpdate}
             mapData={mapData}
+            setShowAlert={setShowAlert}
           />
         );
       })}

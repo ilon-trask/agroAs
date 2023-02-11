@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Itech_cart, Itech_operation } from "../../../tRPC serv/models/models";
 import { deleteOper } from "../http/requests";
 import MapStore from "../store/MapStore";
 import style from "./TableItem.module.css";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  Text,
+  Button,
+  Box,
+  Container,
+} from "@chakra-ui/react";
+import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { Context } from "../main";
 type funcProps = (
   map: MapStore,
   el: Itech_operation,
@@ -79,51 +96,45 @@ const patch: funcProps = function (
 type props = {
   id: number;
   el: Itech_operation;
-  map: MapStore;
   setRes: (res: any) => void;
   setSecondOpen: (open: boolean) => void;
   setCell: (cell: Icell | "") => void;
   setUpdate: (update: boolean) => void;
   mapData: Itech_cart;
+  setShowAlert: (showAlert: boolean) => void;
 };
 
 export default function OpersTableItem({
   id,
   el,
-  map,
   setRes,
   setSecondOpen,
   setCell,
   setUpdate,
   mapData,
+  setShowAlert,
 }: props) {
+  const { map, user } = useContext(Context);
   return (
-    <>
-      <div
-        className={style.item}
+    <Tr>
+      <Td
         onClick={() =>
           patch(map, el, setRes, setSecondOpen, setCell, setUpdate)
         }
       >
-        Ред
-      </div>
-      <div className={style.item}>{el.nameOperation}</div>
-      <div className={style.item}>{mapData.area}</div>
-      <div className={style.item}>{"0"}</div>
-      <div className={style.item}>{el.costCars! * mapData.area || "0"}</div>
-      <div className={style.item}>{el.costFuel! * mapData.area || "0"}</div>
-      <div className={style.item}>
-        {el.costMachineWork! * mapData.area || "0"}
-      </div>
-      <div className={style.item}>{el.costHandWork! * mapData.area || "0"}</div>
-      <div className={style.item}>
-        {el.costMaterials! * mapData.area || "0"}
-      </div>
-      <div className={style.item}>
-        {el.costTransport! * mapData.area || "0"}
-      </div>
-      <div className={style.item}>{el.costServices! * mapData.area || "0"}</div>
-      <div className={style.item}>
+        <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
+      </Td>
+      <Td>{el.nameOperation}</Td>
+      <Td>{mapData.area}</Td>
+      <Td>{"га"}</Td>
+      <Td>{el.costCars! * mapData.area || "0"}</Td>
+      <Td>{el.costFuel! * mapData.area || "0"}</Td>
+      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
+      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
+      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
+      <Td>{el.costTransport! * mapData.area || "0"}</Td>
+      <Td>{el.costServices! * mapData.area || "0"}</Td>
+      <Td>
         {+mapData.area *
           (el.costMaterials ||
             el.costServices ||
@@ -133,15 +144,17 @@ export default function OpersTableItem({
               +el.costHandWork! +
               +el.costMachineWork! ||
             el.costHandWork!)}
-      </div>
-      <div
+      </Td>
+      <Td
         className={style.delete}
-        onClick={() => {
-          deleteOper(map, el.id!, id);
-        }}
+        onClick={
+          user.role == ""
+            ? () => setShowAlert(true)
+            : () => deleteOper(map, el.id!, id)
+        }
       >
-        видалити
-      </div>
-    </>
+        <DeleteIcon w={"20px"} h={"auto"} />
+      </Td>
+    </Tr>
   );
 }

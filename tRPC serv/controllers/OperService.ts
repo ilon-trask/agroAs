@@ -937,7 +937,7 @@ class OperService {
       oper = await updateOper(nameOper, cell, operId);
       if (!oper) return;
 
-      await changeOper(oper, oper.techCartId!);
+      oper = await changeOper(oper, oper.techCartId!);
     }
     return oper;
   }

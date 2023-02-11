@@ -11,7 +11,11 @@ import {
   getMachine,
   getGrades,
 } from "./http/requests";
+
 import { supabase } from "./http/requests";
+import { ChakraProvider } from "@chakra-ui/react";
+
+import { theme } from "./theme";
 
 function App() {
   const { map, user } = useContext(Context);
@@ -44,8 +48,11 @@ function App() {
 
   return (
     <BrowserRouter>
-      <NavBar />
-      <AppRouter />
+      <ChakraProvider theme={theme}>
+        <NavBar />
+
+        <AppRouter />
+      </ChakraProvider>
     </BrowserRouter>
   );
 }

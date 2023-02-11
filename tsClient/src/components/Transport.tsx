@@ -1,12 +1,24 @@
 import React, { useContext } from "react";
 import { observer } from "mobx-react-lite";
-import Input from "../ui/Input/Input";
 import { transportProps, TransportProps } from "../modules/CreateCostTransport";
 import { func, InputProps } from "./Dialog";
-import Button from "../ui/Button/Button";
 import { createOperation, patchOperation } from "../http/requests";
 import { Context } from "../main";
 import { useParams } from "react-router-dom";
+import {
+  Box,
+  Heading,
+  Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  Button,
+  Center,
+  ModalFooter,
+  Input,
+  Text,
+} from "@chakra-ui/react";
 const createTransport: func<TransportProps> = function (
   id,
   map,
@@ -53,23 +65,38 @@ const Easy = observer(
     const { map } = useContext(Context);
     const { id } = useParams();
     return (
-      <>
-        <h4>Внесіть данні для розрахунку транспортування</h4>
-        <div className="d-flex gap-3">
+      <ModalBody>
+        <Heading as={"h4"} size="md" textAlign={"center"}>
+          Внесіть данні для розрахунку транспортування
+        </Heading>
+        <Box
+          display={"flex"}
+          gap={3}
+          mt={"15px"}
+          maxW={"490px"}
+          alignItems={"center"}
+          mx={"auto"}
+        >
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Назва робіт
+          </Heading>
+          <Input
+            size={"sm"}
+            placeholder="Вкажіть назву"
+            type="text"
+            value={res?.nameOper}
+            onChange={(e) => {
+              setRes({ ...res, nameOper: e.target.value });
+            }}
+          />
+        </Box>
+        <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
           <div>
-            <p>Назва робіт</p>
+            <Heading as={"h4"} size="sm">
+              Ціна
+            </Heading>
             <Input
-              placeholder="Вкажіть назву"
-              type="text"
-              value={res?.nameOper}
-              onChange={(e) => {
-                setRes({ ...res, nameOper: e.target.value });
-              }}
-            />
-          </div>
-          <div>
-            <p>Ціна</p>
-            <Input
+              size={"sm"}
               placeholder="Вкажіть ціну"
               type="number"
               value={res?.price}
@@ -79,8 +106,11 @@ const Easy = observer(
             />
           </div>
           <div>
-            <p>Одиниці виміру ціни</p>
+            <Heading as={"h4"} size="sm">
+              Одиниці виміру ціни
+            </Heading>
             <Input
+              size={"sm"}
               placeholder="Вкажіть одиниці"
               type="text"
               value={res?.unitsOfCost}
@@ -89,27 +119,29 @@ const Easy = observer(
               }}
             />
           </div>
-        </div>
-        <Button
-          onClick={() =>
-            createTransport(
-              +id!,
-              map,
-              update,
-              res,
-              setIsErr,
-              setOpen,
-              setRes,
-              cell,
-              setCell,
-              section,
-              setSection
-            )
-          }
-        >
-          Зберегти
-        </Button>
-      </>
+        </Box>
+        <ModalFooter p={"15px 67px"}>
+          <Button
+            onClick={() =>
+              createTransport(
+                +id!,
+                map,
+                update,
+                res,
+                setIsErr,
+                setOpen,
+                setRes,
+                cell,
+                setCell,
+                section,
+                setSection
+              )
+            }
+          >
+            Зберегти
+          </Button>
+        </ModalFooter>
+      </ModalBody>
     );
   }
 );

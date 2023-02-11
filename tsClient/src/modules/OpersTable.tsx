@@ -6,12 +6,28 @@ import style from "./Table.module.css";
 import OpersTableItem from "../components/OpersTableItem";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import OperTableSection from "../components/OperTableSection";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  Text,
+  Button,
+  Box,
+  Container,
+} from "@chakra-ui/react";
 type props = {
   id: number;
   setRes: (res: any) => void;
   setSecondOpen: (open: boolean) => void;
   setCell: (cell: Icell | "") => void;
   setUpdate: (update: boolean) => void;
+  setShowAlert: (showAlert: boolean) => void;
 };
 
 export default function OpersTable({
@@ -20,6 +36,7 @@ export default function OpersTable({
   setSecondOpen,
   setCell,
   setUpdate,
+  setShowAlert,
 }: props) {
   const { map } = useContext(Context);
 
@@ -35,7 +52,7 @@ export default function OpersTable({
   const gathering = operData.filter((el) => el.sectionId == 7);
   const storage = operData.filter((el) => el.sectionId == 8);
   const sections = [
-    { arr: soilPreparation, tittle: "підготовка ґрунту" },
+    { arr: soilPreparation, tittle: "Підготовка ґрунту" },
     { arr: landing, tittle: "Посадка" },
     { arr: care, tittle: "Догляд" },
     { arr: feeding, tittle: "Живлення" },
@@ -47,7 +64,6 @@ export default function OpersTable({
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
   operData.forEach((el) => {
-    console.log(1);
     sum +=
       mapData.area *
       (el.costMaterials ||
@@ -61,23 +77,57 @@ export default function OpersTable({
         0);
   });
   return (
-    <div className={style.opersTable}>
-      <th className={style.headItem}>Р</th>
-      <th className={style.headTextItem}>Технологічна операція</th>
-      <th className={style.headTextItem}>Обсяг робіт</th>
-      <th className={style.headTextItem}>Одиниця виміру</th>
-      <th className={style.headTextItem}>Вартість Техніки</th>
-      <th className={style.headTextItem}>Вартість палива</th>
-      <th className={style.headTextItem}>ЗП механізована</th>
-      <th className={style.headTextItem}>ЗП ручна</th>
-      <th className={style.headTextItem}>Вартість матеріалів</th>
-      <th className={style.headTextItem}>Вартість транспорту</th>
-      <th className={style.headTextItem}>Вартість послуг</th>
-      <th className={style.headTextItem}>Разом</th>
-      <th className={style.headItem}>В</th>
-      {useMemo(
-        () =>
-          sections.map((el) => (
+    <TableContainer overflowX={"scroll"}>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th></Th>
+            <Th>
+              Технологічна <br />
+              операція
+            </Th>
+            <Th>
+              Обсяг <br />
+              робіт
+            </Th>
+            <Th>
+              Одиниця <br />
+              виміру
+            </Th>
+            <Th>
+              Вартість <br />
+              Техніки
+            </Th>
+            <Th>
+              Вартість <br />
+              палива
+            </Th>
+            <Th>
+              ЗП
+              <br /> механізована
+            </Th>
+            <Th>
+              ЗП
+              <br /> ручна
+            </Th>
+            <Th>
+              Вартість
+              <br /> матеріалів
+            </Th>
+            <Th>
+              Вартість
+              <br /> транспорту
+            </Th>
+            <Th>
+              Вартість <br />
+              послуг
+            </Th>
+            <Th>Разом</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {sections.map((el) => (
             <OperTableSection
               arr={el.arr}
               title={el.tittle}
@@ -88,49 +138,27 @@ export default function OpersTable({
               setRes={setRes}
               setUpdate={setUpdate}
               sum={sum}
+              setShowAlert={setShowAlert}
             />
-          )),
-        [sections]
-      )}
-      {/* {operData?.map((el) => {
-        sum +=
-          mapData.area *
-          (el.costMaterials ||
-            el.costServices ||
-            el.costTransport ||
-            +el.costCars! +
-              +el.costFuel! +
-              +el.costHandWork! +
-              +el.costMachineWork! ||
-            el.costHandWork ||
-            0);
-        return (
-          <OpersTableItem
-            id={id}
-            el={el}
-            map={map}
-            setRes={setRes}
-            setSecondOpen={setSecondOpen}
-            setCell={setCell}
-            setUpdate={setUpdate}
-            mapData={mapData}
-          />
-        );
-      })} */}
+          ))}
+        </Tbody>
 
-      <td></td>
-      <td style={{ fontWeight: "bold" }}>Загальні витрати</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td className={style.headItem}>{sum}</td>
-      <td></td>
-    </div>
+        <Tfoot>
+          <Td></Td>
+          <Td style={{ fontWeight: "bold" }}>Загальні витрати</Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td className={style.headItem}>{sum}</Td>
+          <Td></Td>
+        </Tfoot>
+      </Table>
+    </TableContainer>
   );
 }

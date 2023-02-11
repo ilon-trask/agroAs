@@ -15,9 +15,23 @@ import CreateCostMechanical from "../modules/CreateCostMechanical";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
-import Button from "../ui/Button/Button";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
-
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  Text,
+  Button,
+  Box,
+  Container,
+} from "@chakra-ui/react";
+import NoAuthAlert from "../components/NoAuthAlert";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -41,8 +55,8 @@ const DevicePage = observer(() => {
   const [update, setUpdate] = useState(false);
   const [res, setRes] = useState({});
   const [isErr, setIsErr] = useState<boolean>(false);
-
-  const { map } = useContext(Context);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const { map, user } = useContext(Context);
   let { id } = useParams();
 
   return (
@@ -52,9 +66,9 @@ const DevicePage = observer(() => {
         <div style={{ fontSize: "20px" }}>
           <Link to="/">{"<НА ГОЛОВНУ"}</Link>
         </div>
-        <p style={{ textAlign: "center", fontSize: "25px" }}>
+        <Text textAlign={"center"} fontSize={"25px"}>
           Технологічна карта
-        </p>
+        </Text>
         <div>
           <GeneralDataTable
             id={+id!}
@@ -68,13 +82,20 @@ const DevicePage = observer(() => {
             setSecondOpen={setSecondOpen}
             setCell={setCell}
             setUpdate={setUpdate}
+            setShowAlert={setShowAlert}
           />
           <Button
             style={{ marginTop: "15px", marginLeft: "31px" }}
-            onClick={() => {
-              setUpdate(false);
-              setOpen(true);
-            }}
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setUpdate(false);
+                    setOpen(true);
+                  }
+            }
           >
             Додати технологічну операцію
           </Button>
@@ -171,6 +192,7 @@ const DevicePage = observer(() => {
           setRes={setRes}
         />
       </div>
+      <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
     </div>
   );
 });

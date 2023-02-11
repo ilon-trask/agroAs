@@ -4,15 +4,23 @@ import style from "./Input.module.css";
 import CreateTractor, { TracProps } from "../modules/CreateTractor";
 import CreateMachine, { MachineProps } from "../modules/CreateMachine";
 import { observer } from "mobx-react-lite";
-import Input from "../ui/Input/Input";
 import {
   mechanicalWorkProps,
   MechanicalWorkProps,
 } from "../modules/CreateCostMechanical";
 import { func, InputProps } from "./Dialog";
 import { createOperation, patchOperation } from "../http/requests";
-import Button from "../ui/Button/Button";
 import { useParams } from "react-router-dom";
+import {
+  Box,
+  Heading,
+  Select,
+  ModalBody,
+  Button,
+  ModalFooter,
+  Input,
+} from "@chakra-ui/react";
+import { EditIcon } from "@chakra-ui/icons";
 
 const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
   id,
@@ -97,13 +105,18 @@ const MechanicalWork = observer(
     const { id } = useParams();
     console.log(map.tractor);
     return (
-      <>
-        <div>
-          <h4>Внесіть данні для розрахунку</h4>
-          <div>
-            <div className={style.mechanical}>
-              <p>Назва операції</p>
+      <ModalBody>
+        <Box>
+          <Heading as={"h4"} size="md" textAlign={"center"}>
+            Внесіть данні для розрахунку
+          </Heading>
+          <Box mt={"15px"} w={"590px"} mx={"auto"}>
+            <Box display={"flex"}>
+              <Heading as={"h4"} size="sm" w={"200px"}>
+                Назва операції
+              </Heading>
               <Input
+                size={"sm"}
                 placeholder="Вкажіть назву"
                 type="text"
                 value={res?.nameOper}
@@ -111,10 +124,12 @@ const MechanicalWork = observer(
                   setRes({ ...res, nameOper: e.target.value });
                 }}
               />
-            </div>
-            <div className={style.mechanical}>
-              <div style={{ height: "min-content", margin: "auto 0 0" }}>
-                <button
+            </Box>
+            <Box mt={"15px"} display={"flex"} justifyContent={"space-between"}>
+              <Box display={"flex"}>
+                <Button
+                  size="lg"
+                  mt={"5px"}
                   onClick={() => {
                     if (res.idTractor) {
                       console.log(map.tractor);
@@ -127,41 +142,56 @@ const MechanicalWork = observer(
                       setInRes(second);
                       setInUpdate(true);
                       setTractorOpen(true);
+                      console.log(1);
                     }
                   }}
                 >
-                  Ред вибраний трактор
-                </button>
-                <select
-                  value={res.idTractor}
-                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                    setRes(() => {
-                      const [tractor] = map.tractor.filter(
-                        (el) => el.id! == +e.target.value
-                      );
-                      return {
-                        ...res,
-                        fuelConsumption: tractor.fuelConsumption,
-                      };
-                    });
-                    setRes((prev) => ({ ...prev, idTractor: e.target.value }));
-                  }}
-                >
-                  <option value="" hidden>
-                    вибрати трактор
-                  </option>
-                  {map.tractor.map((el) => (
-                    <option key={el.id} value={el.id}>
-                      {el.nameTractor}
+                  <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
+                </Button>
+                <Box>
+                  <Heading as={"h4"} size="sm">
+                    Трактор
+                  </Heading>
+                  <Select
+                    w={"173px"}
+                    size="sm"
+                    value={res.idTractor}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                      setRes(() => {
+                        const [tractor] = map.tractor.filter(
+                          (el) => el.id! == +e.target.value
+                        );
+                        return {
+                          ...res,
+                          fuelConsumption: tractor.fuelConsumption,
+                        };
+                      });
+                      setRes((prev) => ({
+                        ...prev,
+                        idTractor: e.target.value,
+                      }));
+                    }}
+                  >
+                    <option value="" hidden>
+                      вибрати трактор
                     </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <p>Розхід палива на 1 год</p>
+                    {map.tractor.map((el) => (
+                      <option key={el.id} value={el.id}>
+                        {el.nameTractor}
+                      </option>
+                    ))}
+                  </Select>
+                </Box>
+              </Box>
+              <Box>
+                <Heading as={"h4"} size="sm">
+                  Розхід палива на 1 год
+                </Heading>
 
                 <Input
-                  placeholder="Вкажіть ціну"
+                  w={"200px"}
+                  size="sm"
+                  placeholder="Вкажіть розхід"
                   type="number"
                   value={res?.fuelConsumption}
                   onChange={(e) => {
@@ -170,60 +200,82 @@ const MechanicalWork = observer(
                     });
                   }}
                 />
-              </div>
-              <div>
-                <button
-                  className="mt-4"
+              </Box>
+              <Box>
+                <Button
+                  w={"100px"}
+                  mt={"5px"}
+                  color={"blue.400"}
+                  size="lg"
                   onClick={() => {
                     setTractorOpen(true);
                   }}
                 >
-                  додати трактор
-                </button>
-              </div>
-            </div>
-            <div className={style.mechanical}>
-              <div style={{ height: "min-content", margin: "auto 0 0" }}>
-                <button
-                  onClick={() => {
-                    if (res.idMachine) {
-                      let [second] = map.machine.filter(
-                        (el) => el.id == res.idMachine
-                      );
-                      //@ts-ignore
-                      setInRes(second);
-                      setInUpdate(true);
-                      setAgriculturalOpen(true);
-                    }
-                  }}
-                >
-                  Ред вибрану СГ машину
-                </button>
-                <select
-                  value={res.idMachine}
-                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                    setRes(() => {
-                      const machine = map.machine.filter(
-                        (el) => el.id! == +e.target.value
-                      );
-                      return { ...res, workingSpeed: machine[0].workingSpeed };
-                    });
-                    setRes((prev) => ({ ...prev, idMachine: e.target.value }));
-                  }}
-                >
-                  <option value="" hidden>
-                    вибрати СГ машину
-                  </option>
-                  {map?.machine?.map((el) => (
-                    <option key={el.id} value={el.id}>
-                      {el.nameMachine}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <p>Робоча швидкість км/год</p>
+                  додати <br /> трактор
+                </Button>
+              </Box>
+            </Box>
+            <Box mt={"15px"} display={"flex"} justifyContent={"space-between"}>
+              <Box style={{ height: "min-content", margin: "auto 0 0" }}>
+                <Box display={"flex"}>
+                  <Button
+                    mt={"5px"}
+                    size="lg"
+                    onClick={() => {
+                      if (res.idMachine) {
+                        let [second] = map.machine.filter(
+                          (el) => el.id == res.idMachine
+                        );
+                        //@ts-ignore
+                        setInRes(second);
+                        setInUpdate(true);
+                        setAgriculturalOpen(true);
+                      }
+                    }}
+                  >
+                    <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
+                  </Button>
+                  <Box>
+                    <Heading as={"h4"} size="sm">
+                      СГ машина
+                    </Heading>
+                    <Select
+                      size="sm"
+                      value={res.idMachine}
+                      onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                        setRes(() => {
+                          const machine = map.machine.filter(
+                            (el) => el.id! == +e.target.value
+                          );
+                          return {
+                            ...res,
+                            workingSpeed: machine[0].workingSpeed,
+                          };
+                        });
+                        setRes((prev) => ({
+                          ...prev,
+                          idMachine: e.target.value,
+                        }));
+                      }}
+                    >
+                      <option value="" hidden>
+                        вибрати СГ машину
+                      </option>
+                      {map?.machine?.map((el) => (
+                        <option key={el.id} value={el.id}>
+                          {el.nameMachine}
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
+                </Box>
+              </Box>
+              <Box>
+                <Heading as={"h4"} size="sm">
+                  Робоча швидкість км/год
+                </Heading>
                 <Input
+                  size="sm"
                   placeholder="Вкажіть швидкість"
                   type="number"
                   value={res?.workingSpeed}
@@ -231,19 +283,23 @@ const MechanicalWork = observer(
                     setRes({ ...res, workingSpeed: e.target.value });
                   }}
                 />
-              </div>
-              <div>
-                <button
-                  className="mt-4"
+              </Box>
+              <Box>
+                <Button
+                  w={"100px"}
+                  mt={"5px"}
+                  color={"blue.400"}
+                  size="lg"
                   onClick={() => {
                     setAgriculturalOpen(true);
                   }}
                 >
-                  додати СГ машину
-                </button>
-              </div>
-            </div>
-          </div>
+                  додати <br />
+                  СГ машину
+                </Button>
+              </Box>
+            </Box>
+          </Box>
           <CreateTractor
             open={tractorOpen}
             setOpen={setTractorOpen}
@@ -264,27 +320,29 @@ const MechanicalWork = observer(
             isErr={inIsErr}
             setIsErr={setInIsErr}
           />
-        </div>
-        <Button
-          onClick={() =>
-            mechanicalWorkFunc(
-              +id!,
-              map,
-              update,
-              res,
-              setIsErr,
-              setOpen,
-              setRes,
-              cell!,
-              setCell!,
-              section,
-              setSection
-            )
-          }
-        >
-          Зберегти
-        </Button>
-      </>
+        </Box>
+        <ModalFooter p={"15px 20px"}>
+          <Button
+            onClick={() =>
+              mechanicalWorkFunc(
+                +id!,
+                map,
+                update,
+                res,
+                setIsErr,
+                setOpen,
+                setRes,
+                cell!,
+                setCell!,
+                section,
+                setSection
+              )
+            }
+          >
+            Зберегти
+          </Button>
+        </ModalFooter>
+      </ModalBody>
     );
   }
 );

@@ -4,37 +4,58 @@ import { observer } from "mobx-react-lite";
 
 import { Context } from "../main";
 import CartsTableItem from "../components/CartsTableItem";
-import style from "./Table.module.css";
 import { cartProps } from "./CreateCart";
+
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+} from "@chakra-ui/react";
 
 interface props {
   setRes: (res: cartProps) => void;
   setOpen: (open: boolean) => void;
   setUpdate: (update: boolean) => void;
+  setShowAlert: (showAlert: boolean) => void;
 }
 
-const Table = observer(({ setRes, setOpen, setUpdate }: props) => {
-  const { map, user } = useContext(Context);
+const CartsTable = observer(
+  ({ setRes, setOpen, setUpdate, setShowAlert }: props) => {
+    const { map, user } = useContext(Context);
 
-  return (
-    <div className={style.cartsTable}>
-      <th className={style.headItem}></th>
-      <th className={style.headTextItem}>Назва культури</th>
-      <th className={style.headTextItem}>Площа (га)</th>
-      <th className={style.headTextItem}>Загальна вартість (грн)</th>
-      <th className={style.headTextItem}>Витрати на (грн на 1 га)</th>
-      <th className={style.headItem}></th>
-      <th className={style.headItem}>{user.role == "ADMIN" ? "опуб" : ""}</th>
-      {map.maps.map((e) => (
-        <CartsTableItem
-          e={e}
-          setOpen={setOpen}
-          setRes={setRes}
-          setUpdate={setUpdate}
-        />
-      ))}
-    </div>
-  );
-});
+    return (
+      <Table variant="simple" size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th></Th>
+            <Th>Назва культури</Th>
+            <Th>Площа (га)</Th>
+            <Th>Загальна вартість (грн)</Th>
+            <Th>Витрати на (грн на 1 га)</Th>
+            <Th></Th>
+            {user.role == "ADMIN" && <Th></Th>}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {map.maps.map((e) => (
+            <CartsTableItem
+              e={e}
+              setOpen={setOpen}
+              setRes={setRes}
+              setUpdate={setUpdate}
+              setShowAlert={setShowAlert}
+            />
+          ))}
+        </Tbody>
+      </Table>
+    );
+  }
+);
 
-export default Table;
+export default CartsTable;

@@ -5,6 +5,7 @@ import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import style from "./NavBar.module.css";
 import { getCarts, supabase } from "../http/requests";
+import { Button } from "@chakra-ui/react";
 
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
@@ -18,7 +19,7 @@ const NavBar = observer(() => {
         {user.isAuth ? (
           <div>
             <Link to={MAP_ROUTE}>
-              <button
+              <Button
                 onClick={async () => {
                   await supabase.auth.signOut();
                   user.isAuth = false;
@@ -28,13 +29,13 @@ const NavBar = observer(() => {
                 }}
               >
                 Вийти
-              </button>
+              </Button>
             </Link>
           </div>
         ) : (
           <div className="ml-auto">
             <Link to={LOGIN_ROUTE}>
-              <button>Авторизуватись</button>
+              <Button>Авторизуватись</Button>
             </Link>
           </div>
         )}

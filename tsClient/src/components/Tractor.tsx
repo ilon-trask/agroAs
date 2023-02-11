@@ -6,11 +6,16 @@ import { Itractor } from "../../../tRPC serv/models/models";
 import { createTractor, patchTractor } from "../http/requests";
 import { Context } from "../main";
 import { tracProps, TracProps } from "../modules/CreateTractor";
-import Button from "../ui/Button/Button";
-import Input from "../ui/Input/Input.js";
 import { func } from "./Dialog";
-import style from "./input.module.css";
-
+import {
+  Box,
+  Heading,
+  Select,
+  ModalBody,
+  Button,
+  ModalFooter,
+  Input,
+} from "@chakra-ui/react";
 const createTrac: func<TracProps> = function (
   id,
   map,
@@ -58,111 +63,147 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
   const { map } = useContext(Context);
   const { id } = useParams();
   return (
-    <>
-      <h4>Внесіть данні для трактора</h4>
-      <div className={style.machine}>
-        <div>
-          <p>Назва трактора</p>
-          <Input
-            placeholder="Вкажіть назву"
-            type="text"
-            value={res?.nameTractor}
-            onChange={(e) => {
-              setRes({ ...res, nameTractor: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Марка трактора</p>
-          <Input
-            placeholder="Вкажіть марку"
-            type="text"
-            value={res?.brand}
-            onChange={(e) => {
-              setRes({ ...res, brand: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Ціна трактора грн</p>
-          <Input
-            placeholder="Вкажіть ціну"
-            type="number"
-            value={res?.marketCost}
-            onChange={(e) => {
-              setRes({ ...res, marketCost: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Термін амортизації в роках</p>
-          <Input
-            placeholder="Вкажіть термін"
-            type="number"
-            value={res?.depreciationPeriod}
-            onChange={(e) => {
-              setRes({ ...res, depreciationPeriod: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Потужність двигуна кВт</p>
-          <Input
-            placeholder="Вкажіть потіжність"
-            type="number"
-            value={res?.enginePower}
-            onChange={(e) => {
-              setRes({ ...res, enginePower: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Розхід палива на 1 год</p>
-          <Input
-            placeholder="Вкажіть розхід"
-            type="number"
-            value={res?.fuelConsumption}
-            onChange={(e) => {
-              setRes({ ...res, fuelConsumption: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Кількість персоналу</p>
-          <Input
-            placeholder="Вкажіть кількість"
-            type="number"
-            value={res?.numberOfPersonnel}
-            onChange={(e) => {
-              setRes({ ...res, numberOfPersonnel: e.target.value });
-            }}
-          />
-        </div>
-        <div>
-          <p>Розряд роботи</p>
-          <select
-            value={res.gradeId}
-            onChange={(e) => {
-              setRes({ ...res, gradeId: e.target.value });
-            }}
-          >
-            <option selected disabled hidden value="">
-              Виберіть тип роботи
-            </option>
-            {map.grade.map((el) => (
-              <option value={el.id}>{el.indicator}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <Button
-        onClick={() =>
-          createTrac(+id!, map, update, res, setIsErr, setOpen, setRes)
-        }
-      >
-        Зберегти
-      </Button>
-    </>
+    <ModalBody>
+      <Heading as={"h4"} size="md" textAlign={"center"}>
+        Внесіть данні для трактора
+      </Heading>
+      <Box mt={"15px"}>
+        <Box display={"flex"} justifyContent={"space-evenly"}>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Назва трактора
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть назву"
+              type="text"
+              value={res?.nameTractor}
+              onChange={(e) => {
+                setRes({ ...res, nameTractor: e.target.value });
+              }}
+            />
+          </div>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Марка трактора
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть марку"
+              type="text"
+              value={res?.brand}
+              onChange={(e) => {
+                setRes({ ...res, brand: e.target.value });
+              }}
+            />
+          </div>
+        </Box>
+        <Box display={"flex"} justifyContent={"space-evenly"}>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Ціна трактора грн
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть ціну"
+              type="number"
+              value={res?.marketCost}
+              onChange={(e) => {
+                setRes({ ...res, marketCost: e.target.value });
+              }}
+            />
+          </div>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Термін амортизації в роках
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть термін"
+              type="number"
+              value={res?.depreciationPeriod}
+              onChange={(e) => {
+                setRes({ ...res, depreciationPeriod: e.target.value });
+              }}
+            />
+          </div>
+        </Box>
+        <Box display={"flex"} justifyContent={"space-evenly"}>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Потужність двигуна кВт
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть потіжність"
+              type="number"
+              value={res?.enginePower}
+              onChange={(e) => {
+                setRes({ ...res, enginePower: e.target.value });
+              }}
+            />
+          </div>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Розхід палива на 1 год
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть розхід"
+              type="number"
+              value={res?.fuelConsumption}
+              onChange={(e) => {
+                setRes({ ...res, fuelConsumption: e.target.value });
+              }}
+            />
+          </div>
+        </Box>
+        <Box display={"flex"} justifyContent={"space-evenly"}>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Кількість персоналу
+            </Heading>
+            <Input
+              size={"sm"}
+              placeholder="Вкажіть кількість"
+              type="number"
+              value={res?.numberOfPersonnel}
+              onChange={(e) => {
+                setRes({ ...res, numberOfPersonnel: e.target.value });
+              }}
+            />
+          </div>
+          <div>
+            <Heading as={"h4"} size="sm">
+              Розряд роботи
+            </Heading>
+            <Select
+              size={"sm"}
+              value={res.gradeId}
+              onChange={(e) => {
+                setRes({ ...res, gradeId: e.target.value });
+              }}
+            >
+              <option selected disabled hidden value="">
+                Виберіть тип роботи
+              </option>
+              {map.grade.map((el) => (
+                <option value={el.id}>{el.indicator}</option>
+              ))}
+            </Select>
+          </div>
+        </Box>
+      </Box>
+      <ModalFooter p={"15px 67px"}>
+        <Button
+          onClick={() =>
+            createTrac(+id!, map, update, res, setIsErr, setOpen, setRes)
+          }
+        >
+          Зберегти
+        </Button>
+      </ModalFooter>
+    </ModalBody>
   );
 };
 

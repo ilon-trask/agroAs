@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE } from "../utils/consts";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
@@ -28,6 +28,7 @@ export default function AuthPage() {
       console.log(e);
     }
   });
+  const [isHover, setIsHover] = useState<boolean>(false);
   return (
     <div className={style.auth}>
       <div style={{ width: "30%" }}>
@@ -76,45 +77,24 @@ export default function AuthPage() {
             },
           }}
         ></Auth>
+        <p
+          style={{
+            padding: "10px 20px",
+            borderRadius: "5px",
+            textAlign: "center",
+            color: "white",
+            cursor: "pointer",
+            backgroundColor: isHover ? "#4299E1" : "#63B3ED",
+          }}
+          onMouseEnter={() => setIsHover(true)}
+          onMouseLeave={() => setIsHover(false)}
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          Зайти без реєсрації
+        </p>
       </div>
     </div>
-    // <Container
-    //   className="d-flex justify-content-center align-items-center"
-    //   style={{ height: window.innerHeight - 54 }}
-    // >
-    //   <Card style={{ width: "600px" }} className="p-5">
-    //     <h2 className="ml-auto">{isLoginPage ? "Авторизація" : "Регістрація"}</h2>
-    //     <Form className="d-flex flex-column">
-    //       <Form.Control
-    //         className="mt-3"
-    //         placeholder="Введіть email"
-    //       ></Form.Control>
-    //       <Form.Control
-    //         className="mt-3"
-    //         placeholder="Введіть пароль"
-    //         type="password"
-    //       ></Form.Control>
-    //       <Row className="d-flex justify-content-between mt-3 pl-3 pr-3">
-    //         {isLoginPage ? (
-    //           <div style={{ width: "fit-content" }}>
-    //             Немаєте акаунту?{" "}
-    //             <NavLink to={REGISTRATION_ROUTE}>Зареєструйтесь</NavLink>
-    //           </div>
-    //         ) : (
-    //           <div style={{ width: "fit-content" }}>
-    //             Маєте акаунт? <NavLink to={LOGIN_ROUTE}>Увійдіть</NavLink>
-    //           </div>
-    //         )}
-    //         <Button
-    //           style={{ width: "fit-content" }}
-    //           variant={"outline-success"}
-    //           className=" align-self-end"
-    //         >
-    //           {isLoginPage ? "Увійти" : "Зареєструватись"}
-    //         </Button>
-    //       </Row>
-    //     </Form>
-    //   </Card>
-    // </Container>
   );
 }

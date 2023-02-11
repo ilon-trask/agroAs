@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 import { Context } from "../main";
 import css from "./Dialog.module.css";
 import { observer } from "mobx-react-lite";
-import Button from "../ui/Button/Button";
+// import Button from "../ui/Button/Button";
 import { FC } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import MapStore from "../store/MapStore";
@@ -18,6 +18,19 @@ import { TracProps } from "../modules/CreateTractor";
 import { MachineProps } from "../modules/CreateMachine";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork";
 import { MaterialsProps } from "../modules/CreateCostMaterials";
+import {
+  Box,
+  Heading,
+  Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  Button,
+  Center,
+  ModalFooter,
+  Text,
+} from "@chakra-ui/react";
 export type func<T> = (
   id: number,
   map: MapStore,
@@ -89,38 +102,37 @@ const Dialog: FC<props> = observer(
       }
     }, [props]);
     return (
-      <div
-        style={open ? { display: "flex" } : { display: "none" }}
-        className={css.dialog}
-        onClick={() => {
+      <Modal
+        size={"2xl"}
+        isOpen={open}
+        onClose={() => {
           setOpen(false);
           setIsErr(false);
           setUpdate(false);
           setRes(props);
         }}
+        isCentered
       >
-        <div
-          className={css.container}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <ModalOverlay />
+        <ModalContent>
           {children}
-          {isErr ? "Ви не заповнили поля" : ""}
+          <Center>{isErr ? "Ви не заповнили поля" : ""}</Center>
 
           {errMess || (
-            <p>
-              Увага!
+            <Text w={"590px"} mx={"auto"}>
+              <b>Увага!</b>
+              <br />
+              Редагувати можна тільки вибраний трактор або СГ машину
               <br />
               Одиниці виміру "ціни" повинні відповідати одиницям виміру
               "розходу"
               <br />
               Наприклад (грн/кг) відповідає (кг/га) або (грн/шт) відповідає
               (шт/га)
-            </p>
+            </Text>
           )}
-        </div>
-      </div>
+        </ModalContent>
+      </Modal>
     );
   }
 );

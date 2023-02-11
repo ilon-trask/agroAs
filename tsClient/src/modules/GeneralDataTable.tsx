@@ -2,7 +2,22 @@ import React from "react";
 import { useContext } from "react";
 import { Context } from "../main";
 import { cartProps } from "./CreateCart";
-
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  Text,
+  Button,
+  Box,
+  Container,
+} from "@chakra-ui/react";
+import { EditIcon } from "@chakra-ui/icons";
 type props = {
   id: number;
   setMapOpen: (open: boolean) => void;
@@ -20,49 +35,21 @@ export default function GeneralDataTable({
   const { map } = useContext(Context);
   let [mapData] = map.maps.filter((el) => el.id == id);
   return (
-    <table style={{ marginTop: "15px", marginBottom: "15px" }}>
-      <thead>
-        <tr>
-          <th style={th}></th>
-          <th
-            style={{
-              border: "1px solid",
-              ...th,
-            }}
-          >
-            Назва культури
-          </th>
-          <th
-            style={{
-              border: "1px solid",
-              ...th,
-            }}
-          >
-            Площа
-          </th>
-          <th
-            style={{
-              border: "1px solid",
-              ...th,
-            }}
-          >
-            Розрахункова ЗП
-          </th>
-          <th
-            style={{
-              border: "1px solid",
-              ...th,
-            }}
-          >
-            Вартість ДП
-          </th>
-          <th style={{ ...th }}></th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table my={"15px"} maxW={"3xl"}>
+      <Thead>
+        <Tr>
+          <Th></Th>
+          <Th>Назва культури</Th>
+          <Th>Площа</Th>
+          <Th>Розрахункова ЗП</Th>
+          <Th>Вартість ДП</Th>
+          <Th></Th>
+        </Tr>
+      </Thead>
+      <Tbody>
         {
-          <tr key={mapData?.id}>
-            <th
+          <Tr key={mapData?.id}>
+            <Td
               onClick={() => {
                 setMapOpen(true);
                 setUpdate(true);
@@ -72,44 +59,16 @@ export default function GeneralDataTable({
                 });
               }}
             >
-              ред
-            </th>
-            <th
-              style={{
-                border: "1px solid",
-                ...th,
-              }}
-            >
-              {mapData?.nameCart}
-            </th>
-            <th
-              style={{
-                border: "1px solid",
-                ...th,
-              }}
-            >
-              {mapData?.area}
-            </th>
-            <th
-              style={{
-                border: "1px solid",
-                ...th,
-              }}
-            >
-              {mapData?.salary}
-            </th>
-            <th
-              style={{
-                border: "1px solid",
-                ...th,
-              }}
-            >
-              {mapData?.priceDiesel}
-            </th>
-            <th></th>
-          </tr>
+              <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
+            </Td>
+            <Td>{mapData?.nameCart}</Td>
+            <Td>{mapData?.area}</Td>
+            <Td>{mapData?.salary}</Td>
+            <Td>{mapData?.priceDiesel}</Td>
+            <Td></Td>
+          </Tr>
         }
-      </tbody>
-    </table>
+      </Tbody>
+    </Table>
   );
 }
