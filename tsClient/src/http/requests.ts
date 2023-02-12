@@ -21,7 +21,6 @@ import {
 } from "../../../tRPC serv/models/models";
 // import dotenv from "dotenv";
 // dotenv.config();
-console.log(import.meta.env);
 
 import { createClient } from "@supabase/supabase-js";
 import { cartProps } from "../modules/CreateCart";
@@ -29,8 +28,8 @@ import { TracProps } from "../modules/CreateTractor";
 import { MachineProps } from "../modules/CreateMachine";
 
 export const supabase = createClient(
-  "https://bicofnobkczquxvztyzl.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY29mbm9ia2N6cXV4dnp0eXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzQ5MjQ5MTIsImV4cCI6MTk5MDUwMDkxMn0.jEd8pHzVzlqZxf-ioqC_QKoda_xqfD2nh4niJ1mea9s"
+  import.meta.env.VITE_DB_LINK + "",
+  import.meta.env.VITE_DB_KEY + ""
 );
 // (async () => {
 //   console.log(
@@ -43,7 +42,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "https://agroas-server-production.up.railway.app/",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
