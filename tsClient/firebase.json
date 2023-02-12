@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "tsClient",
+    "public": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
