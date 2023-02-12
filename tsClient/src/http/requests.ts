@@ -41,7 +41,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000",
+      url: "https://agroas-server-production.up.railway.app/",
       async headers() {
         const {
           data: { session },
