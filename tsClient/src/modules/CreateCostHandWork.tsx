@@ -1,6 +1,4 @@
 import React from "react";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
-import { Icost_hand_work } from "../../../tRPC serv/models/models";
 import Dialog, { func } from "../components/Dialog";
 import HandWork from "../components/HandWork";
 import { createOperProps } from "../pages/TechnologicalMap";

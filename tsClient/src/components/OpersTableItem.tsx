@@ -37,13 +37,9 @@ const patch: funcProps = function (
   setCell,
   setUpdate
 ) {
-  console.log(el);
-  console.log(el.cell);
-  console.log(map[el.cell]);
   //@ts-ignore
   const [second] = map[el.cell].filter((mat) => mat.techOperationId == el.id);
   const [cart] = map.maps.filter((map) => map.id == el.techCartId);
-  console.log(second);
 
   if (el.cell == "costMechanical") {
     setRes({
@@ -120,7 +116,7 @@ export default function OpersTableItem({
 }: props) {
   const { map, user } = useContext(Context);
   return (
-    <Tr>
+    <Tr key={el.id!}>
       <Td
         onClick={() =>
           patch(map, el, setRes, setSecondOpen, setCell, setUpdate)
@@ -155,7 +151,6 @@ export default function OpersTableItem({
           user.role == ""
             ? () => setShowAlert(true)
             : () => {
-                console.log({ isOpen: true, operId: el.id, cartId: id });
                 setDeleteOpen({ isOpen: true, operId: el.id, cartId: id });
               }
         }

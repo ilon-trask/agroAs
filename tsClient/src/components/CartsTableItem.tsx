@@ -34,10 +34,8 @@ const CartsTableItem = observer(
     setDeleteOpen,
   }: props) => {
     const { map, user } = useContext(Context);
-    console.log(!!e.isPublic);
-    console.log(user.role == "");
     return (
-      <Tr>
+      <Tr key={e.id!}>
         <Td
           className={style.item}
           onClick={() => {
@@ -62,14 +60,9 @@ const CartsTableItem = observer(
           className={style.delete}
           onClick={
             user.role == ""
-              ? () => {
-                  console.log(2);
-
-                  setShowAlert(true);
-                }
-              : () => {
-                  setDeleteOpen({ ...deleteOpen, isOpen: true, cartId: e.id! });
-                }
+              ? () => setShowAlert(true)
+              : () =>
+                  setDeleteOpen({ ...deleteOpen, isOpen: true, cartId: e.id! })
           }
         >
           <DeleteIcon w={"20px"} h={"auto"} />

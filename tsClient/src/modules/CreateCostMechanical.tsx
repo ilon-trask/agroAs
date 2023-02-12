@@ -1,7 +1,5 @@
-import React from "react";
-import Dialog, { func } from "../components/Dialog";
+import Dialog from "../components/Dialog";
 import MechanicalWork from "../components/MechanicalWork";
-import { createOperation, patchOperation } from "../http/requests";
 import { createOperProps } from "../pages/TechnologicalMap";
 export type MechanicalWorkProps = {
   nameOper: string;

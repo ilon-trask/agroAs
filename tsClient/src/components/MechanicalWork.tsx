@@ -108,7 +108,6 @@ const MechanicalWork = observer(
     const [inIsErr, setInIsErr] = useState(false);
     const { map, user } = useContext(Context);
     const { id } = useParams();
-    console.log(map.tractor);
     return (
       <ModalBody>
         <Box>
@@ -140,17 +139,13 @@ const MechanicalWork = observer(
                       ? () => setShowAlert(true)
                       : () => {
                           if (res.idTractor) {
-                            console.log(map.tractor);
-
                             let [second] = map.tractor.filter(
                               (el) => el.id == res.idTractor
                             );
-                            console.log(second);
 
                             setInRes(second);
                             setInUpdate(true);
                             setTractorOpen(true);
-                            console.log(1);
                           }
                         }
                   }

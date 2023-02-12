@@ -9,7 +9,6 @@ import { Button } from "@chakra-ui/react";
 
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
-  const navigate = useNavigate();
   return (
     <div className={style.bg}>
       <div className={style.container}>
@@ -24,7 +23,6 @@ const NavBar = observer(() => {
                   await supabase.auth.signOut();
                   user.isAuth = false;
                   user.role = "";
-                  console.log(user.isAuth);
                   getCarts(map);
                 }}
               >

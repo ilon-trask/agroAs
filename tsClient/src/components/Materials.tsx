@@ -37,7 +37,6 @@ const createMaterials: func<MaterialsProps> = function (
     setIsErr(true);
   } else {
     if (cell == undefined) return;
-    console.log(update);
     setOpen(false);
     setCell!("");
     setRes(materialsProps);

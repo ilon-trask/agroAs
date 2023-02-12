@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LOGIN_ROUTE, REGISTRATION_ROUTE } from "../utils/consts";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
 import { getCarts, supabase } from "../http/requests";
 import style from "./auth.module.css";
@@ -8,8 +7,6 @@ import { useContext } from "react";
 import { Context } from "../main";
 export default function AuthPage() {
   const location = useLocation().pathname;
-  const isLoginPage = location === LOGIN_ROUTE;
-  console.log(isLoginPage);
   const { map, user } = useContext(Context);
   const navigate = useNavigate();
   supabase.auth.onAuthStateChange(async (e) => {
@@ -25,7 +22,6 @@ export default function AuthPage() {
         user.isAuth = true;
         getCarts(map);
       }
-      console.log(e);
     }
   });
   const [isHover, setIsHover] = useState<boolean>(false);

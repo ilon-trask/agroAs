@@ -35,12 +35,12 @@ const MapJornal = observer(function () {
     operId: null,
     cartId: null,
   });
-  console.log(showAlert);
   const navigate = useNavigate();
   return (
     <Container maxW="container.lg">
       <Box>
         {map.isLoading ? <Loader /> : <></>}
+
         <Text textAlign={"center"} fontSize={"25px"}>
           Журнал технологічних карт
         </Text>

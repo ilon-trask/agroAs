@@ -1,13 +1,4 @@
-import React, {
-  ReactChild,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { useParams } from "react-router-dom";
-import { Context } from "../main";
-import css from "./Dialog.module.css";
+import React, { ReactChild, ReactNode, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 // import Button from "../ui/Button/Button";
 import { FC } from "react";
@@ -19,16 +10,10 @@ import { MachineProps } from "../modules/CreateMachine";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork";
 import { MaterialsProps } from "../modules/CreateCostMaterials";
 import {
-  Box,
-  Heading,
-  Select,
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalBody,
-  Button,
   Center,
-  ModalFooter,
   Text,
 } from "@chakra-ui/react";
 export type func<T> = (

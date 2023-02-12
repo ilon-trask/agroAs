@@ -47,8 +47,6 @@ export default function CreateMachine({
   isErr,
   setIsErr,
 }: props) {
-  console.log(open);
-
   return (
     <Dialog
       open={open}

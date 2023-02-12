@@ -30,10 +30,6 @@ function App() {
           | ""
           | undefined;
       }
-      console.log(user.role);
-      console.log(error);
-      console.log(data);
-      supabase.auth.getUser().then((data) => console.log(data));
     })();
   }, [user.isAuth]);
 
@@ -43,7 +39,6 @@ function App() {
     getTractor(map);
     getMachine(map);
     getGrades(map);
-    console.log(3);
   }, []);
 
   return (

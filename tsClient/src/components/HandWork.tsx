@@ -70,7 +70,6 @@ const createCostHandWorkFunc: func<CostHandWorkProps> = (
     setRes(costHandWorkProps);
     setSection!("");
     setIsErr(false);
-    console.log(res.type);
     res.spending = +res.spending!;
     res.yieldСapacity = +res.yieldСapacity!;
     res.gradeId = +res.gradeId!;
@@ -116,7 +115,6 @@ const HandWork = observer(
   }: InputProps<CostHandWorkProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
-    console.log(res.type);
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>

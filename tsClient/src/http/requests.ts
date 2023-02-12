@@ -21,6 +21,8 @@ import {
 } from "../../../tRPC serv/models/models";
 // import dotenv from "dotenv";
 // dotenv.config();
+console.log(import.meta.env);
+
 import { createClient } from "@supabase/supabase-js";
 import { cartProps } from "../modules/CreateCart";
 import { TracProps } from "../modules/CreateTractor";
@@ -47,7 +49,6 @@ const client = createTRPCProxyClient<AppRouter>({
           data: { session },
           error,
         } = await supabase.auth.getSession();
-        console.log(session);
         if (!session) return {};
         return {
           authorization: "Bearer " + session.access_token,
@@ -76,8 +77,6 @@ export async function getCarts(map: MapStore) {
   await client.cart.get
     .query()
     .then((res: { carts: resTechCartsWithOpers[] }) => {
-      console.log(res);
-
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
@@ -113,8 +112,6 @@ export async function setIsPublic(
 ) {
   map.isLoading = true;
   await client.cart.setIsPublic.query(data).then((res) => {
-    console.log(res);
-
     map.opers = [];
     map.costMechanical = [];
     map.costMaterials = [];
@@ -164,12 +161,10 @@ export async function createCart(map: MapStore, data: Itech_cart) {
 export async function updateMap(map: MapStore, dat: any) {
   map.isLoading = true;
   let data = JSON.parse(JSON.stringify(dat));
-  console.log(data);
 
   await client.cart.patch.query(data).then(
     // @ts-ignore
     (res: { carts: resTechCartsWithOpers[] }) => {
-      console.log(res);
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
@@ -180,7 +175,6 @@ export async function updateMap(map: MapStore, dat: any) {
         const opers = res.carts[i].tech_operations;
         for (let j = 0; j < opers.length; j++) {
           const oper = opers[j];
-          console.log(oper);
 
           map.newOper = opers[j];
 
@@ -212,16 +206,9 @@ export async function deleteOper(
     .query({ cartId: +cartId, operId: operId })
     //@ts-ignore
     .then((data: any) => {
-      console.log(data);
       map.opers = map.opers.filter((el) => el.id != data.id);
       let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
-
-      console.log(operValue(data));
-
-      console.log(mapData);
-
       mapData.totalCost! -= operValue(data);
-      console.log(mapData);
     });
   map.isLoading = false;
 }
@@ -245,8 +232,6 @@ export async function createOperation(
     })
     //@ts-ignore
     .then((data: { oper: tech_operation; prope: prope }) => {
-      console.log(data);
-
       const { oper, prope } = data;
       map.newOper = oper;
       let [mapData] = map.maps.filter((el) => el.id == oper.techCartId);
@@ -278,8 +263,6 @@ export async function patchOperation(
 
   let [mapData] = map.maps.filter((el) => el.id == id);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
-  console.log(mapData);
-  console.log(operData);
   mapData.totalCost! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
@@ -288,16 +271,10 @@ export async function patchOperation(
     })
     //@ts-ignore
     .then((res: resTechOperation) => {
-      console.log(res);
-      console.log(arr.res.operId);
-      console.log(map.opers[2].id);
-      console.log(map.opers.filter((el) => el.id != arr.res.operId));
-
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
 
       map.newOper = res;
       let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
-      console.log(mapData);
 
       mapData.totalCost! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
@@ -306,9 +283,7 @@ export async function patchOperation(
       map.costMaterials = map.costMaterials.filter(
         (el) => el.techOperationId != arr.res.operId
       );
-      console.log(map.maps);
       let [thisMap] = map.maps.filter((el) => el.id == id);
-      console.log(thisMap);
       for (let i = 0; i < thisMap.tech_operations.length; i++) {
         const el = thisMap.tech_operations[i];
         if (el?.cost_material?.id == res.cost_material?.id) {
