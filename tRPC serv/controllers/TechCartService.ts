@@ -138,6 +138,8 @@ export async function getCart(userId: string | undefined) {
       where: { isPublic: true },
     });
   } else {
+    console.log(userId);
+
     //@ts-ignore
     Scarts = await tech_cart.findAll({
       include: [
@@ -152,6 +154,7 @@ export async function getCart(userId: string | undefined) {
           ],
         },
       ],
+      where: { userId: userId },
     });
   }
   Scarts.sort((a, b) => a.id! - b.id!);

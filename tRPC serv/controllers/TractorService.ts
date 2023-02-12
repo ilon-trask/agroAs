@@ -70,4 +70,4 @@ class TractorService {
     return Tractor;
   }
 }
-export = new TractorService();
+export default new TractorService();

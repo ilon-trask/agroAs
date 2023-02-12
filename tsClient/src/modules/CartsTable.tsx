@@ -46,7 +46,7 @@ const CartsTable = observer(
             <Th>Назва культури</Th>
             <Th>Площа (га)</Th>
             <Th>Загальна вартість (грн)</Th>
-            <Th>Витрати на (грн на 1 га)</Th>
+            <Th>Витрати (грн на 1 га)</Th>
             <Th></Th>
             {user.role == "ADMIN" && <Th></Th>}
           </Tr>

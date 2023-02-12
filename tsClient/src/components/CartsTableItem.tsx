@@ -47,7 +47,12 @@ const CartsTableItem = observer(
             });
           }}
         >
-          <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
+          <EditIcon
+            color={"blue.400"}
+            w={"20px"}
+            h={"auto"}
+            cursor={"pointer"}
+          />
         </Td>
         <Td>
           <Link to={TEHMAP_ROUTER + `/${e.id}`}>{e.nameCart}</Link>

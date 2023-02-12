@@ -15,6 +15,7 @@ type props = {
 export default function NoAuthAlert({ showAlert, setShowAlert }: props) {
   const navigate = useNavigate();
   return (
+    //@ts-ignore
     <AlertDialog
       isCentered
       isOpen={showAlert}
