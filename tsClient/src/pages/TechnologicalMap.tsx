@@ -16,7 +16,7 @@ import CreateCart, { cartProps } from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
-import { Text, Button } from "@chakra-ui/react";
+import { Text, Button, Container, Box } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import { deleteOper } from "../http/requests";
@@ -54,7 +54,7 @@ const DevicePage = observer(() => {
   return (
     <div>
       {map.isLoading ? <Loader /> : <></>}
-      <div className={style.container}>
+      <Box px={"40px"}>
         <div style={{ fontSize: "20px" }}>
           <Link to="/">{"<НА ГОЛОВНУ"}</Link>
         </div>
@@ -186,7 +186,7 @@ const DevicePage = observer(() => {
           res={res as cartProps}
           setRes={setRes}
         />
-      </div>
+      </Box>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
       <DeleteAlert
         open={deleteOpen.isOpen}
