@@ -8,26 +8,11 @@ import CreateCart, { cartProps } from "../modules/CreateCart";
 import { useNavigate } from "react-router-dom";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import { css } from "@emotion/css";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogContent,
-  TableContainer,
-  Text,
-  Button,
-  Box,
-  Container,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogHeader,
-} from "@chakra-ui/react";
+import { TableContainer, Text, Button, Box, Container } from "@chakra-ui/react";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
+import { deleteCart, deleteOper } from "../http/requests";
+import DeleteAlert from "../components/DeleteAlert";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -45,6 +30,11 @@ const MapJornal = observer(function () {
     priceDiesel: "",
   });
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<any>({
+    idOpen: false,
+    operId: null,
+    cartId: null,
+  });
   console.log(showAlert);
   const navigate = useNavigate();
   return (
@@ -65,6 +55,8 @@ const MapJornal = observer(function () {
             setOpen={setOpen}
             setUpdate={setUpdate}
             setShowAlert={setShowAlert}
+            deleteOpen={deleteOpen}
+            setDeleteOpen={setDeleteOpen}
           ></CartsTable>
         </TableContainer>
         <Button
@@ -93,6 +85,15 @@ const MapJornal = observer(function () {
         />
       </Box>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
+      <DeleteAlert
+        open={deleteOpen.isOpen}
+        setOpen={setDeleteOpen}
+        text={"карту"}
+        func={() => {
+          deleteCart(map, deleteOpen.cartId);
+          setDeleteOpen({ ...deleteOpen, isOpen: false });
+        }}
+      />
     </Container>
   );
 });

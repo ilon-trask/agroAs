@@ -16,6 +16,8 @@ type props = {
   setCell: (cell: Icell | "") => void;
   setUpdate: (update: boolean) => void;
   setShowAlert: (showAlert: boolean) => void;
+  deleteOpen: boolean;
+  setDeleteOpen: (deleteOpen: boolean) => void;
 };
 
 export default function OperTableSection({
@@ -29,6 +31,8 @@ export default function OperTableSection({
   setCell,
   setUpdate,
   setShowAlert,
+  deleteOpen,
+  setDeleteOpen,
 }: props) {
   const line: {} = {
     display: "flex",
@@ -92,6 +96,8 @@ export default function OperTableSection({
             setUpdate={setUpdate}
             mapData={mapData}
             setShowAlert={setShowAlert}
+            deleteOpen={deleteOpen}
+            setDeleteOpen={setDeleteOpen}
           />
         );
       })}

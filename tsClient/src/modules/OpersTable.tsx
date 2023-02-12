@@ -28,6 +28,8 @@ type props = {
   setCell: (cell: Icell | "") => void;
   setUpdate: (update: boolean) => void;
   setShowAlert: (showAlert: boolean) => void;
+  deleteOpen: boolean;
+  setDeleteOpen: (open: boolean) => void;
 };
 
 export default function OpersTable({
@@ -37,6 +39,8 @@ export default function OpersTable({
   setCell,
   setUpdate,
   setShowAlert,
+  deleteOpen,
+  setDeleteOpen,
 }: props) {
   const { map } = useContext(Context);
 
@@ -139,6 +143,8 @@ export default function OpersTable({
               setUpdate={setUpdate}
               sum={sum}
               setShowAlert={setShowAlert}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
             />
           ))}
         </Tbody>

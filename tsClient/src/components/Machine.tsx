@@ -72,15 +72,16 @@ function CreateAgriculturalMachine({
   return (
     <ModalBody>
       <Heading as={"h4"} size="md" textAlign={"center"}>
-        Внесіть данні для СГ машини
+        Внесіть дані для СГ машини
       </Heading>
-      <Box>
+      <Box mt={"15px"}>
         <Box display={"flex"} justifyContent={"space-evenly"}>
           <div>
             <Heading as={"h4"} size="sm">
               Назва СГ машини
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть назву"
               type="text"
@@ -95,6 +96,7 @@ function CreateAgriculturalMachine({
               Марка СГ машини
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть марку"
               type="text"
@@ -111,6 +113,7 @@ function CreateAgriculturalMachine({
               Ціна СГ машини грн
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть ціну"
               type="number"
@@ -125,6 +128,7 @@ function CreateAgriculturalMachine({
               Термін амортизації в роках{" "}
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть термін"
               type="number"
@@ -141,6 +145,7 @@ function CreateAgriculturalMachine({
               Ширина захвату
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть потіжність"
               type="number"
@@ -156,6 +161,7 @@ function CreateAgriculturalMachine({
               Робоча швидкість
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть потіжність"
               type="number"
@@ -169,10 +175,10 @@ function CreateAgriculturalMachine({
         <Box display={"flex"} justifyContent={"space-evenly"}>
           <div>
             <Heading as={"h4"} size="sm">
-              Кількість обслуговуючого
-              <br /> персоналу
+              Кількість персоналу
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть кількість"
               type="number"
@@ -184,10 +190,10 @@ function CreateAgriculturalMachine({
           </div>
           <div>
             <Heading as={"h4"} size="sm">
-              <br />
               Розряд роботи
             </Heading>
             <Select
+              w={"215px"}
               size={"sm"}
               value={res.gradeId}
               onChange={(e) => {

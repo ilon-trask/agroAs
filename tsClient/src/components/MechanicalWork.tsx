@@ -63,6 +63,10 @@ const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
   }
 };
 
+interface MechanicalWorkComProps extends InputProps<MechanicalWorkProps> {
+  setShowAlert: (showAlert: boolean) => void;
+}
+
 const MechanicalWork = observer(
   ({
     res,
@@ -74,7 +78,8 @@ const MechanicalWork = observer(
     setOpen,
     setSection,
     update,
-  }: InputProps<MechanicalWorkProps>) => {
+    setShowAlert,
+  }: MechanicalWorkComProps) => {
     const [inRes, setInRes] = useState<TracProps | MachineProps | {}>({});
     //   {
     //   nameTractor: "",
@@ -101,14 +106,14 @@ const MechanicalWork = observer(
     const [agriculturalOpen, setAgriculturalOpen] = useState(false);
     const [inUpdate, setInUpdate] = useState(false);
     const [inIsErr, setInIsErr] = useState(false);
-    const { map } = useContext(Context);
+    const { map, user } = useContext(Context);
     const { id } = useParams();
     console.log(map.tractor);
     return (
       <ModalBody>
         <Box>
           <Heading as={"h4"} size="md" textAlign={"center"}>
-            Внесіть данні для розрахунку
+            Внесіть дані для розрахунку
           </Heading>
           <Box mt={"15px"} w={"590px"} mx={"auto"}>
             <Box display={"flex"}>
@@ -130,21 +135,25 @@ const MechanicalWork = observer(
                 <Button
                   size="lg"
                   mt={"5px"}
-                  onClick={() => {
-                    if (res.idTractor) {
-                      console.log(map.tractor);
+                  onClick={
+                    user.role == ""
+                      ? () => setShowAlert(true)
+                      : () => {
+                          if (res.idTractor) {
+                            console.log(map.tractor);
 
-                      let [second] = map.tractor.filter(
-                        (el) => el.id == res.idTractor
-                      );
-                      console.log(second);
+                            let [second] = map.tractor.filter(
+                              (el) => el.id == res.idTractor
+                            );
+                            console.log(second);
 
-                      setInRes(second);
-                      setInUpdate(true);
-                      setTractorOpen(true);
-                      console.log(1);
-                    }
-                  }}
+                            setInRes(second);
+                            setInUpdate(true);
+                            setTractorOpen(true);
+                            console.log(1);
+                          }
+                        }
+                  }
                 >
                   <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
                 </Button>
@@ -207,9 +216,13 @@ const MechanicalWork = observer(
                   mt={"5px"}
                   color={"blue.400"}
                   size="lg"
-                  onClick={() => {
-                    setTractorOpen(true);
-                  }}
+                  onClick={
+                    user.role == ""
+                      ? () => setShowAlert(true)
+                      : () => {
+                          setTractorOpen(true);
+                        }
+                  }
                 >
                   додати <br /> трактор
                 </Button>
@@ -221,17 +234,21 @@ const MechanicalWork = observer(
                   <Button
                     mt={"5px"}
                     size="lg"
-                    onClick={() => {
-                      if (res.idMachine) {
-                        let [second] = map.machine.filter(
-                          (el) => el.id == res.idMachine
-                        );
-                        //@ts-ignore
-                        setInRes(second);
-                        setInUpdate(true);
-                        setAgriculturalOpen(true);
-                      }
-                    }}
+                    onClick={
+                      user.role == ""
+                        ? () => setShowAlert(true)
+                        : () => {
+                            if (res.idMachine) {
+                              let [second] = map.machine.filter(
+                                (el) => el.id == res.idMachine
+                              );
+                              //@ts-ignore
+                              setInRes(second);
+                              setInUpdate(true);
+                              setAgriculturalOpen(true);
+                            }
+                          }
+                    }
                   >
                     <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
                   </Button>
@@ -290,9 +307,13 @@ const MechanicalWork = observer(
                   mt={"5px"}
                   color={"blue.400"}
                   size="lg"
-                  onClick={() => {
-                    setAgriculturalOpen(true);
-                  }}
+                  onClick={
+                    user.role == ""
+                      ? () => setShowAlert(true)
+                      : () => {
+                          setAgriculturalOpen(true);
+                        }
+                  }
                 >
                   додати <br />
                   СГ машину

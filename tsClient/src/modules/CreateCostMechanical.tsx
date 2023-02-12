@@ -10,6 +10,10 @@ export type MechanicalWorkProps = {
   workingSpeed: string | number;
   fuelConsumption: string | number;
 };
+interface CreateCostMechanicalProps
+  extends createOperProps<MechanicalWorkProps> {
+  setShowAlert: (showAlert: boolean) => void;
+}
 export const mechanicalWorkProps: MechanicalWorkProps = {
   nameOper: "",
   idMachine: "",
@@ -32,7 +36,8 @@ export default function CreateCostMechanical({
   setUpdate,
   isErr,
   setIsErr,
-}: createOperProps<MechanicalWorkProps>) {
+  setShowAlert,
+}: CreateCostMechanicalProps) {
   return (
     <Dialog
       res={res}
@@ -44,6 +49,16 @@ export default function CreateCostMechanical({
       props={mechanicalWorkProps}
       isErr={isErr}
       setIsErr={setIsErr}
+      errMess={
+        <span>
+          <b>Увага!</b>
+          <br />
+          Редагувати можна тільки вибраний трактор або СГ машину
+          <br />
+          Збільшення розходу палива збільшує суму витрат <br />
+          Збільшення робочої швидкості зменшує суму витрат
+        </span>
+      }
     >
       <MechanicalWork
         res={res as MechanicalWorkProps}
@@ -55,6 +70,7 @@ export default function CreateCostMechanical({
         setIsErr={setIsErr}
         setOpen={setOpen}
         update={update}
+        setShowAlert={setShowAlert}
       />
     </Dialog>
   );

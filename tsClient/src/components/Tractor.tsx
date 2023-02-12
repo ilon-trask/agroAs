@@ -65,7 +65,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
   return (
     <ModalBody>
       <Heading as={"h4"} size="md" textAlign={"center"}>
-        Внесіть данні для трактора
+        Внесіть дані для трактора
       </Heading>
       <Box mt={"15px"}>
         <Box display={"flex"} justifyContent={"space-evenly"}>
@@ -74,6 +74,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Назва трактора
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть назву"
               type="text"
@@ -88,6 +89,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Марка трактора
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть марку"
               type="text"
@@ -104,6 +106,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Ціна трактора грн
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть ціну"
               type="number"
@@ -118,6 +121,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Термін амортизації в роках
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть термін"
               type="number"
@@ -134,6 +138,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Потужність двигуна кВт
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть потіжність"
               type="number"
@@ -148,6 +153,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Розхід палива на 1 год
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть розхід"
               type="number"
@@ -164,6 +170,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Кількість персоналу
             </Heading>
             <Input
+              w={"215px"}
               size={"sm"}
               placeholder="Вкажіть кількість"
               type="number"
@@ -178,6 +185,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               Розряд роботи
             </Heading>
             <Select
+              w={"215px"}
               size={"sm"}
               value={res.gradeId}
               onChange={(e) => {

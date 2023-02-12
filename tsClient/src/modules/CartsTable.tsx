@@ -23,10 +23,19 @@ interface props {
   setOpen: (open: boolean) => void;
   setUpdate: (update: boolean) => void;
   setShowAlert: (showAlert: boolean) => void;
+  deleteOpen: any;
+  setDeleteOpen: (deleteOpen: any) => void;
 }
 
 const CartsTable = observer(
-  ({ setRes, setOpen, setUpdate, setShowAlert }: props) => {
+  ({
+    setRes,
+    setOpen,
+    setUpdate,
+    setShowAlert,
+    deleteOpen,
+    setDeleteOpen,
+  }: props) => {
     const { map, user } = useContext(Context);
 
     return (
@@ -50,6 +59,8 @@ const CartsTable = observer(
               setRes={setRes}
               setUpdate={setUpdate}
               setShowAlert={setShowAlert}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
             />
           ))}
         </Tbody>

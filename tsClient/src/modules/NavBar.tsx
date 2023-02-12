@@ -14,7 +14,7 @@ const NavBar = observer(() => {
     <div className={style.bg}>
       <div className={style.container}>
         <Link style={{ color: "white", textDecoration: "none" }} to={MAP_ROUTE}>
-          калькулятор
+          Калькулятор витрат
         </Link>
         {user.isAuth ? (
           <div>

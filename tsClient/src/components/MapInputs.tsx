@@ -71,7 +71,7 @@ export default function MapInputs({
       <Box
         display={"flex"}
         alignItems={"center"}
-        maxW={"490px"}
+        gap={3}
         mx={"auto"}
         mt={"15px"}
       >
@@ -79,7 +79,7 @@ export default function MapInputs({
           Назва культури
         </Heading>
         <Input
-          placeholder="Вкажіть дату"
+          placeholder="Вкажіть культуру"
           type="text"
           value={res?.nameCart}
           onChange={(e) => {
@@ -93,7 +93,7 @@ export default function MapInputs({
             Площа, га
           </Heading>
           <Input
-            placeholder="Вкажіть дату"
+            placeholder="Вкажіть площу"
             type="number"
             onChange={(e) => {
               setRes({ ...res, area: e.target.value });
@@ -106,7 +106,7 @@ export default function MapInputs({
             Розрахункова ЗП, грн
           </Heading>
           <Input
-            placeholder="Вкажіть дату"
+            placeholder="Вкажіть ЗП"
             type="number"
             onChange={(e) => {
               setRes({ ...res, salary: e.target.value });
@@ -119,7 +119,7 @@ export default function MapInputs({
             Ціна ДП, грн
           </Heading>
           <Input
-            placeholder="Вкажіть дату"
+            placeholder="Вкажіть ціну ДП"
             type="number"
             onChange={(e) => {
               setRes({ ...res, priceDiesel: e.target.value });

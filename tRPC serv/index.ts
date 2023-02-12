@@ -16,7 +16,6 @@ import { tractorRouter } from "./routes/tractorRouter";
 import { machineRouter } from "./routes/machineRouter";
 import { sectionRouter } from "./routes/sectionRouter";
 import { operRouter } from "./routes/operRouter";
-import { userRouter } from "./routes/userRouter";
 import { gradesRouter } from "./routes/gradesRouter";
 
 import OS from "os";
@@ -30,7 +29,7 @@ const appRouter = router({
   machine: machineRouter,
   section: sectionRouter,
   oper: operRouter,
-  user: userRouter,
+
   grade: gradesRouter,
   "": publicProcedure.query(() => "some text"),
   getUser: publicProcedure.query(() => {

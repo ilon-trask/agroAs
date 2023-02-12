@@ -42,6 +42,13 @@ export default function CreateCostTransport({
       props={transportProps}
       isErr={isErr}
       setIsErr={setIsErr}
+      errMess={
+        <span>
+          <b>Увага!</b>
+          <br />
+          Одиниця виміру "ціни" тільки "грн/га"
+        </span>
+      }
     >
       <Transport
         res={res as TransportProps}

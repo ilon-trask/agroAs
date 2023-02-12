@@ -118,11 +118,13 @@ const Dialog: FC<props> = observer(
           {children}
           <Center>{isErr ? "Ви не заповнили поля" : ""}</Center>
 
-          {errMess || (
+          {errMess ? (
+            <Text w={"590px"} mx={"auto"} paddingBottom={"10px"}>
+              {errMess}
+            </Text>
+          ) : (
             <Text w={"590px"} mx={"auto"}>
               <b>Увага!</b>
-              <br />
-              Редагувати можна тільки вибраний трактор або СГ машину
               <br />
               Одиниці виміру "ціни" повинні відповідати одиницям виміру
               "розходу"

@@ -102,6 +102,8 @@ type props = {
   setUpdate: (update: boolean) => void;
   mapData: Itech_cart;
   setShowAlert: (showAlert: boolean) => void;
+  deleteOpen: boolean;
+  setDeleteOpen: (deleteOpen: any) => void;
 };
 
 export default function OpersTableItem({
@@ -113,6 +115,8 @@ export default function OpersTableItem({
   setUpdate,
   mapData,
   setShowAlert,
+  deleteOpen,
+  setDeleteOpen,
 }: props) {
   const { map, user } = useContext(Context);
   return (
@@ -150,7 +154,10 @@ export default function OpersTableItem({
         onClick={
           user.role == ""
             ? () => setShowAlert(true)
-            : () => deleteOper(map, el.id!, id)
+            : () => {
+                console.log({ isOpen: true, operId: el.id, cartId: id });
+                setDeleteOpen({ isOpen: true, operId: el.id, cartId: id });
+              }
         }
       >
         <DeleteIcon w={"20px"} h={"auto"} />

@@ -72,7 +72,7 @@ const Easy = observer(
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Внесіть данні для розрахунку
+          Внесіть дані для розрахунку
         </Heading>
         <Box mt={"15px"}>
           <Box
@@ -95,7 +95,13 @@ const Easy = observer(
               }}
             />
           </Box>
-          <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            mt={"15px"}
+            maxW={"490px"}
+            mx={"auto"}
+          >
             <div>
               <Heading as={"h4"} size="sm">
                 Ціна
@@ -125,7 +131,13 @@ const Easy = observer(
               />
             </div>
           </Box>
-          <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            mt={"15px"}
+            maxW={"490px"}
+            mx={"auto"}
+          >
             <div>
               <Heading as={"h4"} size="sm">
                 Розхід/кількість на 1 га

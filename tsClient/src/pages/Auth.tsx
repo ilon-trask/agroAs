@@ -31,7 +31,7 @@ export default function AuthPage() {
   const [isHover, setIsHover] = useState<boolean>(false);
   return (
     <div className={style.auth}>
-      <div style={{ width: "30%" }}>
+      <div style={{ maxWidth: "600px" }}>
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}

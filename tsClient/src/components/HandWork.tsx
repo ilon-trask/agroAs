@@ -120,7 +120,7 @@ const HandWork = observer(
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Внесіть данні для розрахунку
+          Внесіть дані для розрахунку
         </Heading>
         <Box
           display={"flex"}

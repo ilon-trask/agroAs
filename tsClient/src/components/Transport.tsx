@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { transportProps, TransportProps } from "../modules/CreateCostTransport";
 import { func, InputProps } from "./Dialog";
@@ -64,10 +64,13 @@ const Easy = observer(
   }: InputProps<TransportProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
+    useEffect(() => {
+      setRes({ ...res, unitsOfCost: "грн/га" });
+    }, [res]);
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Внесіть данні для розрахунку транспортування
+          Внесіть дані для розрахунку транспортування
         </Heading>
         <Box
           display={"flex"}
@@ -90,7 +93,13 @@ const Easy = observer(
             }}
           />
         </Box>
-        <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
+        <Box
+          display={"flex"}
+          justifyContent={"space-between"}
+          mt={"15px"}
+          maxW={"490px"}
+          mx={"auto"}
+        >
           <div>
             <Heading as={"h4"} size="sm">
               Ціна
@@ -111,6 +120,7 @@ const Easy = observer(
             </Heading>
             <Input
               size={"sm"}
+              disabled
               placeholder="Вкажіть одиниці"
               type="text"
               value={res?.unitsOfCost}

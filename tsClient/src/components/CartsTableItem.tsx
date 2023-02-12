@@ -10,17 +10,7 @@ import MapStore from "../store/MapStore";
 import { TEHMAP_ROUTER } from "../utils/consts";
 import style from "./TableItem.module.css";
 
-import {
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Checkbox,
-} from "@chakra-ui/react";
+import { Tr, Td, Checkbox } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
 interface props {
@@ -29,10 +19,20 @@ interface props {
   setOpen: (open: boolean) => void;
   setRes: (res: cartProps) => void;
   setShowAlert: (showAlert: boolean) => void;
+  deleteOpen: any;
+  setDeleteOpen: (deleteOpen: any) => void;
 }
 const td = "text-align: center;";
 const CartsTableItem = observer(
-  ({ e, setUpdate, setOpen, setRes, setShowAlert }: props) => {
+  ({
+    e,
+    setUpdate,
+    setOpen,
+    setRes,
+    setShowAlert,
+    deleteOpen,
+    setDeleteOpen,
+  }: props) => {
     const { map, user } = useContext(Context);
     console.log(!!e.isPublic);
     console.log(user.role == "");
@@ -68,7 +68,7 @@ const CartsTableItem = observer(
                   setShowAlert(true);
                 }
               : () => {
-                  deleteCart(map, e.id!);
+                  setDeleteOpen({ ...deleteOpen, isOpen: true, cartId: e.id! });
                 }
           }
         >

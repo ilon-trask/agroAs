@@ -19,7 +19,8 @@ import {
   tech_operation,
   tractor,
 } from "../../../tRPC serv/models/models";
-
+// import dotenv from "dotenv";
+// dotenv.config();
 import { createClient } from "@supabase/supabase-js";
 import { cartProps } from "../modules/CreateCart";
 import { TracProps } from "../modules/CreateTractor";

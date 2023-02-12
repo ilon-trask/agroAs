@@ -16,22 +16,10 @@ import CreateCart, { cartProps } from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Text,
-  Button,
-  Box,
-  Container,
-} from "@chakra-ui/react";
+import { Text, Button } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
+import DeleteAlert from "../components/DeleteAlert";
+import { deleteOper } from "../http/requests";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -58,7 +46,11 @@ const DevicePage = observer(() => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const { map, user } = useContext(Context);
   let { id } = useParams();
-
+  const [deleteOpen, setDeleteOpen] = useState<any>({
+    idOpen: false,
+    operId: null,
+    cartId: null,
+  });
   return (
     <div>
       {map.isLoading ? <Loader /> : <></>}
@@ -83,6 +75,8 @@ const DevicePage = observer(() => {
             setCell={setCell}
             setUpdate={setUpdate}
             setShowAlert={setShowAlert}
+            deleteOpen={deleteOpen}
+            setDeleteOpen={setDeleteOpen}
           />
           <Button
             style={{ marginTop: "15px", marginLeft: "31px" }}
@@ -165,6 +159,7 @@ const DevicePage = observer(() => {
             setUpdate={setUpdate}
             isErr={isErr}
             setIsErr={setIsErr}
+            setShowAlert={setShowAlert}
           />
         ) : cell == "costHandWork" ? (
           <CreateCostHandWork
@@ -193,6 +188,15 @@ const DevicePage = observer(() => {
         />
       </div>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
+      <DeleteAlert
+        open={deleteOpen.isOpen}
+        setOpen={setDeleteOpen}
+        text={"операцію"}
+        func={() => {
+          setDeleteOpen({ ...deleteOpen, isOpen: false });
+          deleteOper(map, deleteOpen.operId!, deleteOpen.cartId);
+        }}
+      />
     </div>
   );
 });

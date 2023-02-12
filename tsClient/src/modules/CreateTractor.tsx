@@ -58,6 +58,7 @@ export default function CreateTractor({
       props={tracProps}
       isErr={isErr}
       setIsErr={setIsErr}
+      errMess={" "}
     >
       <Tractor
         res={res}

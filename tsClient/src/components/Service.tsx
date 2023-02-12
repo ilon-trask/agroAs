@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { ServiceProps, servicesProps } from "../modules/CreateCostServices";
 import { func, InputProps } from "./Dialog";
@@ -64,17 +64,20 @@ const Easy = observer(
   }: InputProps<ServiceProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
+    useEffect(() => {
+      setRes({ ...res, unitsOfCost: "грн/га" });
+    }, [res]);
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Внесіть данні для розрахунку
+          Внесіть дані для розрахунку
         </Heading>
         <Box
           mt={"15px"}
           display={"flex"}
           gap={3}
           alignItems={"center"}
-          w={"490px"}
+          maxW={"490px"}
           mx={"auto"}
         >
           <Heading as={"h4"} size="sm" minW={"max-content"}>
@@ -90,7 +93,13 @@ const Easy = observer(
             }}
           />
         </Box>
-        <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
+        <Box
+          display={"flex"}
+          justifyContent={"space-between"}
+          mt={"15px"}
+          maxW={"490px"}
+          mx={"auto"}
+        >
           <div>
             <Heading as={"h4"} size="sm">
               Ціна
@@ -110,6 +119,7 @@ const Easy = observer(
               Одиниці виміру ціни
             </Heading>
             <Input
+              disabled
               size={"sm"}
               placeholder="Вкажіть одиниці"
               type="text"
