@@ -278,9 +278,8 @@ async function changeOper(
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
-      const rareOfProduction = Math.round(
-        (machine.widthOfCapture * (aggregateData.workingSpeed * 1000)) / 10000
-      );
+      const rareOfProduction =
+        (machine.widthOfCapture * (aggregateData.workingSpeed * 1000)) / 10000;
 
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) /
