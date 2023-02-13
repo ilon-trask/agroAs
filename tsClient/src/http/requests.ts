@@ -42,7 +42,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000/" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -354,7 +354,7 @@ export function createMachine(map: MapStore, res: Imachine) {
 
 export function patchMachine(map: MapStore, res: Imachine) {
   client.machine.patch.query(res).then((data: Imachine) => {
-    map.newMachine = data;
+    map.machine = data;
   });
 }
 

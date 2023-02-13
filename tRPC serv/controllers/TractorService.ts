@@ -9,12 +9,12 @@ class TractorService {
   async getAll(userId: string | undefined) {
     if (!userId) {
       const Tractor: Itractor[] = await tractor.findAll({
-        where: { id: adminId },
+        where: { userId: adminId },
       });
       return Tractor;
     } else {
       const Tractor: Itractor[] = await tractor.findAll({
-        where: { id: userId },
+        where: { userId: userId },
       });
       return Tractor;
     }
@@ -63,7 +63,7 @@ class TractorService {
       gradeId,
     } = data;
 
-    const Tractor = await tractor.update(
+    await tractor.update(
       {
         nameTractor,
         brand,
@@ -76,6 +76,10 @@ class TractorService {
       },
       { where: { id: id } }
     );
+    const Tractor: Itractor | null = await tractor.findOne({
+      where: { id: id },
+    });
+    if (tractor == null) throw new Error("");
 
     return Tractor;
   }

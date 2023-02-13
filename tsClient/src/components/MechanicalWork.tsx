@@ -181,7 +181,7 @@ const MechanicalWork = observer(
                     </option>
                     {map.tractor.map((el) => (
                       <option key={el.id} value={el.id}>
-                        {el.nameTractor}
+                        {el.brand}
                       </option>
                     ))}
                   </Select>
@@ -275,7 +275,7 @@ const MechanicalWork = observer(
                       </option>
                       {map?.machine?.map((el) => (
                         <option key={el.id} value={el.id}>
-                          {el.nameMachine}
+                          {el.brand}
                         </option>
                       ))}
                     </Select>
