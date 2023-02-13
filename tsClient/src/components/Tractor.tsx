@@ -140,7 +140,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
             <Input
               w={"215px"}
               size={"sm"}
-              placeholder="Вкажіть потіжність"
+              placeholder="Вкажіть потужність"
               type="number"
               value={res?.enginePower}
               onChange={(e) => {
@@ -193,7 +193,7 @@ const CreateTractor = ({ res, setRes, setIsErr, setOpen, update }: props) => {
               }}
             >
               <option selected disabled hidden value="">
-                Виберіть тип роботи
+                Виберіть розряд роботи
               </option>
               {map.grade.map((el) => (
                 <option value={el.id}>{el.indicator}</option>

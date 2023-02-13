@@ -337,7 +337,12 @@ export function createTractor(map: MapStore, res: Itractor) {
 }
 
 export function patchTractor(map: MapStore, res: Itractor) {
-  client.tractor.patch.query(res).then(() => getTractor(map));
+  map.isLoading = true;
+  client.tractor.patch.query(res).then((data: Itractor) => {
+    map.tractor = map.tractor.filter((el) => el.id != data.id);
+    map.newTractor = data;
+  });
+  map.isLoading = false;
 }
 
 export function getTractor(map: MapStore) {
@@ -353,9 +358,12 @@ export function createMachine(map: MapStore, res: Imachine) {
 }
 
 export function patchMachine(map: MapStore, res: Imachine) {
+  map.isLoading = true;
   client.machine.patch.query(res).then((data: Imachine) => {
-    map.machine = data;
+    map.machine = map.machine.filter((el) => el.id != data.id);
+    map.newMachine = data;
   });
+  map.isLoading = false;
 }
 
 export function getMachine(map: MapStore) {

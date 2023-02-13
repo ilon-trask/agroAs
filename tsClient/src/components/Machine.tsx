@@ -147,7 +147,7 @@ function CreateAgriculturalMachine({
             <Input
               w={"215px"}
               size={"sm"}
-              placeholder="Вкажіть потіжність"
+              placeholder="Вкажіть ширину"
               type="number"
               step="0.01"
               value={res?.widthOfCapture}
@@ -163,7 +163,7 @@ function CreateAgriculturalMachine({
             <Input
               w={"215px"}
               size={"sm"}
-              placeholder="Вкажіть потіжність"
+              placeholder="Вкажіть швидкість"
               type="number"
               value={res?.workingSpeed}
               onChange={(e) => {
@@ -201,7 +201,7 @@ function CreateAgriculturalMachine({
               }}
             >
               <option selected disabled hidden value="">
-                Виберіть тип роботи
+                Виберіть розряд роботи
               </option>
               {map.grade.map((el) => (
                 <option value={el.id}>{el.indicator}</option>
