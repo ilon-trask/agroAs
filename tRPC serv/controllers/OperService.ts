@@ -278,6 +278,9 @@ async function changeOper(
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
+      const rareOfProduction = Math.round(
+        (machine.widthOfCapture * (Tractor.fuelConsumption * 1000)) / 10000
+      );
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) /
           Math.round(
@@ -299,12 +302,12 @@ async function changeOper(
           )
       );
       const costMachineWork = Math.round(
-        pricePerHourPersonnel *
+        (pricePerHourPersonnel / rareOfProduction) *
           (Tractor.numberOfPersonnel ?? 0) *
           gradeTractor?.coefficient!
       );
       const costHandWork = Math.round(
-        pricePerHourPersonnel *
+        (pricePerHourPersonnel / rareOfProduction) *
           (machine.numberOfServicePersonnel ?? 0) *
           gradeMachine?.coefficient!
       );
@@ -327,6 +330,9 @@ async function changeOper(
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
+      const rareOfProduction = Math.round(
+        (machine.widthOfCapture * (Tractor.fuelConsumption * 1000)) / 10000
+      );
       const costFuel = Math.round(
         (+CostMechanical.fuelConsumption * +CostMechanical.priceDiesel) /
           Math.round(
@@ -348,12 +354,12 @@ async function changeOper(
           )
       );
       const costMachineWork = Math.round(
-        pricePerHourPersonnel *
+        (pricePerHourPersonnel / rareOfProduction) *
           (Tractor.numberOfPersonnel ?? 0) *
           gradeTractor?.coefficient!
       );
       const costHandWork = Math.round(
-        pricePerHourPersonnel *
+        (pricePerHourPersonnel / rareOfProduction) *
           (machine.numberOfServicePersonnel ?? 0) *
           gradeMachine?.coefficient!
       );
