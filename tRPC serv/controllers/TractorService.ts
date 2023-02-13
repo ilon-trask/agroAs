@@ -79,7 +79,7 @@ class TractorService {
     const Tractor: Itractor | null = await tractor.findOne({
       where: { id: id },
     });
-    if (tractor == null) throw new Error("");
+    if (Tractor == null) throw new Error("");
 
     return Tractor;
   }
