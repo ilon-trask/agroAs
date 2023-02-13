@@ -21,6 +21,8 @@ import { gradesRouter } from "./routes/gradesRouter";
 import OS from "os";
 import { inferAsyncReturnType } from "@trpc/server";
 
+export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
+
 let users = [{ id: 1, name: "bob" }];
 
 const appRouter = router({

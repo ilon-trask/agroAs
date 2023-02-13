@@ -4,8 +4,8 @@ import z from "zod";
 import TractorService from "../controllers/TractorService";
 
 export const tractorRouter = router({
-  get: publicProcedure.query(async () => {
-    const tractor = await TractorService.getAll();
+  get: publicProcedure.query(async ({ ctx }) => {
+    const tractor = await TractorService.getAll(ctx.user?.sub);
     return tractor;
   }),
   create: publicProcedure

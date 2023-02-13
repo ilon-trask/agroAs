@@ -3,7 +3,7 @@ import { Isection, section } from "../models/models";
 //   if (!section) return;
 //   const Section: Isection[] = await section.findAll();
 //   if (!Section[0]) {
-//     await section.create({ id: 1, myId: 10, name: "Підготовка  ґруну" });
+//     await section.create({ id: 1, myId: 10, name: "Підготовка  ґрунту" });
 //     await section.create({ id: 2, myId: 20, name: "Посадка" });
 //     await section.create({ id: 3, myId: 30, name: "Догляд" });
 //     await section.create({ id: 4, myId: 40, name: "Живлення" });
@@ -16,6 +16,7 @@ import { Isection, section } from "../models/models";
 class SectionService {
   async getAll() {
     const Section: Isection[] = await section.findAll();
+    Section.sort((a, b) => a.myId - b.myId);
     return Section;
   }
 }

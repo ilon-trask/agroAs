@@ -1,17 +1,20 @@
-import { Principal } from "..";
+import { adminId, Principal } from "..";
 import { agricultural_machine } from "../models/models";
 import { Imachine } from "../models/models";
 
-interface Idata {
-  res: Imachine;
-}
 class MachineService {
   async getAll(user: Principal | undefined) {
-    if (!user) return;
-    const machine: Imachine[] = await agricultural_machine.findAll({
-      where: { userId: user.sub },
-    });
-    return machine;
+    if (!user) {
+      const machine: Imachine[] = await agricultural_machine.findAll({
+        where: { userId: adminId },
+      });
+      return machine;
+    } else {
+      const machine: Imachine[] = await agricultural_machine.findAll({
+        where: { userId: user.sub },
+      });
+      return machine;
+    }
   }
   async create(data: Imachine, user: Principal | undefined) {
     if (!user) return;

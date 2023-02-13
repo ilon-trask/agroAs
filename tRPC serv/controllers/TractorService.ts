@@ -1,4 +1,4 @@
-import { Principal } from "..";
+import { adminId, Principal } from "..";
 import { tractor, Itractor } from "../models/models";
 
 interface Idata {
@@ -6,9 +6,18 @@ interface Idata {
 }
 
 class TractorService {
-  async getAll() {
-    const Tractor: Itractor[] = await tractor.findAll();
-    return Tractor;
+  async getAll(userId: string | undefined) {
+    if (!userId) {
+      const Tractor: Itractor[] = await tractor.findAll({
+        where: { id: adminId },
+      });
+      return Tractor;
+    } else {
+      const Tractor: Itractor[] = await tractor.findAll({
+        where: { id: userId },
+      });
+      return Tractor;
+    }
   }
 
   async create(data: Itractor, user: Principal | undefined) {
@@ -41,6 +50,7 @@ class TractorService {
     return Tractor;
   }
   async patch(data: Itractor, user: Principal | undefined) {
+    if (!user) return;
     const {
       id,
       nameTractor,
