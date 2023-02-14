@@ -204,7 +204,7 @@ async function createOper(
   return oper;
 }
 
-async function changeOper(
+export async function changeOper(
   e: Itech_operation | resTechOperation,
   cartId: number,
   CostMaterials?: Icost_material,

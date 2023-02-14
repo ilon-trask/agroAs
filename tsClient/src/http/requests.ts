@@ -42,7 +42,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000/" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -161,7 +161,7 @@ export async function updateMap(map: MapStore, dat: any) {
   map.isLoading = true;
   let data = JSON.parse(JSON.stringify(dat));
 
-  await client.cart.patch.query(data).then(
+  await client.cart.patch.mutate(data).then(
     // @ts-ignore
     (res: { carts: resTechCartsWithOpers[] }) => {
       map.opers = [];

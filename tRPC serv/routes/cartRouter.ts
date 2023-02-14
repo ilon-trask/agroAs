@@ -128,7 +128,7 @@ export const cartRouter = router({
           .optional(),
       })
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       //@ts-ignore
       const cart = await TechCartService.patchCart(input, ctx.user);
       return cart;
