@@ -18,6 +18,7 @@ import {
   Container,
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
+import { observer } from "mobx-react-lite";
 type props = {
   id: number;
   setMapOpen: (open: boolean) => void;
@@ -25,12 +26,7 @@ type props = {
   setRes: (res: cartProps) => void;
 };
 
-export default function GeneralDataTable({
-  id,
-  setMapOpen,
-  setUpdate,
-  setRes,
-}: props) {
+function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
   let th = { fontSize: "18px", padding: "0 10px " };
   const { map } = useContext(Context);
   let [mapData] = map.maps.filter((el) => el.id == id);
@@ -72,3 +68,4 @@ export default function GeneralDataTable({
     </Table>
   );
 }
+export default observer(GeneralDataTable);

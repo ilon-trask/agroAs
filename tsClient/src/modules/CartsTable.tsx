@@ -6,6 +6,8 @@ import { Context } from "../main";
 import CartsTableItem from "../components/CartsTableItem";
 import { cartProps } from "./CreateCart";
 
+import Loader from "../components/Loader";
+
 import {
   Table,
   Thead,
@@ -16,6 +18,7 @@ import {
   Td,
   TableCaption,
   TableContainer,
+  Box,
 } from "@chakra-ui/react";
 
 interface props {
@@ -52,6 +55,13 @@ const CartsTable = observer(
           </Tr>
         </Thead>
         <Tbody>
+          {map.isLoading ? (
+            <Box mx={"auto"}>
+              <Loader />
+            </Box>
+          ) : (
+            <></>
+          )}
           {map.maps.map((e) => (
             <CartsTableItem
               e={e}

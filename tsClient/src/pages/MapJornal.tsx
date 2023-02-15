@@ -39,9 +39,7 @@ const MapJornal = observer(function () {
   return (
     <Container maxW="container.lg">
       <Box>
-        {map.isLoading ? <Loader /> : <></>}
-
-        <Text textAlign={"center"} fontSize={"25px"}>
+        <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
           Журнал технологічних карт
         </Text>
         <TableContainer

@@ -37,7 +37,7 @@ export default function NoAuthAlert({ showAlert, setShowAlert }: props) {
               Зареєструватись
             </Button>
             <Button onClick={() => setShowAlert(false)} ml={3}>
-              Вийти
+              Закрити
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

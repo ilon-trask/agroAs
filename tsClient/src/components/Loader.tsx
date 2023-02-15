@@ -9,6 +9,7 @@ export default function Loader() {
         height: "30px",
         width: "30px",
         position: "absolute",
+        left: "50%",
       }}
     >
       <img

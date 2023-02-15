@@ -6,6 +6,7 @@ import style from "./Table.module.css";
 import OpersTableItem from "../components/OpersTableItem";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import OperTableSection from "../components/OperTableSection";
+import Loader from "../components/Loader";
 import {
   Table,
   Thead,
@@ -21,6 +22,7 @@ import {
   Box,
   Container,
 } from "@chakra-ui/react";
+import { observer } from "mobx-react-lite";
 type props = {
   id: number;
   setRes: (res: any) => void;
@@ -32,7 +34,7 @@ type props = {
   setDeleteOpen: (open: boolean) => void;
 };
 
-export default function OpersTable({
+function OpersTable({
   id,
   setRes,
   setSecondOpen,
@@ -131,6 +133,7 @@ export default function OpersTable({
           </Tr>
         </Thead>
         <Tbody>
+          {map.isLoading ? <Loader /> : <></>}
           {sections.map((el) => (
             <OperTableSection
               arr={el.arr}
@@ -168,3 +171,4 @@ export default function OpersTable({
     </TableContainer>
   );
 }
+export default observer(OpersTable);

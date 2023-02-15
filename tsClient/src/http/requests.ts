@@ -76,6 +76,8 @@ export async function getCarts(map: MapStore) {
   await client.cart.get
     .query()
     .then((res: { carts: resTechCartsWithOpers[] }) => {
+      console.log(res);
+
       map.opers = [];
       map.costMechanical = [];
       map.costMaterials = [];
@@ -164,12 +166,16 @@ export async function updateMap(map: MapStore, dat: any) {
   await client.cart.patch.mutate(data).then(
     // @ts-ignore
     (res: { carts: resTechCartsWithOpers[] }) => {
-      map.opers = [];
+      console.log(res);
+
+      map.opers = map.opers.filter((el) => el.techCartId != res.carts[0].id!);
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
       map.costTransport = [];
-      map.maps = res.carts;
+      map.maps = map.maps.filter((el) => el.id != res.carts[0].id);
+      map.newMaps = res.carts[0];
+      map.maps.sort((a, b) => a.id! - b.id!);
       for (let i = 0; i < res.carts.length; i++) {
         const opers = res.carts[i].tech_operations;
         for (let j = 0; j < opers.length; j++) {

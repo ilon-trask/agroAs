@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import OperSection from "../components/OperSection";
 
@@ -51,12 +51,14 @@ const DevicePage = observer(() => {
     operId: null,
     cartId: null,
   });
+  const navigate = useNavigate();
   return (
     <div>
-      {map.isLoading ? <Loader /> : <></>}
       <Box px={"40px"}>
         <div style={{ fontSize: "20px" }}>
-          <Link to="/">{"<НА ГОЛОВНУ"}</Link>
+          <Button mt={"30px"} onClick={() => navigate("/")}>
+            {"<НА ГОЛОВНУ"}
+          </Button>
         </div>
         <Text textAlign={"center"} fontSize={"25px"}>
           Технологічна карта
@@ -79,7 +81,9 @@ const DevicePage = observer(() => {
             setDeleteOpen={setDeleteOpen}
           />
           <Button
-            style={{ marginTop: "15px", marginLeft: "31px" }}
+            mt={"15px"}
+            mb={"25px"}
+            ml={"31px"}
             onClick={
               user.role == ""
                 ? () => {

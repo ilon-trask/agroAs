@@ -181,11 +181,11 @@ interface IdataPatchCostHandWork
     yieldСapacity: number;
     salary?: number;
   }> {}
-interface guestAggregate extends Iaggregate {
+export interface guestAggregate extends Iaggregate {
   salary: number;
   priceDiesel: number;
 }
-interface guest_cost_hand_work extends Icost_hand_work {
+export interface guest_cost_hand_work extends Icost_hand_work {
   salary: number;
 }
 async function createOper(
@@ -207,11 +207,11 @@ async function createOper(
 export async function changeOper(
   e: Itech_operation | resTechOperation,
   cartId: number,
-  CostMaterials?: Icost_material,
-  CostServices?: Icost_service,
-  CostTransport?: Icost_transport,
-  CostMechanical?: guestAggregate,
-  CostHandWork?: guest_cost_hand_work
+  CostMaterials?: Icost_material | null,
+  CostServices?: Icost_service | null,
+  CostTransport?: Icost_transport | null,
+  CostMechanical?: guestAggregate | null,
+  CostHandWork?: guest_cost_hand_work | null
 ) {
   let elem = JSON.parse(JSON.stringify(e));
   if (elem.cell == "costMaterials") {
@@ -280,26 +280,14 @@ export async function changeOper(
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
       const rareOfProduction =
         (machine.widthOfCapture * (aggregateData.workingSpeed * 1000)) / 10000;
-
       const costFuel = Math.round(
-        (+aggregateData.fuelConsumption * +cart.priceDiesel) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
+        (+aggregateData.fuelConsumption * +cart.priceDiesel) / rareOfProduction
       );
       const costCars = Math.round(
-        ((Math.round(
-          +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
-        ) +
-          Math.round(
-            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
-          )) *
+        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
+          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
           1.05) /
-          Math.round(
-            (+machine.widthOfCapture * (+aggregateData.workingSpeed * 1000)) /
-              10000
-          )
+          rareOfProduction
       );
       const costMachineWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
@@ -330,29 +318,17 @@ export async function changeOper(
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
-      const rareOfProduction = Math.round(
-        (machine.widthOfCapture * (CostMechanical.fuelConsumption * 1000)) /
-          10000
-      );
+      const rareOfProduction =
+        (machine.widthOfCapture * (CostMechanical.workingSpeed * 1000)) / 10000;
       const costFuel = Math.round(
         (+CostMechanical.fuelConsumption * +CostMechanical.priceDiesel) /
-          Math.round(
-            (+machine.widthOfCapture * (+CostMechanical.workingSpeed * 1000)) /
-              10000
-          )
+          rareOfProduction
       );
       const costCars = Math.round(
-        ((Math.round(
-          +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8
-        ) +
-          Math.round(
-            +machine.marketCost / +machine.depreciationPeriod / 220 / 8
-          )) *
+        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
+          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
           1.05) /
-          Math.round(
-            (+machine.widthOfCapture * (+CostMechanical.workingSpeed * 1000)) /
-              10000
-          )
+          rareOfProduction
       );
       const costMachineWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
@@ -763,8 +739,6 @@ class OperService {
       });
       if (!Oper) return;
       oper = JSON.parse(JSON.stringify(Oper));
-      console.log(123);
-      console.log(oper);
       const CostService: Icost_service = {
         nameService: "",
         price: price,
@@ -780,9 +754,6 @@ class OperService {
           undefined,
           CostService
         ));
-      console.log(2);
-
-      console.log(oper);
     } else {
       const costService = await cost_service.update(
         {
@@ -827,8 +798,6 @@ class OperService {
       });
       if (!Oper) return;
       oper = JSON.parse(JSON.stringify(Oper));
-      console.log(123);
-      console.log(oper);
       const CostTransport: Icost_transport = {
         nameTransport: "",
         price: price,
@@ -845,9 +814,6 @@ class OperService {
           undefined,
           CostTransport
         ));
-      console.log(2);
-
-      console.log(oper);
     } else {
       const costTransport = await cost_transport.update(
         {
@@ -923,8 +889,6 @@ class OperService {
           undefined,
           costMechanical
         ));
-
-      console.log(oper);
     } else {
       const Tractor = await tractor.findOne({ where: { id: idTractor } });
       const machine = await agricultural_machine.findOne({
@@ -985,7 +949,6 @@ class OperService {
           aggregate,
         ],
       });
-      console.log(3);
 
       if (!Oper) return;
       oper = JSON.parse(JSON.stringify(Oper));

@@ -5,13 +5,18 @@ import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import style from "./NavBar.module.css";
 import { getCarts, supabase } from "../http/requests";
-import { Button } from "@chakra-ui/react";
+import { Button, Box } from "@chakra-ui/react";
 
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
   return (
-    <div className={style.bg}>
-      <div className={style.container}>
+    <Box className={style.bg} py={"10px"}>
+      <Box
+        px={"40px"}
+        display={"flex"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
         <Link style={{ color: "white", textDecoration: "none" }} to={MAP_ROUTE}>
           Калькулятор витрат
         </Link>
@@ -37,8 +42,8 @@ const NavBar = observer(() => {
             </Link>
           </div>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 });
 export default NavBar;
