@@ -57,7 +57,7 @@ const DevicePage = observer(() => {
       <Box px={"40px"}>
         <div style={{ fontSize: "20px" }}>
           <Button mt={"30px"} onClick={() => navigate("/")}>
-            {"<НА ГОЛОВНУ"}
+            {"НА ГОЛОВНУ"}
           </Button>
         </div>
         <Text textAlign={"center"} fontSize={"25px"}>

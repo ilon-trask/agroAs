@@ -205,7 +205,7 @@ async function createOper(
 }
 
 export async function changeOper(
-  e: Itech_operation | resTechOperation,
+  e: resTechOperation,
   cartId: number,
   CostMaterials?: Icost_material | null,
   CostServices?: Icost_service | null,
@@ -213,14 +213,12 @@ export async function changeOper(
   CostMechanical?: guestAggregate | null,
   CostHandWork?: guest_cost_hand_work | null
 ) {
-  let elem = JSON.parse(JSON.stringify(e));
+  let elem: resTechOperation = JSON.parse(JSON.stringify(e));
+
   if (elem.cell == "costMaterials") {
     if (!CostMaterials) {
-      //@ts-ignore sequelize-znov
-      let costMaterials = await cost_material.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (!costMaterials) return;
+      let costMaterials = elem.cost_material;
+      if (!costMaterials) return elem;
 
       elem.costMaterials =
         costMaterials.price * costMaterials.consumptionPerHectare;
@@ -232,10 +230,7 @@ export async function changeOper(
     }
   } else if (elem.cell == "costTransport") {
     if (!CostTransport) {
-      //@ts-ignore sequelize-znov
-      let costTransport = await cost_transport.findOne({
-        where: { techOperationId: elem.id },
-      });
+      let costTransport = elem.cost_transport;
       if (!costTransport) return;
 
       elem.costTransport = costTransport.price;
@@ -245,11 +240,8 @@ export async function changeOper(
       return elem;
     }
   } else if (elem.cell == "costServices") {
-    //@ts-ignore sequelize-znov
     if (!CostServices) {
-      let costServices = await cost_service.findOne({
-        where: { techOperationId: elem.id },
-      });
+      let costServices = elem.cost_service;
       if (!costServices) return;
       elem.costServices = costServices.price;
       return elem;
@@ -259,20 +251,21 @@ export async function changeOper(
     }
   } else if (elem.cell == "costMechanical") {
     if (!CostMechanical) {
-      //@ts-ignore sequelize-znov
-      const aggregateData = await aggregate.findOne({
-        where: { techOperationId: elem.id },
-      });
-      if (aggregateData == null) throw new Error("");
+      console.log(1);
 
-      const Tractor = await tractor.findOne({
-        where: { id: aggregateData.tractorId },
-      });
-      const machine = await agricultural_machine.findOne({
-        where: { id: aggregateData.agriculturalMachineId },
-      });
+      console.log(elem);
+
+      const aggregateData = elem.aggregate;
+      if (aggregateData == null) throw new Error();
+
+      const Tractor = aggregateData.tractor;
+      const machine = aggregateData.agricultural_machine;
+
       const Grade = await grade.findAll();
-      const cart = await tech_cart.findOne({ where: { id: cartId } });
+      const cart = await tech_cart.findOne({
+        where: { id: cartId },
+      });
+
       if (Tractor == null || machine == null || cart == null || Grade == null)
         throw new Error("");
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
@@ -349,10 +342,7 @@ export async function changeOper(
     }
   } else if (elem.cell == "costHandWork") {
     if (!CostHandWork) {
-      //@ts-ignore sequelize-znov
-      const handWork = await cost_hand_work.findOne({
-        where: { techOperationId: elem.id },
-      });
+      const handWork = elem.cost_hand_work;
       let costHandWork;
       if (!handWork) return;
       const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
@@ -777,7 +767,6 @@ class OperService {
   ) {
     const {
       cartId,
-
       arr: {
         cell,
         res: { operId, nameOper, price, unitsOfCost },

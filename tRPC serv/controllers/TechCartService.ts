@@ -12,8 +12,10 @@ import {
   Icost_material,
   Icost_service,
   Icost_transport,
+  Imachine,
   Itech_cart,
   Itech_operation,
+  Itractor,
   tech_cart,
   tech_operation,
   tractor,
@@ -95,9 +97,12 @@ export interface Idata {
   ];
   userId?: number;
 }
-
+interface resTechOperationAggreagte extends Iaggregate {
+  tractor: Itractor;
+  agricultural_machine: Imachine;
+}
 export interface resTechOperation extends Itech_operation {
-  aggregate: Iaggregate | null;
+  aggregate: resTechOperationAggreagte | null;
   cost_hand_work: Icost_hand_work | null;
   cost_material: Icost_material | null;
   cost_service: Icost_service | null;
@@ -125,6 +130,7 @@ export async function getCart(userId: string | undefined) {
     carts: [],
   };
   let Scarts: resTechCartsWithOpers[];
+  // console.time("test");
   if (!userId) {
     //@ts-ignore
     Scarts = await tech_cart.findAll({
@@ -136,7 +142,7 @@ export async function getCart(userId: string | undefined) {
             cost_service,
             cost_transport,
             cost_hand_work,
-            aggregate,
+            { model: aggregate, include: [tractor, agricultural_machine] },
           ],
         },
       ],
@@ -153,23 +159,29 @@ export async function getCart(userId: string | undefined) {
             cost_service,
             cost_transport,
             cost_hand_work,
-            aggregate,
+            { model: aggregate, include: [tractor, agricultural_machine] },
           ],
         },
       ],
       where: { userId: userId },
     });
   }
+  // console.timeLog("test", "getCarts");
   Scarts.sort((a, b) => a.id! - b.id!);
+  // console.log(Scarts);
+
   const carts = JSON.parse(JSON.stringify(Scarts));
+  // console.log(carts);
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let sum: number = 0;
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
+      // console.timeLog("test", "changeOper" + i + " " + j);
 
-      //@ts-ignore sequelize-znov
       let el = await changeOper(oper, oper.techCartId!);
+      if (!el) throw new Error("");
+
       cart.tech_operations[j] = el;
       sum +=
         el.costMachineWork! + el.costCars! + el.costFuel! + el.costHandWork! ||
@@ -181,7 +193,7 @@ export async function getCart(userId: string | undefined) {
     }
     cart.totalCost = sum;
   }
-
+  // console.timeLog("test", "calculation");
   res = { carts };
 
   //@ts-ignore
@@ -212,6 +224,8 @@ async function guestPatchCart(data: Idata) {
         salary: cart.salary,
       } as guest_cost_hand_work | null
     );
+    if (!el) throw new Error("");
+
     sum +=
       el.costMachineWork! + el.costCars! + el.costFuel! + el.costHandWork! ||
       el.costHandWork ||
