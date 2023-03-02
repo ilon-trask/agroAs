@@ -9,29 +9,29 @@ import {
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 
-// export interface Iuser {
-//   id?: number;
-//   email: string;
-//   password: string;
-//   role: number;
-// }
+export interface Iuser {
+  id?: number;
+  email: string;
+  password: string;
+  role: number;
+}
 
-// export class user extends Model<Iuser> {
-//   declare id: number;
-//   declare email: string;
-//   declare password: string;
-//   declare role: number;
-// }
+export class user extends Model<Iuser> {
+  declare id: number;
+  declare email: string;
+  declare password: string;
+  declare role: number;
+}
 
-// user.init(
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     email: { type: DataTypes.STRING, unique: true },
-//     password: { type: DataTypes.STRING },
-//     role: { type: DataTypes.STRING, defaultValue: "USER" },
-//   },
-//   { sequelize }
-// );
+user.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    email: { type: DataTypes.STRING, unique: true },
+    password: { type: DataTypes.STRING },
+    role: { type: DataTypes.STRING, defaultValue: "USER" },
+  },
+  { sequelize }
+);
 
 export interface Itech_cart {
   id?: number;
