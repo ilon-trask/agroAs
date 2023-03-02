@@ -1,4 +1,5 @@
 import Auth from "./pages/Auth";
+import CalendarPage from "./pages/CalenderPage";
 import MapJornal from "./pages/MapJornal";
 import TechnologicalMap from "./pages/TechnologicalMap";
 import {
@@ -6,6 +7,7 @@ import {
   REGISTRATION_ROUTE,
   MAP_ROUTE,
   TEHMAP_ROUTER,
+  CALENDAR_ROUTER,
 } from "./utils/consts";
 
 export const authRoutes = [];
@@ -26,5 +28,9 @@ export const publicRoutes = [
   {
     path: TEHMAP_ROUTER + "/:id",
     Component: <TechnologicalMap />,
+  },
+  {
+    path: CALENDAR_ROUTER + "/:id",
+    Component: <CalendarPage />,
   },
 ];

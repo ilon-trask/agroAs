@@ -124,16 +124,10 @@ export default function OpersTableItem({
       >
         <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
       </Td>
+      <Td></Td>
       <Td>{el.nameOperation}</Td>
       <Td>{mapData.area}</Td>
       <Td>{"га"}</Td>
-      <Td>{el.costCars! * mapData.area || "0"}</Td>
-      <Td>{el.costFuel! * mapData.area || "0"}</Td>
-      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
-      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
-      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
-      <Td>{el.costTransport! * mapData.area || "0"}</Td>
-      <Td>{el.costServices! * mapData.area || "0"}</Td>
       <Td>
         {+mapData.area *
           (el.costMaterials ||
@@ -145,6 +139,14 @@ export default function OpersTableItem({
               +el.costMachineWork! ||
             el.costHandWork!)}
       </Td>
+      <Td>{el.costCars! * mapData.area || "0"}</Td>
+      <Td>{el.costFuel! * mapData.area || "0"}</Td>
+      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
+      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
+      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
+      <Td>{el.costTransport! * mapData.area || "0"}</Td>
+      <Td>{el.costServices! * mapData.area || "0"}</Td>
+
       <Td
         className={style.delete}
         onClick={

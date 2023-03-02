@@ -57,22 +57,22 @@ const MapJornal = observer(function () {
             setDeleteOpen={setDeleteOpen}
           ></CartsTable>
         </TableContainer>
-        <Button
-          ml={"auto"}
-          mr={"0"}
-          mt={"15px"}
-          onClick={
-            user.role == ""
-              ? () => {
-                  setShowAlert(true);
-                }
-              : () => {
-                  setOpen(true);
-                }
-          }
-        >
-          Добавити технологічну карту
-        </Button>
+        <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+          <Button
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setOpen(true);
+                  }
+            }
+          >
+            Добавити технологічну карту
+          </Button>
+          <Button>Скопіювати з журналу</Button>
+        </Box>
         <CreateCart
           open={open}
           setOpen={setOpen}
