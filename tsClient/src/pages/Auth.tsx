@@ -5,6 +5,7 @@ import { getCarts, supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
 import { Context } from "../main";
+import { Box } from "@chakra-ui/react";
 export default function AuthPage() {
   const location = useLocation().pathname;
   const { map, user } = useContext(Context);
@@ -26,7 +27,12 @@ export default function AuthPage() {
   });
   const [isHover, setIsHover] = useState<boolean>(false);
   return (
-    <div className={style.auth}>
+    <Box
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      height={"90vh"}
+    >
       <div style={{ maxWidth: "600px" }}>
         <Auth
           supabaseClient={supabase}
@@ -91,6 +97,6 @@ export default function AuthPage() {
           Зайти без реєсрації
         </p>
       </div>
-    </div>
+    </Box>
   );
 }

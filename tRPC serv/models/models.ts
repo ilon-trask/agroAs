@@ -8,6 +8,7 @@ import {
 
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
+import { resTechCartsWithOpers } from "../controllers/TechCartService";
 
 export interface Iuser {
   id?: number;
@@ -42,8 +43,10 @@ export interface Itech_cart {
   priceDiesel: number;
   isPublic?: boolean;
   userId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
-export class tech_cart extends Model<Itech_cart> {
+export class tech_cart extends Model<resTechCartsWithOpers> {
   declare id: number;
   declare nameCart: string;
   declare area: number;

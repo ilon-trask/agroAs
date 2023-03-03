@@ -8,7 +8,6 @@ import { Icost_hand_work } from "../../../tRPC serv/models/models";
 import { createOperation, patchOperation } from "../http/requests";
 import { Context } from "../main";
 import { func, InputProps } from "./Dialog";
-import style from "./Input.module.css";
 import {
   Box,
   Heading,
@@ -188,7 +187,7 @@ const HandWork = observer(
               });
             }}
           />
-          <div
+          <Box
             onClick={() => {
               setRes({
                 ...res,
@@ -217,7 +216,7 @@ const HandWork = observer(
                 м²/год
               </Heading>
             </Box>
-          </div>
+          </Box>
         </Box>
         <Box
           justifyContent={"center"}
@@ -249,7 +248,7 @@ const HandWork = observer(
             }}
           />
           <div>
-            <Box display={"flex"}>
+            <Box display={"flex"} gap={"15px"}>
               <div>
                 <Heading as={"h4"} size="sm" minW={"max-content"}>
                   Норма виробітку ваги
@@ -324,7 +323,7 @@ const HandWork = observer(
             }}
           />
           <div>
-            <Box display={"flex"}>
+            <Box display={"flex"} gap={"15px"}>
               <div>
                 <Heading as={"h4"} size="sm" minW={"max-content"}>
                   Норма виробітку кількість

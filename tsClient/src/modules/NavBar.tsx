@@ -3,14 +3,13 @@ import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
-import style from "./NavBar.module.css";
 import { getCarts, supabase } from "../http/requests";
 import { Button, Box } from "@chakra-ui/react";
 
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
   return (
-    <Box className={style.bg} py={"10px"}>
+    <Box bgColor={"#0f1014"} py={"10px"}>
       <Box
         px={"40px"}
         display={"flex"}

@@ -15,7 +15,6 @@ import {
   Itech_cart,
   Itech_operation,
   Itractor,
-  tech_cart,
   tech_operation,
   tractor,
 } from "../../../tRPC serv/models/models";
@@ -23,9 +22,6 @@ import {
 // dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
-import { cartProps } from "../modules/CreateCart";
-import { TracProps } from "../modules/CreateTractor";
-import { MachineProps } from "../modules/CreateMachine";
 
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -381,4 +377,12 @@ export function getGrades(map: MapStore) {
   client.grade.get.query().then((data: Igrade[]) => {
     map.grade = data;
   });
+}
+export function getCopyCarts(map: MapStore) {
+  client.cart.getCopyCarts
+    .query()
+    .then((data: Itech_cart[]) => (map.copyCarts = data));
+}
+export function makeCopyCarts(cartId: number) {
+  client.cart.makeCopy.query({ cartId }).then((el) => console.log(el));
 }

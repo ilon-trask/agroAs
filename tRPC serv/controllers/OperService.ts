@@ -214,6 +214,7 @@ export async function changeOper(
   CostHandWork?: guest_cost_hand_work | null
 ) {
   let elem: resTechOperation = JSON.parse(JSON.stringify(e));
+  console.log(elem);
 
   if (elem.cell == "costMaterials") {
     if (!CostMaterials) {
@@ -251,10 +252,6 @@ export async function changeOper(
     }
   } else if (elem.cell == "costMechanical") {
     if (!CostMechanical) {
-      console.log(1);
-
-      console.log(elem);
-
       const aggregateData = elem.aggregate;
       if (aggregateData == null) throw new Error();
 
@@ -276,9 +273,10 @@ export async function changeOper(
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) / rareOfProduction
       );
+      //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
       const costCars = Math.round(
         ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
+          +machine.marketCost / +machine.depreciationPeri / 220 / 8) *
           1.05) /
           rareOfProduction
       );
@@ -289,11 +287,12 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
-          (machine.numberOfServicePersonnel ?? 0) *
+          (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
 
       elem.costMachineWork = costMachineWork;
+
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
@@ -330,7 +329,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
-          (machine.numberOfServicePersonnel ?? 0) *
+          (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
 

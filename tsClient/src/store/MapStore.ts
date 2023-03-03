@@ -26,6 +26,7 @@ export default class MapStore {
   private _costMechanical: Iaggregate[] = [];
   private _costHandWork: Icost_hand_work[] = [];
   private _grade: Igrade[] = [];
+  private _copyCarts: Itech_cart[] = [];
   public isLoading: boolean = true;
   constructor() {
     makeAutoObservable(this);
@@ -91,6 +92,9 @@ export default class MapStore {
   public set grade(grade: Igrade[]) {
     this._grade = grade;
   }
+  public set copyCarts(carts: Itech_cart[]) {
+    this._copyCarts = carts;
+  }
   public get maps() {
     return this._maps;
   }
@@ -123,5 +127,8 @@ export default class MapStore {
   }
   get grade() {
     return this._grade;
+  }
+  public get copyCarts() {
+    return this._copyCarts;
   }
 }
