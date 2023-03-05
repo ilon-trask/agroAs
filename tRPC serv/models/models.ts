@@ -73,6 +73,7 @@ tech_cart.init(
 export interface Itech_operation {
   id?: number;
   nameOperation: string;
+  date?: string | null;
   cell: Icell;
   costCars?: number;
   costFuel?: number;
@@ -83,6 +84,8 @@ export interface Itech_operation {
   costServices?: number;
   techCartId?: number;
   sectionId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export class tech_operation extends Model<Itech_operation> {
@@ -98,6 +101,7 @@ tech_operation.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameOperation: { type: DataTypes.STRING },
     cell: { type: DataTypes.STRING, allowNull: false },
+    date: { type: DataTypes.STRING },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -329,6 +333,8 @@ export interface Iaggregate {
   techOperationId?: number;
   tractorId?: number;
   agriculturalMachineId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export class aggregate extends Model<Iaggregate> {

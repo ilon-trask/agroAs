@@ -32,7 +32,9 @@ const createMaterials: func<MaterialsProps> = function (
   if (
     res.nameOper == "" ||
     res.price == "" ||
-    res.consumptionPerHectare == ""
+    res.consumptionPerHectare == "" ||
+    res.unitsOfCost == "" ||
+    res.unitsOfConsumption == ""
   ) {
     setIsErr(true);
   } else {
@@ -41,6 +43,7 @@ const createMaterials: func<MaterialsProps> = function (
     setCell!("");
     setRes(materialsProps);
     setIsErr(false);
+    setSection!("");
     res.consumptionPerHectare = +res.consumptionPerHectare;
     res.price = +res.price;
     if (cell == "") return;
@@ -82,7 +85,7 @@ const Easy = observer(
             mx={"auto"}
           >
             <Heading as={"h4"} size="sm" minW={"max-content"} mr={"20px"}>
-              Назва операції
+              Назва матеріалу
             </Heading>
             <Input
               size={"sm"}
@@ -92,6 +95,25 @@ const Easy = observer(
               onChange={(e) => {
                 setRes({ ...res, nameOper: e.target.value });
               }}
+            />
+          </Box>
+          <Box
+            display={"flex"}
+            justifyContent={"space-evenly"}
+            alignItems={"center"}
+            maxW={"490px"}
+            mx={"auto"}
+            mt={"10px"}
+          >
+            <Heading as={"h4"} size="sm" minW={"max-content"} mr={"20px"}>
+              Дата використання
+            </Heading>
+            <Input
+              placeholder="Select Date and Time"
+              size="sm"
+              type="date"
+              value={res.date}
+              onChange={(e) => setRes({ ...res, date: e.target.value })}
             />
           </Box>
           <Box

@@ -96,15 +96,19 @@ const DevicePage = observer(() => {
             >
               Додати технологічну операцію
             </Button>
-            <Button
-              onClick={() => {
-                console.log(CALENDAR_ROUTER + "/" + id);
+            {user.role == "ADMIN" ? (
+              <Button
+                onClick={() => {
+                  console.log(CALENDAR_ROUTER + "/" + id);
 
-                navigate(CALENDAR_ROUTER + "/" + id);
-              }}
-            >
-              Створити календар робіт
-            </Button>
+                  navigate(CALENDAR_ROUTER + "/" + id);
+                }}
+              >
+                Створити календар робіт
+              </Button>
+            ) : (
+              ""
+            )}
           </Box>
         </div>
         <OperSection

@@ -19,27 +19,10 @@ import {
   Input,
   Radio,
 } from "@chakra-ui/react";
-export type CostHandWorkProps = {
-  nameOper: string;
-  gradeId: number | string;
-  type: number | string;
-  productionRateAmount: number | string;
-  productionRateWeight: number | string;
-  yieldСapacity: number | string;
-  spending: number | string;
-  productionRateTime: number | string;
-};
-
-const costHandWorkProps: CostHandWorkProps = {
-  nameOper: "",
-  gradeId: "",
-  type: 1,
-  productionRateAmount: "",
-  productionRateWeight: "",
-  yieldСapacity: "",
-  spending: "",
-  productionRateTime: "",
-};
+import {
+  costHandWorkProps,
+  CostHandWorkProps,
+} from "../modules/CreateCostHandWork";
 
 const createCostHandWorkFunc: func<CostHandWorkProps> = (
   id,
@@ -69,6 +52,7 @@ const createCostHandWorkFunc: func<CostHandWorkProps> = (
     setRes(costHandWorkProps);
     setSection!("");
     setIsErr(false);
+    setSection!("");
     res.spending = +res.spending!;
     res.yieldСapacity = +res.yieldСapacity!;
     res.gradeId = +res.gradeId!;
@@ -143,6 +127,25 @@ const HandWork = observer(
         </Box>
         <Box
           display={"flex"}
+          gap={3}
+          maxW={"490px"}
+          mt={"10px"}
+          alignItems={"center"}
+          mx={"auto"}
+        >
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Дата початку
+          </Heading>
+          <Input
+            placeholder="Select Date and Time"
+            size="sm"
+            type="date"
+            value={res.date}
+            onChange={(e) => setRes({ ...res, date: e.target.value })}
+          />
+        </Box>
+        <Box
+          display={"flex"}
           maxW={"490px"}
           mx={"auto"}
           mt={"10px"}
@@ -169,7 +172,7 @@ const HandWork = observer(
           </Select>
         </Box>
 
-        <Box display={"flex"} mt={"15px"} justifyContent={"center"}>
+        <Box display={"flex"} mt={"15px"} maxW={"490px"} mx={"auto"}>
           <Radio
             color={"gray.400"}
             mr={"5px"}
@@ -222,6 +225,8 @@ const HandWork = observer(
           justifyContent={"center"}
           mt={"15px"}
           display={"flex"}
+          maxW={"490px"}
+          mx={"auto"}
           onClick={() => {
             setRes({
               ...res,
@@ -297,6 +302,8 @@ const HandWork = observer(
           justifyContent={"center"}
           mt={"10px"}
           display={"flex"}
+          maxW={"490px"}
+          mx={"auto"}
           onClick={() => {
             setRes({
               ...res,

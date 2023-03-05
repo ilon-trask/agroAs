@@ -136,25 +136,7 @@ const cartsIncludes = [
     ],
   },
 ];
-export async function getCart(userId: string | undefined) {
-  let res: { carts: resTechCartsWithOpers[] } = {
-    carts: [],
-  };
-  let Scarts: resTechCartsWithOpers[];
-  if (!userId) {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { isPublic: true },
-    });
-  } else {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { userId: userId },
-    });
-  }
-
+async function changeCart(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
 
   const carts = JSON.parse(JSON.stringify(Scarts));
@@ -179,8 +161,28 @@ export async function getCart(userId: string | undefined) {
 
     cart.totalCost = sum;
   }
+  return carts;
+}
+export async function getCart(userId: string | undefined) {
+  let res: { carts: resTechCartsWithOpers[] } = {
+    carts: [],
+  };
+  let Scarts: resTechCartsWithOpers[];
+  if (!userId) {
+    //@ts-ignore
+    Scarts = await tech_cart.findAll({
+      include: cartsIncludes,
+      where: { isPublic: true },
+    });
+  } else {
+    //@ts-ignore
+    Scarts = await tech_cart.findAll({
+      include: cartsIncludes,
+      where: { userId: userId },
+    });
+  }
 
-  res = { carts };
+  res = { carts: await changeCart(Scarts) };
 
   //@ts-ignore
   return res;
@@ -191,6 +193,7 @@ async function guestPatchCart(data: Idata) {
   const Scart: resTechCartsWithOpers = data;
   const cart: resTechCartsWithOpers = JSON.parse(JSON.stringify(Scart));
   let sum = 0;
+  if (!cart.tech_operations) return;
   for (let j = 0; j < cart.tech_operations.length; j++) {
     let oper: resTechOperation = cart.tech_operations[j];
 
@@ -277,7 +280,14 @@ class TechCartService {
     if (user.role != "ADMIN") return;
     const { id, isPublic } = data;
     tech_cart.update({ isPublic }, { where: { id } });
-    return getCart(user?.sub);
+    //@ts-ignore
+    let cart: resTechCartsWithOpers[] = await tech_cart.findAll({
+      where: { id },
+      include: cartsIncludes,
+    });
+
+    cart = await changeCart(JSON.parse(JSON.stringify(cart)));
+    return cart;
   }
   async getCopyCarts(user: Principal | undefined) {
     if (!user) return;
@@ -296,155 +306,181 @@ class TechCartService {
       JSON.stringify(cartsData)
     );
 
-    let carts;
     if (!cartsBefore) return;
-    console.log(123);
     if (!cartsBefore[0].tech_operations) return;
-    console.log(123);
+    let cartIn;
+    for (let i = 0; i < cartsBefore.length; i++) {
+      const el = cartsBefore[i];
 
-    cartsBefore.forEach(async (el) => {
-      console.log(123);
       if (!el.tech_operations) return;
-      console.log(123);
+      console.log(23213);
 
-      carts = await tech_cart.create(
-        {
-          area: el.area,
-          nameCart: el.nameCart,
-          isPublic: false,
-          priceDiesel: el.priceDiesel,
-          salary: el.salary,
-          userId: user.sub,
-          createdAt: el.createdAt,
-          updatedAt: el.updatedAt,
-          tech_operations: el.tech_operations.map((el) => {
-            if (el.cell == "costMechanical")
-              console.log(el.aggregate?.workingSpeed!);
+      cartIn = JSON.parse(
+        JSON.stringify(
+          await tech_cart.create(
+            {
+              area: el.area,
+              nameCart: el.nameCart,
+              isPublic: false,
+              priceDiesel: el.priceDiesel,
+              salary: el.salary,
+              userId: user.sub,
+              createdAt: el.createdAt,
+              updatedAt: el.updatedAt,
+              tech_operations: el.tech_operations.map((el) => {
+                if (el.cell == "costMechanical")
+                  console.log(el.aggregate?.workingSpeed!);
 
-            return {
-              nameOperation: el.nameOperation,
-              sectionId: el.sectionId,
-              cell: el.cell,
-              ...(el.cell == "costMechanical"
-                ? {
-                    aggregate: {
-                      agriculturalMachineId:
-                        el.aggregate?.agriculturalMachineId,
-                      amountOfMachineDepreciationPerHour:
-                        el.aggregate?.amountOfMachineDepreciationPerHour,
-                      amountOfTractorDepreciationPerHour:
-                        el.aggregate?.amountOfTractorDepreciationPerHour,
-                      fuelConsumption: el.aggregate?.fuelConsumption!,
-                      pricePerHourDiesel: el.aggregate?.pricePerHourDiesel,
-                      pricePerHourServicePersonnel:
-                        el.aggregate?.pricePerHourServicePersonnel,
-                      tractorId: el.aggregate?.tractorId,
-                      unitProductionAggregate:
-                        el.aggregate?.unitProductionAggregate,
-                      workingSpeed: el.aggregate?.workingSpeed!,
-                      createdAt: el.createdAt,
-                      updatedAt: el.updatedAt,
-                      tractor: {
-                        brand: el.aggregate?.tractor?.brand,
-                        depreciationPeriod:
-                          el.aggregate?.tractor?.depreciationPeriod,
-                        enginePower: el.aggregate?.tractor?.enginePower,
-                        fuelConsumption: el.aggregate?.tractor?.fuelConsumption,
-                        marketCost: el.aggregate?.tractor?.marketCost,
-                        nameTractor: el.aggregate?.tractor?.nameTractor,
-                        numberOfPersonnel:
-                          el.aggregate?.tractor?.numberOfPersonnel,
-                        gradeId: el.aggregate?.tractor?.gradeId,
-                        userId: user.sub,
-                        createdAt: el.createdAt,
-                        updatedAt: el.updatedAt,
-                      },
-                      agricultural_machine: {
-                        brand: el.aggregate?.agricultural_machine?.brand,
-                        depreciationPeriod:
-                          el.aggregate?.agricultural_machine?.depreciationPeri,
-                        marketCost:
-                          el.aggregate?.agricultural_machine?.marketCost,
-                        nameMachine:
-                          el.aggregate?.agricultural_machine?.nameMachine,
-                        numberOfServicePersonnel:
-                          el.aggregate?.agricultural_machine?.numberOfServiceP,
-                        widthOfCapture:
-                          el.aggregate?.agricultural_machine?.widthOfCapture,
-                        workingSpeed:
-                          el.aggregate?.agricultural_machine?.workingSpeed,
-                        gradeId: el.aggregate?.agricultural_machine?.gradeId,
-                        userId: user.sub,
-                        createdAt: el.createdAt,
-                        updatedAt: el.updatedAt,
-                      },
-                    },
-                  }
-                : el.cell == "costHandWork"
-                ? {
-                    cost_hand_work: {
-                      gradeId: el.cost_hand_work?.gradeId,
-                      nameOper: el.cost_hand_work?.nameOper,
-                      pricePerHourPersonnel:
-                        el.cost_hand_work?.pricePerHourPersonnel,
-                      productionPerShift: el.cost_hand_work?.productionPerShift,
-                      productionRateAmount:
-                        el.cost_hand_work?.productionRateAmount,
-                      productionRateTime: el.cost_hand_work?.productionRateTime,
-                      productionRateWeight:
-                        el.cost_hand_work?.productionRateWeight,
-                      salaryPerShift: el.cost_hand_work?.salaryPerShift,
-                      spending: el.cost_hand_work?.spending,
-                      type: el.cost_hand_work?.type,
-                      yieldСapacity: el.cost_hand_work?.yieldСapacity,
-                      unitOfMeasurement: el.cost_hand_work?.unitOfMeasurement,
-                      createdAt: el.createdAt,
-                      updatedAt: el.updatedAt,
-                    },
-                  }
-                : el.cell == "costMaterials"
-                ? {
-                    cost_material: {
-                      consumptionPerHectare:
-                        el.cost_material?.consumptionPerHectare,
-                      nameMaterials: el.cost_material?.nameMaterials,
-                      nameOper: el.cost_material?.nameOper,
-                      price: el.cost_material?.price,
-                      unitsOfConsumption: el.cost_material?.unitsOfConsumption,
-                      unitsOfCost: el.cost_material?.unitsOfCost,
-                      createdAt: el.createdAt,
-                      updatedAt: el.updatedAt,
-                    },
-                  }
-                : el.cell == "costServices"
-                ? {
-                    cost_service: {
-                      nameService: el.cost_service?.nameService,
-                      price: el.cost_service?.price,
-                      unitsOfCost: el.cost_service?.unitsOfCost,
-                      createdAt: el.createdAt,
-                      updatedAt: el.updatedAt,
-                    },
-                  }
-                : el.cell == "costTransport"
-                ? {
-                    cost_transport: {
-                      nameTransport: el.cost_transport?.nameTransport,
-                      price: el.cost_transport?.price,
-                      unitsOfCost: el.cost_transport?.unitsOfCost,
-                      createdAt: el.createdAt,
-                      updatedAt: el.updatedAt,
-                    },
-                  }
-                : {}),
-            };
-          }),
-        },
-        { include: cartsIncludes }
+                return {
+                  nameOperation: el.nameOperation,
+                  sectionId: el.sectionId,
+                  cell: el.cell,
+                  ...(el.cell == "costMechanical"
+                    ? {
+                        aggregate: {
+                          agriculturalMachineId:
+                            el.aggregate?.agriculturalMachineId,
+                          amountOfMachineDepreciationPerHour:
+                            el.aggregate?.amountOfMachineDepreciationPerHour,
+                          amountOfTractorDepreciationPerHour:
+                            el.aggregate?.amountOfTractorDepreciationPerHour,
+                          fuelConsumption: el.aggregate?.fuelConsumption!,
+                          pricePerHourDiesel: el.aggregate?.pricePerHourDiesel,
+                          pricePerHourServicePersonnel:
+                            el.aggregate?.pricePerHourServicePersonnel,
+                          tractorId: el.aggregate?.tractorId,
+                          unitProductionAggregate:
+                            el.aggregate?.unitProductionAggregate,
+                          workingSpeed: el.aggregate?.workingSpeed!,
+                          createdAt: el.createdAt,
+                          updatedAt: el.updatedAt,
+                          tractor: {
+                            brand: el.aggregate?.tractor?.brand,
+                            depreciationPeriod:
+                              el.aggregate?.tractor?.depreciationPeriod,
+                            enginePower: el.aggregate?.tractor?.enginePower,
+                            fuelConsumption:
+                              el.aggregate?.tractor?.fuelConsumption,
+                            marketCost: el.aggregate?.tractor?.marketCost,
+                            nameTractor: el.aggregate?.tractor?.nameTractor,
+                            numberOfPersonnel:
+                              el.aggregate?.tractor?.numberOfPersonnel,
+                            gradeId: el.aggregate?.tractor?.gradeId,
+                            userId: user.sub,
+                            createdAt: el.createdAt,
+                            updatedAt: el.updatedAt,
+                          },
+                          agricultural_machine: {
+                            brand: el.aggregate?.agricultural_machine?.brand,
+                            depreciationPeriod:
+                              el.aggregate?.agricultural_machine
+                                ?.depreciationPeri,
+                            marketCost:
+                              el.aggregate?.agricultural_machine?.marketCost,
+                            nameMachine:
+                              el.aggregate?.agricultural_machine?.nameMachine,
+                            numberOfServicePersonnel:
+                              el.aggregate?.agricultural_machine
+                                ?.numberOfServiceP,
+                            widthOfCapture:
+                              el.aggregate?.agricultural_machine
+                                ?.widthOfCapture,
+                            workingSpeed:
+                              el.aggregate?.agricultural_machine?.workingSpeed,
+                            gradeId:
+                              el.aggregate?.agricultural_machine?.gradeId,
+                            userId: user.sub,
+                            createdAt: el.createdAt,
+                            updatedAt: el.updatedAt,
+                          },
+                        },
+                      }
+                    : el.cell == "costHandWork"
+                    ? {
+                        cost_hand_work: {
+                          gradeId: el.cost_hand_work?.gradeId,
+                          nameOper: el.cost_hand_work?.nameOper,
+                          pricePerHourPersonnel:
+                            el.cost_hand_work?.pricePerHourPersonnel,
+                          productionPerShift:
+                            el.cost_hand_work?.productionPerShift,
+                          productionRateAmount:
+                            el.cost_hand_work?.productionRateAmount,
+                          productionRateTime:
+                            el.cost_hand_work?.productionRateTime,
+                          productionRateWeight:
+                            el.cost_hand_work?.productionRateWeight,
+                          salaryPerShift: el.cost_hand_work?.salaryPerShift,
+                          spending: el.cost_hand_work?.spending,
+                          type: el.cost_hand_work?.type,
+                          yieldСapacity: el.cost_hand_work?.yieldСapacity,
+                          unitOfMeasurement:
+                            el.cost_hand_work?.unitOfMeasurement,
+                          createdAt: el.createdAt,
+                          updatedAt: el.updatedAt,
+                        },
+                      }
+                    : el.cell == "costMaterials"
+                    ? {
+                        cost_material: {
+                          consumptionPerHectare:
+                            el.cost_material?.consumptionPerHectare,
+                          nameMaterials: el.cost_material?.nameMaterials,
+                          nameOper: el.cost_material?.nameOper,
+                          price: el.cost_material?.price,
+                          unitsOfConsumption:
+                            el.cost_material?.unitsOfConsumption,
+                          unitsOfCost: el.cost_material?.unitsOfCost,
+                          createdAt: el.createdAt,
+                          updatedAt: el.updatedAt,
+                        },
+                      }
+                    : el.cell == "costServices"
+                    ? {
+                        cost_service: {
+                          nameService: el.cost_service?.nameService,
+                          price: el.cost_service?.price,
+                          unitsOfCost: el.cost_service?.unitsOfCost,
+                          createdAt: el.createdAt,
+                          updatedAt: el.updatedAt,
+                        },
+                      }
+                    : el.cell == "costTransport"
+                    ? {
+                        cost_transport: {
+                          nameTransport: el.cost_transport?.nameTransport,
+                          price: el.cost_transport?.price,
+                          unitsOfCost: el.cost_transport?.unitsOfCost,
+                          createdAt: el.createdAt,
+                          updatedAt: el.updatedAt,
+                        },
+                      }
+                    : {}),
+                };
+              }),
+            },
+            { include: cartsIncludes }
+          )
+        )
       );
-    });
+      console.log(24);
+      console.log(cartIn);
+    }
+    console.log(12312);
+    console.log(cartIn);
 
-    return carts;
+    let cart1 = JSON.parse(
+      JSON.stringify(
+        await tech_cart.findAll({
+          include: cartsIncludes,
+          where: { id: cartIn.id },
+        })
+      )
+    );
+    cart1 = changeCart(cart1);
+    console.log(cart1);
+
+    return cart1;
   }
 }
 

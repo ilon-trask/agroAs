@@ -45,6 +45,7 @@ const patch: funcProps = function (
     setRes({
       id: el.id,
       nameOper: el.nameOperation,
+      date: el.date,
       fuelConsumption: second.fuelConsumption,
       idTractor: second.tractorId,
       idMachine: second.agriculturalMachineId,
@@ -60,6 +61,7 @@ const patch: funcProps = function (
       id: el.id,
       gradeId: second.gradeId || "",
       nameOper: second.nameOper || "",
+      date: el.date,
       pricePerHourPersonnel: +second.pricePerHourPersonnel || "",
       productionPerShift: +second.productionPerShift || "",
       productionRaeAmount: +second.productionRateAmount || "",
@@ -77,6 +79,7 @@ const patch: funcProps = function (
     setRes({
       id: el.id,
       nameOper: el.nameOperation,
+      date: el.date,
       price: second.price,
       unitsOfCost: second.unitsOfCost,
       consumptionPerHectare: second.consumptionPerHectare,
@@ -124,7 +127,7 @@ export default function OpersTableItem({
       >
         <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
       </Td>
-      <Td></Td>
+      <Td>{el.date || 0}</Td>
       <Td>{el.nameOperation}</Td>
       <Td>{mapData.area}</Td>
       <Td>{"га"}</Td>

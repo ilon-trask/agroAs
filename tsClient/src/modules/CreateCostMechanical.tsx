@@ -3,6 +3,7 @@ import MechanicalWork from "../components/MechanicalWork";
 import { createOperProps } from "../pages/TechnologicalMap";
 export type MechanicalWorkProps = {
   nameOper: string;
+  date: string;
   idMachine: string | number;
   idTractor: string | number;
   workingSpeed: string | number;
@@ -14,6 +15,7 @@ interface CreateCostMechanicalProps
 }
 export const mechanicalWorkProps: MechanicalWorkProps = {
   nameOper: "",
+  date: "",
   idMachine: "",
   idTractor: "",
   workingSpeed: "",

@@ -53,6 +53,31 @@ const client = createTRPCProxyClient<AppRouter>({
   ],
 });
 
+function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
+  for (let i = 0; i < carts.length; i++) {
+    const cart = carts[i];
+    map.newMap = cart;
+    const opers = carts[i].tech_operations;
+    if (!opers) return;
+    for (let j = 0; j < opers.length; j++) {
+      const oper = opers[j];
+      map.newOper = opers[j];
+
+      if (oper.aggregate) {
+        map.newCostMechanical = oper.aggregate;
+      } else if (oper.cost_service) {
+        map.newCostServices = oper.cost_service;
+      } else if (oper.cost_transport) {
+        map.newCostTransport = oper.cost_transport;
+      } else if (oper.cost_material) {
+        map.newCostMaterials = oper.cost_material;
+      } else if (oper.cost_hand_work) {
+        map.newCostHandWork = oper.cost_hand_work;
+      }
+    }
+  }
+}
+
 function operValue(oper: Itech_operation) {
   return (
     oper.costMachineWork! +
@@ -73,32 +98,13 @@ export async function getCarts(map: MapStore) {
     .query()
     .then((res: { carts: resTechCartsWithOpers[] }) => {
       console.log(res);
-
-      map.opers = [];
+      map.maps = [];
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
       map.costTransport = [];
-      map.maps = res.carts;
-      for (let i = 0; i < res.carts.length; i++) {
-        const opers = res.carts[i].tech_operations;
-        for (let j = 0; j < opers.length; j++) {
-          const oper = opers[j];
-          map.newOper = opers[j];
-
-          if (oper.aggregate) {
-            map.newCostMechanical = oper.aggregate;
-          } else if (oper.cost_service) {
-            map.newCostServices = oper.cost_service;
-          } else if (oper.cost_transport) {
-            map.newCostTransport = oper.cost_transport;
-          } else if (oper.cost_material) {
-            map.newCostMaterials = oper.cost_material;
-          } else if (oper.cost_hand_work) {
-            map.newCostHandWork = oper.cost_hand_work;
-          }
-        }
-      }
+      map.opers = [];
+      operationsFilter(res.carts, map);
     });
   map.isLoading = false;
 }
@@ -114,26 +120,8 @@ export async function setIsPublic(
     map.costMaterials = [];
     map.costServices = [];
     map.costTransport = [];
-    map.maps = res.carts;
-    for (let i = 0; i < res.carts.length; i++) {
-      const opers = res.carts[i].tech_operations;
-      for (let j = 0; j < opers.length; j++) {
-        const oper = opers[j];
-        map.newOper = opers[j];
-
-        if (oper.aggregate) {
-          map.newCostMechanical = oper.aggregate;
-        } else if (oper.cost_service) {
-          map.newCostServices = oper.cost_service;
-        } else if (oper.cost_transport) {
-          map.newCostTransport = oper.cost_transport;
-        } else if (oper.cost_material) {
-          map.newCostMaterials = oper.cost_material;
-        } else if (oper.cost_hand_work) {
-          map.newCostHandWork = oper.cost_hand_work;
-        }
-      }
-    }
+    map.maps = map.maps.filter((el) => el.id != data.id);
+    operationsFilter(res, map);
   });
   map.isLoading = false;
 }
@@ -141,6 +129,8 @@ export async function setIsPublic(
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
   await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
+    console.log(data.id);
+
     map.maps = map.maps.filter((el) => el.id != data.id);
   });
   map.isLoading = false;
@@ -150,7 +140,7 @@ export async function createCart(map: MapStore, data: Itech_cart) {
   map.isLoading = true;
   //@ts-ignore
   await client.cart.create.query(data).then((res: resTechCartsWithOpers) => {
-    map.newMaps = res;
+    map.newMap = res;
   });
   map.isLoading = false;
 }
@@ -170,10 +160,11 @@ export async function updateMap(map: MapStore, dat: any) {
       map.costServices = [];
       map.costTransport = [];
       map.maps = map.maps.filter((el) => el.id != res.carts[0].id);
-      map.newMaps = res.carts[0];
+      map.newMap = res.carts[0];
       map.maps.sort((a, b) => a.id! - b.id!);
       for (let i = 0; i < res.carts.length; i++) {
         const opers = res.carts[i].tech_operations;
+        if (!opers) return;
         for (let j = 0; j < opers.length; j++) {
           const oper = opers[j];
 
@@ -224,6 +215,7 @@ export async function createOperation(
   id: number
 ) {
   map.isLoading = true;
+  console.log(arr.res);
 
   //@ts-ignore
   await client.oper.create[arr.cell]
@@ -273,7 +265,6 @@ export async function patchOperation(
     //@ts-ignore
     .then((res: resTechOperation) => {
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
-
       map.newOper = res;
       let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
 
@@ -284,25 +275,6 @@ export async function patchOperation(
       map.costMaterials = map.costMaterials.filter(
         (el) => el.techOperationId != arr.res.operId
       );
-      let [thisMap] = map.maps.filter((el) => el.id == id);
-      for (let i = 0; i < thisMap.tech_operations.length; i++) {
-        const el = thisMap.tech_operations[i];
-        if (el?.cost_material?.id == res.cost_material?.id) {
-          el.cost_material = res.cost_material;
-        }
-        if (el?.cost_service?.id == res.cost_service?.id) {
-          el.cost_service = res.cost_service;
-        }
-        if (el?.aggregate?.id == res.aggregate?.id) {
-          el.aggregate = res.aggregate;
-        }
-        if (el.cost_hand_work?.id == res.cost_hand_work?.id) {
-          el.cost_hand_work = res.cost_hand_work;
-        }
-        if (el?.cost_transport?.id == res.cost_transport?.id) {
-          el.cost_transport = res.cost_transport;
-        }
-      }
       map.costMechanical = map.costMechanical.filter(
         (el) => el.techOperationId != arr.res.operId
       );
@@ -383,6 +355,8 @@ export function getCopyCarts(map: MapStore) {
     .query()
     .then((data: Itech_cart[]) => (map.copyCarts = data));
 }
-export function makeCopyCarts(cartId: number) {
-  client.cart.makeCopy.query({ cartId }).then((el) => console.log(el));
+export function makeCopyCarts(map: MapStore, cartId: number) {
+  client.cart.makeCopy.query({ cartId }).then((data) => {
+    operationsFilter(data, map);
+  });
 }

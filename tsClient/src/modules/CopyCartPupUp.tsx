@@ -61,7 +61,7 @@ function CopyCartPupUp({ open, setOpen }: props) {
           <Button
             isActive={checked == 0}
             onClick={() => {
-              makeCopyCarts(checked);
+              makeCopyCarts(map, checked);
             }}
           >
             Скопіювати

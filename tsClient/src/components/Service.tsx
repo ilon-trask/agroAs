@@ -40,6 +40,7 @@ const createServices: func<ServiceProps> = function (
     setCell!("");
     setRes(servicesProps);
     setIsErr(false);
+    setSection!("");
     res.price = +res.price;
     if (cell == "") return;
     const request = { cell, res, section };
@@ -91,6 +92,25 @@ const Easy = observer(
             onChange={(e) => {
               setRes({ ...res, nameOper: e.target.value });
             }}
+          />
+        </Box>
+        <Box
+          display={"flex"}
+          gap={3}
+          mt={"10px"}
+          maxW={"490px"}
+          alignItems={"center"}
+          mx={"auto"}
+        >
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Дата початку
+          </Heading>
+          <Input
+            placeholder="Select Date and Time"
+            size="sm"
+            type="date"
+            value={res.date}
+            onChange={(e) => setRes({ ...res, date: e.target.value })}
           />
         </Box>
         <Box

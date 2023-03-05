@@ -35,7 +35,7 @@ export default class MapStore {
   public set maps(maps) {
     this._maps = maps;
   }
-  public set newMaps(maps: resTechCartsWithOpers) {
+  public set newMap(maps: resTechCartsWithOpers) {
     this._maps.push(maps);
   }
   public set opers(opers: Itech_operation[]) {
