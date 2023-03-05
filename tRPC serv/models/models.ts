@@ -8,30 +8,31 @@ import {
 
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
+import { resTechCartsWithOpers } from "../controllers/TechCartService";
 
-// export interface Iuser {
-//   id?: number;
-//   email: string;
-//   password: string;
-//   role: number;
-// }
+export interface Iuser {
+  id?: number;
+  email: string;
+  password: string;
+  role: number;
+}
 
-// export class user extends Model<Iuser> {
-//   declare id: number;
-//   declare email: string;
-//   declare password: string;
-//   declare role: number;
-// }
+export class user extends Model<Iuser> {
+  declare id: number;
+  declare email: string;
+  declare password: string;
+  declare role: number;
+}
 
-// user.init(
-//   {
-//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//     email: { type: DataTypes.STRING, unique: true },
-//     password: { type: DataTypes.STRING },
-//     role: { type: DataTypes.STRING, defaultValue: "USER" },
-//   },
-//   { sequelize }
-// );
+user.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    email: { type: DataTypes.STRING, unique: true },
+    password: { type: DataTypes.STRING },
+    role: { type: DataTypes.STRING, defaultValue: "USER" },
+  },
+  { sequelize }
+);
 
 export interface Itech_cart {
   id?: number;
@@ -42,8 +43,10 @@ export interface Itech_cart {
   priceDiesel: number;
   isPublic?: boolean;
   userId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
-export class tech_cart extends Model<Itech_cart> {
+export class tech_cart extends Model<resTechCartsWithOpers> {
   declare id: number;
   declare nameCart: string;
   declare area: number;
@@ -70,6 +73,7 @@ tech_cart.init(
 export interface Itech_operation {
   id?: number;
   nameOperation: string;
+  date?: string | null;
   cell: Icell;
   costCars?: number;
   costFuel?: number;
@@ -80,6 +84,8 @@ export interface Itech_operation {
   costServices?: number;
   techCartId?: number;
   sectionId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export class tech_operation extends Model<Itech_operation> {
@@ -95,6 +101,7 @@ tech_operation.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nameOperation: { type: DataTypes.STRING },
     cell: { type: DataTypes.STRING, allowNull: false },
+    date: { type: DataTypes.STRING },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -326,6 +333,8 @@ export interface Iaggregate {
   techOperationId?: number;
   tractorId?: number;
   agriculturalMachineId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export class aggregate extends Model<Iaggregate> {

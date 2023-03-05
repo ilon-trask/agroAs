@@ -48,6 +48,7 @@ const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
     setOpen(false);
     setCell!("");
     setRes(mechanicalWorkProps);
+    setSection!("");
     res.idMachine = +res.idMachine;
     res.idTractor = +res.idTractor;
     res.workingSpeed = +res.workingSpeed;
@@ -115,8 +116,8 @@ const MechanicalWork = observer(
             Внесіть дані для розрахунку
           </Heading>
           <Box mt={"15px"} w={"590px"} mx={"auto"}>
-            <Box display={"flex"}>
-              <Heading as={"h4"} size="sm" w={"200px"}>
+            <Box display={"flex"} gap={3}>
+              <Heading as={"h4"} size="sm" minW={"max-content"}>
                 Назва операції
               </Heading>
               <Input
@@ -127,6 +128,24 @@ const MechanicalWork = observer(
                 onChange={(e) => {
                   setRes({ ...res, nameOper: e.target.value });
                 }}
+              />
+            </Box>
+            <Box
+              display={"flex"}
+              gap={3}
+              mt={"10px"}
+              alignItems={"center"}
+              mx={"auto"}
+            >
+              <Heading as={"h4"} size="sm" minW={"max-content"}>
+                Дата початку
+              </Heading>
+              <Input
+                placeholder="Select Date and Time"
+                size="sm"
+                type="date"
+                value={res.date}
+                onChange={(e) => setRes({ ...res, date: e.target.value })}
               />
             </Box>
             <Box mt={"15px"} display={"flex"} justifyContent={"space-between"}>

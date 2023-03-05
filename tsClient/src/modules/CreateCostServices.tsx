@@ -6,12 +6,14 @@ import { createOperProps } from "../pages/TechnologicalMap";
 
 export type ServiceProps = {
   nameOper: string;
+  date: string;
   price: string | number;
   unitsOfCost: string | number;
 };
 
 export const servicesProps: ServiceProps = {
   nameOper: "",
+  date: "",
   price: "",
   unitsOfCost: "",
 };

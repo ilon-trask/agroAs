@@ -5,6 +5,7 @@ import { createOperProps } from "../pages/TechnologicalMap";
 
 export type MaterialsProps = {
   nameOper: string;
+  date: string;
   price: string | number;
   consumptionPerHectare: string | number;
   unitsOfCost: string;
@@ -13,6 +14,7 @@ export type MaterialsProps = {
 
 export const materialsProps: MaterialsProps = {
   nameOper: "",
+  date: "",
   price: "",
   consumptionPerHectare: "",
   unitsOfCost: "",

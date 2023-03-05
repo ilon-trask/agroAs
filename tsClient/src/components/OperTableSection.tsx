@@ -47,6 +47,9 @@ export default function OperTableSection({
           <Td h={"auto"} padding={"0"}>
             <Divider orientation="horizontal" opacity={"1"} />
           </Td>
+          <Td h={"auto"} padding={"0"}>
+            <Divider orientation="horizontal" opacity={"1"} />
+          </Td>
           <Td>
             <b>{title}</b>
           </Td>

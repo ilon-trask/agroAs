@@ -20,6 +20,7 @@ import {
   TableContainer,
   Box,
 } from "@chakra-ui/react";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 
 interface props {
   setRes: (res: cartProps) => void;
@@ -40,7 +41,8 @@ const CartsTable = observer(
     setDeleteOpen,
   }: props) => {
     const { map, user } = useContext(Context);
-
+    let maps: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(map.maps));
+    maps.sort((a, b) => a.id! - b.id!);
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
@@ -62,7 +64,7 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {map.maps.map((e) => (
+          {maps.map((e) => (
             <CartsTableItem
               e={e}
               setOpen={setOpen}

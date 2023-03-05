@@ -20,6 +20,7 @@ import { Text, Button, Container, Box } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import { deleteOper } from "../http/requests";
+import { CALENDAR_ROUTER } from "../utils/consts";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -53,7 +54,7 @@ const DevicePage = observer(() => {
   });
   const navigate = useNavigate();
   return (
-    <div>
+    <Box pb={"25px"}>
       <Box px={"40px"}>
         <div style={{ fontSize: "20px" }}>
           <Button mt={"30px"} onClick={() => navigate("/")}>
@@ -80,23 +81,35 @@ const DevicePage = observer(() => {
             deleteOpen={deleteOpen}
             setDeleteOpen={setDeleteOpen}
           />
-          <Button
-            mt={"15px"}
-            mb={"25px"}
-            ml={"31px"}
-            onClick={
-              user.role == ""
-                ? () => {
-                    setShowAlert(true);
-                  }
-                : () => {
-                    setUpdate(false);
-                    setOpen(true);
-                  }
-            }
-          >
-            Додати технологічну операцію
-          </Button>
+          <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
+            <Button
+              onClick={
+                user.role == ""
+                  ? () => {
+                      setShowAlert(true);
+                    }
+                  : () => {
+                      setUpdate(false);
+                      setOpen(true);
+                    }
+              }
+            >
+              Додати технологічну операцію
+            </Button>
+            {user.role == "ADMIN" ? (
+              <Button
+                onClick={() => {
+                  console.log(CALENDAR_ROUTER + "/" + id);
+
+                  navigate(CALENDAR_ROUTER + "/" + id);
+                }}
+              >
+                Створити календар робіт
+              </Button>
+            ) : (
+              ""
+            )}
+          </Box>
         </div>
         <OperSection
           open={open}
@@ -201,7 +214,7 @@ const DevicePage = observer(() => {
           deleteOper(map, deleteOpen.operId!, deleteOpen.cartId);
         }}
       />
-    </div>
+    </Box>
   );
 });
 export default DevicePage;

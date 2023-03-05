@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useContext } from "react";
 import { Context } from "../main";
 import { deleteOper } from "../http/requests";
-import style from "./Table.module.css";
 import OpersTableItem from "../components/OpersTableItem";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import OperTableSection from "../components/OperTableSection";
@@ -23,6 +22,7 @@ import {
   Container,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
+import getSectionsOpers from "../store/GetSectionsOpers";
 type props = {
   id: number;
   setRes: (res: any) => void;
@@ -48,25 +48,8 @@ function OpersTable({
 
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
-  const soilPreparation = operData.filter((el) => el.sectionId == 1);
-  const landing = operData.filter((el) => el.sectionId == 2);
-  const care = operData.filter((el) => el.sectionId == 3);
-  const feeding = operData.filter((el) => el.sectionId == 4);
-  const monitoring = operData.filter((el) => el.sectionId == 5);
 
-  const protection = operData.filter((el) => el.sectionId == 6);
-  const gathering = operData.filter((el) => el.sectionId == 7);
-  const storage = operData.filter((el) => el.sectionId == 8);
-  const sections = [
-    { arr: soilPreparation, tittle: "Підготовка ґрунту" },
-    { arr: landing, tittle: "Посадка" },
-    { arr: care, tittle: "Догляд" },
-    { arr: feeding, tittle: "Живлення" },
-    { arr: monitoring, tittle: "Моніторинг" },
-    { arr: protection, tittle: "Захист" },
-    { arr: gathering, tittle: "Збір" },
-    { arr: storage, tittle: "Зберігання" },
-  ];
+  const sections = getSectionsOpers(map, id);
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
   operData.forEach((el) => {
@@ -89,6 +72,10 @@ function OpersTable({
           <Tr>
             <Th></Th>
             <Th>
+              Дата <br />
+              початку
+            </Th>
+            <Th>
               Технологічна <br />
               операція
             </Th>
@@ -100,6 +87,7 @@ function OpersTable({
               Одиниця <br />
               виміру
             </Th>
+            <Th>Разом</Th>
             <Th>
               Вартість <br />
               Техніки
@@ -128,7 +116,6 @@ function OpersTable({
               Вартість <br />
               послуг
             </Th>
-            <Th>Разом</Th>
             <Th></Th>
           </Tr>
         </Thead>
@@ -137,7 +124,7 @@ function OpersTable({
           {sections.map((el) => (
             <OperTableSection
               arr={el.arr}
-              title={el.tittle}
+              title={el.title}
               id={id}
               mapData={mapData}
               setCell={setCell}
@@ -154,17 +141,13 @@ function OpersTable({
 
         <Tfoot>
           <Td></Td>
-          <Td style={{ fontWeight: "bold" }}>Загальні витрати</Td>
+          <Td></Td>
+          <Td fontWeight={"bold"}>Загальні витрати</Td>
           <Td></Td>
           <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td className={style.headItem}>{sum}</Td>
+          <Td px={"10px"} fontWeight={"bold"}>
+            {sum}
+          </Td>
           <Td></Td>
         </Tfoot>
       </Table>

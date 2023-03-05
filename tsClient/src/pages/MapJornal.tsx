@@ -2,17 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import CartsTable from "../modules/CartsTable";
 import { observer } from "mobx-react-lite";
-import Loader from "../components/Loader";
-import style from "./map.module.css";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import { useNavigate } from "react-router-dom";
 import { Itech_cart } from "../../../tRPC serv/models/models";
-import { css } from "@emotion/css";
 import { TableContainer, Text, Button, Box, Container } from "@chakra-ui/react";
-import { InfoOutlineIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
-import { deleteCart, deleteOper } from "../http/requests";
+import { deleteCart, getCopyCarts } from "../http/requests";
 import DeleteAlert from "../components/DeleteAlert";
+import CopyCartPupUp from "../modules/CopyCartPupUp";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -35,6 +32,7 @@ const MapJornal = observer(function () {
     operId: null,
     cartId: null,
   });
+  const [openCopy, setOpenCopy] = useState(false);
   const navigate = useNavigate();
   return (
     <Container maxW="container.lg">
@@ -57,22 +55,29 @@ const MapJornal = observer(function () {
             setDeleteOpen={setDeleteOpen}
           ></CartsTable>
         </TableContainer>
-        <Button
-          ml={"auto"}
-          mr={"0"}
-          mt={"15px"}
-          onClick={
-            user.role == ""
-              ? () => {
-                  setShowAlert(true);
-                }
-              : () => {
-                  setOpen(true);
-                }
-          }
-        >
-          Добавити технологічну карту
-        </Button>
+        <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+          <Button
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setOpen(true);
+                  }
+            }
+          >
+            Добавити технологічну карту
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenCopy(true);
+              getCopyCarts(map);
+            }}
+          >
+            Скопіювати з журналу
+          </Button>
+        </Box>
         <CreateCart
           open={open}
           setOpen={setOpen}
@@ -92,6 +97,7 @@ const MapJornal = observer(function () {
           setDeleteOpen({ ...deleteOpen, isOpen: false });
         }}
       />
+      <CopyCartPupUp open={openCopy} setOpen={setOpenCopy} />
     </Container>
   );
 });

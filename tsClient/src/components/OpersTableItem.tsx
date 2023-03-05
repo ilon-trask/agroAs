@@ -45,6 +45,7 @@ const patch: funcProps = function (
     setRes({
       id: el.id,
       nameOper: el.nameOperation,
+      date: el.date,
       fuelConsumption: second.fuelConsumption,
       idTractor: second.tractorId,
       idMachine: second.agriculturalMachineId,
@@ -60,6 +61,7 @@ const patch: funcProps = function (
       id: el.id,
       gradeId: second.gradeId || "",
       nameOper: second.nameOper || "",
+      date: el.date,
       pricePerHourPersonnel: +second.pricePerHourPersonnel || "",
       productionPerShift: +second.productionPerShift || "",
       productionRaeAmount: +second.productionRateAmount || "",
@@ -77,6 +79,7 @@ const patch: funcProps = function (
     setRes({
       id: el.id,
       nameOper: el.nameOperation,
+      date: el.date,
       price: second.price,
       unitsOfCost: second.unitsOfCost,
       consumptionPerHectare: second.consumptionPerHectare,
@@ -124,16 +127,10 @@ export default function OpersTableItem({
       >
         <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
       </Td>
+      <Td>{el.date || 0}</Td>
       <Td>{el.nameOperation}</Td>
       <Td>{mapData.area}</Td>
       <Td>{"га"}</Td>
-      <Td>{el.costCars! * mapData.area || "0"}</Td>
-      <Td>{el.costFuel! * mapData.area || "0"}</Td>
-      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
-      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
-      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
-      <Td>{el.costTransport! * mapData.area || "0"}</Td>
-      <Td>{el.costServices! * mapData.area || "0"}</Td>
       <Td>
         {+mapData.area *
           (el.costMaterials ||
@@ -145,6 +142,14 @@ export default function OpersTableItem({
               +el.costMachineWork! ||
             el.costHandWork!)}
       </Td>
+      <Td>{el.costCars! * mapData.area || "0"}</Td>
+      <Td>{el.costFuel! * mapData.area || "0"}</Td>
+      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
+      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
+      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
+      <Td>{el.costTransport! * mapData.area || "0"}</Td>
+      <Td>{el.costServices! * mapData.area || "0"}</Td>
+
       <Td
         className={style.delete}
         onClick={

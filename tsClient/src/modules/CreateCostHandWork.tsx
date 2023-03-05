@@ -4,6 +4,7 @@ import HandWork from "../components/HandWork";
 import { createOperProps } from "../pages/TechnologicalMap";
 export type CostHandWorkProps = {
   nameOper: string;
+  date: string;
   gradeId: number | string;
   type: number | string;
   productionRateAmount: number | string;
@@ -15,6 +16,7 @@ export type CostHandWorkProps = {
 
 export const costHandWorkProps: CostHandWorkProps = {
   nameOper: "",
+  date: "",
   gradeId: "",
   type: 1,
   productionRateAmount: "",

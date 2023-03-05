@@ -1,8 +1,10 @@
 import { router, publicProcedure } from "../trpc";
 import z, { optional } from "zod";
-import { tech_cart } from "../models/models";
+import { Itech_cart, tech_cart } from "../models/models";
 
-import TechCartService from "../controllers/TechCartService";
+import TechCartService, {
+  resTechCartsWithOpers,
+} from "../controllers/TechCartService";
 
 import { Idata } from "../controllers/TechCartService";
 
@@ -138,5 +140,21 @@ export const cartRouter = router({
     .query(async ({ input, ctx }) => {
       const cart = await TechCartService.setIsPublic(input, ctx.user);
       return cart;
+    }),
+  getCopyCarts: publicProcedure.query(async ({ ctx }) => {
+    const cart: Itech_cart[] | undefined = await TechCartService.getCopyCarts(
+      ctx.user
+    );
+    return cart;
+  }),
+  makeCopy: publicProcedure
+    .input(z.object({ cartId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { cartId } = input;
+      const res: resTechCartsWithOpers[] = await TechCartService.copyCarts(
+        cartId,
+        ctx.user
+      );
+      return res;
     }),
 });

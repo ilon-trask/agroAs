@@ -6,12 +6,14 @@ import { createOperProps } from "../pages/TechnologicalMap";
 
 export type TransportProps = {
   nameOper: string;
+  date: string;
   price: string | number;
   unitsOfCost: string | number;
 };
 
 export const transportProps: TransportProps = {
   nameOper: "",
+  date: "",
   price: "",
   unitsOfCost: "",
 };

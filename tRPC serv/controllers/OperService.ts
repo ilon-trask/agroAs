@@ -91,6 +91,7 @@ interface Idata<T> {
 interface IdataCreateCostMaterials
   extends Idata<{
     nameOper: string;
+    date: string | null | undefined;
     consumptionPerHectare: number;
     price: number;
     unitsOfConsumption: string;
@@ -98,12 +99,23 @@ interface IdataCreateCostMaterials
   }> {}
 
 interface IdataCreateCostServices
-  extends Idata<{ nameOper: string; price: number; unitsOfCost: string }> {}
+  extends Idata<{
+    nameOper: string;
+    date: string | null | undefined;
+    price: number;
+    unitsOfCost: string;
+  }> {}
 interface IdataCreateCostTransport
-  extends Idata<{ nameOper: string; price: number; unitsOfCost: string }> {}
+  extends Idata<{
+    nameOper: string;
+    date: string | null | undefined;
+    price: number;
+    unitsOfCost: string;
+  }> {}
 interface IdataCreateCostMechanical
   extends Idata<{
     nameOper: string;
+    date: string | null | undefined;
     fuelConsumption: number;
     workingSpeed: number;
     idTractor: number;
@@ -112,6 +124,7 @@ interface IdataCreateCostMechanical
 interface IdataCreateCostHandWork
   extends Idata<{
     nameOper: string;
+    date: string | null | undefined;
     gradeId: number;
     productionRateAmount?: number;
     productionRateTime?: number;
@@ -134,6 +147,7 @@ interface IdataPatchCostMaterial
   extends IdataPatch<{
     operId: number;
     nameOper: string;
+    date: string | null | undefined;
     consumptionPerHectare: number;
     price: number;
     unitsOfConsumption: string;
@@ -143,6 +157,7 @@ interface IdataPatchCostServices
   extends IdataPatch<{
     operId: number;
     nameOper: string;
+    date: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
@@ -151,6 +166,7 @@ interface IdataPatchCostTransport
   extends IdataPatch<{
     operId: number;
     nameOper: string;
+    date: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
@@ -158,6 +174,7 @@ interface IdataPatchCostMachine
   extends IdataPatch<{
     operId: number;
     nameOper: string;
+    date: string | null | undefined;
     fuelConsumption: number;
     workingSpeed: number;
     idTractor: number;
@@ -170,6 +187,7 @@ interface IdataPatchCostHandWork
   extends IdataPatch<{
     operId: number;
     nameOper: string;
+    date: string | null | undefined;
     gradeId: number;
     productionRateAmount?: number;
     productionRateTime?: number;
@@ -192,13 +210,18 @@ async function createOper(
   cartId: number,
   nameOper: string,
   cell: Icell,
-  section: number
+  section: number,
+  date: string | null | undefined
 ) {
+  console.log("date");
+  console.log(date);
+
   let Soper: Itech_operation = await tech_operation.create({
     techCartId: cartId,
     nameOperation: nameOper,
     cell,
     sectionId: section,
+    date: date,
   });
   const oper = JSON.parse(JSON.stringify(Soper));
   return oper;
@@ -251,10 +274,6 @@ export async function changeOper(
     }
   } else if (elem.cell == "costMechanical") {
     if (!CostMechanical) {
-      console.log(1);
-
-      console.log(elem);
-
       const aggregateData = elem.aggregate;
       if (aggregateData == null) throw new Error();
 
@@ -276,9 +295,10 @@ export async function changeOper(
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) / rareOfProduction
       );
+      //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
       const costCars = Math.round(
         ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
+          +machine.marketCost / +machine.depreciationPeri / 220 / 8) *
           1.05) /
           rareOfProduction
       );
@@ -289,11 +309,12 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
-          (machine.numberOfServicePersonnel ?? 0) *
+          (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
 
       elem.costMachineWork = costMachineWork;
+
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
@@ -330,7 +351,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
-          (machine.numberOfServicePersonnel ?? 0) *
+          (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
 
@@ -406,23 +427,29 @@ export async function changeOper(
   }
 }
 
-async function updateOper(nameOper: string, cell: Icell, operId: number) {
+async function updateOper(
+  nameOper: string,
+  cell: Icell,
+  operId: number,
+  date: string | null | undefined
+) {
   const techOperation = await tech_operation.update(
     {
       nameOperation: nameOper,
       cell,
+      date,
     },
     { where: { id: operId } }
   );
   //@ts-ignore
-  const oper: resTechOperation = await tech_operation.findOne({
+  let oper: resTechOperation = await tech_operation.findOne({
     where: { id: operId },
     include: [
       cost_material,
       cost_service,
       cost_transport,
       cost_hand_work,
-      aggregate,
+      { model: aggregate, include: [tractor, agricultural_machine] },
     ],
   });
   return oper;
@@ -432,11 +459,11 @@ class OperService {
   async createCostMaterials(data: IdataCreateCostMaterials) {
     const {
       cartId,
-
       arr: {
         cell,
         res: {
           nameOper,
+          date,
           consumptionPerHectare,
           price,
           unitsOfConsumption,
@@ -445,7 +472,10 @@ class OperService {
         section,
       },
     } = data;
-    const oper = await createOper(cartId, nameOper, cell, section);
+    console.log("date1");
+    console.log(date);
+
+    const oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;
 
     const costMaterial = await cost_material.create({
@@ -466,11 +496,11 @@ class OperService {
 
       arr: {
         cell,
-        res: { nameOper, price, unitsOfCost },
+        res: { nameOper, date, price, unitsOfCost },
         section,
       },
     } = data;
-    let oper = await createOper(cartId, nameOper, cell, section);
+    let oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;
     const costService = await cost_service.create({
       nameService: nameOper,
@@ -487,11 +517,11 @@ class OperService {
 
       arr: {
         cell,
-        res: { nameOper, price, unitsOfCost },
+        res: { nameOper, date, price, unitsOfCost },
         section,
       },
     } = data;
-    let oper = await createOper(cartId, nameOper, cell, section);
+    let oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;
     const costTransport = await cost_transport.create({
       nameTransport: nameOper,
@@ -509,7 +539,14 @@ class OperService {
 
       arr: {
         cell,
-        res: { nameOper, fuelConsumption, workingSpeed, idTractor, idMachine },
+        res: {
+          nameOper,
+          date,
+          fuelConsumption,
+          workingSpeed,
+          idTractor,
+          idMachine,
+        },
         section,
       },
     } = data;
@@ -520,7 +557,7 @@ class OperService {
       where: { id: idMachine },
     });
 
-    let oper = await createOper(cartId, nameOper, cell, section);
+    let oper = await createOper(cartId, nameOper, cell, section, date);
     if (!machine || !Tractor || !cart || !oper) throw new Error("");
     const Aggregate = await aggregate.create({
       fuelConsumption: +fuelConsumption,
@@ -577,6 +614,7 @@ class OperService {
         cell,
         res: {
           nameOper,
+          date,
           gradeId,
           productionRateAmount,
           productionRateTime,
@@ -594,7 +632,7 @@ class OperService {
     const Grade = await grade.findOne({ where: { id: gradeId } });
     if (!Grade || !cart) throw new Error("");
 
-    let oper = await createOper(cartId, nameOper, cell, section);
+    let oper = await createOper(cartId, nameOper, cell, section, date);
 
     const costHandWork = await cost_hand_work.create({
       nameOper,
@@ -648,6 +686,7 @@ class OperService {
         res: {
           operId,
           nameOper,
+          date,
           consumptionPerHectare,
           price,
           unitsOfConsumption,
@@ -664,7 +703,7 @@ class OperService {
           cost_service,
           cost_transport,
           cost_hand_work,
-          aggregate,
+          { model: aggregate, include: [tractor, agricultural_machine] },
         ],
       });
       if (!Oper) return;
@@ -695,7 +734,7 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
@@ -710,7 +749,7 @@ class OperService {
       cartId,
       arr: {
         cell,
-        res: { operId, nameOper, price, unitsOfCost },
+        res: { operId, nameOper, date, price, unitsOfCost },
       },
     } = data;
 
@@ -724,7 +763,7 @@ class OperService {
           cost_service,
           cost_transport,
           cost_hand_work,
-          aggregate,
+          { model: aggregate, include: [tractor, agricultural_machine] },
         ],
       });
       if (!Oper) return;
@@ -754,7 +793,7 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
@@ -769,7 +808,7 @@ class OperService {
       cartId,
       arr: {
         cell,
-        res: { operId, nameOper, price, unitsOfCost },
+        res: { operId, nameOper, date, price, unitsOfCost },
       },
     } = data;
     if (price === undefined || unitsOfCost === undefined) throw new Error("");
@@ -782,7 +821,7 @@ class OperService {
           cost_service,
           cost_transport,
           cost_hand_work,
-          aggregate,
+          { model: aggregate, include: [tractor, agricultural_machine] },
         ],
       });
       if (!Oper) return;
@@ -813,7 +852,7 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
@@ -832,6 +871,7 @@ class OperService {
         res: {
           operId,
           nameOper,
+          date,
           fuelConsumption,
           idMachine,
           idTractor,
@@ -850,7 +890,7 @@ class OperService {
           cost_service,
           cost_transport,
           cost_hand_work,
-          aggregate,
+          { model: aggregate, include: [tractor, agricultural_machine] },
         ],
       });
       if (!Oper) return;
@@ -894,7 +934,7 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
@@ -912,6 +952,7 @@ class OperService {
         res: {
           operId,
           nameOper,
+          date,
           gradeId,
           type,
           yieldСapacity,
@@ -941,7 +982,7 @@ class OperService {
 
       if (!Oper) return;
       oper = JSON.parse(JSON.stringify(Oper));
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
       const CostHandWork: guest_cost_hand_work = {
         nameOper: "",
@@ -990,7 +1031,7 @@ class OperService {
         { where: { techOperationId: operId } }
       );
 
-      oper = await updateOper(nameOper, cell, operId);
+      oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
@@ -1003,8 +1044,16 @@ class OperService {
 
     let elem: any | null = await tech_operation.findOne({
       where: { id: operId },
+      include: [
+        cost_material,
+        cost_service,
+        cost_transport,
+        cost_hand_work,
+        { model: aggregate, include: [tractor, agricultural_machine] },
+      ],
     });
     elem = await changeOper(elem, elem.techCartId!);
+
     if (!elem) throw new Error("");
     await changeOper(elem, cartId);
     await cost_material.destroy({
