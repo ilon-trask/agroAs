@@ -298,6 +298,7 @@ export async function changeOper(
       //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
       const costCars = Math.round(
         ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
+          //@ts-ignore
           +machine.marketCost / +machine.depreciationPeri / 220 / 8) *
           1.05) /
           rareOfProduction
@@ -309,6 +310,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
+          //@ts-ignore
           (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
@@ -351,6 +353,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
+          //@ts-ignore
           (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );

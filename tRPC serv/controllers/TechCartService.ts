@@ -327,6 +327,7 @@ class TechCartService {
               userId: user.sub,
               createdAt: el.createdAt,
               updatedAt: el.updatedAt,
+              //@ts-ignore
               tech_operations: el.tech_operations.map((el) => {
                 if (el.cell == "costMechanical")
                   console.log(el.aggregate?.workingSpeed!);

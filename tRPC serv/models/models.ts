@@ -286,9 +286,11 @@ export interface Imachine {
   brand: string;
   marketCost: number;
   depreciationPeriod: number;
+  depreciationPeri?: number;
   widthOfCapture: number;
   workingSpeed: number;
   numberOfServicePersonnel: number;
+  numberOfServiceP?: number;
   userId?: string;
   gradeId?: number;
 }
