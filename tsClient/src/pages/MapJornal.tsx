@@ -10,6 +10,7 @@ import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteCart, getCopyCarts } from "../http/requests";
 import DeleteAlert from "../components/DeleteAlert";
 import CopyCartPupUp from "../modules/CopyCartPupUp";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -33,7 +34,8 @@ const MapJornal = observer(function () {
     cartId: null,
   });
   const [openCopy, setOpenCopy] = useState(false);
-  const navigate = useNavigate();
+  let maps: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(map.maps));
+  maps.sort((a, b) => a.id! - b.id!);
   return (
     <Container maxW="container.lg">
       <Box>
@@ -47,6 +49,7 @@ const MapJornal = observer(function () {
           overflowX={"scroll"}
         >
           <CartsTable
+            maps={maps}
             setRes={setRes}
             setOpen={setOpen}
             setUpdate={setUpdate}
@@ -86,6 +89,30 @@ const MapJornal = observer(function () {
           res={res}
           setRes={setRes as any}
         />
+      </Box>
+      <Box>
+        <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+          Журнал спеціалізованих робіт
+        </Text>
+        <TableContainer
+          maxW="1000px"
+          mx="auto"
+          mt={"20px"}
+          overflowX={"scroll"}
+        >
+          <CartsTable
+            maps={[]}
+            setRes={setRes}
+            setOpen={setOpen}
+            setUpdate={setUpdate}
+            setShowAlert={setShowAlert}
+            deleteOpen={deleteOpen}
+            setDeleteOpen={setDeleteOpen}
+          ></CartsTable>
+        </TableContainer>
+        <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+          <Button>Добавити спеціалізовані роботи</Button>
+        </Box>
       </Box>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
       <DeleteAlert

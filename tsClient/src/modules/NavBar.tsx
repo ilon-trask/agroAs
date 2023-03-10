@@ -9,7 +9,7 @@ import { Button, Box } from "@chakra-ui/react";
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
   return (
-    <Box bgColor={"#0f1014"} py={"10px"}>
+    <Box bgColor={"RGBA(0, 0, 0, 0.44)"} py={"10px"}>
       <Box
         px={"40px"}
         display={"flex"}
