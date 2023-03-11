@@ -5,10 +5,10 @@ import { FC } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import MapStore from "../store/MapStore";
 import { cartProps } from "../modules/CreateCart";
-import { TracProps } from "../modules/CreateTractor";
-import { MachineProps } from "../modules/CreateMachine";
-import { CostHandWorkProps } from "../modules/CreateCostHandWork";
-import { MaterialsProps } from "../modules/CreateCostMaterials";
+import { TracProps } from "../modules/CreateTractor/CreateTractor";
+import { MachineProps } from "../modules/CreateMachine/CreateMachine";
+import { CostHandWorkProps } from "../modules/CreateCostHandWork/CreateCostHandWork";
+import { MaterialsProps } from "../modules/CreateCostMaterials/CreateCostMaterials";
 import {
   Modal,
   ModalOverlay,

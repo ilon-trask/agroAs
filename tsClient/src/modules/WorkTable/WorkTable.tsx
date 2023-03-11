@@ -2,29 +2,17 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
-import { Context } from "../main";
-import CartsTableItem from "../components/CartsTableItem";
-import { cartProps } from "./CreateCart";
+import { Context } from "../../main";
+import WorkTableItem from "./components/WorkTableItem";
+import { workProps } from "../CreateWork";
+import Loader from "../../components/Loader";
 
-import Loader from "../components/Loader";
-
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Box,
-} from "@chakra-ui/react";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { Table, Thead, Tbody, Tr, Th, Box } from "@chakra-ui/react";
+import { Ispecial_work } from "../../../../tRPC serv/models/models";
 
 interface props {
-  maps: resTechCartsWithOpers[] | [];
-  setRes: (res: cartProps) => void;
+  works: Ispecial_work[] | [];
+  setRes: (res: workProps) => void;
   setOpen: (open: boolean) => void;
   setUpdate: (update: boolean) => void;
   setShowAlert: (showAlert: boolean) => void;
@@ -34,7 +22,7 @@ interface props {
 
 const CartsTable = observer(
   ({
-    maps,
+    works,
     setRes,
     setOpen,
     setUpdate,
@@ -49,7 +37,7 @@ const CartsTable = observer(
         <Thead>
           <Tr>
             <Th></Th>
-            <Th>Назва культури</Th>
+            <Th>Назва роботи</Th>
             <Th>Площа (га)</Th>
             <Th>Загальна вартість (грн)</Th>
             <Th>Витрати на 1 га (грн)</Th>
@@ -65,8 +53,8 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {maps.map((e) => (
-            <CartsTableItem
+          {works.map((e) => (
+            <WorkTableItem
               key={e.id}
               e={e}
               setOpen={setOpen}

@@ -138,7 +138,6 @@ const cartsIncludes = [
 ];
 async function changeCart(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
-
   const carts = JSON.parse(JSON.stringify(Scarts));
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];

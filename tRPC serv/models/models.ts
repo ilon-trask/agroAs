@@ -46,7 +46,7 @@ export interface Itech_cart {
   createdAt?: string;
   updatedAt?: string;
 }
-export class tech_cart extends Model<resTechCartsWithOpers> {
+export class tech_cart extends Model<Itech_cart> {
   declare id: number;
   declare nameCart: string;
   declare area: number;
@@ -70,6 +70,41 @@ tech_cart.init(
   // { sequelize, timestamps: false }
 );
 
+export interface Ispecial_work {
+  id?: number;
+  nameWork: string;
+  area: number;
+  salary: number;
+  priceDiesel: number;
+  totalCost?: number;
+  isPublic?: boolean;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export class special_work extends Model<Ispecial_work> {
+  declare id: number;
+  declare nameWork: string;
+  declare area: number;
+  declare salary: number;
+  declare priceDiesel: number;
+  declare isPublic?: boolean;
+  declare userId: string;
+}
+special_work.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    nameWork: { type: DataTypes.STRING, allowNull: false },
+    area: { type: DataTypes.INTEGER, allowNull: false },
+    salary: { type: DataTypes.INTEGER, allowNull: false },
+    priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
+    isPublic: { type: DataTypes.BOOLEAN },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+  // { sequelize, timestamps: false }
+);
 export interface Itech_operation {
   id?: number;
   nameOperation: string;

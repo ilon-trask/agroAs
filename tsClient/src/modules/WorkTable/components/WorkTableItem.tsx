@@ -1,23 +1,19 @@
 import { observer } from "mobx-react-lite";
 import React, { FC, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Itech_cart } from "../../../tRPC serv/models/models";
-import { deleteCart, setIsPublic } from "../http/requests";
-import { Context } from "../main";
-import { cartProps } from "../modules/CreateCart";
-import { Icart } from "../pages/MapJornal";
-import MapStore from "../store/MapStore";
-import { TEHMAP_ROUTER } from "../utils/consts";
-import style from "./TableItem.module.css";
+import { deleteWork, setIsPublic } from "../../../http/requests";
+import { Context } from "../../../main";
+import { workProps } from "../../CreateWork";
+import { TEHMAP_ROUTER } from "../../../utils/consts";
 
 import { Tr, Td, Checkbox } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
 interface props {
-  e: cartProps;
+  e: workProps;
   setUpdate: (update: boolean) => void;
   setOpen: (open: boolean) => void;
-  setRes: (res: cartProps) => void;
+  setRes: (res: workProps) => void;
   setShowAlert: (showAlert: boolean) => void;
   deleteOpen: any;
   setDeleteOpen: (deleteOpen: any) => void;
@@ -42,6 +38,7 @@ const CartsTableItem = observer(
             setUpdate(true);
             setOpen(true);
             setRes({
+              workId: e.id!,
               ...e,
             });
           }}
@@ -54,7 +51,11 @@ const CartsTableItem = observer(
           />
         </Td>
         <Td>
-          <Link to={TEHMAP_ROUTER + `/${e.id}`}>{e.nameCart}</Link>
+          {/* <Link 
+              to={TEHMAP_ROUTER + `/${e.id}`}
+        > */}
+          {e.nameWork}
+          {/* </Link> */}
         </Td>
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.totalCost! * +e.area)) / 10 || "0"}</Td>
@@ -74,9 +75,9 @@ const CartsTableItem = observer(
                     ...deleteOpen,
                     isOpen: true,
                     cartId: e.id!,
-                    text: "карту",
+                    text: "спеціалізовану роботу",
                     func: () => {
-                      deleteCart(map, e.id!);
+                      deleteWork(map, e.id!);
                       setDeleteOpen({ ...deleteOpen, isOpen: false });
                     },
                   }));
