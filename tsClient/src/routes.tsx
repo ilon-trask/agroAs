@@ -1,5 +1,6 @@
 import Auth from "./pages/Auth";
 import CalendarPage from "./pages/CalenderPage";
+import Main from "./pages/MainPage";
 import MapJornal from "./pages/MapJornal";
 import TechnologicalMap from "./pages/TechnologicalMap";
 import {
@@ -16,6 +17,10 @@ export const publicRoutes = [
   {
     path: MAP_ROUTE,
     Component: <MapJornal />,
+  },
+  {
+    path: "/main",
+    Component: <Main />,
   },
   {
     path: LOGIN_ROUTE,

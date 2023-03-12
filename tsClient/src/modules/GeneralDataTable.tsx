@@ -2,21 +2,7 @@ import React from "react";
 import { useContext } from "react";
 import { Context } from "../main";
 import { cartProps } from "./CreateCart";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Text,
-  Button,
-  Box,
-  Container,
-} from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { observer } from "mobx-react-lite";
 type props = {

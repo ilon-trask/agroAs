@@ -1,22 +1,20 @@
 import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import OperSection from "../components/OperSection";
 
 import { Context } from "../main";
-import Loader from "../components/Loader";
-import style from "./map.module.css";
 import CreateCostHandWork from "../modules/CreateCostHandWork";
 import CreateCostMaterials from "../modules/CreateCostMaterials";
 import CreateCostServices from "../modules/CreateCostServices";
 import CreateCostTransport from "../modules/CreateCostTransport";
-import CreateCostMechanical from "../modules/CreateCostMechanical";
+import CreateCostMechanical from "../modules/CreateCostMechanical/CreateCostMechanical";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import OpersTable from "../modules/OpersTable";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
-import { Text, Button, Container, Box } from "@chakra-ui/react";
+import { Text, Button, Box } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import { deleteOper } from "../http/requests";

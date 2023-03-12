@@ -37,11 +37,10 @@ const CartsTableItem = observer(
     return (
       <Tr key={e.id!}>
         <Td
-          className={style.item}
+          textAlign={"center"}
           onClick={() => {
             setUpdate(true);
             setOpen(true);
-
             setRes({
               ...e,
             });
@@ -62,12 +61,26 @@ const CartsTableItem = observer(
         <Td>{e.totalCost || "0"}</Td>
 
         <Td
-          className={style.delete}
+          textAlign={"center"}
+          cursor={"pointer"}
+          color={"red"}
           onClick={
             user.role == ""
               ? () => setShowAlert(true)
-              : () =>
-                  setDeleteOpen({ ...deleteOpen, isOpen: true, cartId: e.id! })
+              : () => {
+                  console.log(e.id);
+
+                  setDeleteOpen(() => ({
+                    ...deleteOpen,
+                    isOpen: true,
+                    cartId: e.id!,
+                    text: "карту",
+                    func: () => {
+                      deleteCart(map, e.id!);
+                      setDeleteOpen({ ...deleteOpen, isOpen: false });
+                    },
+                  }));
+                }
           }
         >
           <DeleteIcon w={"20px"} h={"auto"} />

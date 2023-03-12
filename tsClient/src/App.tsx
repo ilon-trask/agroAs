@@ -1,5 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
-import AppRouter from "./components/AppRouter";
+import AppRouter from "./AppRouter";
 import NavBar from "./modules/NavBar";
 import { useEffect, useContext } from "react";
 import { Context } from "./main";
@@ -10,6 +10,7 @@ import {
   getTractor,
   getMachine,
   getGrades,
+  getWorks,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -35,6 +36,7 @@ function App() {
 
   useEffect(() => {
     getCarts(map);
+    getWorks(map);
     getSection(map);
     getTractor(map);
     getMachine(map);

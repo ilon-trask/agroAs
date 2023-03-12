@@ -298,6 +298,7 @@ export async function changeOper(
       //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
       const costCars = Math.round(
         ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
+          //@ts-ignore
           +machine.marketCost / +machine.depreciationPeri / 220 / 8) *
           1.05) /
           rareOfProduction
@@ -309,6 +310,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
+          //@ts-ignore
           (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
@@ -351,6 +353,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
+          //@ts-ignore
           (machine.numberOfServiceP ?? 0) *
           gradeMachine?.coefficient!
       );
@@ -865,7 +868,6 @@ class OperService {
   ) {
     const {
       cartId,
-
       arr: {
         cell,
         res: {
@@ -1056,29 +1058,18 @@ class OperService {
 
     if (!elem) throw new Error("");
     await changeOper(elem, cartId);
-    await cost_material.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_service.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_transport.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_service.destroy({
-      where: { techOperationId: operId },
-    });
-    await aggregate.destroy({
-      where: {
-        techOperationId: operId,
-      },
-    });
-    await cost_hand_work.destroy({
-      where: { techOperationId: operId },
-    });
-    await tech_operation.destroy({
-      where: { id: operId },
-    });
+    if (elem.cell == "costHandWork") {
+      await cost_hand_work.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costMaterials") {
+      await cost_material.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costMechanical") {
+      await aggregate.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costServices") {
+      await cost_service.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costTransport") {
+      await cost_transport.destroy({ where: { techOperationId: elem.id } });
+    }
+    await tech_operation.destroy({ where: { id: operId } });
     return elem;
   }
   async getProps({ operId }: { operId: number }) {

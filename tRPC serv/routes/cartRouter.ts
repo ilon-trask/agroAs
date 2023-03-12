@@ -1,12 +1,10 @@
 import { router, publicProcedure } from "../trpc";
-import z, { optional } from "zod";
-import { Itech_cart, tech_cart } from "../models/models";
+import z from "zod";
+import { Itech_cart } from "../models/models";
 
 import TechCartService, {
   resTechCartsWithOpers,
 } from "../controllers/TechCartService";
-
-import { Idata } from "../controllers/TechCartService";
 
 export const cartRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {

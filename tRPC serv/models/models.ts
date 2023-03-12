@@ -46,7 +46,7 @@ export interface Itech_cart {
   createdAt?: string;
   updatedAt?: string;
 }
-export class tech_cart extends Model<resTechCartsWithOpers> {
+export class tech_cart extends Model<Itech_cart> {
   declare id: number;
   declare nameCart: string;
   declare area: number;
@@ -70,6 +70,41 @@ tech_cart.init(
   // { sequelize, timestamps: false }
 );
 
+export interface Ispecial_work {
+  id?: number;
+  nameWork: string;
+  area: number;
+  salary: number;
+  priceDiesel: number;
+  totalCost?: number;
+  isPublic?: boolean;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export class special_work extends Model<Ispecial_work> {
+  declare id: number;
+  declare nameWork: string;
+  declare area: number;
+  declare salary: number;
+  declare priceDiesel: number;
+  declare isPublic?: boolean;
+  declare userId: string;
+}
+special_work.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    nameWork: { type: DataTypes.STRING, allowNull: false },
+    area: { type: DataTypes.INTEGER, allowNull: false },
+    salary: { type: DataTypes.INTEGER, allowNull: false },
+    priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
+    isPublic: { type: DataTypes.BOOLEAN },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+  // { sequelize, timestamps: false }
+);
 export interface Itech_operation {
   id?: number;
   nameOperation: string;
@@ -250,6 +285,7 @@ export interface Itractor {
   numberOfPersonnel: number;
   userId?: string;
   gradeId?: number;
+  copiedFromId?: number;
 }
 export class tractor extends Model<Itractor> {
   declare id: number;
@@ -262,6 +298,7 @@ export class tractor extends Model<Itractor> {
   declare numberOfPersonnel: number;
   declare userId: string;
   declare gradeId?: number;
+  declare copiedFromId?: number;
 }
 
 tractor.init(
@@ -275,6 +312,7 @@ tractor.init(
     fuelConsumption: { type: DataTypes.FLOAT, allowNull: false },
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    copiedFromId: { type: DataTypes.NUMBER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -286,11 +324,14 @@ export interface Imachine {
   brand: string;
   marketCost: number;
   depreciationPeriod: number;
+  depreciationPeri?: number;
   widthOfCapture: number;
   workingSpeed: number;
   numberOfServicePersonnel: number;
+  numberOfServiceP?: number;
   userId?: string;
   gradeId?: number;
+  copiedFromId?: number;
 }
 export class agricultural_machine extends Model<Imachine> {
   declare id: number;
@@ -303,6 +344,7 @@ export class agricultural_machine extends Model<Imachine> {
   declare numberOfServicePersonnel: number;
   declare userId: string;
   declare gradeId?: number;
+  declare copiedFromId?: number;
 }
 
 agricultural_machine.init(
@@ -316,6 +358,7 @@ agricultural_machine.init(
     workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    copiedFromId: { type: DataTypes.NUMBER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -426,6 +469,9 @@ cost_service.belongsTo(tech_operation);
 tech_operation.hasOne(cost_transport, { onDelete: "CASCADE" });
 cost_transport.belongsTo(tech_operation);
 
+agricultural_machine.hasMany(aggregate);
+aggregate.belongsTo(agricultural_machine);
+
 section.hasMany(tech_operation);
 tech_operation.belongsTo(section);
 
@@ -434,9 +480,6 @@ aggregate.belongsTo(tech_operation);
 
 tractor.hasMany(aggregate);
 aggregate.belongsTo(tractor);
-
-agricultural_machine.hasMany(aggregate);
-aggregate.belongsTo(agricultural_machine);
 
 grade.hasMany(tractor);
 

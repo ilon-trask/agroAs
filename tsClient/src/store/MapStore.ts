@@ -12,6 +12,7 @@ import {
   Imachine,
   Igrade,
   Icost_hand_work,
+  Ispecial_work,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -28,6 +29,9 @@ export default class MapStore {
   private _grade: Igrade[] = [];
   private _copyCarts: Itech_cart[] = [];
   public isLoading: boolean = true;
+  private _works: Ispecial_work[] = [];
+  private _copyTractors: Itractor[] = [];
+  private _copyMachine: Imachine[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -95,6 +99,19 @@ export default class MapStore {
   public set copyCarts(carts: Itech_cart[]) {
     this._copyCarts = carts;
   }
+  public set works(works: Ispecial_work[]) {
+    this._works = works;
+  }
+  public set newWork(work: Ispecial_work) {
+    this._works.push(work);
+  }
+  public set copyTractors(copyTractors: Itractor[]) {
+    this._copyTractors = copyTractors;
+  }
+  public set copyMachine(copyMachine: Imachine[]) {
+    this._copyMachine = copyMachine;
+  }
+
   public get maps() {
     return this._maps;
   }
@@ -128,7 +145,16 @@ export default class MapStore {
   get grade() {
     return this._grade;
   }
+  get works() {
+    return this._works;
+  }
   public get copyCarts() {
     return this._copyCarts;
+  }
+  public get copyTractors() {
+    return this._copyTractors;
+  }
+  public get copyMachine() {
+    return this._copyMachine;
   }
 }

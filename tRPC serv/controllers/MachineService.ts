@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { adminId, Principal } from "..";
 import { agricultural_machine } from "../models/models";
 import { Imachine } from "../models/models";
@@ -73,6 +74,53 @@ class MachineService {
     if (machine == null) throw new Error("");
 
     return machine;
+  }
+  async getCopyMachine(user: Principal | undefined) {
+    if (!user) return;
+    let adminMachine: Imachine[] = JSON.parse(
+      JSON.stringify(
+        await agricultural_machine.findAll({
+          where: { userId: adminId },
+        })
+      )
+    );
+    const Machines: Imachine[] | null = JSON.parse(
+      JSON.stringify(
+        await agricultural_machine.findAll({
+          //@ts-ignore
+          where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
+        })
+      )
+    );
+    if (!Machines) return adminMachine;
+    Machines.forEach(
+      (Tr) =>
+        (adminMachine = adminMachine.filter((Ad) => Ad.id != Tr.copiedFromId))
+    );
+
+    return adminMachine;
+  }
+  async copyMachine(MachineId: number, user: Principal | undefined) {
+    if (!user) return;
+
+    const machineData: Imachine | null = await agricultural_machine.findOne({
+      where: { id: MachineId },
+    });
+    if (!machineData) return;
+    const Machine: Imachine = await agricultural_machine.create({
+      brand: machineData.brand,
+      depreciationPeriod: machineData.depreciationPeriod,
+      marketCost: machineData.marketCost,
+      nameMachine: machineData.nameMachine,
+      numberOfServicePersonnel: machineData.numberOfServicePersonnel,
+      widthOfCapture: machineData.widthOfCapture,
+      workingSpeed: machineData.workingSpeed,
+      copiedFromId: machineData.id,
+      gradeId: machineData.gradeId,
+      userId: user?.sub,
+    });
+    console.log(Machine);
+    return Machine;
   }
 }
 export default new MachineService();

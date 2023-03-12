@@ -23,6 +23,7 @@ import {
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 
 interface props {
+  maps: resTechCartsWithOpers[] | [];
   setRes: (res: cartProps) => void;
   setOpen: (open: boolean) => void;
   setUpdate: (update: boolean) => void;
@@ -33,6 +34,7 @@ interface props {
 
 const CartsTable = observer(
   ({
+    maps,
     setRes,
     setOpen,
     setUpdate,
@@ -41,8 +43,7 @@ const CartsTable = observer(
     setDeleteOpen,
   }: props) => {
     const { map, user } = useContext(Context);
-    let maps: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(map.maps));
-    maps.sort((a, b) => a.id! - b.id!);
+
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
@@ -66,6 +67,7 @@ const CartsTable = observer(
           )}
           {maps.map((e) => (
             <CartsTableItem
+              key={e.id}
               e={e}
               setOpen={setOpen}
               setRes={setRes}

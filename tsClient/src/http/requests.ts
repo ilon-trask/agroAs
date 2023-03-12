@@ -12,6 +12,7 @@ import {
   Igrade,
   Imachine,
   Isection,
+  Ispecial_work,
   Itech_cart,
   Itech_operation,
   Itractor,
@@ -358,5 +359,52 @@ export function getCopyCarts(map: MapStore) {
 export function makeCopyCarts(map: MapStore, cartId: number) {
   client.cart.makeCopy.query({ cartId }).then((data) => {
     operationsFilter(data, map);
+  });
+}
+export function getWorks(map: MapStore) {
+  client.works.get
+    .query()
+    .then((works) => (map.works = works as Ispecial_work[]));
+}
+export function createWork(map: MapStore, data: Ispecial_work) {
+  client.works.create
+    .query(data)
+    .then((res) => (map.newWork = res as Ispecial_work));
+}
+export function deleteWork(map: MapStore, workId: number) {
+  client.works.delete
+    .query({ workId })
+    .then((res) => (map.works = map.works.filter((el) => el.id != workId)));
+}
+export function patchWork(map: MapStore, data: any) {
+  client.works.patch.query(data).then((res) => {
+    map.works = map.works.filter((el) => el.id != res.id);
+    map.newWork = res;
+  });
+}
+export function getCopyTractors(map: MapStore) {
+  client.tractor.getCopyTractors.query().then((res) => {
+    map.copyTractors = [];
+    map.copyTractors = res;
+  });
+}
+export function makeCopyTractor(map: MapStore, tractorId: number) {
+  client.tractor.copyTractor.query({ tractorId }).then((res) => {
+    map.copyTractors = map.copyTractors.filter(
+      (el) => el.id != res.copiedFromId
+    );
+    map.newTractor = res;
+  });
+}
+export function getCopyMachine(map: MapStore) {
+  client.machine.getCopyMachine.query().then((res) => {
+    map.copyMachine = [];
+    map.copyMachine = res;
+  });
+}
+export function makeCopyMachine(map: MapStore, machineId: number) {
+  client.machine.copyMachine.query({ machineId }).then((res) => {
+    map.copyMachine = map.copyMachine.filter((el) => el.id != res.copiedFromId);
+    map.newMachine = res;
   });
 }
