@@ -26,7 +26,7 @@ function MainTable({ e }: props) {
           <Heading size="md">Культура {e?.nameCart || ""}</Heading>
           <Text>Автор:</Text>
         </Stack>
-        <Image src="../../малина.jpg" alt="малина" />
+        <Image src={"../../" + e?.nameCart + ".jpg"} alt={e?.nameCart} />
         <Stack mt="6" spacing="1">
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Площа</Box>
