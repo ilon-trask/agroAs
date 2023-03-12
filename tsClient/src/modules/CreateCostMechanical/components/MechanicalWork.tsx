@@ -8,7 +8,12 @@ import {
   MechanicalWorkProps,
 } from "../CreateCostMechanical";
 import { func, InputProps } from "../../../components/Dialog";
-import { createOperation, patchOperation } from "../../../http/requests";
+import {
+  createOperation,
+  getCopyMachine,
+  getCopyTractors,
+  patchOperation,
+} from "../../../http/requests";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -20,6 +25,8 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
+import CopyTractorPopUp from "../../CopyTractorPopUp";
+import CopyMachinePopUp from "../../CopyMachinePopUp";
 
 const mechanicalWorkFunc: func<MechanicalWorkProps> = function (
   id,
@@ -103,6 +110,8 @@ const MechanicalWork = observer(
     //   gradeId: "",
     // }
     const [tractorOpen, setTractorOpen] = useState(false);
+    const [copyTractorOpen, setCopyTractorOpen] = useState(false);
+    const [copyMachineOpen, setCopyMachineOpen] = useState(false);
     const [agriculturalOpen, setAgriculturalOpen] = useState(false);
     const [inUpdate, setInUpdate] = useState(false);
     const [inIsErr, setInIsErr] = useState(false);
@@ -114,7 +123,7 @@ const MechanicalWork = observer(
           <Heading as={"h4"} size="md" textAlign={"center"}>
             Внесіть дані для розрахунку
           </Heading>
-          <Box mt={"15px"} w={"590px"} mx={"auto"}>
+          <Box mt={"15px"} mx={"auto"}>
             <Box display={"flex"} gap={3}>
               <Heading as={"h4"} size="sm" minW={"max-content"}>
                 Назва операції
@@ -147,7 +156,12 @@ const MechanicalWork = observer(
                 onChange={(e) => setRes({ ...res, date: e.target.value })}
               />
             </Box>
-            <Box mt={"15px"} display={"flex"} justifyContent={"space-between"}>
+            <Box
+              mt={"15px"}
+              display={"flex"}
+              gap={1}
+              justifyContent={"space-between"}
+            >
               <Box display={"flex"}>
                 <Button
                   size="lg"
@@ -171,11 +185,11 @@ const MechanicalWork = observer(
                   <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
                 </Button>
                 <Box>
-                  <Heading as={"h4"} size="sm">
+                  <Heading as={"h3"} size="sm" fontSize={"15px"}>
                     Трактор
                   </Heading>
                   <Select
-                    w={"173px"}
+                    w={"max-content"}
                     size="sm"
                     value={res.idTractor}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
@@ -206,12 +220,12 @@ const MechanicalWork = observer(
                 </Box>
               </Box>
               <Box>
-                <Heading as={"h4"} size="sm">
+                <Heading as={"h4"} size="sm" fontSize={"15px"}>
                   Розхід палива на 1 год
                 </Heading>
 
                 <Input
-                  w={"200px"}
+                  w={"max-content"}
                   size="sm"
                   placeholder="Вкажіть розхід"
                   type="number"
@@ -225,8 +239,10 @@ const MechanicalWork = observer(
               </Box>
               <Box>
                 <Button
-                  w={"100px"}
+                  w={"100%"}
                   mt={"5px"}
+                  h={"50%"}
+                  fontSize={15}
                   color={"blue.400"}
                   size="lg"
                   onClick={
@@ -237,7 +253,20 @@ const MechanicalWork = observer(
                         }
                   }
                 >
-                  додати <br /> трактор
+                  додати трактор
+                </Button>
+                <Button
+                  fontSize={15}
+                  h={"50%"}
+                  mt={"5px"}
+                  color={"blue.400"}
+                  w={"200px"}
+                  onClick={() => {
+                    getCopyTractors(map);
+                    setCopyTractorOpen(true);
+                  }}
+                >
+                  скопіювати трактор
                 </Button>
               </Box>
             </Box>
@@ -266,7 +295,7 @@ const MechanicalWork = observer(
                     <EditIcon w={"30px"} h={"auto"} color={"blue.400"} />
                   </Button>
                   <Box>
-                    <Heading as={"h4"} size="sm">
+                    <Heading as={"h4"} size="sm" fontSize={"15px"}>
                       СГ машина
                     </Heading>
                     <Select
@@ -301,8 +330,8 @@ const MechanicalWork = observer(
                 </Box>
               </Box>
               <Box>
-                <Heading as={"h4"} size="sm">
-                  Робоча швидкість км/год
+                <Heading as={"h4"} size="sm" fontSize={"15px"}>
+                  Роб. швидкість км/год
                 </Heading>
                 <Input
                   size="sm"
@@ -314,10 +343,12 @@ const MechanicalWork = observer(
                   }}
                 />
               </Box>
-              <Box>
+              <Box w={"min-content"}>
                 <Button
-                  w={"100px"}
                   mt={"5px"}
+                  fontSize={15}
+                  h={"50%"}
+                  w={"100%"}
                   color={"blue.400"}
                   size="lg"
                   onClick={
@@ -328,8 +359,19 @@ const MechanicalWork = observer(
                         }
                   }
                 >
-                  додати <br />
-                  СГ машину
+                  додати СГ машину
+                </Button>
+                <Button
+                  h={"50%"}
+                  mt={"5px"}
+                  fontSize={15}
+                  color={"blue.400"}
+                  onClick={() => {
+                    getCopyMachine(map);
+                    setCopyMachineOpen(true);
+                  }}
+                >
+                  скопіювати СГ машину
                 </Button>
               </Box>
             </Box>
@@ -353,6 +395,14 @@ const MechanicalWork = observer(
             setUpdate={setInUpdate}
             isErr={inIsErr}
             setIsErr={setInIsErr}
+          />
+          <CopyTractorPopUp
+            open={copyTractorOpen}
+            setOpen={setCopyTractorOpen}
+          />
+          <CopyMachinePopUp
+            open={copyMachineOpen}
+            setOpen={setCopyMachineOpen}
           />
         </Box>
         <ModalFooter p={"15px 20px"}>

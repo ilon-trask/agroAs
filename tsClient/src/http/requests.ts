@@ -382,3 +382,29 @@ export function patchWork(map: MapStore, data: any) {
     map.newWork = res;
   });
 }
+export function getCopyTractors(map: MapStore) {
+  client.tractor.getCopyTractors.query().then((res) => {
+    map.copyTractors = [];
+    map.copyTractors = res;
+  });
+}
+export function makeCopyTractor(map: MapStore, tractorId: number) {
+  client.tractor.copyTractor.query({ tractorId }).then((res) => {
+    map.copyTractors = map.copyTractors.filter(
+      (el) => el.id != res.copiedFromId
+    );
+    map.newTractor = res;
+  });
+}
+export function getCopyMachine(map: MapStore) {
+  client.machine.getCopyMachine.query().then((res) => {
+    map.copyMachine = [];
+    map.copyMachine = res;
+  });
+}
+export function makeCopyMachine(map: MapStore, machineId: number) {
+  client.machine.copyMachine.query({ machineId }).then((res) => {
+    map.copyMachine = map.copyMachine.filter((el) => el.id != res.copiedFromId);
+    map.newMachine = res;
+  });
+}

@@ -285,6 +285,7 @@ export interface Itractor {
   numberOfPersonnel: number;
   userId?: string;
   gradeId?: number;
+  copiedFromId?: number;
 }
 export class tractor extends Model<Itractor> {
   declare id: number;
@@ -297,6 +298,7 @@ export class tractor extends Model<Itractor> {
   declare numberOfPersonnel: number;
   declare userId: string;
   declare gradeId?: number;
+  declare copiedFromId?: number;
 }
 
 tractor.init(
@@ -310,6 +312,7 @@ tractor.init(
     fuelConsumption: { type: DataTypes.FLOAT, allowNull: false },
     numberOfPersonnel: { type: DataTypes.INTEGER, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    copiedFromId: { type: DataTypes.NUMBER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -328,6 +331,7 @@ export interface Imachine {
   numberOfServiceP?: number;
   userId?: string;
   gradeId?: number;
+  copiedFromId?: number;
 }
 export class agricultural_machine extends Model<Imachine> {
   declare id: number;
@@ -340,6 +344,7 @@ export class agricultural_machine extends Model<Imachine> {
   declare numberOfServicePersonnel: number;
   declare userId: string;
   declare gradeId?: number;
+  declare copiedFromId?: number;
 }
 
 agricultural_machine.init(
@@ -353,6 +358,7 @@ agricultural_machine.init(
     workingSpeed: { type: DataTypes.FLOAT, allowNull: false },
     numberOfServicePersonnel: { type: DataTypes.INTEGER, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    copiedFromId: { type: DataTypes.NUMBER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -463,6 +469,9 @@ cost_service.belongsTo(tech_operation);
 tech_operation.hasOne(cost_transport, { onDelete: "CASCADE" });
 cost_transport.belongsTo(tech_operation);
 
+agricultural_machine.hasMany(aggregate);
+aggregate.belongsTo(agricultural_machine);
+
 section.hasMany(tech_operation);
 tech_operation.belongsTo(section);
 
@@ -471,9 +480,6 @@ aggregate.belongsTo(tech_operation);
 
 tractor.hasMany(aggregate);
 aggregate.belongsTo(tractor);
-
-agricultural_machine.hasMany(aggregate);
-aggregate.belongsTo(agricultural_machine);
 
 grade.hasMany(tractor);
 

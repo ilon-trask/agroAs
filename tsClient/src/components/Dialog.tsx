@@ -101,7 +101,7 @@ const Dialog: FC<props> = observer(
         <ModalOverlay />
         <ModalContent>
           {children}
-          <Center>{isErr ? "Ви не заповнили поля" : ""}</Center>
+          <Center>{isErr ? "Ви не заповнили поля" : null}</Center>
 
           {errMess ? (
             <Text w={"590px"} mx={"auto"} paddingBottom={"10px"}>

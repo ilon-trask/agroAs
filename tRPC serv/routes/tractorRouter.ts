@@ -2,6 +2,7 @@ import { publicProcedure, router } from "../trpc";
 import z from "zod";
 
 import TractorService from "../controllers/TractorService";
+import { Itractor } from "../models/models";
 
 export const tractorRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
@@ -41,5 +42,21 @@ export const tractorRouter = router({
     )
     .query(
       async ({ input, ctx }) => await TractorService.patch(input, ctx.user)
+    ),
+  getCopyTractors: publicProcedure.query(
+    async ({ ctx }) => await TractorService.getCopyTractors(ctx.user)
+  ),
+  copyTractor: publicProcedure
+    .input(
+      z.object({
+        tractorId: z.number(),
+      })
+    )
+    .query(
+      async ({ input, ctx }) =>
+        (await TractorService.copyTractor(
+          input.tractorId,
+          ctx.user
+        )) as Itractor
     ),
 });

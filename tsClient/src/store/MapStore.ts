@@ -30,6 +30,8 @@ export default class MapStore {
   private _copyCarts: Itech_cart[] = [];
   public isLoading: boolean = true;
   private _works: Ispecial_work[] = [];
+  private _copyTractors: Itractor[] = [];
+  private _copyMachine: Imachine[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -103,6 +105,13 @@ export default class MapStore {
   public set newWork(work: Ispecial_work) {
     this._works.push(work);
   }
+  public set copyTractors(copyTractors: Itractor[]) {
+    this._copyTractors = copyTractors;
+  }
+  public set copyMachine(copyMachine: Imachine[]) {
+    this._copyMachine = copyMachine;
+  }
+
   public get maps() {
     return this._maps;
   }
@@ -141,5 +150,11 @@ export default class MapStore {
   }
   public get copyCarts() {
     return this._copyCarts;
+  }
+  public get copyTractors() {
+    return this._copyTractors;
+  }
+  public get copyMachine() {
+    return this._copyMachine;
   }
 }

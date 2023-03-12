@@ -1,9 +1,6 @@
+import { Op } from "sequelize";
 import { adminId, Principal } from "..";
 import { tractor, Itractor } from "../models/models";
-
-interface Idata {
-  res: Itractor;
-}
 
 class TractorService {
   async getAll(userId: string | undefined) {
@@ -81,6 +78,53 @@ class TractorService {
     });
     if (Tractor == null) throw new Error("");
 
+    return Tractor;
+  }
+  async getCopyTractors(user: Principal | undefined) {
+    if (!user) return;
+    let adminTractors: Itractor[] = JSON.parse(
+      JSON.stringify(
+        await tractor.findAll({
+          where: { userId: adminId },
+        })
+      )
+    );
+    const Tractors: Itractor[] | null = JSON.parse(
+      JSON.stringify(
+        await tractor.findAll({
+          //@ts-ignore
+          where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
+        })
+      )
+    );
+    if (!Tractors) return adminTractors;
+    Tractors.forEach(
+      (Tr) =>
+        (adminTractors = adminTractors.filter((Ad) => Ad.id != Tr.copiedFromId))
+    );
+
+    return adminTractors;
+  }
+  async copyTractor(TractorId: number, user: Principal | undefined) {
+    if (!user) return;
+
+    const tractorData: Itractor | null = await tractor.findOne({
+      where: { id: TractorId },
+    });
+    if (!tractorData) return;
+    const Tractor: Itractor = await tractor.create({
+      brand: tractorData.brand,
+      depreciationPeriod: tractorData.depreciationPeriod,
+      enginePower: tractorData.enginePower,
+      fuelConsumption: tractorData.fuelConsumption,
+      marketCost: tractorData.marketCost,
+      nameTractor: tractorData.nameTractor,
+      numberOfPersonnel: tractorData.numberOfPersonnel,
+      copiedFromId: tractorData.id,
+      gradeId: tractorData.gradeId,
+      userId: user?.sub,
+    });
+    console.log(Tractor);
     return Tractor;
   }
 }

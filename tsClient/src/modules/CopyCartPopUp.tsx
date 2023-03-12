@@ -16,12 +16,10 @@ import { Itech_cart } from "../../../tRPC serv/models/models";
 import { makeCopyCarts } from "../http/requests";
 
 type props = { open: boolean; setOpen: (open: boolean) => void };
-function CopyCartPupUp({ open, setOpen }: props) {
+function CopyCartPopUp({ open, setOpen }: props) {
   const [checked, setChecked] = useState(0);
   const { map } = useContext(Context);
-  function checkedSetter(el: Itech_cart) {
-    setChecked(el.id!);
-  }
+
   return (
     <Modal
       size={"2xl"}
@@ -34,11 +32,12 @@ function CopyCartPupUp({ open, setOpen }: props) {
       <ModalOverlay />
       <ModalContent>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Виберіть карти для копіювання
+          Виберіть карту для копіювання
         </Heading>
         <Box width={"60%"} mx={"auto"}>
           {map.copyCarts.map((el) => (
             <Box
+              key={el.id}
               display={"flex"}
               gap={"10px"}
               p={"10px"}
@@ -46,10 +45,10 @@ function CopyCartPupUp({ open, setOpen }: props) {
               border={"1px"}
               borderRadius={"10px"}
               onClick={() => {
-                checkedSetter(el);
+                setChecked(el.id!);
               }}
               onChange={() => {
-                checkedSetter(el);
+                setChecked(el.id!);
               }}
             >
               <Checkbox isChecked={el.id == checked} />
@@ -61,7 +60,7 @@ function CopyCartPupUp({ open, setOpen }: props) {
           <Button
             isActive={checked == 0}
             onClick={() => {
-              makeCopyCarts(map, checked);
+              if (checked != 0) makeCopyCarts(map, checked);
             }}
           >
             Скопіювати
@@ -72,4 +71,4 @@ function CopyCartPupUp({ open, setOpen }: props) {
   );
 }
 
-export default observer(CopyCartPupUp);
+export default observer(CopyCartPopUp);

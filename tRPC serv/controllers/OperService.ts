@@ -868,7 +868,6 @@ class OperService {
   ) {
     const {
       cartId,
-
       arr: {
         cell,
         res: {
@@ -1059,29 +1058,18 @@ class OperService {
 
     if (!elem) throw new Error("");
     await changeOper(elem, cartId);
-    await cost_material.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_service.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_transport.destroy({
-      where: { techOperationId: operId },
-    });
-    await cost_service.destroy({
-      where: { techOperationId: operId },
-    });
-    await aggregate.destroy({
-      where: {
-        techOperationId: operId,
-      },
-    });
-    await cost_hand_work.destroy({
-      where: { techOperationId: operId },
-    });
-    await tech_operation.destroy({
-      where: { id: operId },
-    });
+    if (elem.cell == "costHandWork") {
+      await cost_hand_work.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costMaterials") {
+      await cost_material.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costMechanical") {
+      await aggregate.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costServices") {
+      await cost_service.destroy({ where: { techOperationId: elem.id } });
+    } else if (elem.cell == "costTransport") {
+      await cost_transport.destroy({ where: { techOperationId: elem.id } });
+    }
+    await tech_operation.destroy({ where: { id: operId } });
     return elem;
   }
   async getProps({ operId }: { operId: number }) {
