@@ -86,10 +86,16 @@ const MapJornal = observer(function () {
             Добавити технологічну карту
           </Button>
           <Button
-            onClick={() => {
-              setOpenCopy(true);
-              getCopyCarts(map);
-            }}
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setOpenCopy(true);
+                    getCopyCarts(map);
+                  }
+            }
           >
             Скопіювати з журналу
           </Button>
