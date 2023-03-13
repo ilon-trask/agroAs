@@ -8,13 +8,8 @@ import { createOperation, patchOperation } from "../../../http/requests";
 import {
   Box,
   Heading,
-  Select,
-  Modal,
-  ModalOverlay,
-  ModalContent,
   ModalBody,
   Button,
-  Center,
   ModalFooter,
   Input,
   Text,
@@ -51,7 +46,7 @@ const createServices: func<ServiceProps> = function (
     }
   }
 };
-const Easy = observer(
+const Service = observer(
   ({
     res,
     setRes,
@@ -171,9 +166,14 @@ const Easy = observer(
             Зберегти
           </Button>
         </ModalFooter>
+        <Text w={"590px"} mx={"auto"}>
+          <b>Увага!</b>
+          <br />
+          Одиниця виміру "ціни" тільки "грн/га"
+        </Text>
       </ModalBody>
     );
   }
 );
 
-export default Easy;
+export default Service;

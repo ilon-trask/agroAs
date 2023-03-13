@@ -45,7 +45,6 @@ export default function CreateWork({
       update={update}
       setUpdate={setUpdate}
       props={WorkProps}
-      errMess={" "}
       isErr={isErr}
       setIsErr={setIsErr}
     >

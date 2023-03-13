@@ -56,7 +56,7 @@ const createMaterials: func<MaterialsProps> = function (
   }
 };
 
-const Easy = observer(
+const Materials = observer(
   ({
     res,
     setRes,
@@ -210,9 +210,16 @@ const Easy = observer(
             Зберегти
           </Button>
         </ModalFooter>
+        <Text w={"590px"} mx={"auto"}>
+          <b>Увага!</b>
+          <br />
+          Одиниці виміру "ціни" повинні відповідати одиницям виміру "розходу"
+          <br />
+          Наприклад (грн/кг) відповідає (кг/га) або (грн/шт) відповідає (шт/га)
+        </Text>
       </ModalBody>
     );
   }
 );
 
-export default Easy;
+export default Materials;

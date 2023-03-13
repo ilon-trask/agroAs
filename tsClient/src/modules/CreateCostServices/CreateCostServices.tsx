@@ -44,13 +44,6 @@ export default function CreateCostServices({
       props={servicesProps}
       isErr={isErr}
       setIsErr={setIsErr}
-      errMess={
-        <span>
-          <b>Увага!</b>
-          <br />
-          Одиниця виміру "ціни" тільки "грн/га"
-        </span>
-      }
     >
       <Service
         res={res as ServiceProps}

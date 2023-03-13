@@ -58,7 +58,6 @@ export default function CreateMachine({
       props={machineProps}
       isErr={isErr}
       setIsErr={setIsErr}
-      errMess={" "}
     >
       <Machine
         res={res as MachineProps}

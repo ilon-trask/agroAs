@@ -23,6 +23,7 @@ import {
   Button,
   ModalFooter,
   Input,
+  Text,
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import CopyTractorPopUp from "../../CopyTractorPopUp";
@@ -440,6 +441,14 @@ const MechanicalWork = observer(
             Зберегти
           </Button>
         </ModalFooter>
+        <Text w={"590px"} mx={"auto"}>
+          <b>Увага!</b>
+          <br />
+          Редагувати можна тільки вибраний трактор або СГ машину
+          <br />
+          Збільшення розходу палива збільшує суму витрат <br />
+          Збільшення робочої швидкості зменшує суму витрат
+        </Text>
       </ModalBody>
     );
   }
