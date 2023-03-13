@@ -47,7 +47,6 @@ export default function CreateCart({
       update={update}
       setUpdate={setUpdate}
       props={CartProps}
-      errMess={" "}
       isErr={isErr}
       setIsErr={setIsErr}
     >
