@@ -13,6 +13,7 @@ import {
   Igrade,
   Icost_hand_work,
   Ispecial_work,
+  Icultures_types,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -32,6 +33,9 @@ export default class MapStore {
   private _works: Ispecial_work[] = [];
   private _copyTractors: Itractor[] = [];
   private _copyMachine: Imachine[] = [];
+  private _cultural: Icultures_types[] = [];
+  private _NoAgreeCarts: resTechCartsWithOpers[] = [];
+  private _agreeCarts: resTechCartsWithOpers[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -111,7 +115,21 @@ export default class MapStore {
   public set copyMachine(copyMachine: Imachine[]) {
     this._copyMachine = copyMachine;
   }
-
+  public set cultural(cultural: Icultures_types[]) {
+    this._cultural = cultural;
+  }
+  public set NoAgreeCarts(NoAgreeCarts: Itech_cart[]) {
+    this._NoAgreeCarts = NoAgreeCarts;
+  }
+  public set newNoAgreeCarts(maps: Itech_cart) {
+    this._NoAgreeCarts.push(maps);
+  }
+  public set agreeCarts(maps: resTechCartsWithOpers[]) {
+    this._agreeCarts = maps;
+  }
+  public set newAgreeCarts(maps: resTechCartsWithOpers) {
+    this._agreeCarts.push(maps);
+  }
   public get maps() {
     return this._maps;
   }
@@ -156,5 +174,14 @@ export default class MapStore {
   }
   public get copyMachine() {
     return this._copyMachine;
+  }
+  public get cultural() {
+    return this._cultural;
+  }
+  public get NoAgreeCarts() {
+    return this._NoAgreeCarts;
+  }
+  public get agreeCarts() {
+    return this._agreeCarts;
   }
 }

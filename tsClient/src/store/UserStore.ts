@@ -1,8 +1,9 @@
 import { makeAutoObservable } from "mobx";
+import { IUserRole } from "../../../tRPC serv";
 
 export default class UserStore {
   private _isAuth: boolean = false;
-  private _role: "ADMIN" | "authenticated" | "" | undefined = "";
+  private _role: IUserRole = "";
   constructor() {
     makeAutoObservable(this);
   }
@@ -10,8 +11,8 @@ export default class UserStore {
   set isAuth(auth: boolean) {
     this._isAuth = auth;
   }
-  set role(user) {
-    this._role = user;
+  set role(role) {
+    this._role = role;
   }
   get isAuth() {
     return this._isAuth;

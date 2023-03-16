@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
-import { getCarts, supabase } from "../http/requests";
+import { getCarts, getWorks, supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
 import { Context } from "../main";
 import { Box } from "@chakra-ui/react";
+import { IUserRole } from "../../../tRPC serv";
 export default function AuthPage() {
   const location = useLocation().pathname;
   const { map, user } = useContext(Context);
@@ -15,13 +16,10 @@ export default function AuthPage() {
       navigate("/");
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
-        user.role = data.session.user.role as
-          | "ADMIN"
-          | "authenticated"
-          | ""
-          | undefined;
+        user.role = data.session.user.role as IUserRole;
         user.isAuth = true;
         getCarts(map);
+        getWorks(map);
       }
     }
   });

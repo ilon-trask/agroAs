@@ -8,7 +8,6 @@ import {
 } from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
 import {
-  Icost_hand_work,
   Igrade,
   Imachine,
   Isection,
@@ -19,8 +18,6 @@ import {
   tech_operation,
   tractor,
 } from "../../../tRPC serv/models/models";
-// import dotenv from "dotenv";
-// dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -39,7 +36,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -106,16 +103,25 @@ export async function getCarts(map: MapStore) {
       map.costTransport = [];
       map.opers = [];
       operationsFilter(res.carts, map);
+      map.isLoading = false;
     });
-  map.isLoading = false;
 }
 
 export async function setIsPublic(
   map: MapStore,
-  data: { id: number; isPublic: boolean }
+  data: {
+    id: number;
+    isPublic: boolean;
+    authorName?: string;
+    cultural?: number;
+  }
 ) {
   map.isLoading = true;
   await client.cart.setIsPublic.query(data).then((res) => {
+    if (!res) {
+      map.isLoading = false;
+      return;
+    }
     map.opers = [];
     map.costMechanical = [];
     map.costMaterials = [];
@@ -123,8 +129,8 @@ export async function setIsPublic(
     map.costTransport = [];
     map.maps = map.maps.filter((el) => el.id != data.id);
     operationsFilter(res, map);
+    map.isLoading = false;
   });
-  map.isLoading = false;
 }
 
 export async function deleteCart(map: MapStore, id: number) {
@@ -133,8 +139,8 @@ export async function deleteCart(map: MapStore, id: number) {
     console.log(data.id);
 
     map.maps = map.maps.filter((el) => el.id != data.id);
+    map.isLoading = false;
   });
-  map.isLoading = false;
 }
 
 export async function createCart(map: MapStore, data: Itech_cart) {
@@ -142,8 +148,8 @@ export async function createCart(map: MapStore, data: Itech_cart) {
   //@ts-ignore
   await client.cart.create.query(data).then((res: resTechCartsWithOpers) => {
     map.newMap = res;
+    map.isLoading = false;
   });
-  map.isLoading = false;
 }
 
 export async function updateMap(map: MapStore, dat: any) {
@@ -184,9 +190,9 @@ export async function updateMap(map: MapStore, dat: any) {
           }
         }
       }
+      map.isLoading = false;
     }
   );
-  map.isLoading = false;
 }
 
 export async function deleteOper(
@@ -202,8 +208,8 @@ export async function deleteOper(
       map.opers = map.opers.filter((el) => el.id != data.id);
       let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
       mapData.totalCost! -= operValue(data);
+      map.isLoading = false;
     });
-  map.isLoading = false;
 }
 
 export async function createOperation(
@@ -241,8 +247,8 @@ export async function createOperation(
       } else if ("fuelConsumption" in prope) {
         map.newCostMechanical = prope;
       }
+      map.isLoading = false;
     });
-  map.isLoading = false;
 }
 
 export async function patchOperation(
@@ -297,8 +303,8 @@ export async function patchOperation(
       } else if (res.cost_hand_work) {
         map.newCostHandWork = res.cost_hand_work;
       }
+      map.isLoading = false;
     });
-  map.isLoading = false;
 }
 
 export function getSection(map: MapStore) {
@@ -316,8 +322,8 @@ export function patchTractor(map: MapStore, res: Itractor) {
   client.tractor.patch.query(res).then((data: Itractor) => {
     map.tractor = map.tractor.filter((el) => el.id != data.id);
     map.newTractor = data;
+    map.isLoading = false;
   });
-  map.isLoading = false;
 }
 
 export function getTractor(map: MapStore) {
@@ -337,8 +343,8 @@ export function patchMachine(map: MapStore, res: Imachine) {
   client.machine.patch.query(res).then((data: Imachine) => {
     map.machine = map.machine.filter((el) => el.id != data.id);
     map.newMachine = data;
+    map.isLoading = false;
   });
-  map.isLoading = false;
 }
 
 export function getMachine(map: MapStore) {
@@ -406,5 +412,43 @@ export function makeCopyMachine(map: MapStore, machineId: number) {
   client.machine.copyMachine.query({ machineId }).then((res) => {
     map.copyMachine = map.copyMachine.filter((el) => el.id != res.copiedFromId);
     map.newMachine = res;
+  });
+}
+export function getCultural(map: MapStore) {
+  client.cultural.get.query().then((res) => {
+    map.cultural = [];
+    map.cultural = res;
+  });
+}
+export function getIsAgreeCarts(map: MapStore) {
+  client.cart.getNoAgreeCarts.query().then((res) => {
+    map.NoAgreeCarts = [];
+    map.NoAgreeCarts = res;
+  });
+}
+export function setIsAgreeCarts(
+  map: MapStore,
+  isAgree: boolean,
+  cartId: number,
+  authorName?: string,
+  cultural?: number
+) {
+  client.cart.setIsAgreeCarts
+    .query({
+      isAgree: isAgree,
+      cartId: cartId,
+      authorName: authorName,
+      cultural: cultural,
+    })
+    .then((res) => {
+      console.log(res);
+    });
+}
+export function agreeCarts(map: MapStore) {
+  map.isLoading = true;
+  client.cart.getAgreeCarts.query().then((res) => {
+    map.agreeCarts = [];
+    map.agreeCarts = res;
+    map.isLoading = false;
   });
 }

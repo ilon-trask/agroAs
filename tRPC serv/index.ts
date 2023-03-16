@@ -21,6 +21,7 @@ import { gradesRouter } from "./routes/gradesRouter";
 import OS from "os";
 import { inferAsyncReturnType } from "@trpc/server";
 import { workRouter } from "./routes/workRouter";
+import { culturalRouter } from "./routes/culturalRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -34,6 +35,7 @@ const appRouter = router({
   oper: operRouter,
   works: workRouter,
   grade: gradesRouter,
+  cultural: culturalRouter,
   "": publicProcedure.query(() => "some text"),
   getUser: publicProcedure.query(() => {
     console.log(users);
@@ -57,11 +59,20 @@ const appRouter = router({
 //   },
 // }).listen(5000);
 
+export type IUserRole =
+  | "ADMIN"
+  | "authenticated"
+  | ""
+  | "AUTHOR"
+  | "service_role";
+
 const app = express();
+
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
+
 export type Principal = {
   sub: string;
-  role: string;
+  role: IUserRole;
   email: string;
 };
 const createContext = ({

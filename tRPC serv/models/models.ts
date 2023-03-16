@@ -43,6 +43,9 @@ export interface Itech_cart {
   priceDiesel: number;
   isPublic?: boolean;
   userId: string;
+  culturesTypeId?: number;
+  authorName?: string;
+  isAgree?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -54,6 +57,8 @@ export class tech_cart extends Model<Itech_cart> {
   declare priceDiesel: number;
   declare isPublic?: boolean;
   declare userId: string;
+  declare authorName?: string;
+  declare isAgree?: boolean;
 }
 
 tech_cart.init(
@@ -63,8 +68,10 @@ tech_cart.init(
     area: { type: DataTypes.INTEGER, allowNull: false },
     salary: { type: DataTypes.INTEGER, allowNull: false },
     priceDiesel: { type: DataTypes.INTEGER, allowNull: false },
-    isPublic: { type: DataTypes.BOOLEAN },
+    isPublic: { type: DataTypes.BOOLEAN, defaultValue: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    authorName: { type: DataTypes.STRING },
+    isAgree: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -457,6 +464,23 @@ cost_hand_work.init(
   // { sequelize, timestamps: false }
 );
 
+export interface Icultures_types {
+  id?: number;
+  nameCulture: string;
+}
+export class cultures_types extends Model<Icultures_types> {
+  declare id?: number;
+  declare nameCulture: string;
+}
+
+cultures_types.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    nameCulture: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -488,3 +512,5 @@ grade.hasMany(agricultural_machine);
 grade.hasMany(cost_hand_work);
 
 tech_operation.hasOne(cost_hand_work);
+
+cultures_types.hasMany(tech_cart);

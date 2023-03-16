@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
-import OperSection from "../components/OperSection";
+import OperSection from "../modules/OperSection";
 
 import { Context } from "../main";
 import CreateCostHandWork from "../modules/CreateCostHandWork";

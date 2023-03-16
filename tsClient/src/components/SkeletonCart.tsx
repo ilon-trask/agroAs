@@ -11,54 +11,44 @@ import {
   CardFooter,
   ButtonGroup,
   Button,
+  Skeleton,
 } from "@chakra-ui/react";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { TEHMAP_ROUTER } from "../utils/consts";
-type props = { e: Itech_cart | undefined };
-function MainTable({ e }: props) {
+function MainTable() {
   const navigate = useNavigate();
   return (
     <Card maxW="sm">
       <CardBody pt={0}>
         <Stack mt="2" spacing="3">
-          <Heading size="md">Культура {e?.nameCart || ""}</Heading>
-          <Text>Автор: {e?.authorName}</Text>
+          <Skeleton h={"24px"} w={"235px"} />
+          <Skeleton h={"15px"} w={"135px"} />
         </Stack>
-        <Image
-          src={"../../" + e?.nameCart + ".jpg"}
-          h={"auto"}
+        <Skeleton
+          mt={"3"}
+          h={"176px"}
           w={"220px"}
+          borderRadius={"200%"}
           mx={"auto"}
-          alt={e?.nameCart}
         />
         <Stack mt="6" spacing="1">
           <Box display={"flex"} justifyContent={"space-between"}>
-            <Box fontWeight={"bold"}>Площа</Box>
-            <Box>{e?.area || "0"}</Box>
+            <Skeleton w={"246px"} h={"24px"} />
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
-            <Box fontWeight={"bold"}>Загальна вартість </Box>
-            <Box>1000000</Box>
+            <Skeleton w={"246px"} h={"24px"} />
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
-            <Box fontWeight={"bold"}>Собівартість 1 га</Box>
-            <Box>{e?.totalCost || "0"}</Box>
+            <Skeleton w={"246px"} h={"24px"} />
           </Box>
         </Stack>
       </CardBody>
       <Divider />
       <CardFooter>
         <ButtonGroup spacing="2">
-          <Button
-            onClick={() => {
-              navigate(TEHMAP_ROUTER + "/" + e?.id);
-              console.log(TEHMAP_ROUTER + "/" + e?.id);
-            }}
-          >
-            До карти
-          </Button>
+          <Skeleton w={"102px"} h={"40px"} />
           {/* <Button variant="ghost" colorScheme="blue">
             Технологія
           </Button> */}
