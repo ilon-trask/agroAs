@@ -1,14 +1,11 @@
 import { observer } from "mobx-react-lite";
 import React, { FC, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Itech_cart } from "../../../tRPC serv/models/models";
 import { deleteCart, setIsPublic } from "../http/requests";
 import { Context } from "../main";
 import { cartProps } from "../modules/CreateCart";
-import { Icart } from "../pages/MapJornal";
 import MapStore from "../store/MapStore";
 import { TEHMAP_ROUTER } from "../utils/consts";
-import style from "./TableItem.module.css";
 
 import { Tr, Td, Checkbox } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
@@ -21,8 +18,15 @@ interface props {
   setShowAlert: (showAlert: boolean) => void;
   deleteOpen: any;
   setDeleteOpen: (deleteOpen: any) => void;
+  setPublicationOpen: ({
+    isOpen,
+    data: { id, isPublic },
+  }: {
+    isOpen: boolean;
+    data: { id: number; isPublic: boolean };
+  }) => void;
 }
-const td = "text-align: center;";
+
 const CartsTableItem = observer(
   ({
     e,
@@ -32,6 +36,7 @@ const CartsTableItem = observer(
     setShowAlert,
     deleteOpen,
     setDeleteOpen,
+    setPublicationOpen,
   }: props) => {
     const { map, user } = useContext(Context);
     return (
@@ -87,13 +92,20 @@ const CartsTableItem = observer(
         </Td>
 
         <Td>
-          {user.role == "ADMIN" && (
+          {(user.role == "ADMIN" || user.role == "AUTHOR") && (
             <div
               onClick={() => {
-                setIsPublic(map, { id: e.id!, isPublic: !e.isPublic });
+                if (e.isPublic) {
+                  setIsPublic(map, { id: e.id!, isPublic: !e.isPublic });
+                } else {
+                  setPublicationOpen({
+                    isOpen: true,
+                    data: { id: e.id!, isPublic: !e.isPublic },
+                  });
+                }
               }}
             >
-              <Checkbox size="md" colorScheme="green" isChecked={!!e.isPublic}>
+              <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>
                 опублікувати
               </Checkbox>
             </div>

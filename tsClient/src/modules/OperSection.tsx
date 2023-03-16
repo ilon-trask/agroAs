@@ -121,7 +121,7 @@ function OperSection({
         <ModalFooter>
           <Box>
             <Button
-              className={css.button}
+              mt={"10px"}
               onClick={() => {
                 if (cell === "" || section === "") {
                   setIsErr(true);

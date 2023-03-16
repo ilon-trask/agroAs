@@ -49,16 +49,6 @@ export default function CreateCostMechanical({
       props={mechanicalWorkProps}
       isErr={isErr}
       setIsErr={setIsErr}
-      errMess={
-        <span>
-          <b>Увага!</b>
-          <br />
-          Редагувати можна тільки вибраний трактор або СГ машину
-          <br />
-          Збільшення розходу палива збільшує суму витрат <br />
-          Збільшення робочої швидкості зменшує суму витрат
-        </span>
-      }
     >
       <MechanicalWork
         res={res as MechanicalWorkProps}

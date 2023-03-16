@@ -9,13 +9,7 @@ import { TracProps } from "../modules/CreateTractor/CreateTractor";
 import { MachineProps } from "../modules/CreateMachine/CreateMachine";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork/CreateCostHandWork";
 import { MaterialsProps } from "../modules/CreateCostMaterials/CreateCostMaterials";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  Center,
-  Text,
-} from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalContent, Center } from "@chakra-ui/react";
 export type func<T> = (
   id: number,
   map: MapStore,
@@ -60,7 +54,6 @@ interface props {
   setUpdate: (update: boolean) => void;
   children: ReactChild | ReactNode;
   props: resType;
-  errMess?: " " | JSX.Element;
   isErr: boolean;
   setIsErr: (isErr: boolean) => void;
 }
@@ -74,7 +67,7 @@ const Dialog: FC<props> = observer(
     setUpdate,
     children,
     props,
-    errMess,
+
     isErr,
     setIsErr,
   }) => {
@@ -102,22 +95,6 @@ const Dialog: FC<props> = observer(
         <ModalContent>
           {children}
           <Center>{isErr ? "Ви не заповнили поля" : null}</Center>
-
-          {errMess ? (
-            <Text w={"590px"} mx={"auto"} paddingBottom={"10px"}>
-              {errMess}
-            </Text>
-          ) : (
-            <Text w={"590px"} mx={"auto"}>
-              <b>Увага!</b>
-              <br />
-              Одиниці виміру "ціни" повинні відповідати одиницям виміру
-              "розходу"
-              <br />
-              Наприклад (грн/кг) відповідає (кг/га) або (грн/шт) відповідає
-              (шт/га)
-            </Text>
-          )}
         </ModalContent>
       </Modal>
     );

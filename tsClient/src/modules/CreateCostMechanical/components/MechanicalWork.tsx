@@ -23,6 +23,7 @@ import {
   Button,
   ModalFooter,
   Input,
+  Text,
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import CopyTractorPopUp from "../../CopyTractorPopUp";
@@ -261,10 +262,16 @@ const MechanicalWork = observer(
                   mt={"5px"}
                   color={"blue.400"}
                   w={"200px"}
-                  onClick={() => {
-                    getCopyTractors(map);
-                    setCopyTractorOpen(true);
-                  }}
+                  onClick={
+                    user.role == ""
+                      ? () => {
+                          setShowAlert(true);
+                        }
+                      : () => {
+                          getCopyTractors(map);
+                          setCopyTractorOpen(true);
+                        }
+                  }
                 >
                   скопіювати трактор
                 </Button>
@@ -299,6 +306,7 @@ const MechanicalWork = observer(
                       СГ машина
                     </Heading>
                     <Select
+                      w={"max-content"}
                       size="sm"
                       value={res.idMachine}
                       onChange={(e: ChangeEvent<HTMLSelectElement>) => {
@@ -366,10 +374,16 @@ const MechanicalWork = observer(
                   mt={"5px"}
                   fontSize={15}
                   color={"blue.400"}
-                  onClick={() => {
-                    getCopyMachine(map);
-                    setCopyMachineOpen(true);
-                  }}
+                  onClick={
+                    user.role == ""
+                      ? () => {
+                          setShowAlert(true);
+                        }
+                      : () => {
+                          getCopyMachine(map);
+                          setCopyMachineOpen(true);
+                        }
+                  }
                 >
                   скопіювати СГ машину
                 </Button>
@@ -405,8 +419,9 @@ const MechanicalWork = observer(
             setOpen={setCopyMachineOpen}
           />
         </Box>
-        <ModalFooter p={"15px 20px"}>
+        <ModalFooter p={"0"}>
           <Button
+            mt={"20px"}
             onClick={() =>
               mechanicalWorkFunc(
                 +id!,
@@ -426,6 +441,14 @@ const MechanicalWork = observer(
             Зберегти
           </Button>
         </ModalFooter>
+        <Text w={"590px"} mx={"auto"}>
+          <b>Увага!</b>
+          <br />
+          Редагувати можна тільки вибраний трактор або СГ машину
+          <br />
+          Збільшення розходу палива збільшує суму витрат <br />
+          Збільшення робочої швидкості зменшує суму витрат
+        </Text>
       </ModalBody>
     );
   }

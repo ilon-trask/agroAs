@@ -134,7 +134,14 @@ export const cartRouter = router({
       return cart;
     }),
   setIsPublic: publicProcedure
-    .input(z.object({ id: z.number(), isPublic: z.boolean() }))
+    .input(
+      z.object({
+        id: z.number(),
+        isPublic: z.boolean(),
+        authorName: z.string().optional(),
+        cultural: z.number().optional(),
+      })
+    )
     .query(async ({ input, ctx }) => {
       const cart = await TechCartService.setIsPublic(input, ctx.user);
       return cart;
@@ -155,4 +162,31 @@ export const cartRouter = router({
       );
       return res;
     }),
+  getNoAgreeCarts: publicProcedure.query(async () => {
+    const res: Itech_cart[] = await TechCartService.getIsAgreeCarts();
+    return res;
+  }),
+  setIsAgreeCarts: publicProcedure
+    .input(
+      z.object({
+        isAgree: z.boolean(),
+        cartId: z.number(),
+        authorName: z.string().optional(),
+        cultural: z.number().optional(),
+      })
+    )
+    .query(
+      async ({ input, ctx }) =>
+        await TechCartService.setIsAgreeCarts(
+          ctx.user,
+          input.isAgree,
+          input.cartId,
+          input.authorName,
+          input.cultural
+        )
+    ),
+  getAgreeCarts: publicProcedure.query(async () => {
+    const res = await TechCartService.getAgreeCarts();
+    return res;
+  }),
 });

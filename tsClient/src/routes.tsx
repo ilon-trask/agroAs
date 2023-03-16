@@ -2,6 +2,7 @@ import Auth from "./pages/Auth";
 import CalendarPage from "./pages/CalenderPage";
 import Main from "./pages/MainPage";
 import MapJornal from "./pages/MapJornal";
+import StartPage from "./pages/StartPage";
 import TechnologicalMap from "./pages/TechnologicalMap";
 import {
   LOGIN_ROUTE,
@@ -16,11 +17,7 @@ export const authRoutes = [];
 export const publicRoutes = [
   {
     path: MAP_ROUTE,
-    Component: <MapJornal />,
-  },
-  {
-    path: "/main",
-    Component: <Main />,
+    Component: <StartPage />,
   },
   {
     path: LOGIN_ROUTE,

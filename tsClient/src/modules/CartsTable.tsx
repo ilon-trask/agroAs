@@ -8,18 +8,7 @@ import { cartProps } from "./CreateCart";
 
 import Loader from "../components/Loader";
 
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Box,
-} from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 
 interface props {
@@ -30,6 +19,13 @@ interface props {
   setShowAlert: (showAlert: boolean) => void;
   deleteOpen: any;
   setDeleteOpen: (deleteOpen: any) => void;
+  setPublicationOpen: ({
+    isOpen,
+    data: { id, isPublic },
+  }: {
+    isOpen: boolean;
+    data: { id: number; isPublic: boolean };
+  }) => void;
 }
 
 const CartsTable = observer(
@@ -41,6 +37,7 @@ const CartsTable = observer(
     setShowAlert,
     deleteOpen,
     setDeleteOpen,
+    setPublicationOpen,
   }: props) => {
     const { map, user } = useContext(Context);
 
@@ -54,7 +51,7 @@ const CartsTable = observer(
             <Th>Загальна вартість (грн)</Th>
             <Th>Витрати на 1 га (грн)</Th>
             <Th></Th>
-            {user.role == "ADMIN" && <Th></Th>}
+            {(user.role == "ADMIN" || user.role == "AUTHOR") && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -75,6 +72,7 @@ const CartsTable = observer(
               setShowAlert={setShowAlert}
               deleteOpen={deleteOpen}
               setDeleteOpen={setDeleteOpen}
+              setPublicationOpen={setPublicationOpen}
             />
           ))}
         </Tbody>

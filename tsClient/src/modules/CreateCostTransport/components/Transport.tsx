@@ -51,7 +51,7 @@ const createTransport: func<TransportProps> = function (
     }
   }
 };
-const Easy = observer(
+const Transport = observer(
   ({
     res,
     setRes,
@@ -171,9 +171,14 @@ const Easy = observer(
             Зберегти
           </Button>
         </ModalFooter>
+        <Text w={"590px"} mx={"auto"}>
+          <b>Увага!</b>
+          <br />
+          Одиниця виміру "ціни" тільки "грн/га"
+        </Text>
       </ModalBody>
     );
   }
 );
 
-export default Easy;
+export default Transport;

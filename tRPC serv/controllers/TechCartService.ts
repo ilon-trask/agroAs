@@ -139,25 +139,29 @@ const cartsIncludes = [
 ];
 async function changeCart(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
-  const carts = JSON.parse(JSON.stringify(Scarts));
+  const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let sum: number = 0;
-    for (let j = 0; j < cart.tech_operations.length; j++) {
-      let oper: resTechOperation = cart.tech_operations[j];
+    if (cart.tech_operations)
+      for (let j = 0; j < cart.tech_operations.length; j++) {
+        let oper: resTechOperation = cart.tech_operations[j];
 
-      let el = await changeOper(oper, oper.techCartId!);
-      if (!el) throw new Error("");
+        let el = await changeOper(oper, oper.techCartId!);
+        if (!el) throw new Error("");
 
-      cart.tech_operations[j] = el;
-      sum +=
-        el.costMachineWork! + el.costCars! + el.costFuel! + el.costHandWork! ||
-        el.costHandWork ||
-        el.costServices ||
-        el.costTransport ||
-        el.costMaterials ||
-        0;
-    }
+        cart.tech_operations[j] = el;
+        sum +=
+          el.costMachineWork! +
+            el.costCars! +
+            el.costFuel! +
+            el.costHandWork! ||
+          el.costHandWork ||
+          el.costServices ||
+          el.costTransport ||
+          el.costMaterials ||
+          0;
+      }
 
     cart.totalCost = sum;
   }
@@ -297,13 +301,28 @@ class TechCartService {
     return { id };
   }
   async setIsPublic(
-    data: { id: number; isPublic: boolean },
+    data: {
+      id: number;
+      isPublic: boolean;
+      authorName?: string;
+      cultural?: number;
+    },
     user: Principal | undefined
   ) {
     if (!user) return;
-    if (user.role != "ADMIN") return;
-    const { id, isPublic } = data;
-    tech_cart.update({ isPublic }, { where: { id } });
+    if (user.role != "ADMIN" && user.role != "AUTHOR") return;
+    const { id, isPublic, authorName, cultural } = data;
+    if (isPublic == false) {
+      await tech_cart.update(
+        { isPublic, authorName, culturesTypeId: cultural, isAgree: false },
+        { where: { id } }
+      );
+    } else {
+      await tech_cart.update(
+        { isPublic, authorName, culturesTypeId: cultural },
+        { where: { id } }
+      );
+    }
     //@ts-ignore
     let cart: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { id },
@@ -331,25 +350,35 @@ class TechCartService {
     );
 
     if (!cartsBefore) return;
-    const tractors: Itractor[] | [] = await tractor.findAll({
-      //@ts-ignore
-      where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
-    });
-    function checkTractorId(authorTractorId: number | undefined) {
+    async function getExistTractors() {
+      const Tractors: Itractor[] = await tractor.findAll({
+        //@ts-ignore
+        where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
+      });
+      console.log(Tractors);
+
+      return Tractors;
+    }
+    async function getExistMachines() {
+      return await agricultural_machine.findAll({
+        //@ts-ignore
+        where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
+      });
+    }
+    async function checkTractorId(authorTractorId: number | undefined) {
+      let tractors = await getExistTractors();
+      // console.log(tractors);
+
       for (let i = 0; i < tractors.length; i++) {
         const el = tractors[i];
         if (el.copiedFromId == authorTractorId) {
           return el.id;
         }
       }
-
       return false;
     }
-    const machines: Imachine[] | [] = await agricultural_machine.findAll({
-      //@ts-ignore
-      where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
-    });
-    function checkMachineId(authorMachineId: number | undefined) {
+    async function checkMachineId(authorMachineId: number | undefined) {
+      let machines = await getExistMachines();
       for (let i = 0; i < machines.length; i++) {
         const el = machines[i];
         if (el.copiedFromId == authorMachineId) {
@@ -364,7 +393,143 @@ class TechCartService {
       const cart = cartsBefore[i];
 
       if (!cart.tech_operations) return;
-
+      async function mapTechOperation(
+        cart: resTechCartsWithOpers,
+        user: Principal
+      ) {
+        if (!cart.tech_operations) return;
+        let res: [] | any = [];
+        for (let i = 0; i < cart.tech_operations.length; i++) {
+          const el = cart.tech_operations[i];
+          let isTractor;
+          let isMachine;
+          if (el.cell == "costMechanical") {
+            isTractor = await checkTractorId(el.aggregate?.tractor?.id);
+            isMachine = await checkMachineId(
+              el.aggregate?.agricultural_machine.id
+            );
+          }
+          res.push({
+            nameOperation: el.nameOperation,
+            sectionId: el.sectionId,
+            cell: el.cell,
+            ...(el.cell == "costMechanical"
+              ? {
+                  aggregate: {
+                    amountOfMachineDepreciationPerHour:
+                      el.aggregate?.amountOfMachineDepreciationPerHour,
+                    amountOfTractorDepreciationPerHour:
+                      el.aggregate?.amountOfTractorDepreciationPerHour,
+                    fuelConsumption: el.aggregate?.fuelConsumption!,
+                    pricePerHourDiesel: el.aggregate?.pricePerHourDiesel,
+                    pricePerHourServicePersonnel:
+                      el.aggregate?.pricePerHourServicePersonnel,
+                    unitProductionAggregate:
+                      el.aggregate?.unitProductionAggregate,
+                    workingSpeed: el.aggregate?.workingSpeed!,
+                    ...(isTractor
+                      ? { tractorId: isTractor }
+                      : {
+                          tractorId: el.aggregate?.tractorId,
+                          tractor: {
+                            brand: el.aggregate?.tractor?.brand,
+                            depreciationPeriod:
+                              el.aggregate?.tractor?.depreciationPeriod,
+                            enginePower: el.aggregate?.tractor?.enginePower,
+                            fuelConsumption:
+                              el.aggregate?.tractor?.fuelConsumption,
+                            marketCost: el.aggregate?.tractor?.marketCost,
+                            nameTractor: el.aggregate?.tractor?.nameTractor,
+                            numberOfPersonnel:
+                              el.aggregate?.tractor?.numberOfPersonnel,
+                            gradeId: el.aggregate?.tractor?.gradeId,
+                            userId: user.sub,
+                            copiedFromId: el.aggregate?.tractor.id,
+                          },
+                        }),
+                    ...(isMachine
+                      ? { agriculturalMachineId: isMachine }
+                      : {
+                          agriculturalMachineId:
+                            el.aggregate?.agriculturalMachineId,
+                          agricultural_machine: {
+                            brand: el.aggregate?.agricultural_machine?.brand,
+                            depreciationPeriod:
+                              el.aggregate?.agricultural_machine
+                                ?.depreciationPeri,
+                            marketCost:
+                              el.aggregate?.agricultural_machine?.marketCost,
+                            nameMachine:
+                              el.aggregate?.agricultural_machine?.nameMachine,
+                            numberOfServicePersonnel:
+                              el.aggregate?.agricultural_machine
+                                ?.numberOfServiceP,
+                            widthOfCapture:
+                              el.aggregate?.agricultural_machine
+                                ?.widthOfCapture,
+                            workingSpeed:
+                              el.aggregate?.agricultural_machine?.workingSpeed,
+                            gradeId:
+                              el.aggregate?.agricultural_machine?.gradeId,
+                            userId: user.sub,
+                            copiedFromId: el.aggregate?.agricultural_machine.id,
+                          },
+                        }),
+                  },
+                }
+              : el.cell == "costHandWork"
+              ? {
+                  cost_hand_work: {
+                    gradeId: el.cost_hand_work?.gradeId,
+                    nameOper: el.cost_hand_work?.nameOper,
+                    pricePerHourPersonnel:
+                      el.cost_hand_work?.pricePerHourPersonnel,
+                    productionPerShift: el.cost_hand_work?.productionPerShift,
+                    productionRateAmount:
+                      el.cost_hand_work?.productionRateAmount,
+                    productionRateTime: el.cost_hand_work?.productionRateTime,
+                    productionRateWeight:
+                      el.cost_hand_work?.productionRateWeight,
+                    salaryPerShift: el.cost_hand_work?.salaryPerShift,
+                    spending: el.cost_hand_work?.spending,
+                    type: el.cost_hand_work?.type,
+                    yieldСapacity: el.cost_hand_work?.yieldСapacity,
+                    unitOfMeasurement: el.cost_hand_work?.unitOfMeasurement,
+                  },
+                }
+              : el.cell == "costMaterials"
+              ? {
+                  cost_material: {
+                    consumptionPerHectare:
+                      el.cost_material?.consumptionPerHectare,
+                    nameMaterials: el.cost_material?.nameMaterials,
+                    nameOper: el.cost_material?.nameOper,
+                    price: el.cost_material?.price,
+                    unitsOfConsumption: el.cost_material?.unitsOfConsumption,
+                    unitsOfCost: el.cost_material?.unitsOfCost,
+                  },
+                }
+              : el.cell == "costServices"
+              ? {
+                  cost_service: {
+                    nameService: el.cost_service?.nameService,
+                    price: el.cost_service?.price,
+                    unitsOfCost: el.cost_service?.unitsOfCost,
+                  },
+                }
+              : el.cell == "costTransport"
+              ? {
+                  cost_transport: {
+                    nameTransport: el.cost_transport?.nameTransport,
+                    price: el.cost_transport?.price,
+                    unitsOfCost: el.cost_transport?.unitsOfCost,
+                  },
+                }
+              : {}),
+          });
+        }
+        return res;
+      }
       cartIn = JSON.parse(
         JSON.stringify(
           await tech_cart.create(
@@ -375,158 +540,8 @@ class TechCartService {
               priceDiesel: cart.priceDiesel,
               salary: cart.salary,
               userId: user.sub,
-              createdAt: cart.createdAt,
-              updatedAt: cart.updatedAt,
               //@ts-ignore
-              tech_operations: cart.tech_operations.map((el) => {
-                const isTractor = checkTractorId(el.aggregate?.tractor?.id);
-                const isMachine = checkMachineId(
-                  el.aggregate?.agricultural_machine.id
-                );
-                return {
-                  nameOperation: el.nameOperation,
-                  sectionId: el.sectionId,
-                  cell: el.cell,
-                  ...(el.cell == "costMechanical"
-                    ? {
-                        aggregate: {
-                          amountOfMachineDepreciationPerHour:
-                            el.aggregate?.amountOfMachineDepreciationPerHour,
-                          amountOfTractorDepreciationPerHour:
-                            el.aggregate?.amountOfTractorDepreciationPerHour,
-                          fuelConsumption: el.aggregate?.fuelConsumption!,
-                          pricePerHourDiesel: el.aggregate?.pricePerHourDiesel,
-                          pricePerHourServicePersonnel:
-                            el.aggregate?.pricePerHourServicePersonnel,
-                          unitProductionAggregate:
-                            el.aggregate?.unitProductionAggregate,
-                          workingSpeed: el.aggregate?.workingSpeed!,
-                          createdAt: el.createdAt,
-                          updatedAt: el.updatedAt,
-                          ...(isTractor
-                            ? { tractorId: isTractor }
-                            : {
-                                tractorId: el.aggregate?.tractorId,
-                                tractor: {
-                                  brand: el.aggregate?.tractor?.brand,
-                                  depreciationPeriod:
-                                    el.aggregate?.tractor?.depreciationPeriod,
-                                  enginePower:
-                                    el.aggregate?.tractor?.enginePower,
-                                  fuelConsumption:
-                                    el.aggregate?.tractor?.fuelConsumption,
-                                  marketCost: el.aggregate?.tractor?.marketCost,
-                                  nameTractor:
-                                    el.aggregate?.tractor?.nameTractor,
-                                  numberOfPersonnel:
-                                    el.aggregate?.tractor?.numberOfPersonnel,
-                                  gradeId: el.aggregate?.tractor?.gradeId,
-                                  userId: user.sub,
-                                  copiedFromId: el.aggregate?.tractor.id,
-                                  createdAt: el.createdAt,
-                                  updatedAt: el.updatedAt,
-                                },
-                              }),
-                          ...(isMachine
-                            ? { agriculturalMachineId: isMachine }
-                            : {
-                                agriculturalMachineId:
-                                  el.aggregate?.agriculturalMachineId,
-                                agricultural_machine: {
-                                  brand:
-                                    el.aggregate?.agricultural_machine?.brand,
-                                  depreciationPeriod:
-                                    el.aggregate?.agricultural_machine
-                                      ?.depreciationPeri,
-                                  marketCost:
-                                    el.aggregate?.agricultural_machine
-                                      ?.marketCost,
-                                  nameMachine:
-                                    el.aggregate?.agricultural_machine
-                                      ?.nameMachine,
-                                  numberOfServicePersonnel:
-                                    el.aggregate?.agricultural_machine
-                                      ?.numberOfServiceP,
-                                  widthOfCapture:
-                                    el.aggregate?.agricultural_machine
-                                      ?.widthOfCapture,
-                                  workingSpeed:
-                                    el.aggregate?.agricultural_machine
-                                      ?.workingSpeed,
-                                  gradeId:
-                                    el.aggregate?.agricultural_machine?.gradeId,
-                                  userId: user.sub,
-                                  copiedFromId:
-                                    el.aggregate?.agricultural_machine.id,
-                                  createdAt: el.createdAt,
-                                  updatedAt: el.updatedAt,
-                                },
-                              }),
-                        },
-                      }
-                    : el.cell == "costHandWork"
-                    ? {
-                        cost_hand_work: {
-                          gradeId: el.cost_hand_work?.gradeId,
-                          nameOper: el.cost_hand_work?.nameOper,
-                          pricePerHourPersonnel:
-                            el.cost_hand_work?.pricePerHourPersonnel,
-                          productionPerShift:
-                            el.cost_hand_work?.productionPerShift,
-                          productionRateAmount:
-                            el.cost_hand_work?.productionRateAmount,
-                          productionRateTime:
-                            el.cost_hand_work?.productionRateTime,
-                          productionRateWeight:
-                            el.cost_hand_work?.productionRateWeight,
-                          salaryPerShift: el.cost_hand_work?.salaryPerShift,
-                          spending: el.cost_hand_work?.spending,
-                          type: el.cost_hand_work?.type,
-                          yieldСapacity: el.cost_hand_work?.yieldСapacity,
-                          unitOfMeasurement:
-                            el.cost_hand_work?.unitOfMeasurement,
-                          createdAt: el.createdAt,
-                          updatedAt: el.updatedAt,
-                        },
-                      }
-                    : el.cell == "costMaterials"
-                    ? {
-                        cost_material: {
-                          consumptionPerHectare:
-                            el.cost_material?.consumptionPerHectare,
-                          nameMaterials: el.cost_material?.nameMaterials,
-                          nameOper: el.cost_material?.nameOper,
-                          price: el.cost_material?.price,
-                          unitsOfConsumption:
-                            el.cost_material?.unitsOfConsumption,
-                          unitsOfCost: el.cost_material?.unitsOfCost,
-                          createdAt: el.createdAt,
-                          updatedAt: el.updatedAt,
-                        },
-                      }
-                    : el.cell == "costServices"
-                    ? {
-                        cost_service: {
-                          nameService: el.cost_service?.nameService,
-                          price: el.cost_service?.price,
-                          unitsOfCost: el.cost_service?.unitsOfCost,
-                          createdAt: el.createdAt,
-                          updatedAt: el.updatedAt,
-                        },
-                      }
-                    : el.cell == "costTransport"
-                    ? {
-                        cost_transport: {
-                          nameTransport: el.cost_transport?.nameTransport,
-                          price: el.cost_transport?.price,
-                          unitsOfCost: el.cost_transport?.unitsOfCost,
-                          createdAt: el.createdAt,
-                          updatedAt: el.updatedAt,
-                        },
-                      }
-                    : {}),
-                };
-              }),
+              tech_operations: await mapTechOperation(cart, user),
             },
             { include: cartsIncludes }
           )
@@ -543,9 +558,46 @@ class TechCartService {
       )
     );
     cart1 = changeCart(cart1);
-    console.log(cart1);
 
     return cart1;
+  }
+  async getIsAgreeCarts() {
+    let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
+      where: { isPublic: true, isAgree: false },
+      include: cartsIncludes,
+    });
+    carts = await changeCart(carts);
+    return carts;
+  }
+  async setIsAgreeCarts(
+    user: Principal | undefined,
+    isAgree: boolean,
+    cartId: number,
+    authorName?: string,
+    cultural?: number
+  ) {
+    if (user?.role !== "ADMIN") return;
+    if (authorName && cultural) {
+      await tech_cart.update(
+        { isAgree, isPublic: true, authorName, culturesTypeId: cultural },
+        { where: { id: cartId } }
+      );
+    } else {
+      await tech_cart.update(
+        { isAgree, isPublic: true },
+        { where: { id: cartId } }
+      );
+    }
+    const cart = await tech_cart.findAll({ where: { id: cartId } });
+    return cart;
+  }
+  async getAgreeCarts() {
+    let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
+      where: { isPublic: true, isAgree: true },
+      include: cartsIncludes,
+    });
+    carts = await changeCart(carts);
+    return carts;
   }
 }
 
