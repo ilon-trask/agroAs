@@ -43,7 +43,7 @@ function MainPage() {
             ПРО ПРОЕКТ
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
-              <br /> обліку та аналізу діяльності фермерського господарства
+              <br /> обліку та аналізу витрат фермерського господарства
             </Text>
           </Box>
         </Box>
@@ -80,24 +80,22 @@ function MainPage() {
                   )}
             </Box>
           </TabPanel>
-          <TabPanel>
-            <Box
-              display={"grid"}
-              gridTemplateColumns={"1fr 1fr 1fr"}
-              gridColumnGap={"15px"}
-            >
-              <p>two!</p>
-            </Box>
-          </TabPanel>
-          <TabPanel>
-            <Box
-              display={"grid"}
-              gridTemplateColumns={"1fr 1fr 1fr"}
-              gridColumnGap={"15px"}
-            >
-              <p>three!</p>
-            </Box>
-          </TabPanel>
+          {map.cultural.map((el) => (
+            <TabPanel>
+              <Box
+                display={"grid"}
+                gridTemplateColumns={"1fr 1fr 1fr"}
+                gridColumnGap={"15px"}
+              >
+                {map.isLoading
+                  ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
+                  : map.agreeCarts.map((e) => {
+                      if (el.id == e.culturesTypeId)
+                        return <MainTableItem e={e} />;
+                    }) || <Text>Немає жодної карти</Text>}
+              </Box>
+            </TabPanel>
+          ))}
         </TabPanels>
       </Box>
     </Tabs>

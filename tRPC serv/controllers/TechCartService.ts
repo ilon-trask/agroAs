@@ -137,7 +137,7 @@ const cartsIncludes = [
     ],
   },
 ];
-async function changeCart(Scarts: resTechCartsWithOpers[]) {
+async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
   const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
   for (let i = 0; i < carts.length; i++) {
@@ -186,7 +186,7 @@ export async function getCart(userId: string | undefined) {
     });
   }
 
-  res = { carts: await changeCart(Scarts) };
+  res = { carts: await changeCarts(Scarts) };
 
   //@ts-ignore
   return res;
@@ -324,13 +324,13 @@ class TechCartService {
       );
     }
     //@ts-ignore
-    let cart: resTechCartsWithOpers[] = await tech_cart.findAll({
+    let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { id },
       include: cartsIncludes,
     });
 
-    cart = await changeCart(JSON.parse(JSON.stringify(cart)));
-    return cart;
+    carts = await changeCarts(carts);
+    return carts;
   }
   async getCopyCarts(user: Principal | undefined) {
     if (!user) return;
@@ -557,7 +557,7 @@ class TechCartService {
         })
       )
     );
-    cart1 = changeCart(cart1);
+    cart1 = changeCarts(cart1);
 
     return cart1;
   }
@@ -566,7 +566,7 @@ class TechCartService {
       where: { isPublic: true, isAgree: false },
       include: cartsIncludes,
     });
-    carts = await changeCart(carts);
+    carts = await changeCarts(carts);
     return carts;
   }
   async setIsAgreeCarts(
@@ -588,15 +588,22 @@ class TechCartService {
         { where: { id: cartId } }
       );
     }
-    const cart = await tech_cart.findAll({ where: { id: cartId } });
-    return cart;
+    if (authorName && cultural) {
+      let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
+        where: { id: cartId },
+        include: cartsIncludes,
+      });
+      carts = await changeCarts(carts);
+      return carts;
+    }
+    return 1;
   }
   async getAgreeCarts() {
     let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { isPublic: true, isAgree: true },
       include: cartsIncludes,
     });
-    carts = await changeCart(carts);
+    carts = await changeCarts(carts);
     return carts;
   }
 }
