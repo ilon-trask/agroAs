@@ -14,14 +14,14 @@ export type AppRouter = typeof appRouter;
 import { cartRouter } from "./routes/cartRouter";
 import { tractorRouter } from "./routes/tractorRouter";
 import { machineRouter } from "./routes/machineRouter";
-import { sectionRouter } from "./routes/sectionRouter";
 import { operRouter } from "./routes/operRouter";
-import { gradesRouter } from "./routes/gradesRouter";
 
 import OS from "os";
 import { inferAsyncReturnType } from "@trpc/server";
 import { workRouter } from "./routes/workRouter";
 import { culturalRouter } from "./routes/culturalRouter";
+import SectionService from "./controllers/SectionService";
+import gradeService from "./controllers/gradeService";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -31,10 +31,20 @@ const appRouter = router({
   cart: cartRouter,
   tractor: tractorRouter,
   machine: machineRouter,
-  section: sectionRouter,
+  section: router({
+    get: publicProcedure.query(async () => {
+      const data = await SectionService.getAll();
+      return data;
+    }),
+  }),
   oper: operRouter,
   works: workRouter,
-  grade: gradesRouter,
+  grade: router({
+    get: publicProcedure.query(async () => {
+      const grades = await gradeService.get();
+      return grades;
+    }),
+  }),
   cultural: culturalRouter,
   "": publicProcedure.query(() => "some text"),
   getUser: publicProcedure.query(() => {
