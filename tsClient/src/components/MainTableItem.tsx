@@ -40,7 +40,7 @@ function MainTable({ e }: props) {
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Загальна вартість </Box>
-            <Box>1000000</Box>
+            <Box>{e?.area! * e?.totalCost! || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>

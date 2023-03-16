@@ -322,6 +322,8 @@ export async function changeOper(
       elem.costHandWork = costHandWork;
       return elem;
     } else {
+      console.log(1);
+
       const Tractor = await tractor.findOne({
         where: { id: CostMechanical.tractorId },
       });
@@ -331,6 +333,7 @@ export async function changeOper(
       const Grade = await grade.findAll();
       if (Tractor == null || machine == null || Grade == null)
         throw new Error("");
+      console.log(1);
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
@@ -353,8 +356,7 @@ export async function changeOper(
       );
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
-          //@ts-ignore
-          (machine.numberOfServiceP ?? 0) *
+          (machine.numberOfServicePersonnel ?? 0) *
           gradeMachine?.coefficient!
       );
 
@@ -394,6 +396,7 @@ export async function changeOper(
             Grade.coefficient
         );
       }
+
       elem.costHandWork = costHandWork;
       return elem;
     } else {
@@ -424,6 +427,7 @@ export async function changeOper(
             Grade.coefficient
         );
       }
+      console.log(costHandWork);
       elem.costHandWork = costHandWork;
       return elem;
     }
@@ -912,14 +916,16 @@ class OperService {
         (oper.aggregate.tractorId = idTractor),
         (oper.aggregate.agriculturalMachineId = idMachine),
         (oper.nameOperation = nameOper),
-        (oper = await changeOper(
-          oper,
-          oper.techCartId!,
-          undefined,
-          undefined,
-          undefined,
-          costMechanical
-        ));
+        console.log(costMechanical);
+
+      oper = await changeOper(
+        oper,
+        oper.techCartId!,
+        undefined,
+        undefined,
+        undefined,
+        costMechanical
+      );
     } else {
       const Tractor = await tractor.findOne({ where: { id: idTractor } });
       const machine = await agricultural_machine.findOne({
