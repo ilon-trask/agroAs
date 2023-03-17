@@ -36,7 +36,7 @@ type props = {
 function PublicationPopUp({ data, setData }: props) {
   const [isErr, setIsErr] = useState(false);
   const { map, user } = useContext(Context);
-  const [cart] = map.maps.filter((el) => el.id == data.data.id);
+  const [cart] = map.NoAgreeCarts.filter((el) => el.id == data.data.id);
   useEffect(() => {
     setCultural(cart?.culturesTypeId || 0);
     setAuthorName(cart?.authorName || "");

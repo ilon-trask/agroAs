@@ -322,8 +322,6 @@ export async function changeOper(
       elem.costHandWork = costHandWork;
       return elem;
     } else {
-      console.log(1);
-
       const Tractor = await tractor.findOne({
         where: { id: CostMechanical.tractorId },
       });
@@ -333,7 +331,7 @@ export async function changeOper(
       const Grade = await grade.findAll();
       if (Tractor == null || machine == null || Grade == null)
         throw new Error("");
-      console.log(1);
+
       const [gradeTractor] = Grade.filter((el) => el.id == Tractor.gradeId);
       const [gradeMachine] = Grade.filter((el) => el.id == machine.gradeId);
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
@@ -427,7 +425,7 @@ export async function changeOper(
             Grade.coefficient
         );
       }
-      console.log(costHandWork);
+
       elem.costHandWork = costHandWork;
       return elem;
     }

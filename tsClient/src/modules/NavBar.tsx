@@ -27,7 +27,7 @@ const NavBar = observer(() => {
                   await supabase.auth.signOut();
                   user.isAuth = false;
                   user.role = "";
-                  getCarts(map);
+                  // getCarts(map);
                 }}
               >
                 Вийти

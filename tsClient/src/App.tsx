@@ -20,6 +20,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
+import { observer } from "mobx-react-lite";
 
 function App() {
   const { map, user } = useContext(Context);
@@ -31,20 +32,19 @@ function App() {
         user.isAuth = true;
         user.role = data.session.user.role as IUserRole;
       }
+      getCarts(map);
+      getWorks(map);
+      getSection(map);
+      getTractor(map);
+      getMachine(map);
+      getGrades(map);
+      getCultural(map);
+      if (user.role == "ADMIN") getIsAgreeCarts(map);
+      if (user.role == "ADMIN" || user.role == "") agreeCarts(map);
     })();
   }, [user.isAuth]);
 
-  useEffect(() => {
-    getCarts(map);
-    getWorks(map);
-    getSection(map);
-    getTractor(map);
-    getMachine(map);
-    getGrades(map);
-    getCultural(map);
-    if (true) getIsAgreeCarts(map);
-    agreeCarts(map);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <BrowserRouter>
@@ -56,4 +56,4 @@ function App() {
   );
 }
 
-export default App;
+export default observer(App);
