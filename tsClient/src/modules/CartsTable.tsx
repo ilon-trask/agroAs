@@ -24,7 +24,7 @@ interface props {
     data: { id, isPublic },
   }: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
 }
 
@@ -51,7 +51,9 @@ const CartsTable = observer(
             <Th>Загальна вартість (грн)</Th>
             <Th>Витрати на 1 га (грн)</Th>
             <Th></Th>
-            {(user.role == "ADMIN" || user.role == "AUTHOR") && <Th></Th>}
+            {(user.role == "ADMIN" ||
+              user.role == "AUTHOR" ||
+              user.role == "service_role") && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody>

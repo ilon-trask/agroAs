@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Box,
   Image,
@@ -13,17 +13,21 @@ import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
-const IMGuRL =
-  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/";
+
 function MainPage() {
   const { map } = useContext(Context);
-  console.log(map.maps);
+
+  const [windW, setWindW] = useState(window.innerWidth);
 
   return (
-    <Tabs orientation="vertical" variant="soft-rounded">
+    <Tabs
+      orientation={windW < 770 ? "horizontal" : "vertical"}
+      w={"100vw"}
+      variant="soft-rounded"
+    >
       <Box
         display={"grid"}
-        gridTemplateColumns={"1fr 3fr"}
+        gridTemplateColumns={["1fr", "1fr", "1fr 3fr"]}
         gridColumnGap={"15px"}
         gridGap={"15px"}
         maxW={"1200px"}
@@ -47,7 +51,8 @@ function MainPage() {
             </Text>
           </Box>
         </Box>
-        <Box p={"15px"}>
+        {/* @ts-ignore */}
+        <Box p={"15px"} overflowX={windW < 770 && "scroll"} maxW={"100vw"}>
           {/* <Text mt={"10px"} fontWeight={"bold"} fontSize={"20px"}>
             КУЛЬТУРИ
           </Text> */}
@@ -72,6 +77,7 @@ function MainPage() {
               gridTemplateColumns={["1fr", "1fr", "1fr 1fr", "1fr 1fr 1fr"]}
               gridColumnGap={"15px"}
               rowGap={"20px"}
+              mx={"auto"}
             >
               {map.isLoading
                 ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
@@ -84,7 +90,15 @@ function MainPage() {
             <TabPanel>
               <Box
                 display={"grid"}
-                gridTemplateColumns={["1fr", "1fr", "1fr 1fr", "1fr 1fr 1fr"]}
+                gridTemplateColumns={[
+                  "1fr",
+                  "1fr 1fr",
+                  "1fr 1fr",
+                  "1fr 1fr",
+                  "1fr 1fr",
+                  "1fr 1fr",
+                  "1fr 1fr 1fr",
+                ]}
                 gridColumnGap={"15px"}
               >
                 {map.isLoading

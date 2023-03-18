@@ -1,5 +1,11 @@
 import { observer } from "mobx-react-lite";
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
 import css from "./Dialog.module.css";
@@ -17,11 +23,11 @@ import {
   Input,
   Image,
 } from "@chakra-ui/react";
-import { setIsAgreeCarts, setIsPublic } from "../http/requests";
+import { setIsAgreeCarts, setIsPublic, supabase } from "../http/requests";
 type props = {
   data: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   };
   setData: (
     data:
@@ -36,30 +42,16 @@ type props = {
 function PublicationPopUp({ data, setData }: props) {
   const [isErr, setIsErr] = useState(false);
   const { map, user } = useContext(Context);
-  const [cart] = map.maps.filter((el) => el.id == data.data.id);
+  const imgRef = useRef(null);
+  const [cart] = map.NoAgreeCarts.filter((el) => el.id == data.data.id);
+  const [myCart] = map.maps.filter((el) => el.id == data.data.id);
   useEffect(() => {
-    setCultural(cart?.culturesTypeId || 0);
-    setAuthorName(cart?.authorName || "");
-  }, [cart]);
+    setCultural(cart?.culturesTypeId || myCart?.culturesTypeId || 0);
+    setAuthorName(cart?.authorName || myCart?.authorName || "");
+  }, [cart, myCart]);
 
   const [cultural, setCultural] = useState(cart?.culturesTypeId || 0);
   const [authorName, setAuthorName] = useState(cart?.authorName || "");
-  const whichFunc = {
-    ADMIN() {
-      setIsAgreeCarts(map, true, data.data.id, authorName, cultural);
-    },
-    AUTHOR() {
-      setIsPublic(map, {
-        id: data.data.id,
-        isPublic: data.data.isPublic,
-        authorName,
-        cultural,
-      });
-    },
-    "": () => {},
-    authenticated: () => {},
-    service_role: () => {},
-  };
 
   return (
     //@ts-ignore
@@ -92,7 +84,7 @@ function PublicationPopUp({ data, setData }: props) {
                     setCultural(+e.target.value);
                   }}
                   value={cultural}
-                  defaultValue={0}
+                  // defaultValue={0}
                 >
                   <option disabled hidden value={0}>
                     Виберіть розділ
@@ -122,10 +114,41 @@ function PublicationPopUp({ data, setData }: props) {
               </Box>
             </Box>
           </Box>
-          {user.role == "ADMIN" ? (
-            <Box>
-              ASDF
-              <Image></Image>
+          {user.role == "ADMIN" || user.role == "service_role" ? (
+            <Box mt={3}>
+              <Button
+                onClick={() => {
+                  //@ts-ignore
+                  imgRef?.current?.click();
+                }}
+              >
+                Додоти фото
+              </Button>
+              <input
+                style={{ display: "none" }}
+                type="file"
+                accept="image/jpg, image/png"
+                ref={imgRef}
+                onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                  if (!e.target.files) return;
+                  const file = e.target?.files[0];
+
+                  console.log(file);
+
+                  const res = await supabase.storage
+                    .from("images")
+                    .upload("unUsed/" + data.data.id, file);
+                  // const { data, error } = await supabase.storage
+                  //   .from("images")
+                  //   .list("unUsed", {
+                  //     limit: 100,
+                  //     offset: 0,
+                  //     sortBy: { column: "name", order: "asc" },
+                  //   });
+                  console.log(res.data);
+                  console.log(res.error);
+                }}
+              />
             </Box>
           ) : null}
           {isErr ? "Ви не заповнили поля" : ""}
@@ -143,14 +166,26 @@ function PublicationPopUp({ data, setData }: props) {
                 } else {
                   setIsErr(false);
                   setData({ isOpen: false, data: { id: 0, isPublic: false } });
-                  console.log(user.role);
-                  console.log(whichFunc[user.role]());
-
-                  whichFunc[user.role]();
+                  if (data.data.agree) {
+                    setIsAgreeCarts(
+                      map,
+                      true,
+                      data.data.id,
+                      authorName,
+                      cultural
+                    );
+                  } else {
+                    setIsPublic(map, {
+                      id: data.data.id,
+                      isPublic: data.data.isPublic,
+                      authorName,
+                      cultural,
+                    });
+                  }
                 }
               }}
             >
-              Створити
+              Підтвердити
             </Button>
           </Box>
         </ModalFooter>

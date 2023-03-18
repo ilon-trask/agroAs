@@ -18,7 +18,7 @@ interface props {
     data: { id, isPublic },
   }: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
 }
 
