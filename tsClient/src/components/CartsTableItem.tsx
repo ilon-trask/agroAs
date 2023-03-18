@@ -23,7 +23,7 @@ interface props {
     data: { id, isPublic },
   }: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
 }
 
@@ -92,7 +92,9 @@ const CartsTableItem = observer(
         </Td>
 
         <Td>
-          {(user.role == "ADMIN" || user.role == "AUTHOR") && (
+          {(user.role == "ADMIN" ||
+            user.role == "AUTHOR" ||
+            user.role == "service_role") && (
             <div
               onClick={() => {
                 if (e.isPublic) {
@@ -100,7 +102,7 @@ const CartsTableItem = observer(
                 } else {
                   setPublicationOpen({
                     isOpen: true,
-                    data: { id: e.id!, isPublic: !e.isPublic },
+                    data: { id: e.id!, isPublic: !e.isPublic, agree: false },
                   });
                 }
               }}

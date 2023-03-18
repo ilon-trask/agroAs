@@ -1,9 +1,7 @@
 import { router, publicProcedure } from "../trpc";
-import z, { number } from "zod";
+import z from "zod";
 
 import OperService from "../controllers/OperService";
-import { Ioper } from "../controllers/OperService";
-import { Itech_operation } from "../models/models";
 
 export const operRouter = router({
   create: router({

@@ -56,7 +56,7 @@ const MapJornal = observer(function () {
   const [openCopy, setOpenCopy] = useState(false);
   const [publicationOpen, setPublicationOpen] = useState({
     isOpen: false,
-    data: { id: 0, isPublic: false },
+    data: { id: 0, isPublic: false, agree: false },
   });
   let maps: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(map.maps));
   maps.sort((a, b) => a.id! - b.id!);
@@ -114,7 +114,7 @@ const MapJornal = observer(function () {
             Скопіювати з журналу
           </Button>
         </Box>
-        {user.role == "ADMIN" && (
+        {(user.role == "ADMIN" || user.role == "service_role") && (
           <TableContainer
             maxW="1000px"
             mx="auto"

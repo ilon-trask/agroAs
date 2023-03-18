@@ -20,7 +20,7 @@ type props = { e: Itech_cart | undefined };
 function MainTable({ e }: props) {
   const navigate = useNavigate();
   return (
-    <Card maxW="sm">
+    <Card maxW="sm" mx={"auto"}>
       <CardBody pt={0}>
         <Stack mt="2" spacing="3">
           <Heading size="md">Культура {e?.nameCart || ""}</Heading>

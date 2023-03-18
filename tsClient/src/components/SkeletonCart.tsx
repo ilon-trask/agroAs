@@ -20,7 +20,7 @@ import { TEHMAP_ROUTER } from "../utils/consts";
 function MainTable() {
   const navigate = useNavigate();
   return (
-    <Card maxW="sm">
+    <Card maxW="sm" mx={"auto"}>
       <CardBody pt={0}>
         <Stack mt="2" spacing="3">
           <Skeleton h={"24px"} w={"235px"} />
@@ -29,7 +29,7 @@ function MainTable() {
         <Skeleton
           mt={"3"}
           h={"176px"}
-          w={"220px"}
+          w={"176px"}
           borderRadius={"200%"}
           mx={"auto"}
         />

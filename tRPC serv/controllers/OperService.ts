@@ -298,20 +298,26 @@ export async function changeOper(
       //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
       const costCars = Math.round(
         ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          //@ts-ignore
-          +machine.marketCost / +machine.depreciationPeri / 220 / 8) *
+          +machine.marketCost /
+            //@ts-ignore
+            (+machine.depreciationPeri || +machine.depreciationPeriod) /
+            220 /
+            8) *
           1.05) /
           rareOfProduction
       );
+
       const costMachineWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
           (Tractor.numberOfPersonnel ?? 0) *
           gradeTractor?.coefficient!
       );
+
       const costHandWork = Math.round(
         (pricePerHourPersonnel / rareOfProduction) *
           //@ts-ignore
-          (machine.numberOfServiceP ?? 0) *
+          ((machine.numberOfServiceP || machine.numberOfServicePersonnel) ??
+            0) *
           gradeMachine?.coefficient!
       );
 
@@ -914,16 +920,14 @@ class OperService {
         (oper.aggregate.tractorId = idTractor),
         (oper.aggregate.agriculturalMachineId = idMachine),
         (oper.nameOperation = nameOper),
-        console.log(costMechanical);
-
-      oper = await changeOper(
-        oper,
-        oper.techCartId!,
-        undefined,
-        undefined,
-        undefined,
-        costMechanical
-      );
+        (oper = await changeOper(
+          oper,
+          oper.techCartId!,
+          undefined,
+          undefined,
+          undefined,
+          costMechanical
+        ));
     } else {
       const Tractor = await tractor.findOne({ where: { id: idTractor } });
       const machine = await agricultural_machine.findOne({

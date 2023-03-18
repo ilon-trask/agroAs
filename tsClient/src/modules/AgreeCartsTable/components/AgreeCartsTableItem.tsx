@@ -17,10 +17,10 @@ interface props {
   setRes: (res: Itech_cart) => void;
   setPublicationOpen: ({
     isOpen,
-    data: { id, isPublic },
+    data: { id, isPublic, agree },
   }: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
 }
 
@@ -56,7 +56,7 @@ const CartsTableItem = observer(
             onClick={() => {
               setPublicationOpen({
                 isOpen: true,
-                data: { id: e.id!, isPublic: true },
+                data: { id: e.id!, isPublic: true, agree: true },
               });
             }}
           >

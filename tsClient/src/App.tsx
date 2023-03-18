@@ -39,7 +39,10 @@ function App() {
       getMachine(map);
       getGrades(map);
       getCultural(map);
-      if (user.role == "ADMIN") getIsAgreeCarts(map);
+      console.log(1);
+
+      if (user.role == "ADMIN" || user.role == "service_role")
+        getIsAgreeCarts(map);
       if (user.role == "ADMIN" || user.role == "") agreeCarts(map);
     })();
   }, [user.isAuth]);

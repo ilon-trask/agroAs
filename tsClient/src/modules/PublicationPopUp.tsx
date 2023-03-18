@@ -21,7 +21,7 @@ import { setIsAgreeCarts, setIsPublic } from "../http/requests";
 type props = {
   data: {
     isOpen: boolean;
-    data: { id: number; isPublic: boolean };
+    data: { id: number; isPublic: boolean; agree: boolean };
   };
   setData: (
     data:
@@ -37,29 +37,14 @@ function PublicationPopUp({ data, setData }: props) {
   const [isErr, setIsErr] = useState(false);
   const { map, user } = useContext(Context);
   const [cart] = map.NoAgreeCarts.filter((el) => el.id == data.data.id);
+  const [myCart] = map.maps.filter((el) => el.id == data.data.id);
   useEffect(() => {
-    setCultural(cart?.culturesTypeId || 0);
-    setAuthorName(cart?.authorName || "");
-  }, [cart]);
+    setCultural(cart?.culturesTypeId || myCart?.culturesTypeId || 0);
+    setAuthorName(cart?.authorName || myCart?.authorName || "");
+  }, [cart, myCart]);
 
   const [cultural, setCultural] = useState(cart?.culturesTypeId || 0);
   const [authorName, setAuthorName] = useState(cart?.authorName || "");
-  const whichFunc = {
-    ADMIN() {
-      setIsAgreeCarts(map, true, data.data.id, authorName, cultural);
-    },
-    AUTHOR() {
-      setIsPublic(map, {
-        id: data.data.id,
-        isPublic: data.data.isPublic,
-        authorName,
-        cultural,
-      });
-    },
-    "": () => {},
-    authenticated: () => {},
-    service_role: () => {},
-  };
 
   return (
     //@ts-ignore
@@ -92,7 +77,7 @@ function PublicationPopUp({ data, setData }: props) {
                     setCultural(+e.target.value);
                   }}
                   value={cultural}
-                  defaultValue={0}
+                  // defaultValue={0}
                 >
                   <option disabled hidden value={0}>
                     Виберіть розділ
@@ -122,7 +107,7 @@ function PublicationPopUp({ data, setData }: props) {
               </Box>
             </Box>
           </Box>
-          {user.role == "ADMIN" ? (
+          {user.role == "ADMIN" || user.role == "service_role" ? (
             <Box>
               ASDF
               <Image></Image>
@@ -143,14 +128,26 @@ function PublicationPopUp({ data, setData }: props) {
                 } else {
                   setIsErr(false);
                   setData({ isOpen: false, data: { id: 0, isPublic: false } });
-                  console.log(user.role);
-                  console.log(whichFunc[user.role]());
-
-                  whichFunc[user.role]();
+                  if (data.data.agree) {
+                    setIsAgreeCarts(
+                      map,
+                      true,
+                      data.data.id,
+                      authorName,
+                      cultural
+                    );
+                  } else {
+                    setIsPublic(map, {
+                      id: data.data.id,
+                      isPublic: data.data.isPublic,
+                      authorName,
+                      cultural,
+                    });
+                  }
                 }
               }}
             >
-              Створити
+              Підтвердити
             </Button>
           </Box>
         </ModalFooter>

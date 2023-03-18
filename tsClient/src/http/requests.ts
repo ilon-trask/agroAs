@@ -131,6 +131,7 @@ export async function setIsPublic(
     operationsFilter(res, map);
     map.isLoading = false;
   });
+  getIsAgreeCarts(map);
 }
 
 export async function deleteCart(map: MapStore, id: number) {
