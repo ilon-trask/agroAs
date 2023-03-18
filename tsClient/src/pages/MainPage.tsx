@@ -13,8 +13,7 @@ import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
-const IMGuRL =
-  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/";
+
 function MainPage() {
   const { map } = useContext(Context);
 

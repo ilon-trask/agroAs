@@ -140,18 +140,21 @@ const cartsIncludes = [
 async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
   const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
+  let promises = [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
-    let sum: number = 0;
-    if (cart.tech_operations)
-      for (let j = 0; j < cart.tech_operations.length; j++) {
-        let oper: resTechOperation = cart.tech_operations[j];
-
-        let el = await changeOper(oper, oper.techCartId!);
+    cart.totalCost = 0;
+    if (!cart.tech_operations) throw new Error("");
+    for (let j = 0; j < cart.tech_operations.length; j++) {
+      let oper: resTechOperation = cart.tech_operations[j];
+      let promise = changeOper(oper, oper.techCartId!);
+      promises.push(promise);
+      promise.then((el) => {
+        if (!cart.tech_operations) throw new Error("");
         if (!el) throw new Error("");
-
+        if (cart.totalCost == undefined) throw new Error("");
         cart.tech_operations[j] = el;
-        sum +=
+        cart.totalCost +=
           el.costMachineWork! +
             el.costCars! +
             el.costFuel! +
@@ -161,10 +164,10 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
           el.costTransport ||
           el.costMaterials ||
           0;
-      }
-
-    cart.totalCost = sum;
+      });
+    }
   }
+  await Promise.all(promises);
   return carts;
 }
 export async function getCart(userId: string | undefined) {
