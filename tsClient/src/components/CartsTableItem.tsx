@@ -7,11 +7,12 @@ import { cartProps } from "../modules/CreateCart";
 import MapStore from "../store/MapStore";
 import { TEHMAP_ROUTER } from "../utils/consts";
 
-import { Tr, Td, Checkbox } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
+import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
+import { Itech_cart } from "../../../tRPC serv/models/models";
 
 interface props {
-  e: cartProps;
+  e: Itech_cart;
   setUpdate: (update: boolean) => void;
   setOpen: (open: boolean) => void;
   setRes: (res: cartProps) => void;

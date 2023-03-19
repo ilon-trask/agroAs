@@ -1,6 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "./AppRouter";
 import NavBar from "./modules/NavBar";
+import Footer from "./modules/Footer";
 import { useEffect, useContext } from "react";
 import { Context } from "./main";
 import {
@@ -16,7 +17,7 @@ import {
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 
 import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
@@ -52,8 +53,11 @@ function App() {
   return (
     <BrowserRouter>
       <ChakraProvider theme={theme}>
-        <NavBar />
-        <AppRouter />
+        <Box minH={"100vh"} display={"flex"} flexDirection={"column"}>
+          <NavBar />
+          <AppRouter />
+          <Footer />
+        </Box>
       </ChakraProvider>
     </BrowserRouter>
   );

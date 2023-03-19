@@ -35,26 +35,44 @@ function CopyCartPopUp({ open, setOpen }: props) {
           Виберіть карту для копіювання
         </Heading>
         <Box width={"60%"} mx={"auto"}>
-          {map.copyCarts.map((el) => (
-            <Box
-              key={el.id}
-              display={"flex"}
-              gap={"10px"}
-              p={"10px"}
-              my={"10px"}
-              border={"1px"}
-              borderRadius={"10px"}
-              onClick={() => {
-                setChecked(el.id!);
-              }}
-              onChange={() => {
-                setChecked(el.id!);
-              }}
-            >
-              <Checkbox isChecked={el.id == checked} />
-              <Box>{el.nameCart}</Box>
-            </Box>
-          ))}
+          {map.copyCarts.map((el) => {
+            el.description =
+              "R9DdkfvN958K9Mt3d4ND3y86DBx3tJrkR9DdkfvN958K9Mt3d4ND3y86DBx3tJrk";
+            return (
+              <Box
+                cursor={"pointer"}
+                key={el.id}
+                display={["block", "block", "flex"]}
+                gap={"10px"}
+                p={"10px"}
+                my={"10px"}
+                border={"1px"}
+                borderRadius={"10px"}
+                onClick={() => {
+                  setChecked(el.id!);
+                }}
+                onChange={() => {
+                  setChecked(el.id!);
+                }}
+              >
+                <Box display={"flex"} gap={"10px"} alignItems={"start"}>
+                  <Checkbox
+                    isChecked={el.id == checked}
+                    mt={2}
+                    colorScheme={"teal"}
+                  />
+                  <Text fontSize={"20px"}>{el.nameCart}</Text>
+                </Box>
+                <Text
+                  fontSize={"15px"}
+                  maxW={["500px", "500px", "250px"]}
+                  pt={"7px"}
+                >
+                  {el.description}{" "}
+                </Text>
+              </Box>
+            );
+          })}
         </Box>
         <Box ml={"auto"} mr={"20px"} mb={"10px"}>
           <Button

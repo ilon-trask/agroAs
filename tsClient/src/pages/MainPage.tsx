@@ -43,8 +43,8 @@ function MainPage() {
           backgroundRepeat={"no-repeat"}
           backgroundSize={"cover"}
         >
-          <Box textAlign={"center"} fontWeight={"bold"}>
-            ПРО ПРОЕКТ
+          <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
+            AgroAs
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
@@ -58,11 +58,19 @@ function MainPage() {
           </Text> */}
           <Box>
             <TabList gap={2}>
-              <Tab display={"block"} textAlign={"left"}>
+              <Tab
+                display={"block"}
+                textAlign={"left"}
+                _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
+              >
                 КУЛЬТУРИ
               </Tab>
               {map.cultural.map((el) => (
-                <Tab display={"block"} textAlign={"left"}>
+                <Tab
+                  display={"block"}
+                  textAlign={"left"}
+                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
+                >
                   {el.nameCulture}
                 </Tab>
               ))}
