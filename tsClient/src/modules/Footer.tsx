@@ -28,7 +28,7 @@ const NavBar = observer(() => {
       >
         <Text
           style={{
-            color: "white",
+            color: "#20401e",
             textDecoration: "none",
             fontWeight: "500",
           }}
@@ -38,7 +38,7 @@ const NavBar = observer(() => {
         <Box display={"flex"} alignItems={"center"}>
           <Text
             style={{
-              color: "white",
+              color: "#20401e",
               textDecoration: "none",
               fontWeight: "500",
             }}

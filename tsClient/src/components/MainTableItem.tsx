@@ -28,8 +28,12 @@ function MainTable({ e }: props) {
           <Heading size="md" textAlign={"center"} textColor={"#20401e"}>
             {e?.nameCart || ""}
           </Heading>
-          <Text maxW="250px">{e?.description}</Text>
-          <Text>Автор: {e?.authorName}</Text>
+          <Text>
+            <b>Автор:</b> {e?.authorName}
+          </Text>
+          <Text maxW="250px" minH={"48px"}>
+            {e?.description}
+          </Text>
         </Stack>
         <Image
           src={IMGuRL + "/" + e?.id}
