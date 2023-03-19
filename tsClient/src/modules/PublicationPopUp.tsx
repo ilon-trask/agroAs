@@ -48,10 +48,20 @@ function PublicationPopUp({ data, setData }: props) {
   useEffect(() => {
     setCultural(cart?.culturesTypeId || myCart?.culturesTypeId || 0);
     setAuthorName(cart?.authorName || myCart?.authorName || "");
+
+    setDescription(cart?.description || myCart?.description || "");
+    console.log(cart?.description || myCart?.description || "");
   }, [cart, myCart]);
 
-  const [cultural, setCultural] = useState(cart?.culturesTypeId || 0);
-  const [authorName, setAuthorName] = useState(cart?.authorName || "");
+  const [cultural, setCultural] = useState(
+    cart?.culturesTypeId || myCart?.culturesTypeId || 0
+  );
+  const [authorName, setAuthorName] = useState(
+    cart?.authorName || myCart?.authorName || ""
+  );
+  const [description, setDescription] = useState(
+    cart?.description || myCart?.description || ""
+  );
 
   return (
     //@ts-ignore
@@ -84,7 +94,6 @@ function PublicationPopUp({ data, setData }: props) {
                     setCultural(+e.target.value);
                   }}
                   value={cultural}
-                  // defaultValue={0}
                 >
                   <option disabled hidden value={0}>
                     Виберіть розділ
@@ -114,43 +123,53 @@ function PublicationPopUp({ data, setData }: props) {
               </Box>
             </Box>
           </Box>
-          {user.role == "ADMIN" || user.role == "service_role" ? (
-            <Box mt={3}>
-              <Button
-                onClick={() => {
-                  //@ts-ignore
-                  imgRef?.current?.click();
-                }}
-              >
-                Додоти фото
-              </Button>
-              <input
-                style={{ display: "none" }}
-                type="file"
-                accept="image/jpg, image/png"
-                ref={imgRef}
-                onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                  if (!e.target.files) return;
-                  const file = e.target?.files[0];
+          <Box display={"flex"} mt={3}>
+            <Input
+              type="text"
+              maxLength={55}
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value);
+              }}
+            />
+            {user.role == "ADMIN" || user.role == "service_role" ? (
+              <Box>
+                <Button
+                  onClick={() => {
+                    //@ts-ignore
+                    imgRef?.current?.click();
+                  }}
+                >
+                  Додоти фото
+                </Button>
+                <input
+                  style={{ display: "none" }}
+                  type="file"
+                  accept="image/jpg, image/png"
+                  ref={imgRef}
+                  onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                    if (!e.target.files) return;
+                    const file = e.target?.files[0];
 
-                  console.log(file);
+                    console.log(file);
 
-                  const res = await supabase.storage
-                    .from("images")
-                    .upload("unUsed/" + data.data.id, file);
-                  // const { data, error } = await supabase.storage
-                  //   .from("images")
-                  //   .list("unUsed", {
-                  //     limit: 100,
-                  //     offset: 0,
-                  //     sortBy: { column: "name", order: "asc" },
-                  //   });
-                  console.log(res.data);
-                  console.log(res.error);
-                }}
-              />
-            </Box>
-          ) : null}
+                    const res = await supabase.storage
+                      .from("images")
+                      .upload("unUsed/" + data.data.id, file);
+                    // const { data, error } = await supabase.storage
+                    //   .from("images")
+                    //   .list("unUsed", {
+                    //     limit: 100,
+                    //     offset: 0,
+                    //     sortBy: { column: "name", order: "asc" },
+                    //   });
+                    console.log(res.data);
+                    console.log(res.error);
+                  }}
+                />
+              </Box>
+            ) : null}
+          </Box>
           {isErr ? "Ви не заповнили поля" : ""}
         </ModalBody>
         <ModalFooter>
@@ -172,7 +191,8 @@ function PublicationPopUp({ data, setData }: props) {
                       true,
                       data.data.id,
                       authorName,
-                      cultural
+                      cultural,
+                      description
                     );
                   } else {
                     setIsPublic(map, {
@@ -180,6 +200,7 @@ function PublicationPopUp({ data, setData }: props) {
                       isPublic: data.data.isPublic,
                       authorName,
                       cultural,
+                      description,
                     });
                   }
                 }

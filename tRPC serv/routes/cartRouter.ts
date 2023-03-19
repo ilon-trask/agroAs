@@ -140,6 +140,7 @@ export const cartRouter = router({
         isPublic: z.boolean(),
         authorName: z.string().optional(),
         cultural: z.number().optional(),
+        description: z.string().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -173,6 +174,7 @@ export const cartRouter = router({
         cartId: z.number(),
         authorName: z.string().optional(),
         cultural: z.number().optional(),
+        description: z.string().optional(),
       })
     )
     .query(
@@ -182,7 +184,8 @@ export const cartRouter = router({
           input.isAgree,
           input.cartId,
           input.authorName,
-          input.cultural
+          input.cultural,
+          input.description
         )
     ),
   getAgreeCarts: publicProcedure.query(async () => {

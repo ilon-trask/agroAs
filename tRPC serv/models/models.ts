@@ -46,6 +46,7 @@ export interface Itech_cart {
   culturesTypeId?: number;
   authorName?: string;
   isAgree?: boolean;
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -59,6 +60,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare userId: string;
   declare authorName?: string;
   declare isAgree?: boolean;
+  declare description?: string;
 }
 
 tech_cart.init(
@@ -72,6 +74,7 @@ tech_cart.init(
     userId: { type: DataTypes.STRING, allowNull: false },
     authorName: { type: DataTypes.STRING },
     isAgree: { type: DataTypes.BOOLEAN, defaultValue: false },
+    description: { type: DataTypes.STRING },
   },
   { sequelize }
   // { sequelize, timestamps: false }

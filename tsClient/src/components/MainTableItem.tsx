@@ -25,7 +25,10 @@ function MainTable({ e }: props) {
     <Card maxW="sm" mx={"auto"}>
       <CardBody pt={0}>
         <Stack mt="2" spacing="3">
-          <Heading size="md">Культура {e?.nameCart || ""}</Heading>
+          <Heading size="md" textAlign={"center"} textColor={"#20401e"}>
+            {e?.nameCart || ""}
+          </Heading>
+          <Text maxW="250px">{e?.description}</Text>
           <Text>Автор: {e?.authorName}</Text>
         </Stack>
         <Image
@@ -50,8 +53,7 @@ function MainTable({ e }: props) {
           </Box>
         </Stack>
       </CardBody>
-      <Divider />
-      <CardFooter>
+      <CardFooter pt={0}>
         <ButtonGroup spacing="2">
           <Button
             onClick={() => {

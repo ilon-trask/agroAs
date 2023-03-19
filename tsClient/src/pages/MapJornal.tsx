@@ -85,7 +85,13 @@ const MapJornal = observer(function () {
             setPublicationOpen={setPublicationOpen}
           />
         </TableContainer>
-        <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+        <Box
+          mt={"15px"}
+          ml={"auto"}
+          mb={"25px"}
+          display={["block", "flex"]}
+          gap={"10px"}
+        >
           <Button
             onClick={
               user.role == ""

@@ -309,6 +309,7 @@ class TechCartService {
       isPublic: boolean;
       authorName?: string;
       cultural?: number;
+      description?: string;
     },
     user: Principal | undefined
   ) {
@@ -319,7 +320,7 @@ class TechCartService {
       user.role != "service_role"
     )
       return;
-    const { id, isPublic, authorName, cultural } = data;
+    const { id, isPublic, authorName, cultural, description } = data;
     if (isPublic == false) {
       await tech_cart.update(
         { isPublic, authorName, culturesTypeId: cultural, isAgree: false },
@@ -327,7 +328,7 @@ class TechCartService {
       );
     } else {
       await tech_cart.update(
-        { isPublic, authorName, culturesTypeId: cultural },
+        { isPublic, authorName, culturesTypeId: cultural, description },
         { where: { id } }
       );
     }
@@ -571,12 +572,19 @@ class TechCartService {
     isAgree: boolean,
     cartId: number,
     authorName?: string,
-    cultural?: number
+    cultural?: number,
+    description?: string
   ) {
     if (user?.role !== "ADMIN" && user?.role != "service_role") return;
-    if (authorName && cultural) {
+    if (authorName && cultural && description) {
       await tech_cart.update(
-        { isAgree, isPublic: true, authorName, culturesTypeId: cultural },
+        {
+          isAgree,
+          isPublic: true,
+          authorName,
+          culturesTypeId: cultural,
+          description,
+        },
         { where: { id: cartId } }
       );
     } else {
@@ -585,7 +593,7 @@ class TechCartService {
         { where: { id: cartId } }
       );
     }
-    if (authorName && cultural) {
+    if (authorName && cultural && description) {
       let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
         where: { id: cartId },
         include: cartsIncludes,

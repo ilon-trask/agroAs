@@ -36,7 +36,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -114,6 +114,7 @@ export async function setIsPublic(
     isPublic: boolean;
     authorName?: string;
     cultural?: number;
+    description?: string;
   }
 ) {
   map.isLoading = true;
@@ -432,7 +433,8 @@ export function setIsAgreeCarts(
   isAgree: boolean,
   cartId: number,
   authorName?: string,
-  cultural?: number
+  cultural?: number,
+  description?: string
 ) {
   map.isLoading = true;
   client.cart.setIsAgreeCarts
@@ -441,6 +443,7 @@ export function setIsAgreeCarts(
       cartId: cartId,
       authorName: authorName,
       cultural: cultural,
+      description: description,
     })
     .then((res) => {
       if (res == 1) {
