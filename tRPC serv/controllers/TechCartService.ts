@@ -349,16 +349,18 @@ class TechCartService {
   async copyCarts(cartId: number, user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore
-    const cartsData: resTechCartsWithOpers[] = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { id: cartId },
-    });
-
-    const cartsBefore: resTechCartsWithOpers[] | undefined = JSON.parse(
-      JSON.stringify(cartsData)
+    const cartsData: resTechCartsWithOpers[] = JSON.parse(
+      JSON.stringify(
+        await tech_cart.findAll({
+          include: cartsIncludes,
+          where: { id: cartId },
+        })
+      )
     );
 
-    if (!cartsBefore) return;
+    console.log(cartsData[0].tech_operations?.sort((a, b) => a.id! - b.id!));
+
+    if (!cartsData) return;
     async function getExistTractors() {
       const Tractors: Itractor[] = await tractor.findAll({
         //@ts-ignore
@@ -429,8 +431,8 @@ class TechCartService {
       return Machine.id;
     }
     let cartIn;
-    for (let i = 0; i < cartsBefore.length; i++) {
-      const cart = cartsBefore[i];
+    for (let i = 0; i < cartsData.length; i++) {
+      const cart = cartsData[i];
 
       if (!cart.tech_operations) return;
       async function mapTechOperation(

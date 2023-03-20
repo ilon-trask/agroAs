@@ -11,6 +11,7 @@ import {
   Box,
   Container,
   Input,
+  Tooltip,
 } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteCart, getCopyCarts, supabase } from "../http/requests";
@@ -105,20 +106,48 @@ const MapJornal = observer(function () {
           >
             Добавити технологічну карту
           </Button>
-          <Button
-            onClick={
-              user.role == ""
-                ? () => {
-                    setShowAlert(true);
-                  }
-                : () => {
-                    setOpenCopy(true);
-                    getCopyCarts(map);
-                  }
-            }
-          >
-            Скопіювати з журналу
-          </Button>
+          {user.role != "service_role" ? (
+            <Tooltip label={"Функція в розробці"}>
+              <Button
+                onClick={
+                  user.role == ""
+                    ? () => {
+                        setShowAlert(true);
+                      }
+                    : () => {
+                        user.role == "service_role"
+                          ? (() => {
+                              setOpenCopy(true);
+                              getCopyCarts(map);
+                            })()
+                          : () => {};
+                      }
+                }
+              >
+                Скопіювати з журналу
+              </Button>
+            </Tooltip>
+          ) : (
+            <Button
+              onClick={
+                //@ts-ignore
+                user.role == ""
+                  ? () => {
+                      setShowAlert(true);
+                    }
+                  : () => {
+                      user.role == "service_role"
+                        ? (() => {
+                            setOpenCopy(true);
+                            getCopyCarts(map);
+                          })()
+                        : () => {};
+                    }
+              }
+            >
+              Скопіювати з журналу
+            </Button>
+          )}
         </Box>
         {(user.role == "ADMIN" || user.role == "service_role") && (
           <TableContainer

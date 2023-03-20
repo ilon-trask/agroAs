@@ -36,8 +36,6 @@ function CopyCartPopUp({ open, setOpen }: props) {
         </Heading>
         <Box width={"60%"} mx={"auto"}>
           {map.copyCarts.map((el) => {
-            el.description =
-              "R9DdkfvN958K9Mt3d4ND3y86DBx3tJrkR9DdkfvN958K9Mt3d4ND3y86DBx3tJrk";
             return (
               <Box
                 cursor={"pointer"}
@@ -78,7 +76,10 @@ function CopyCartPopUp({ open, setOpen }: props) {
           <Button
             isActive={checked == 0}
             onClick={() => {
-              if (checked != 0) makeCopyCarts(map, checked);
+              if (checked != 0) {
+                makeCopyCarts(map, checked);
+                setOpen(false);
+              }
             }}
           >
             Скопіювати
