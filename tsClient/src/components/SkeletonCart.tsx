@@ -43,6 +43,9 @@ function MainTable() {
           <Box display={"flex"} justifyContent={"space-between"}>
             <Skeleton w={"246px"} h={"24px"} />
           </Box>
+          <Box display={"flex"} justifyContent={"space-between"}>
+            <Skeleton w={"246px"} h={"24px"} />
+          </Box>
         </Stack>
       </CardBody>
       <Divider />

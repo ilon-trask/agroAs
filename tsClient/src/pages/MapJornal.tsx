@@ -106,7 +106,7 @@ const MapJornal = observer(function () {
           >
             Добавити технологічну карту
           </Button>
-          {user.role != "service_role" ? (
+          {/* {user.role != "service_role" ? (
             <Tooltip label={"Функція в розробці"}>
               <Button
                 onClick={
@@ -147,7 +147,7 @@ const MapJornal = observer(function () {
             >
               Скопіювати з журналу
             </Button>
-          )}
+          )} */}
         </Box>
         {(user.role == "ADMIN" || user.role == "service_role") && (
           <TableContainer

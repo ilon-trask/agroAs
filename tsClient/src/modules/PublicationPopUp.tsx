@@ -165,10 +165,12 @@ function PublicationPopUp({ data, setData }: props) {
                       .upload("unUsed/" + data.data.id, file);
                     console.log(res.data);
                     console.log(res.error);
-                    if (res.error?.message == "Duplicate") {
+                    //@ts-ignore
+                    if (res.error?.error == "Duplicate") {
                       const res = await supabase.storage
                         .from("images")
                         .update("unUsed/" + data.data.id, file);
+                      console.log(res.data);
                     }
                   }}
                 />
