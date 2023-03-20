@@ -16,7 +16,10 @@ const NavBar = observer(() => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Link style={{ color: "white", textDecoration: "none" }} to={MAP_ROUTE}>
+        <Link
+          style={{ color: "#20401e", textDecoration: "none" }}
+          to={MAP_ROUTE}
+        >
           Калькулятор витрат
         </Link>
         {user.isAuth ? (

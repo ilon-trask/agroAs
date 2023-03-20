@@ -44,7 +44,7 @@ function MainPage() {
           backgroundSize={"cover"}
         >
           <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
-            AgroAs
+            <Text color={"#20401e"}>AgroAs</Text>
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства

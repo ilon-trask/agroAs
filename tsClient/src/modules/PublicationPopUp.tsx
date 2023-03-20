@@ -126,7 +126,7 @@ function PublicationPopUp({ data, setData }: props) {
           <Box display={"flex"} mt={3}>
             <Input
               type="text"
-              maxLength={55}
+              maxLength={45}
               value={description}
               onChange={(e) => {
                 setDescription(e.target.value);
