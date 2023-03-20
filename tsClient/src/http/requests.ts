@@ -314,7 +314,7 @@ export function getSection(map: MapStore) {
 }
 
 export function createTractor(map: MapStore, res: Itractor) {
-  client.tractor.create.query(res).then((data: Itractor) => {
+  client.tractor.create.query(res).then((data) => {
     map.newTractor = data;
   });
 }

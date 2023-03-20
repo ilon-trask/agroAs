@@ -153,9 +153,6 @@ function PublicationPopUp({ data, setData }: props) {
 
                     console.log(file);
 
-                    const res = await supabase.storage
-                      .from("images")
-                      .upload("unUsed/" + data.data.id, file);
                     // const { data, error } = await supabase.storage
                     //   .from("images")
                     //   .list("unUsed", {
@@ -163,8 +160,16 @@ function PublicationPopUp({ data, setData }: props) {
                     //     offset: 0,
                     //     sortBy: { column: "name", order: "asc" },
                     //   });
+                    const res = await supabase.storage
+                      .from("images")
+                      .upload("unUsed/" + data.data.id, file);
                     console.log(res.data);
                     console.log(res.error);
+                    if (res.error?.message == "Duplicate") {
+                      const res = await supabase.storage
+                        .from("images")
+                        .update("unUsed/" + data.data.id, file);
+                    }
                   }}
                 />
               </Box>
