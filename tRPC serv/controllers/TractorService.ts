@@ -29,7 +29,6 @@ class TractorService {
       numberOfPersonnel,
       gradeId,
     } = data;
-
     const Tractor: Itractor = await tractor.create({
       nameTractor,
       brand,
@@ -41,6 +40,12 @@ class TractorService {
       gradeId,
       userId: user.sub,
     });
+    if (user.role == "service_role") {
+      await tractor.update(
+        { copiedFromId: Tractor.id },
+        { where: { id: Tractor.id } }
+      );
+    }
     console.log(123);
     console.log(Tractor);
 

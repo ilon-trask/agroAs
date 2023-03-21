@@ -170,30 +170,6 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   await Promise.all(promises);
   return carts;
 }
-export async function getCart(userId: string | undefined) {
-  let res: { carts: resTechCartsWithOpers[] } = {
-    carts: [],
-  };
-  let Scarts: resTechCartsWithOpers[];
-  if (!userId) {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { isPublic: true },
-    });
-  } else {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { userId: userId },
-    });
-  }
-
-  res = { carts: await changeCarts(Scarts) };
-
-  //@ts-ignore
-  return res;
-}
 
 async function guestPatchCart(data: Idata) {
   //@ts-ignore
@@ -233,12 +209,29 @@ async function guestPatchCart(data: Idata) {
   }
   cart.totalCost = sum;
 
-  return { carts: [cart] };
+  return [cart];
 }
 
 class TechCartService {
   async getAll(user: Principal | undefined) {
-    return getCart(user?.sub);
+    let Scarts: resTechCartsWithOpers[];
+    if (!user?.sub) {
+      //@ts-ignore
+      Scarts = await tech_cart.findAll({
+        include: cartsIncludes,
+        where: { isPublic: true },
+      });
+    } else {
+      //@ts-ignore
+      Scarts = await tech_cart.findAll({
+        include: cartsIncludes,
+        where: { userId: user.sub },
+      });
+    }
+
+    const carts = await changeCarts(Scarts);
+
+    return carts;
   }
   async create(data: Idata, user: Principal | undefined) {
     const {
@@ -264,11 +257,15 @@ class TechCartService {
   async patchCart(data: Idata, user: Principal | undefined) {
     const { id, nameCart, area, salary, isPublic, priceDiesel } = data;
     if (user) {
-      const techCart = await tech_cart.update(
+      await tech_cart.update(
         { nameCart, area, salary, isPublic, priceDiesel },
         { where: { id: id } }
       );
-      return getCart(user?.sub);
+      const techCart: resTechCartsWithOpers[] = await tech_cart.findAll({
+        where: { id: id },
+        include: cartsIncludes,
+      });
+      return await changeCarts(techCart);
     } else {
       return await guestPatchCart(data);
     }
@@ -349,18 +346,16 @@ class TechCartService {
   async copyCarts(cartId: number, user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore
-    const cartsData: resTechCartsWithOpers[] = JSON.parse(
-      JSON.stringify(
-        await tech_cart.findAll({
-          include: cartsIncludes,
-          where: { id: cartId },
-        })
-      )
+    const cartsData: resTechCartsWithOpers[] = await tech_cart.findAll({
+      include: cartsIncludes,
+      where: { id: cartId },
+    });
+
+    const cartsBefore: resTechCartsWithOpers[] | undefined = JSON.parse(
+      JSON.stringify(cartsData)
     );
 
-    console.log(cartsData[0].tech_operations?.sort((a, b) => a.id! - b.id!));
-
-    if (!cartsData) return;
+    if (!cartsBefore) return;
     async function getExistTractors() {
       const Tractors: Itractor[] = await tractor.findAll({
         //@ts-ignore
@@ -431,8 +426,8 @@ class TechCartService {
       return Machine.id;
     }
     let cartIn;
-    for (let i = 0; i < cartsData.length; i++) {
-      const cart = cartsData[i];
+    for (let i = 0; i < cartsBefore.length; i++) {
+      const cart = cartsBefore[i];
 
       if (!cart.tech_operations) return;
       async function mapTechOperation(

@@ -8,9 +8,9 @@ import TechCartService, {
 
 export const cartRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
-    const cart = await TechCartService.getAll(ctx.user);
+    const carts = await TechCartService.getAll(ctx.user);
 
-    return cart;
+    return carts;
   }),
 
   create: publicProcedure

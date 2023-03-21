@@ -19,7 +19,7 @@ export const operRouter = router({
             ]),
             res: z.object({
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               fuelConsumption: z.number(),
               workingSpeed: z.number(),
               idTractor: z.number(),
@@ -49,7 +49,7 @@ export const operRouter = router({
             ]),
             res: z.object({
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               gradeId: z.number(),
               productionRateAmount: z.number().optional(),
               productionRateTime: z.number().optional(),
@@ -79,7 +79,7 @@ export const operRouter = router({
             ]),
             res: z.object({
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               consumptionPerHectare: z.number(),
               price: z.number(),
               unitsOfConsumption: z.string(),
@@ -104,7 +104,7 @@ export const operRouter = router({
             ]),
             res: z.object({
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               price: z.number(),
               unitsOfCost: z.string(),
             }),
@@ -127,7 +127,7 @@ export const operRouter = router({
             ]),
             res: z.object({
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               price: z.number(),
               unitsOfCost: z.string(),
             }),
@@ -154,7 +154,7 @@ export const operRouter = router({
             res: z.object({
               operId: z.number(),
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               consumptionPerHectare: z.number(),
               price: z.number(),
               unitsOfConsumption: z.string(),
@@ -182,7 +182,7 @@ export const operRouter = router({
             res: z.object({
               operId: z.number(),
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               price: z.number(),
               unitsOfCost: z.string(),
             }),
@@ -208,7 +208,7 @@ export const operRouter = router({
             res: z.object({
               operId: z.number(),
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               fuelConsumption: z.number(),
               idMachine: z.number(),
               idTractor: z.number(),
@@ -238,7 +238,7 @@ export const operRouter = router({
             res: z.object({
               operId: z.number(),
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               price: z.number(),
               unitsOfCost: z.string(),
             }),
@@ -264,7 +264,7 @@ export const operRouter = router({
             res: z.object({
               operId: z.number(),
               nameOper: z.string(),
-              date: z.string().nullable(),
+              date: z.string().nullish(),
               gradeId: z.number(),
               type: z.number(),
               yieldСapacity: z.number(),

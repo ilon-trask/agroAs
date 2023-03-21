@@ -18,9 +18,9 @@ import {
   tech_operation,
   tractor,
 } from "../../../tRPC serv/models/models";
-
+import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
-
+let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
@@ -36,7 +36,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -92,19 +92,17 @@ function operValue(oper: Itech_operation) {
 export async function getCarts(map: MapStore) {
   map.isLoading = true;
 
-  await client.cart.get
-    .query()
-    .then((res: { carts: resTechCartsWithOpers[] }) => {
-      console.log(res);
-      map.maps = [];
-      map.costMechanical = [];
-      map.costMaterials = [];
-      map.costServices = [];
-      map.costTransport = [];
-      map.opers = [];
-      operationsFilter(res.carts, map);
-      map.isLoading = false;
-    });
+  await client.cart.get.query().then((carts) => {
+    console.log(carts);
+    map.maps = [];
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
+    map.opers = [];
+    operationsFilter(carts, map);
+    map.isLoading = false;
+  });
 }
 
 export async function setIsPublic(
@@ -147,9 +145,9 @@ export async function deleteCart(map: MapStore, id: number) {
 
 export async function createCart(map: MapStore, data: Itech_cart) {
   map.isLoading = true;
-  //@ts-ignore
-  await client.cart.create.query(data).then((res: resTechCartsWithOpers) => {
-    map.newMap = res;
+
+  await client.cart.create.query(data).then((res) => {
+    map.newMap = res as resTechCartsWithOpers;
     map.isLoading = false;
   });
 }
@@ -158,43 +156,40 @@ export async function updateMap(map: MapStore, dat: any) {
   map.isLoading = true;
   let data = JSON.parse(JSON.stringify(dat));
 
-  await client.cart.patch.mutate(data).then(
-    // @ts-ignore
-    (res: { carts: resTechCartsWithOpers[] }) => {
-      console.log(res);
+  await client.cart.patch.mutate(data).then((res) => {
+    console.log(res);
+    map.maps = map.maps.filter((el) => el.id != res[0].id);
+    map.newMap = res[0];
 
-      map.opers = map.opers.filter((el) => el.techCartId != res.carts[0].id!);
-      map.costMechanical = [];
-      map.costMaterials = [];
-      map.costServices = [];
-      map.costTransport = [];
-      map.maps = map.maps.filter((el) => el.id != res.carts[0].id);
-      map.newMap = res.carts[0];
-      map.maps.sort((a, b) => a.id! - b.id!);
-      for (let i = 0; i < res.carts.length; i++) {
-        const opers = res.carts[i].tech_operations;
-        if (!opers) return;
-        for (let j = 0; j < opers.length; j++) {
-          const oper = opers[j];
+    map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
+    map.maps.sort((a, b) => a.id! - b.id!);
+    for (let i = 0; i < res.length; i++) {
+      const opers = res[i].tech_operations;
+      if (!opers) return;
+      for (let j = 0; j < opers.length; j++) {
+        const oper = opers[j];
 
-          map.newOper = opers[j];
+        map.newOper = opers[j];
 
-          if (oper.aggregate) {
-            map.newCostMechanical = oper.aggregate;
-          } else if (oper.cost_service) {
-            map.newCostServices = oper.cost_service;
-          } else if (oper.cost_transport) {
-            map.newCostTransport = oper.cost_transport;
-          } else if (oper.cost_material) {
-            map.newCostMaterials = oper.cost_material;
-          } else if (oper.cost_hand_work) {
-            map.newCostHandWork = oper.cost_hand_work;
-          }
+        if (oper.aggregate) {
+          map.newCostMechanical = oper.aggregate;
+        } else if (oper.cost_service) {
+          map.newCostServices = oper.cost_service;
+        } else if (oper.cost_transport) {
+          map.newCostTransport = oper.cost_transport;
+        } else if (oper.cost_material) {
+          map.newCostMaterials = oper.cost_material;
+        } else if (oper.cost_hand_work) {
+          map.newCostHandWork = oper.cost_hand_work;
         }
       }
-      map.isLoading = false;
     }
-  );
+    map.isLoading = false;
+  });
 }
 
 export async function deleteOper(
@@ -314,7 +309,7 @@ export function getSection(map: MapStore) {
 }
 
 export function createTractor(map: MapStore, res: Itractor) {
-  client.tractor.create.query(res).then((data: Itractor) => {
+  client.tractor.create.query(res).then((data) => {
     map.newTractor = data;
   });
 }

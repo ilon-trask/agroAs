@@ -11,6 +11,7 @@ import {
   CardFooter,
   ButtonGroup,
   Button,
+  Tooltip,
 } from "@chakra-ui/react";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
@@ -23,7 +24,12 @@ function MainTable({ e }: props) {
   const navigate = useNavigate();
   return (
     <Card maxW="sm" mx={"auto"}>
-      <CardBody pt={0}>
+      <CardBody
+        pt={0}
+        display={"flex"}
+        flexDirection={"column"}
+        justifyContent={"space-between"}
+      >
         <Stack mt="2" spacing="3">
           <Heading size="md" textAlign={"center"} textColor={"#20401e"}>
             {e?.nameCart || ""}
@@ -35,14 +41,16 @@ function MainTable({ e }: props) {
             {e?.description}
           </Text>
         </Stack>
-        <Image
-          src={IMGuRL + "/" + e?.id}
-          h={"auto"}
-          w={"220px"}
-          mx={"auto"}
-          alt={e?.nameCart}
-        />
-        <Stack mt="6" spacing="1">
+        <Box minH={"180px"}>
+          <Image
+            src={IMGuRL + "/" + e?.id}
+            h={"auto"}
+            w={"220px"}
+            mx={"auto"}
+            alt={e?.nameCart}
+          />
+        </Box>
+        <Stack mt="6" spacing="1" mb={0}>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Площа</Box>
             <Box>{e?.area || "0"}</Box>
@@ -54,6 +62,10 @@ function MainTable({ e }: props) {
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>
             <Box>{e?.totalCost || "0"}</Box>
+          </Box>
+          <Box display={"flex"} justifyContent={"space-between"}>
+            <Box fontWeight={"bold"}>Оновлено</Box>
+            <Box>{e?.updatedAt?.slice(0, 10) || "0"}</Box>
           </Box>
         </Stack>
       </CardBody>
@@ -67,9 +79,16 @@ function MainTable({ e }: props) {
           >
             До карти
           </Button>
-          {/* <Button variant="ghost" colorScheme="blue">
-            Технологія
-          </Button> */}
+          <Tooltip
+            label="Рекомендації в розробці"
+            bgColor={"grey.100"}
+            color={"black"}
+            fontSize={17}
+          >
+            <Button variant="ghost" colorScheme="blue">
+              Рекомендації
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </CardFooter>
     </Card>

@@ -24,7 +24,7 @@ export const tractorRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const tractor = await TractorService.create(input, ctx.user);
-      return tractor;
+      if (tractor) return tractor;
     }),
   patch: publicProcedure
     .input(
