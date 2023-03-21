@@ -171,10 +171,8 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   return carts;
 }
 
-async function guestPatchCart(data: Idata) {
-  //@ts-ignore
-  const Scart: resTechCartsWithOpers = data;
-  const cart: resTechCartsWithOpers = JSON.parse(JSON.stringify(Scart));
+async function guestPatchCart(data: resTechCartsWithOpers) {
+  const cart: resTechCartsWithOpers = JSON.parse(JSON.stringify(data));
   let sum = 0;
   if (!cart.tech_operations) return;
   for (let j = 0; j < cart.tech_operations.length; j++) {
@@ -208,6 +206,8 @@ async function guestPatchCart(data: Idata) {
     cart.tech_operations[j] = el;
   }
   cart.totalCost = sum;
+  console.log(cart.tech_operations.map((el) => el));
+  console.log(cart.tech_operations.map((el) => el.cost_hand_work));
 
   return [cart];
 }
@@ -254,8 +254,10 @@ class TechCartService {
 
     return techCart;
   }
-  async patchCart(data: Idata, user: Principal | undefined) {
+  async patchCart(data: resTechCartsWithOpers, user: Principal | undefined) {
     const { id, nameCart, area, salary, isPublic, priceDiesel } = data;
+    console.log(user);
+
     if (user) {
       await tech_cart.update(
         { nameCart, area, salary, isPublic, priceDiesel },

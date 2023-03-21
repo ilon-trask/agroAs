@@ -130,7 +130,10 @@ export const cartRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       //@ts-ignore
-      const cart = await TechCartService.patchCart(input, ctx.user);
+      const cart: resTechCartsWithOpers[] = await TechCartService.patchCart(
+        input,
+        ctx.user
+      );
       return cart;
     }),
   setIsPublic: publicProcedure
