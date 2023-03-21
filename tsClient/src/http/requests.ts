@@ -159,35 +159,48 @@ export async function updateMap(map: MapStore, dat: any) {
   await client.cart.patch.mutate(data).then((res) => {
     console.log(res);
     map.maps = map.maps.filter((el) => el.id != res[0].id);
-    map.newMap = res[0];
 
     map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.maps.sort((a, b) => a.id! - b.id!);
-    for (let i = 0; i < res.length; i++) {
-      const opers = res[i].tech_operations;
-      if (!opers) return;
-      for (let j = 0; j < opers.length; j++) {
-        const oper = opers[j];
+    res[0].tech_operations?.forEach((oper) => {
+      map.costMechanical = map.costMechanical.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costMaterials = map.costMaterials.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costServices = map.costServices.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costTransport = map.costTransport.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costHandWork = map.costHandWork.filter(
+        (el) => el.techOperationId != oper.id
+      );
+    });
+    operationsFilter(res, map);
+    // map.maps.sort((a, b) => a.id! - b.id!);
+    // for (let i = 0; i < res.length; i++) {
+    //   const opers = res[i].tech_operations;
+    //   if (!opers) return;
+    //   for (let j = 0; j < opers.length; j++) {
+    //     const oper = opers[j];
 
-        map.newOper = opers[j];
+    //     map.newOper = opers[j];
 
-        if (oper.aggregate) {
-          map.newCostMechanical = oper.aggregate;
-        } else if (oper.cost_service) {
-          map.newCostServices = oper.cost_service;
-        } else if (oper.cost_transport) {
-          map.newCostTransport = oper.cost_transport;
-        } else if (oper.cost_material) {
-          map.newCostMaterials = oper.cost_material;
-        } else if (oper.cost_hand_work) {
-          map.newCostHandWork = oper.cost_hand_work;
-        }
-      }
-    }
+    //     if (oper.aggregate) {
+    //       map.newCostMechanical = oper.aggregate;
+    //     } else if (oper.cost_service) {
+    //       map.newCostServices = oper.cost_service;
+    //     } else if (oper.cost_transport) {
+    //       map.newCostTransport = oper.cost_transport;
+    //     } else if (oper.cost_material) {
+    //       map.newCostMaterials = oper.cost_material;
+    //     } else if (oper.cost_hand_work) {
+    //       map.newCostHandWork = oper.cost_hand_work;
+    //     }
+    //   }
+    // }
     map.isLoading = false;
   });
 }
@@ -260,6 +273,7 @@ export async function patchOperation(
 
   let [mapData] = map.maps.filter((el) => el.id == id);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
+
   mapData.totalCost! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
@@ -270,7 +284,7 @@ export async function patchOperation(
     .then((res: resTechOperation) => {
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
       map.newOper = res;
-      let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
+      // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
 
       mapData.totalCost! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
