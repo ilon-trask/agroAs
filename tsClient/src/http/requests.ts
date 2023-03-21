@@ -36,7 +36,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: " http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -160,19 +160,19 @@ export async function updateMap(map: MapStore, dat: any) {
 
   await client.cart.patch.mutate(data).then(
     // @ts-ignore
-    (res: { carts: resTechCartsWithOpers[] }) => {
+    (res) => {
       console.log(res);
 
-      map.opers = map.opers.filter((el) => el.techCartId != res.carts[0].id!);
+      map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
       map.costMechanical = [];
       map.costMaterials = [];
       map.costServices = [];
       map.costTransport = [];
-      map.maps = map.maps.filter((el) => el.id != res.carts[0].id);
-      map.newMap = res.carts[0];
+      map.maps = map.maps.filter((el) => el.id != res[0].id);
+      map.newMap = res[0];
       map.maps.sort((a, b) => a.id! - b.id!);
-      for (let i = 0; i < res.carts.length; i++) {
-        const opers = res.carts[i].tech_operations;
+      for (let i = 0; i < res.length; i++) {
+        const opers = res[i].tech_operations;
         if (!opers) return;
         for (let j = 0; j < opers.length; j++) {
           const oper = opers[j];

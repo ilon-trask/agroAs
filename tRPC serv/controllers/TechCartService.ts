@@ -233,7 +233,7 @@ async function guestPatchCart(data: Idata) {
   }
   cart.totalCost = sum;
 
-  return { carts: [cart] };
+  return [cart];
 }
 
 class TechCartService {
@@ -264,11 +264,15 @@ class TechCartService {
   async patchCart(data: Idata, user: Principal | undefined) {
     const { id, nameCart, area, salary, isPublic, priceDiesel } = data;
     if (user) {
-      const techCart = await tech_cart.update(
+      await tech_cart.update(
         { nameCart, area, salary, isPublic, priceDiesel },
         { where: { id: id } }
       );
-      return getCart(user?.sub);
+      const techCart: resTechCartsWithOpers[] = await tech_cart.findAll({
+        where: { id: id },
+        include: cartsIncludes,
+      });
+      return await changeCarts(techCart);
     } else {
       return await guestPatchCart(data);
     }
