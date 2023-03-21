@@ -11,6 +11,7 @@ import {
   CardFooter,
   ButtonGroup,
   Button,
+  Tooltip,
 } from "@chakra-ui/react";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
@@ -78,9 +79,16 @@ function MainTable({ e }: props) {
           >
             До карти
           </Button>
-          {/* <Button variant="ghost" colorScheme="blue">
-            Технологія
-          </Button> */}
+          <Tooltip
+            label="Рекомендації в розробці"
+            bgColor={"grey.100"}
+            color={"black"}
+            fontSize={17}
+          >
+            <Button variant="ghost" colorScheme="blue">
+              Рекомендації
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </CardFooter>
     </Card>

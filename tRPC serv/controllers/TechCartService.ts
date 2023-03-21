@@ -170,30 +170,6 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   await Promise.all(promises);
   return carts;
 }
-export async function getCart(userId: string | undefined) {
-  let res: { carts: resTechCartsWithOpers[] } = {
-    carts: [],
-  };
-  let Scarts: resTechCartsWithOpers[];
-  if (!userId) {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { isPublic: true },
-    });
-  } else {
-    //@ts-ignore
-    Scarts = await tech_cart.findAll({
-      include: cartsIncludes,
-      where: { userId: userId },
-    });
-  }
-
-  res = { carts: await changeCarts(Scarts) };
-
-  //@ts-ignore
-  return res;
-}
 
 async function guestPatchCart(data: Idata) {
   //@ts-ignore
@@ -238,7 +214,24 @@ async function guestPatchCart(data: Idata) {
 
 class TechCartService {
   async getAll(user: Principal | undefined) {
-    return getCart(user?.sub);
+    let Scarts: resTechCartsWithOpers[];
+    if (!user?.sub) {
+      //@ts-ignore
+      Scarts = await tech_cart.findAll({
+        include: cartsIncludes,
+        where: { isPublic: true },
+      });
+    } else {
+      //@ts-ignore
+      Scarts = await tech_cart.findAll({
+        include: cartsIncludes,
+        where: { userId: user.sub },
+      });
+    }
+
+    const carts = await changeCarts(Scarts);
+
+    return carts;
   }
   async create(data: Idata, user: Principal | undefined) {
     const {

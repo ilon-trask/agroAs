@@ -19,7 +19,7 @@ import {
   Iaggregate,
 } from "../models/models";
 
-import { getCart, resTechOperation } from "./TechCartService";
+import { resTechOperation } from "./TechCartService";
 
 export type prope =
   | cost_material
@@ -91,7 +91,7 @@ interface Idata<T> {
 interface IdataCreateCostMaterials
   extends Idata<{
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     consumptionPerHectare: number;
     price: number;
     unitsOfConsumption: string;
@@ -101,21 +101,21 @@ interface IdataCreateCostMaterials
 interface IdataCreateCostServices
   extends Idata<{
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
 interface IdataCreateCostTransport
   extends Idata<{
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
 interface IdataCreateCostMechanical
   extends Idata<{
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     fuelConsumption: number;
     workingSpeed: number;
     idTractor: number;
@@ -124,7 +124,7 @@ interface IdataCreateCostMechanical
 interface IdataCreateCostHandWork
   extends Idata<{
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     gradeId: number;
     productionRateAmount?: number;
     productionRateTime?: number;
@@ -147,7 +147,7 @@ interface IdataPatchCostMaterial
   extends IdataPatch<{
     operId: number;
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     consumptionPerHectare: number;
     price: number;
     unitsOfConsumption: string;
@@ -157,7 +157,7 @@ interface IdataPatchCostServices
   extends IdataPatch<{
     operId: number;
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
@@ -166,7 +166,7 @@ interface IdataPatchCostTransport
   extends IdataPatch<{
     operId: number;
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     price: number;
     unitsOfCost: string;
   }> {}
@@ -174,7 +174,7 @@ interface IdataPatchCostMachine
   extends IdataPatch<{
     operId: number;
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     fuelConsumption: number;
     workingSpeed: number;
     idTractor: number;
@@ -187,7 +187,7 @@ interface IdataPatchCostHandWork
   extends IdataPatch<{
     operId: number;
     nameOper: string;
-    date: string | null | undefined;
+    date?: string | null | undefined;
     gradeId: number;
     productionRateAmount?: number;
     productionRateTime?: number;
