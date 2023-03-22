@@ -1,7 +1,7 @@
 import Auth from "./pages/Auth";
+import BusinessPlanPage from "./pages/BusinessPlanPage";
+import BusinessCatalog from "./pages/BusinessCatalog";
 import CalendarPage from "./pages/CalenderPage";
-import Main from "./pages/MainPage";
-import MapJornal from "./pages/MapJornal";
 import StartPage from "./pages/StartPage";
 import TechnologicalMap from "./pages/TechnologicalMap";
 import {
@@ -10,7 +10,11 @@ import {
   MAP_ROUTE,
   TEHMAP_ROUTER,
   CALENDAR_ROUTER,
+  BUSINESSpLAN_ROUTER,
+  BUSINESScATALOG_ROUTER,
+  BUSINESS_ROUTER,
 } from "./utils/consts";
+import BusinessPage from "./pages/BusinessPage";
 
 export const authRoutes = [];
 
@@ -34,5 +38,17 @@ export const publicRoutes = [
   {
     path: CALENDAR_ROUTER + "/:id",
     Component: <CalendarPage />,
+  },
+  {
+    path: BUSINESSpLAN_ROUTER,
+    Component: <BusinessPlanPage />,
+  },
+  {
+    path: BUSINESScATALOG_ROUTER,
+    Component: <BusinessCatalog />,
+  },
+  {
+    path: BUSINESS_ROUTER,
+    Component: <BusinessPage />,
   },
 ];

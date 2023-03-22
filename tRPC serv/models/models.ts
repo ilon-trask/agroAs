@@ -484,6 +484,42 @@ cultures_types.init(
   { sequelize }
 );
 
+export interface IbusinessPlan {
+  id?: number;
+  name: string;
+  userId: string;
+  businessCategoryId?: number;
+}
+export class businessPlan extends Model<IbusinessPlan> {
+  declare id?: number;
+  declare name: string;
+  declare userId: string;
+}
+businessPlan.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
+export interface IbusinessCategory {
+  id?: number;
+  name: string;
+}
+export class businessCategory extends Model<IbusinessCategory> {
+  declare id?: number;
+  declare name: string;
+}
+businessCategory.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -517,3 +553,5 @@ grade.hasMany(cost_hand_work);
 tech_operation.hasOne(cost_hand_work);
 
 cultures_types.hasMany(tech_cart);
+
+businessCategory.hasMany(businessPlan);

@@ -22,6 +22,7 @@ import { workRouter } from "./routes/workRouter";
 import { culturalRouter } from "./routes/culturalRouter";
 import SectionService from "./controllers/SectionService";
 import gradeService from "./controllers/gradeService";
+import businessRouter from "./routes/businessRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -46,6 +47,7 @@ const appRouter = router({
     }),
   }),
   cultural: culturalRouter,
+  business: businessRouter,
   "": publicProcedure.query(() => "some text"),
   getUser: publicProcedure.query(() => {
     console.log(users);

@@ -14,6 +14,8 @@ import {
   getCultural,
   getIsAgreeCarts,
   agreeCarts,
+  getBusinessCategory,
+  getBusinessPlans,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -24,7 +26,7 @@ import { IUserRole } from "../../tRPC serv";
 import { observer } from "mobx-react-lite";
 
 function App() {
-  const { map, user } = useContext(Context);
+  const { map, user, business } = useContext(Context);
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -40,6 +42,8 @@ function App() {
       getMachine(map);
       getGrades(map);
       getCultural(map);
+      getBusinessCategory(map, business);
+      getBusinessPlans(map, business);
       console.log(1);
 
       if (user.role == "ADMIN" || user.role == "service_role")

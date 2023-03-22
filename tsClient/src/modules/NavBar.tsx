@@ -20,10 +20,16 @@ const NavBar = observer(() => {
           style={{ color: "#20401e", textDecoration: "none" }}
           to={MAP_ROUTE}
         >
-          Калькулятор витрат
+          AgroAs
         </Link>
+        {user.role == "service_role" && (
+          <Box>
+            <Button>Калькулятор витрат</Button>
+            <Button>Бізнес-плани</Button>
+          </Box>
+        )}
         {user.isAuth ? (
-          <div>
+          <Box>
             <Link to={MAP_ROUTE}>
               <Button
                 onClick={async () => {
@@ -36,7 +42,7 @@ const NavBar = observer(() => {
                 Вийти
               </Button>
             </Link>
-          </div>
+          </Box>
         ) : (
           <Box>
             <Link to={LOGIN_ROUTE}>
