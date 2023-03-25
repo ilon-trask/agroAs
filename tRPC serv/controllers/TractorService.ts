@@ -46,8 +46,8 @@ class TractorService {
         { where: { id: Tractor.id } }
       );
     }
-    console.log(123);
-    console.log(Tractor);
+    // console.log(123);
+    // console.log(Tractor);
 
     return Tractor;
   }
@@ -129,7 +129,7 @@ class TractorService {
       gradeId: tractorData.gradeId,
       userId: user?.sub,
     });
-    console.log(Tractor);
+    // console.log(Tractor);
     return Tractor;
   }
 }

@@ -487,12 +487,20 @@ cultures_types.init(
 export interface IbusinessPlan {
   id?: number;
   name: string;
-  userId: string;
   businessCategoryId?: number;
+  isPublic?: boolean;
+  isAgree?: boolean;
+  description?: string;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export class businessPlan extends Model<IbusinessPlan> {
   declare id?: number;
   declare name: string;
+  declare isPublic?: boolean;
+  declare isAgree?: boolean;
+  declare description?: string;
   declare userId: string;
 }
 businessPlan.init(
@@ -500,6 +508,17 @@ businessPlan.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isAgree: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    description: { type: DataTypes.STRING },
   },
   { sequelize }
 );

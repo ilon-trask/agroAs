@@ -24,6 +24,7 @@ import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
 import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
+import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -523,9 +524,87 @@ export function createBusinessPlan(
 ) {
   map.isLoading = true;
   client.business.create.query(data).then((res) => {
+    Bus.newBusinessPlan = res;
+    map.isLoading = false;
+  });
+}
+export function deleteBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  BusinessId: number
+) {
+  map.isLoading = true;
+  client.business.delete.query({ BusinessId }).then((res) => {
+    if (res == 1) {
+      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != BusinessId);
+    }
+    map.isLoading = false;
+  });
+}
+export function patchBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: BusinessProps
+) {
+  map.isLoading = true;
+  client.business.patch
+    .query({
+      businessCategoryId: +data.businessCategoryId!,
+      name: data.name,
+      planId: data.id!,
+    })
+    .then((res) => {
+      if (res) {
+        Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
+        Bus.newBusinessPlan = res;
+      }
+      map.isLoading = false;
+    });
+}
+export function setIsPublicBusiness(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: { BusinessId: number; isPublic: boolean; description?: string }
+) {
+  map.isLoading = true;
+  client.business.setIsPublic.query(data).then((res) => {
+    if (res) {
+      Bus.businessPlan = Bus.businessPlan.filter(
+        (el) => el.id != data.BusinessId
+      );
+      Bus.newBusinessPlan = res;
+      getNoAgreeBusiness(map, Bus);
+    }
+    map.isLoading = false;
+  });
+}
+export function sendFeedBack(data: FeedBackProps) {
+  client.feedBack.get.query(data);
+}
+export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
+  map.isLoading = true;
+  client.business.getNoAgree.query().then((res) => {
     console.log(res);
 
-    Bus.newBusinessPlan = res;
+    Bus.noAgreeBusinessPlan = res;
+    map.isLoading = false;
+  });
+}
+export function setIsAgreeBusiness(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: { BusinessId: number; isAgree: boolean; description?: string }
+) {
+  map.isLoading = true;
+  client.business.setIsAgree.query(data).then((res) => {
+    console.log(res);
+
+    if (res)
+      if (res[0]) {
+        Bus.noAgreeBusinessPlan = Bus.noAgreeBusinessPlan.filter(
+          (el) => el.id != data.BusinessId
+        );
+      }
     map.isLoading = false;
   });
 }

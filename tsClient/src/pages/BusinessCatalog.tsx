@@ -13,6 +13,7 @@ import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
+import BusinessCatalogItem from "../components/BusinessCatalogItem";
 
 function MainPage() {
   const { map, business } = useContext(Context);
@@ -62,6 +63,7 @@ function MainPage() {
                 display={"block"}
                 textAlign={"left"}
                 _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
+                textTransform={"uppercase"}
               >
                 Бізнес-плани
               </Tab>
@@ -89,12 +91,12 @@ function MainPage() {
             >
               {map.isLoading
                 ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                : map.agreeCarts.map((e) => <MainTableItem e={e} />) || (
-                    <Text>Немає жодної карти</Text>
-                  )}
+                : business.businessPlan.map((e) => (
+                    <BusinessCatalogItem e={e} />
+                  )) || <Text>Немає жодного бізнес-плану</Text>}
             </Box>
           </TabPanel>
-          {map.cultural.map((el) => (
+          {business.businessCategory.map((el) => (
             <TabPanel>
               <Box
                 display={"grid"}
@@ -111,10 +113,10 @@ function MainPage() {
               >
                 {map.isLoading
                   ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                  : map.agreeCarts.map((e) => {
-                      if (el.id == e.culturesTypeId)
-                        return <MainTableItem e={e} />;
-                    }) || <Text>Немає жодної карти</Text>}
+                  : business.businessPlan.map((e) => {
+                      if (el.id == e.businessCategoryId)
+                        return <BusinessCatalogItem e={e} />;
+                    }) || <Text>Немає жодного бізнес-плану</Text>}
               </Box>
             </TabPanel>
           ))}

@@ -39,7 +39,7 @@ type props = {
   ) => void;
 };
 
-function PublicationPopUp({ data, setData }: props) {
+function CartPublicationPopUp({ data, setData }: props) {
   const [isErr, setIsErr] = useState(false);
   const { map, user } = useContext(Context);
   const imgRef = useRef(null);
@@ -222,4 +222,4 @@ function PublicationPopUp({ data, setData }: props) {
   );
 }
 
-export default observer(PublicationPopUp);
+export default observer(CartPublicationPopUp);

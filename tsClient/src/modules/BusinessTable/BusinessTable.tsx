@@ -1,49 +1,40 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import { observer } from "mobx-react-lite";
 
-import { Context } from "../main";
-import BusinessTableItem from "../components/BusinessTableItem";
+import { Context } from "../../main";
+import BusinessTableItem from "./component/BusinessTableItem";
 
-import Loader from "../components/Loader";
+import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../tRPC serv/models/models";
+import { BusinessProps } from "../CreateBusiness/CreateBusinessPlan";
+import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 
 interface props {
   // maps: resTechCartsWithOpers[] | [];
-  setCreate: (open: boolean) => void;
-  // setRes: (res: cartProps) => void;
-  // setOpen: (open: boolean) => void;
-  // setUpdate: (update: boolean) => void;
-  // setShowAlert: (showAlert: boolean) => void;
-  // deleteOpen: any;
-  // setDeleteOpen: (deleteOpen: any) => void;
-  // setPublicationOpen: ({
-  //   isOpen,
-  //   data: { id, isPublic },
-  // }: {
-  //   isOpen: boolean;
-  //   data: { id: number; isPublic: boolean; agree: boolean };
-  // }) => void;
+  setCreate: Dispatch<SetStateAction<boolean>>;
+  deleteFunc: (BusinessId: number) => void;
+  setShowAlert: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRes: Dispatch<SetStateAction<BusinessProps>>;
+  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
 }
 
 const CartsTable = observer(
   ({
     setCreate,
-  }: // maps,
-  // setRes,
-  // setOpen,
-  // setUpdate,
-  // setShowAlert,
-  // deleteOpen,
-  // setDeleteOpen,
-  // setPublicationOpen,
-  props) => {
+    deleteFunc,
+    setShowAlert,
+    setUpdate,
+    setRes,
+    agreeFunc,
+  }: props) => {
     const { map, user, business } = useContext(Context);
-
+    const Business: IbusinessPlan[] = JSON.parse(
+      JSON.stringify(business.businessPlan)
+    );
+    Business.sort((a, b) => a.id! - b.id!);
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
@@ -64,14 +55,18 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {business.businessPlan.map((e) => (
+          {Business.map((e) => (
             <BusinessTableItem
               key={e.id}
               e={e}
+              deleteFunc={deleteFunc}
+              setShowAlert={setShowAlert}
+              setOpen={setCreate}
+              setUpdate={setUpdate}
+              setRes={setRes}
+              agreeFunc={agreeFunc}
               // setOpen={setOpen}
-              // setRes={setRes}
               // setUpdate={setUpdate}
-              // setShowAlert={setShowAlert}
               // deleteOpen={deleteOpen}
               // setDeleteOpen={setDeleteOpen}
               // setPublicationOpen={setPublicationOpen}

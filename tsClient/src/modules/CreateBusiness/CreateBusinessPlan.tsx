@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
 import BusinessPlan from "./components/BusinessPlan";
 import { createOperProps } from "../../pages/TechnologicalMap";
 
 export type BusinessProps = {
+  id?: number;
   name: string;
   businessCategoryId: number | "";
 };
@@ -29,7 +30,7 @@ export default function CreateBusiness({
   res: BusinessProps;
   setRes: (res: BusinessProps) => void;
   update: boolean;
-  setUpdate: (update: boolean) => void;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
   isErr: boolean;
   setIsErr: (isErr: boolean) => void;
 }) {
@@ -51,6 +52,7 @@ export default function CreateBusiness({
         setOpen={setOpen}
         setIsErr={setIsErr}
         update={update}
+        setUpdate={setUpdate}
       />
     </Dialog>
   );

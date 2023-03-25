@@ -20,7 +20,7 @@ import CopyCartPupUp from "../modules/CopyCartPopUp";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import CreateWork, { workProps } from "../modules/CreateWork";
 import WorkTable from "../modules/WorkTable";
-import PublicationPopUp from "../modules/PublicationPopUp";
+import PublicationPopUp from "../modules/CartPublicationPopUp";
 import AgreeCartsTable from "../modules/AgreeCartsTable";
 // import Button from "@mui/material/Button";
 export interface Icart extends Itech_cart {
@@ -208,14 +208,14 @@ const MapJornal = observer(function () {
         res={res}
         setRes={setRes as any}
       />
-      <CreateWork
+      {/* <CreateWork
         open={workOpen}
         setOpen={setWorkOpen}
         update={update}
         setUpdate={setUpdate}
         res={workRes}
         setRes={setWorkRes as any}
-      />
+      /> */}
       {!!showAlert && (
         <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
       )}

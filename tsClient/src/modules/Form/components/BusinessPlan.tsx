@@ -1,6 +1,6 @@
-import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { BusinessProps, businessProps } from "../CreateBusinessPlan";
+import { BusinessProps, businessProps } from "../FeadbackForm";
 import { func, InputProps } from "../../../components/Dialog";
 import { Context } from "../../../main";
 import { useParams } from "react-router-dom";
@@ -17,52 +17,41 @@ import {
 } from "@chakra-ui/react";
 import MapStore from "../../../store/MapStore";
 import BusinessStore from "../../../store/BusinessStore";
-import { createBusinessPlan, patchBusinessPlan } from "../../../http/requests";
+import { createBusinessPlan } from "../../../http/requests";
 
 const createBusiness: (
+  id: number,
   map: MapStore,
   bus: BusinessStore,
   update: boolean,
-  setUpdate: Dispatch<SetStateAction<boolean>>,
   res: BusinessProps,
   setIsErr: (isErr: boolean) => void,
   setOpen: (open: boolean) => void,
   setRes: (res: BusinessProps) => void
-) => void = function (
-  map,
-  bus,
-  update,
-  setUpdate,
-  res,
-  setIsErr,
-  setOpen,
-  setRes
-) {
+) => void = function (id, map, bus, update, res, setIsErr, setOpen, setRes) {
   if (res.name == "" || res.businessCategoryId == "") {
     setIsErr(true);
   } else {
     setOpen(false);
     setRes(businessProps);
-    setUpdate(false);
     setIsErr(false);
-    if (update) {
-      patchBusinessPlan(map, bus, res);
-    } else {
-      createBusinessPlan(map, bus, {
-        name: res.name,
-        businessCategoryId: res.businessCategoryId,
-      });
-    }
+    // if (update) {
+    //   (map, res, id);
+    // } else {
+    createBusinessPlan(map, bus, {
+      name: res.name,
+      businessCategoryId: res.businessCategoryId,
+    });
+    // }
   }
 };
-const Plan = observer(
+const Transport = observer(
   ({
     res,
     setRes,
     setIsErr,
     setOpen,
     update,
-    setUpdate,
   }: {
     res: BusinessProps;
     setRes: (
@@ -71,18 +60,11 @@ const Plan = observer(
     setIsErr: (isErr: boolean) => void;
     setOpen: (open: boolean) => void;
     update: boolean;
-    setUpdate: Dispatch<SetStateAction<boolean>>;
   }) => {
     const { map, business } = useContext(Context);
+    const { id } = useParams();
 
-    // useEffect(() => {
-    //   if (!update) {
-    //     //@ts-ignore
-
-    //     setRes({});
-    //     console.log(123);
-    //   }
-    // }, [res]);
+    useEffect(() => {}, [res]);
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
@@ -138,10 +120,10 @@ const Plan = observer(
           <Button
             onClick={() =>
               createBusiness(
+                +id!,
                 map,
                 business,
                 update,
-                setUpdate,
                 res,
                 setIsErr,
                 setOpen,
@@ -157,4 +139,4 @@ const Plan = observer(
   }
 );
 
-export default Plan;
+export default Transport;

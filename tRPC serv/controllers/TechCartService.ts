@@ -206,8 +206,8 @@ async function guestPatchCart(data: resTechCartsWithOpers) {
     cart.tech_operations[j] = el;
   }
   cart.totalCost = sum;
-  console.log(cart.tech_operations.map((el) => el));
-  console.log(cart.tech_operations.map((el) => el.cost_hand_work));
+  // console.log(cart.tech_operations.map((el) => el));
+  // console.log(cart.tech_operations.map((el) => el.cost_hand_work));
 
   return [cart];
 }
@@ -256,7 +256,7 @@ class TechCartService {
   }
   async patchCart(data: resTechCartsWithOpers, user: Principal | undefined) {
     const { id, nameCart, area, salary, isPublic, priceDiesel } = data;
-    console.log(user);
+    // console.log(user);
 
     if (user) {
       await tech_cart.update(
@@ -363,7 +363,7 @@ class TechCartService {
         //@ts-ignore
         where: { userId: user.sub, copiedFromId: { [Op.ne]: null } },
       });
-      console.log(Tractors);
+      // console.log(Tractors);
 
       return JSON.parse(JSON.stringify(Tractors));
     }
@@ -378,7 +378,7 @@ class TechCartService {
       el: resTechOperation
     ) {
       let tractors = await getExistTractors();
-      console.log(tractors);
+      // console.log(tractors);
 
       for (let i = 0; i < tractors.length; i++) {
         const el = tractors[i];
@@ -444,8 +444,8 @@ class TechCartService {
           let isMachine;
           if (el.cell == "costMechanical") {
             isTractor = await checkTractorId(el.aggregate?.tractor?.id, el);
-            console.log("id");
-            console.log(isTractor);
+            // console.log("id");
+            // console.log(isTractor);
 
             isMachine = await checkMachineId(
               el.aggregate?.agricultural_machine.id,

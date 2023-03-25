@@ -1,13 +1,15 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
-import { LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
+import { BUSINESS_ROUTER, LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { getCarts, supabase } from "../http/requests";
-import { Button, Box } from "@chakra-ui/react";
+import { Button, Box, Image } from "@chakra-ui/react";
+import verticalLogo from "/verticalLogo.svg";
 
 const NavBar = observer(() => {
   const { map, user } = useContext(Context);
+
   return (
     <Box bgColor={"rgba( 93, 160, 93, 0.55 )"} py={"10px"}>
       <Box
@@ -20,12 +22,22 @@ const NavBar = observer(() => {
           style={{ color: "#20401e", textDecoration: "none" }}
           to={MAP_ROUTE}
         >
-          AgroAs
+          <Image src={verticalLogo} h={"50px"} w={"111px"} />
         </Link>
-        {user.role == "service_role" && (
-          <Box>
-            <Button>Калькулятор витрат</Button>
-            <Button>Бізнес-плани</Button>
+        {user.role !== "" && (
+          <Box gap={4} display={"flex"}>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={MAP_ROUTE}
+            >
+              Калькулятор витрат
+            </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={BUSINESS_ROUTER}
+            >
+              Бізнес-плани
+            </Link>
           </Box>
         )}
         {user.isAuth ? (
