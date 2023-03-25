@@ -13,11 +13,13 @@ import {
 type props = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  text: "карту" | "операцію";
+  text: "карту" | "операцію" | "бізнес-план";
   func: any;
 };
 
 export default function DeleteAlert({ open, setOpen, text, func }: props) {
+  console.log(func);
+
   return (
     //@ts-ignore
     <AlertDialog onClose={() => setOpen(false)} isOpen={open} isCentered>

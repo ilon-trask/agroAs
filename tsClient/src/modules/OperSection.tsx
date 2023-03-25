@@ -66,7 +66,6 @@ function OperSection({
                     setSection(+e.target.value);
                   }}
                   value={section}
-                  defaultValue={""}
                 >
                   <option disabled hidden value="">
                     Виберіть розділ

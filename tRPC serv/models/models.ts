@@ -484,6 +484,61 @@ cultures_types.init(
   { sequelize }
 );
 
+export interface IbusinessPlan {
+  id?: number;
+  name: string;
+  businessCategoryId?: number;
+  isPublic?: boolean;
+  isAgree?: boolean;
+  description?: string;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export class businessPlan extends Model<IbusinessPlan> {
+  declare id?: number;
+  declare name: string;
+  declare isPublic?: boolean;
+  declare isAgree?: boolean;
+  declare description?: string;
+  declare userId: string;
+}
+businessPlan.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isAgree: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    description: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
+
+export interface IbusinessCategory {
+  id?: number;
+  name: string;
+}
+export class businessCategory extends Model<IbusinessCategory> {
+  declare id?: number;
+  declare name: string;
+}
+businessCategory.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -517,3 +572,5 @@ grade.hasMany(cost_hand_work);
 tech_operation.hasOne(cost_hand_work);
 
 cultures_types.hasMany(tech_cart);
+
+businessCategory.hasMany(businessPlan);

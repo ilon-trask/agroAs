@@ -7,7 +7,9 @@ import {
   resTechOperation,
 } from "../../../tRPC serv/controllers/TechCartService";
 import MapStore from "../store/MapStore";
+import BusinessStore from "../store/BusinessStore";
 import {
+  IbusinessPlan,
   Igrade,
   Imachine,
   Isection,
@@ -20,6 +22,9 @@ import {
 } from "../../../tRPC serv/models/models";
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
+import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
+import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
+import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -121,11 +126,23 @@ export async function setIsPublic(
       map.isLoading = false;
       return;
     }
-    map.opers = [];
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
+    res[0].tech_operations?.forEach((oper) => {
+      map.costMechanical = map.costMechanical.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costMaterials = map.costMaterials.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costServices = map.costServices.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costTransport = map.costTransport.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costHandWork = map.costHandWork.filter(
+        (el) => el.techOperationId != oper.id
+      );
+    });
     map.maps = map.maps.filter((el) => el.id != data.id);
     operationsFilter(res, map);
     map.isLoading = false;
@@ -273,6 +290,12 @@ export async function patchOperation(
 
   let [mapData] = map.maps.filter((el) => el.id == id);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
+  //@ts-ignore
+  let [mapOperData] = mapData.tech_operations?.filter(
+    (el) => el.id == arr.res.operId
+  );
+  console.log(mapData);
+  console.log(mapOperData);
 
   mapData.totalCost! -= operValue(operData);
   await client.oper.patch[arr.cell]
@@ -304,16 +327,22 @@ export async function patchOperation(
       );
 
       if (res.aggregate) {
+        mapOperData.aggregate = res.aggregate;
         map.newCostMechanical = res.aggregate;
       } else if (res.cost_service) {
+        mapOperData.cost_service = res.cost_service;
         map.newCostServices = res.cost_service;
       } else if (res.cost_transport) {
+        mapOperData.cost_transport = res.cost_transport;
         map.newCostTransport = res.cost_transport;
       } else if (res.cost_material) {
+        mapOperData.cost_material = res.cost_material;
         map.newCostMaterials = res.cost_material;
       } else if (res.cost_hand_work) {
+        mapOperData.cost_hand_work = res.cost_hand_work;
         map.newCostHandWork = res.cost_hand_work;
       }
+      console.log(mapOperData);
       map.isLoading = false;
     });
 }
@@ -469,6 +498,113 @@ export function agreeCarts(map: MapStore) {
   client.cart.getAgreeCarts.query().then((res) => {
     map.agreeCarts = [];
     map.agreeCarts = res;
+    map.isLoading = false;
+  });
+}
+export function getBusinessCategory(map: MapStore, Bus: BusinessStore) {
+  map.isLoading = true;
+  client.business.getCategory.query().then((res) => {
+    Bus.businessCategory = res;
+    map.isLoading = false;
+  });
+}
+
+export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
+  map.isLoading = true;
+  client.business.get.query().then((res) => {
+    Bus.businessPlan = res;
+    map.isLoading = false;
+  });
+}
+
+export function createBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: CreateBusinessPlan
+) {
+  map.isLoading = true;
+  client.business.create.query(data).then((res) => {
+    Bus.newBusinessPlan = res;
+    map.isLoading = false;
+  });
+}
+export function deleteBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  BusinessId: number
+) {
+  map.isLoading = true;
+  client.business.delete.query({ BusinessId }).then((res) => {
+    if (res == 1) {
+      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != BusinessId);
+    }
+    map.isLoading = false;
+  });
+}
+export function patchBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: BusinessProps
+) {
+  map.isLoading = true;
+  client.business.patch
+    .query({
+      businessCategoryId: +data.businessCategoryId!,
+      name: data.name,
+      planId: data.id!,
+    })
+    .then((res) => {
+      if (res) {
+        Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
+        Bus.newBusinessPlan = res;
+      }
+      map.isLoading = false;
+    });
+}
+export function setIsPublicBusiness(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: { BusinessId: number; isPublic: boolean; description?: string }
+) {
+  map.isLoading = true;
+  client.business.setIsPublic.query(data).then((res) => {
+    if (res) {
+      Bus.businessPlan = Bus.businessPlan.filter(
+        (el) => el.id != data.BusinessId
+      );
+      Bus.newBusinessPlan = res;
+      getNoAgreeBusiness(map, Bus);
+    }
+    map.isLoading = false;
+  });
+}
+export function sendFeedBack(data: FeedBackProps) {
+  client.feedBack.get.query(data);
+}
+export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
+  map.isLoading = true;
+  client.business.getNoAgree.query().then((res) => {
+    console.log(res);
+
+    Bus.noAgreeBusinessPlan = res;
+    map.isLoading = false;
+  });
+}
+export function setIsAgreeBusiness(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: { BusinessId: number; isAgree: boolean; description?: string }
+) {
+  map.isLoading = true;
+  client.business.setIsAgree.query(data).then((res) => {
+    console.log(res);
+
+    if (res)
+      if (res[0]) {
+        Bus.noAgreeBusinessPlan = Bus.noAgreeBusinessPlan.filter(
+          (el) => el.id != data.BusinessId
+        );
+      }
     map.isLoading = false;
   });
 }

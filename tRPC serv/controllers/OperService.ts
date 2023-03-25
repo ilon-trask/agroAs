@@ -213,8 +213,8 @@ async function createOper(
   section: number,
   date: string | null | undefined
 ) {
-  console.log("date");
-  console.log(date);
+  // console.log("date");
+  // console.log(date);
 
   let Soper: Itech_operation = await tech_operation.create({
     techCartId: cartId,
@@ -483,8 +483,8 @@ class OperService {
         section,
       },
     } = data;
-    console.log("date1");
-    console.log(date);
+    // console.log("date1");
+    // console.log(date);
 
     const oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;

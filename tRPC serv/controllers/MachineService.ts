@@ -119,7 +119,7 @@ class MachineService {
       gradeId: machineData.gradeId,
       userId: user?.sub,
     });
-    console.log(Machine);
+    // console.log(Machine);
     return Machine;
   }
 }

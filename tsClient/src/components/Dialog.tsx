@@ -10,6 +10,7 @@ import { MachineProps } from "../modules/CreateMachine/CreateMachine";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork/CreateCostHandWork";
 import { MaterialsProps } from "../modules/CreateCostMaterials/CreateCostMaterials";
 import { Modal, ModalOverlay, ModalContent, Center } from "@chakra-ui/react";
+import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
 export type func<T> = (
   id: number,
   map: MapStore,
@@ -43,6 +44,7 @@ export type resType =
   | CostHandWorkProps
   | MaterialsProps
   | MachineProps
+  | BusinessProps
   | {};
 
 interface props {

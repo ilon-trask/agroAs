@@ -131,6 +131,7 @@ export const cartRouter = router({
     .mutation(async ({ input, ctx }) => {
       //@ts-ignore
       const cart: resTechCartsWithOpers[] = await TechCartService.patchCart(
+        //@ts-ignore
         input,
         ctx.user
       );

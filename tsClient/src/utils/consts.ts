@@ -6,3 +6,6 @@ export const BASKET_ROUTE = "/basket";
 export const DEVICE_ROUTE = "/device";
 export const TEHMAP_ROUTER = "/cart";
 export const CALENDAR_ROUTER = "/calendar";
+export const BUSINESSpLAN_ROUTER = "/businessPlan";
+export const BUSINESScATALOG_ROUTER = "/businessCatalog";
+export const BUSINESS_ROUTER = "/business";

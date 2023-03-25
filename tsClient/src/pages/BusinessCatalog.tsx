@@ -13,11 +13,12 @@ import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
+import BusinessCatalogItem from "../components/BusinessCatalogItem";
 
 function MainPage() {
-  const { map } = useContext(Context);
+  const { map, business } = useContext(Context);
 
-  const windW = window.innerWidth;
+  const [windW, setWindW] = useState(window.innerWidth);
 
   return (
     <Tabs
@@ -44,7 +45,7 @@ function MainPage() {
           backgroundSize={"cover"}
         >
           <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
-            <Text color={"#20401e"}>AgroSaaS</Text>
+            <Text color={"#20401e"}>AgroAs</Text>
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
@@ -62,16 +63,17 @@ function MainPage() {
                 display={"block"}
                 textAlign={"left"}
                 _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
+                textTransform={"uppercase"}
               >
-                КУЛЬТУРИ
+                Бізнес-плани
               </Tab>
-              {map.cultural.map((el) => (
+              {business.businessCategory.map((el) => (
                 <Tab
                   display={"block"}
                   textAlign={"left"}
                   _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
                 >
-                  {el.nameCulture}
+                  {el.name}
                 </Tab>
               ))}
             </TabList>
@@ -82,25 +84,19 @@ function MainPage() {
           <TabPanel>
             <Box
               display={"grid"}
-              gridTemplateColumns={[
-                "1fr",
-                "1fr",
-                "1fr 1fr",
-                "1fr 1fr",
-                "1fr 1fr 1fr",
-              ]}
+              gridTemplateColumns={["1fr", "1fr", "1fr 1fr", "1fr 1fr 1fr"]}
               gridColumnGap={"15px"}
               rowGap={"20px"}
               mx={"auto"}
             >
               {map.isLoading
                 ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                : map.agreeCarts.map((e) => <MainTableItem e={e} />) || (
-                    <Text>Немає жодної карти</Text>
-                  )}
+                : business.businessPlan.map((e) => (
+                    <BusinessCatalogItem e={e} />
+                  )) || <Text>Немає жодного бізнес-плану</Text>}
             </Box>
           </TabPanel>
-          {map.cultural.map((el) => (
+          {business.businessCategory.map((el) => (
             <TabPanel>
               <Box
                 display={"grid"}
@@ -117,10 +113,10 @@ function MainPage() {
               >
                 {map.isLoading
                   ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                  : map.agreeCarts.map((e) => {
-                      if (el.id == e.culturesTypeId)
-                        return <MainTableItem e={e} />;
-                    }) || <Text>Немає жодної карти</Text>}
+                  : business.businessPlan.map((e) => {
+                      if (el.id == e.businessCategoryId)
+                        return <BusinessCatalogItem e={e} />;
+                    }) || <Text>Немає жодного бізнес-плану</Text>}
               </Box>
             </TabPanel>
           ))}
