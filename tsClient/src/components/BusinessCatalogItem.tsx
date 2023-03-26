@@ -73,10 +73,7 @@ function MainTable({ e }: props) {
         <ButtonGroup spacing="2">
           <Button
             onClick={() => {
-              navigate(
-                BUSINESSpLAN_ROUTER
-                //  + "/" + e?.id
-              );
+              navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`);
               console.log(BUSINESSpLAN_ROUTER + "/" + e?.id);
             }}
           >

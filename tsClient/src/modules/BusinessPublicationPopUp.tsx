@@ -87,6 +87,9 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
           </Heading>
           <Box as={"div"} display={"flex"} gap={10} mt={"15px"}></Box>
           <Box display={"flex"} mt={3}>
+            <Heading as={"h4"} size="sm">
+              Коротний опис
+            </Heading>
             <Input
               type="text"
               maxLength={45}

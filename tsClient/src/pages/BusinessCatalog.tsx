@@ -45,7 +45,7 @@ function MainPage() {
           backgroundSize={"cover"}
         >
           <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
-            <Text color={"#20401e"}>AgroAs</Text>
+            <Text color={"#20401e"}>AgroDiBi</Text>
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
@@ -100,15 +100,7 @@ function MainPage() {
             <TabPanel>
               <Box
                 display={"grid"}
-                gridTemplateColumns={[
-                  "1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
-                  "1fr 1fr 1fr",
-                ]}
+                gridTemplateColumns={["1fr", "1fr", "1fr 1fr", "1fr 1fr 1fr"]}
                 gridColumnGap={"15px"}
               >
                 {map.isLoading

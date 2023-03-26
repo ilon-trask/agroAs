@@ -9,7 +9,7 @@ import {
 import { Context } from "../../../main";
 import { cartProps } from "../../CreateCart";
 import MapStore from "../../../store/MapStore";
-import { TEHMAP_ROUTER } from "../../../utils/consts";
+import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
@@ -59,7 +59,7 @@ const CartsTableItem = observer(
           />
         </Td>
         <Td>
-          <Link to={TEHMAP_ROUTER + `/${e.id}`}>{e.name}</Link>
+          <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.name}</Link>
         </Td>
 
         <Td

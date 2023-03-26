@@ -40,7 +40,7 @@ export const publicRoutes = [
     Component: <CalendarPage />,
   },
   {
-    path: BUSINESSpLAN_ROUTER,
+    path: BUSINESSpLAN_ROUTER + "/:id",
     Component: <BusinessPlanPage />,
   },
   {

@@ -1,5 +1,11 @@
 import { Principal } from "..";
-import { businessCategory, businessPlan } from "../models/models";
+import {
+  businessCategory,
+  businessPlan,
+  IbusinessPlan,
+  Iresume,
+  resume,
+} from "../models/models";
 import {
   CreateBusinessPlan,
   DeleteBusinessPlan,
@@ -7,7 +13,9 @@ import {
   SetIsAgreeBusinessPlan,
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
-
+export interface resBusinessPlan extends IbusinessPlan {
+  resume: Iresume;
+}
 class BusinessService {
   async getCategory() {
     const category = await businessCategory.findAll();
@@ -15,18 +23,26 @@ class BusinessService {
   }
   async get(user: Principal | undefined) {
     if (user) {
-      const plans = await businessPlan.findAll({ where: { userId: user.sub } });
+      //@ts-ignore
+      const plans: resBusinessPlan[] = await businessPlan.findAll({
+        where: { userId: user.sub },
+        include: [{ model: resume }],
+      });
+
       return plans;
     } else {
-      const plans = await businessPlan.findAll({
+      //@ts-ignore
+      const plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
+        include: [{ model: resume }],
       });
       return plans;
     }
   }
   async create(user: Principal | undefined, data: CreateBusinessPlan) {
     if (!user) throw new Error("юсер не увійшов");
-    const plan = await businessPlan.create({
+    //@ts-ignore
+    const plan: resBusinessPlan = await businessPlan.create({
       name: data.name,
       businessCategoryId: data.businessCategoryId,
       userId: user.sub,
@@ -42,9 +58,13 @@ class BusinessService {
       },
       { where: { id: data.planId } }
     );
-    let res = undefined;
+    let res: resBusinessPlan | undefined | null = undefined;
     if (ind[0] == 1) {
-      res = await businessPlan.findOne({ where: { id: data.planId } });
+      //@ts-ignore
+      res = await businessPlan.findOne({
+        where: { id: data.planId },
+        include: [{ model: resume }],
+      });
     }
     return res;
   }
@@ -68,15 +88,21 @@ class BusinessService {
       },
       { where: { id: data.BusinessId } }
     );
-    let res = undefined;
+    let res: resBusinessPlan | null | undefined = undefined;
     if (ind[0] == 1) {
-      res = await businessPlan.findOne({ where: { id: data.BusinessId } });
+      //@ts-ignore
+      res = await businessPlan.findOne({
+        where: { id: data.BusinessId },
+        include: [{ model: resume }],
+      });
     }
     return res;
   }
   async getNoAgree() {
-    const res = businessPlan.findAll({
+    //@ts-ignore
+    const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true, isAgree: false },
+      include: [{ model: resume }],
     });
     return res;
   }

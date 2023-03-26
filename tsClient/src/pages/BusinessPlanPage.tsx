@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   Tab,
   Tabs,
@@ -7,229 +7,90 @@ import {
   TabPanels,
   Box,
   Heading,
+  Button,
+  TableContainer,
+  Text,
 } from "@chakra-ui/react";
-const windW = 1000;
+import { EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import CreateResume from "../modules/CreateResume";
+import BusinessConceptTable from "../modules/BusinessConceptTable";
+import { useParams } from "react-router-dom";
+import { Context } from "../main";
+import { IbusinessPlan } from "../../../tRPC serv/models/models";
+import { observer } from "mobx-react-lite";
+import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
+import { names } from "../modules/BusinessConceptTable/index";
+import SelectCart from "../modules/BusinessConceptTable/component/SelectCart";
+import CartsTableInBusiness from "../modules/CartsTableInBusiness";
 function BiznesPlanPage() {
+  const [openResume, setOpenResume] = useState(false);
+  const [data, setData] = useState();
+  const [name, setName] = useState();
+  const [cild, setCild] = useState<string>();
+  const [showSelectCart, setShowSelectCart] = useState(false);
+  const [infCartId, setInfCartId] = useState<number>();
+  const { map, user, business } = useContext(Context);
+  const { id } = useParams();
+  const Business: resBusinessPlan[] = JSON.parse(
+    JSON.stringify(business.businessPlan)
+  );
+
+  const [myBusiness] = Business.filter((el) => el.id == id);
+  function getData(name: string, children: string, infCartId?: number) {
+    setInfCartId(infCartId);
+    setCild(children);
+    //@ts-ignore
+    setName(names[children]);
+    //@ts-ignore
+    setData(myBusiness[name][children]);
+  }
   return (
     <Box>
-      <Tabs
-        orientation={windW < 770 ? "horizontal" : "vertical"}
-        w={"100vw"}
-        variant="soft-rounded"
-      >
-        <TabList gap={2} minW={"max-content"}>
-          <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-            Бізнес-план
-          </Heading>
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Титульний аркуш
-          </Tab>
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Резуме
-          </Tab>
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Підприємство
-          </Tab>
-
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Проект
-          </Tab>
-
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Фінансування
-          </Tab>
-
-          <Tab
-            display={"block"}
-            textAlign={"left"}
-            _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-          >
-            Додатки
-          </Tab>
-        </TabList>
-        <TabPanels>
-          {/* <TabPanel></TabPanel> */}
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Бізнес-план
+      </Heading>
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        {myBusiness?.name}
+      </Heading>
+      <Box maxW={"1000px"} mx="auto" display={"flex"} gap={"30px"}>
+        <TableContainer maxW="min-content" mt={"20px"} overflowX={"scroll"}>
+          <BusinessConceptTable
+            setOpenResume={setOpenResume}
+            getData={getData}
+          />
+        </TableContainer>
+        <Box mt={4}>
+          {data && (
+            <>
+              <Text fontSize={"20px"} fontWeight={"500"}>
+                {name}
+              </Text>
+              {data}
+              <Box>
+                <Button>
+                  <EditIcon></EditIcon>
+                </Button>
+                {!!infCartId && <CartsTableInBusiness cartId={infCartId} />}
+                <Button
+                  onClick={() => {
+                    setShowSelectCart(true);
+                  }}
                 >
-                  Титульний аркуш
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Резюме
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Стан підприємства
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Власники
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Поточна діяльність
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Фінансовий стан
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Кредити
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Загальна інформація
-                </Tab>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Інвестиційний план
-                </Tab>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Аналіз ринку
-                </Tab>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Опис виробництва
-                </Tab>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Фінансовий план
-                </Tab>
-                <Tab
-                  fontSize={"15"}
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Екологічна оцінка
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Графік фінансування
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Застава
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Інвестиції
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  SWOT-аналіз
-                </Tab>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Ризики
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <TabPanel>
-            <Tabs w={"100vw"} variant="soft-rounded">
-              <TabList gap={2} minW={"max-content"}>
-                <Tab
-                  display={"block"}
-                  _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
-                >
-                  Додаток 1
-                </Tab>
-              </TabList>
-            </Tabs>
-          </TabPanel>
-          <Box border={"2px"} minH={"100%"}></Box>
-        </TabPanels>
-      </Tabs>
+                  Добавити таблицю
+                </Button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Box>
+      <SelectCart
+        open={showSelectCart}
+        setOpen={setShowSelectCart}
+        cild={cild!}
+      />
+      <CreateResume open={openResume} setOpen={setOpenResume} />
     </Box>
   );
 }
 
-export default BiznesPlanPage;
+export default observer(BiznesPlanPage);
