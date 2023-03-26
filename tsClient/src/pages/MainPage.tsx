@@ -44,7 +44,7 @@ function MainPage() {
           backgroundSize={"cover"}
         >
           <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
-            <Text color={"#20401e"}>AgroSaaS</Text>
+            <Text color={"#20401e"}>AgroDiBi</Text>
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
@@ -95,9 +95,9 @@ function MainPage() {
             >
               {map.isLoading
                 ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                : map.agreeCarts.map((e) => <MainTableItem e={e} />) || (
-                    <Text>Немає жодної карти</Text>
-                  )}
+                : map.agreeCarts.map((e) => (
+                    <MainTableItem e={e} key={e.id} />
+                  )) || <Text>Немає жодної карти</Text>}
             </Box>
           </TabPanel>
           {map.cultural.map((el) => (
@@ -106,9 +106,7 @@ function MainPage() {
                 display={"grid"}
                 gridTemplateColumns={[
                   "1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
-                  "1fr 1fr",
+                  "1fr",
                   "1fr 1fr",
                   "1fr 1fr",
                   "1fr 1fr 1fr",
@@ -119,7 +117,7 @@ function MainPage() {
                   ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
                   : map.agreeCarts.map((e) => {
                       if (el.id == e.culturesTypeId)
-                        return <MainTableItem e={e} />;
+                        return <MainTableItem e={e} key={e.id} />;
                     }) || <Text>Немає жодної карти</Text>}
               </Box>
             </TabPanel>

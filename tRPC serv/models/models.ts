@@ -539,6 +539,38 @@ businessCategory.init(
   { sequelize }
 );
 
+export interface Iresume {
+  id?: number;
+  aboutProject: string | null;
+  investment: string | null;
+  id_tableInvestment: number | null;
+  finIndicators: string | null;
+  deduction: string | null;
+  businessPlanId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export class resume extends Model<Iresume> {
+  declare id?: number;
+  declare aboutProject: string;
+  declare investment: string;
+  declare id_tableInvestment: number;
+  declare finIndicators: string;
+  declare deduction: string;
+}
+
+resume.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    aboutProject: { type: DataTypes.STRING },
+    investment: { type: DataTypes.STRING },
+    id_tableInvestment: { type: DataTypes.NUMBER },
+    finIndicators: { type: DataTypes.STRING },
+    deduction: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -574,3 +606,5 @@ tech_operation.hasOne(cost_hand_work);
 cultures_types.hasMany(tech_cart);
 
 businessCategory.hasMany(businessPlan);
+
+businessPlan.hasOne(resume);

@@ -87,23 +87,6 @@ const BusinessAgreeTable = observer(
               // setPublicationOpen={setPublicationOpen}
             />
           ))}
-          <Tr>
-            <Th>
-              <PlusSquareIcon
-                h={6}
-                w={6}
-                color={"blue.400"}
-                onClick={() => {
-                  console.log(23423);
-
-                  setCreate(true);
-                }}
-              />
-            </Th>
-            <Th></Th>
-            <Th></Th>
-            <Th></Th>
-          </Tr>
         </Tbody>
       </Table>
     );

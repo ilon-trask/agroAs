@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import {
   IbusinessCategory,
   IbusinessPlan,
@@ -6,7 +7,7 @@ import {
 
 export default class MapStore {
   private _businessCategory: IbusinessCategory[] = [];
-  private _businessPlans: IbusinessPlan[] = [];
+  private _businessPlans: resBusinessPlan[] = [];
   private _noAgreeBusinessPlan: IbusinessPlan[] = [];
   constructor() {
     makeAutoObservable(this);
@@ -18,10 +19,10 @@ export default class MapStore {
   public set newBusinessCategory(v: IbusinessCategory) {
     this._businessCategory.push(v);
   }
-  public set businessPlan(v: IbusinessPlan[]) {
+  public set businessPlan(v: resBusinessPlan[]) {
     this._businessPlans = v;
   }
-  public set newBusinessPlan(v: IbusinessPlan) {
+  public set newBusinessPlan(v: resBusinessPlan) {
     this._businessPlans.push(v);
   }
   public set noAgreeBusinessPlan(v: IbusinessPlan[]) {
@@ -34,7 +35,7 @@ export default class MapStore {
   public get businessCategory(): IbusinessCategory[] {
     return this._businessCategory;
   }
-  public get businessPlan(): IbusinessPlan[] {
+  public get businessPlan(): resBusinessPlan[] {
     return this._businessPlans;
   }
   public get noAgreeBusinessPlan(): IbusinessPlan[] {

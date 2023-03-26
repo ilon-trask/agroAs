@@ -25,7 +25,7 @@ import { Box, ChakraProvider } from "@chakra-ui/react";
 import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
 import { observer } from "mobx-react-lite";
-
+let ind = 0;
 function App() {
   const { map, user, business } = useContext(Context);
 
@@ -37,30 +37,51 @@ function App() {
         user.isAuth = true;
         user.role = data.session.user.role as IUserRole;
       }
-      getCarts(map);
-      getWorks(map);
-      getSection(map);
-      getTractor(map);
-      getMachine(map);
-      getGrades(map);
-      getCultural(map);
-      getBusinessCategory(map, business);
-      getBusinessPlans(map, business);
+      if (ind == 1) {
+        getCarts(map);
+        getWorks(map);
+        getSection(map);
+        getTractor(map);
+        getMachine(map);
+        getGrades(map);
+        getCultural(map);
+        getBusinessCategory(map, business);
+        getBusinessPlans(map, business);
 
-      if (user.role == "ADMIN" || user.role == "service_role") {
-        getNoAgreeBusiness(map, business);
-        getIsAgreeCarts(map);
+        if (user.role == "ADMIN" || user.role == "service_role") {
+          getNoAgreeBusiness(map, business);
+          getIsAgreeCarts(map);
+        }
+        if (
+          user.role == "ADMIN" ||
+          user.role == "service_role" ||
+          user.role == ""
+        )
+          agreeCarts(map);
+        console.log(123);
       }
-      if (
-        user.role == "ADMIN" ||
-        user.role == "service_role" ||
-        user.role == ""
-      )
-        agreeCarts(map);
     })();
   }, [user.isAuth]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    ind = 1;
+    getCarts(map);
+    getWorks(map);
+    getSection(map);
+    getTractor(map);
+    getMachine(map);
+    getGrades(map);
+    getCultural(map);
+    getBusinessCategory(map, business);
+    getBusinessPlans(map, business);
+
+    if (user.role == "ADMIN" || user.role == "service_role") {
+      getNoAgreeBusiness(map, business);
+      getIsAgreeCarts(map);
+    }
+    if (user.role == "ADMIN" || user.role == "service_role" || user.role == "")
+      agreeCarts(map);
+  }, []);
 
   return (
     <BrowserRouter>

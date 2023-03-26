@@ -41,7 +41,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -606,5 +606,31 @@ export function setIsAgreeBusiness(
         );
       }
     map.isLoading = false;
+  });
+}
+
+export function patchResume(
+  Bus: BusinessStore,
+  data: {
+    businessId: number;
+    data: {
+      aboutProject?: string | null;
+      investment?: string | null;
+      finIndicators?: string | null;
+      deduction?: string | null;
+    };
+  }
+) {
+  client.resume.patch.query(data).then((res) => {
+    console.log(res);
+  });
+}
+
+export function setIdTableInvestment(
+  Bus: BusinessStore,
+  data: { cartId: number; businessPlanId: number }
+) {
+  client.resume.setId_tableInvestment.query(data).then((res) => {
+    console.log(res);
   });
 }

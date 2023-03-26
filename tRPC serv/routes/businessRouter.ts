@@ -1,6 +1,8 @@
 import { router, publicProcedure } from "../trpc";
 import z from "zod";
-import BusinessService from "../controllers/BusinessService";
+import BusinessService, {
+  resBusinessPlan,
+} from "../controllers/BusinessService";
 import { IbusinessCategory, IbusinessPlan } from "../models/models";
 const createType = z.object({
   name: z.string(),
@@ -36,16 +38,16 @@ const businessRouter = router({
     return res;
   }),
   get: publicProcedure.query(async ({ ctx }) => {
-    const res: IbusinessPlan[] = await BusinessService.get(ctx.user);
+    const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
 
     return res;
   }),
   create: publicProcedure.input(createType).query(async ({ input, ctx }) => {
-    const res: IbusinessPlan = await BusinessService.create(ctx.user, input);
+    const res: resBusinessPlan = await BusinessService.create(ctx.user, input);
     return res;
   }),
   patch: publicProcedure.input(patchType).query(async ({ input, ctx }) => {
-    const res: IbusinessPlan | null | undefined = await BusinessService.patch(
+    const res: resBusinessPlan | null | undefined = await BusinessService.patch(
       ctx.user,
       input
     );
@@ -58,12 +60,12 @@ const businessRouter = router({
   setIsPublic: publicProcedure
     .input(setIsPublic)
     .query(async ({ input, ctx }) => {
-      const res: IbusinessPlan | null | undefined =
+      const res: resBusinessPlan | null | undefined =
         await BusinessService.setIsPublic(ctx.user, input);
       return res;
     }),
   getNoAgree: publicProcedure.query(async () => {
-    const res: IbusinessPlan[] = await BusinessService.getNoAgree();
+    const res: resBusinessPlan[] = await BusinessService.getNoAgree();
     return res;
   }),
   setIsAgree: publicProcedure
