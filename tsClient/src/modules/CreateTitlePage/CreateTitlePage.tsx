@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Dialog, { func } from "../../components/Dialog";
-import Resume from "./components/Resume";
+import Title from "./components/Title";
 import { createOperProps } from "../../pages/TechnologicalMap";
 export type CostHandWorkProps = {
   nameOper: string;
@@ -31,10 +31,8 @@ const cell = "costHandWork";
 function CreateCostHandWork({
   open,
   setOpen,
-}: // setCell,
-// section,
+}: // section,
 // setSection,
-// res,
 // setRes,
 // update,
 // setUpdate,
@@ -56,7 +54,7 @@ function CreateCostHandWork({
       isErr={false}
       setIsErr={() => {}}
     >
-      <Resume
+      <Title
         setOpen={setOpen}
         // res={res}
         // setRes={setRes}

@@ -9,6 +9,7 @@ import {
   createOperation,
   patchOperation,
   patchResume,
+  patchTitlePage,
 } from "../../../http/requests";
 import { Context } from "../../../main";
 import { func, InputProps } from "../../../components/Dialog";
@@ -24,28 +25,26 @@ import {
   Radio,
   Textarea,
 } from "@chakra-ui/react";
-import { costHandWorkProps, CostHandWorkProps } from "../CreateResume";
+import { costHandWorkProps, CostHandWorkProps } from "../CreateTitlePage";
 import MapStore from "../../../store/MapStore";
 import BusinessStore from "../../../store/BusinessStore";
-const createResume: (
+const createTitle: (
   businessId: number,
-  select: string,
   text: string,
   setIsErr: any,
   setOpen: any,
   business: BusinessStore
-) => void = (businessId, select, text, setIsErr, setOpen, business) => {
-  if (select == "" || text == "") {
+) => void = (businessId, text, setIsErr, setOpen, business) => {
+  if (text == "") {
     setIsErr(true);
   } else {
     setOpen(false);
     setIsErr(false);
-    //@ts-ignore
-    patchResume(business, { businessId: businessId, data: { [select]: text } });
+    patchTitlePage(business, { businessId, title: text });
   }
 };
 
-const Resumes = observer(
+const Title = observer(
   ({
     setOpen,
   }: // res,
@@ -53,7 +52,6 @@ const Resumes = observer(
   // update,
   // cell,
   // setCell,
-  // setOpen,
   // section,
   // setSection,
   // setIsErr,
@@ -64,30 +62,16 @@ const Resumes = observer(
     const { id } = useParams();
     console.log(id);
 
-    const [select, setSelect] = useState("");
     const [text, setText] = useState("");
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Резюме
+          Титульна сторінка
         </Heading>
-        <Box>
-          <Select
-            value={select}
-            onChange={(e) => {
-              setSelect(e.target.value);
-            }}
-          >
-            <option value="" hidden disabled defaultChecked></option>
-            <option value="aboutProject">Про проект</option>
-            <option value="investment">Інвестиції</option>
-            <option value="finIndicators">Фінансові показники</option>
-            <option value="deduction">Висновки</option>
-          </Select>
-        </Box>
+
         <Box>
           <Heading as={"h4"} size="sm">
-            Опишіть параграф
+            Напишіть назву бізнес-плану
           </Heading>
           <Textarea
             value={text}
@@ -98,9 +82,7 @@ const Resumes = observer(
         </Box>
         <ModalFooter p={"15px 67px"}>
           <Button
-            onClick={() =>
-              createResume(+id!, select, text, () => {}, setOpen, business)
-            }
+            onClick={() => createTitle(+id!, text, () => {}, setOpen, business)}
           >
             Зберегти
           </Button>
@@ -110,4 +92,4 @@ const Resumes = observer(
   }
 );
 
-export default Resumes;
+export default Title;

@@ -12,6 +12,7 @@ import { BusinessProps } from "../CreateBusiness/CreateBusinessPlan";
 import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 import { useParams } from "react-router-dom";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { iChild, iName } from "../../pages/BusinessPlanPage";
 
 interface props {
   // maps: resTechCartsWithOpers[] | [];
@@ -22,11 +23,13 @@ interface props {
   // setRes: Dispatch<SetStateAction<BusinessProps>>;
   // agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
   setOpenResume: Dispatch<SetStateAction<boolean>>;
-  getData: (name: string, children: string, infCartId?: number) => void;
+  setOpenTitle: Dispatch<SetStateAction<boolean>>;
+  getData: (name: iName, children: iChild, infCartId: number | null) => void;
 }
 const CartsTable = observer(
   ({
     setOpenResume,
+    setOpenTitle,
     getData,
   }: // setCreate,
   // deleteFunc,
@@ -43,8 +46,22 @@ const CartsTable = observer(
     );
     const [showAlert, setShowAlert] = useState(false);
     const [myBusiness] = Business.filter((el) => el.id == id);
-    const data = [
-      { id: 1, name: "Титульний", label: "", setOpen: () => {} },
+    console.log(myBusiness);
+
+    const data: {
+      id: number;
+      name: string;
+      label: iName;
+      setOpen: Dispatch<SetStateAction<boolean>> | ((res: any) => void);
+      children: any;
+    }[] = [
+      {
+        id: 1,
+        name: "Титульний",
+        label: "titlePage",
+        setOpen: setOpenTitle,
+        children: myBusiness?.titlePage,
+      },
       {
         id: 2,
         name: "Резюме",
@@ -52,10 +69,28 @@ const CartsTable = observer(
         setOpen: setOpenResume,
         children: myBusiness?.resume,
       },
-      { id: 3, name: "Про підприємство", label: "", setOpen: () => {} },
-      { id: 4, name: "Про проект", label: "", setOpen: () => {} },
-      { id: 5, name: "Фінансування", label: "", setOpen: () => {} },
-      { id: 6, name: "Додатку", label: "", setOpen: () => {} },
+      {
+        id: 3,
+        name: "Про підприємство",
+        label: "",
+        setOpen: () => {},
+        children: null,
+      },
+      {
+        id: 4,
+        name: "Про проект",
+        label: "",
+        setOpen: () => {},
+        children: null,
+      },
+      {
+        id: 5,
+        name: "Фінансування",
+        label: "",
+        setOpen: () => {},
+        children: null,
+      },
+      { id: 6, name: "Додатки", label: "", setOpen: () => {}, children: null },
     ];
     return (
       <Table variant="simple" size={"sm"}>

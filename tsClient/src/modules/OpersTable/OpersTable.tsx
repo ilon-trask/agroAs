@@ -41,8 +41,11 @@ function OpersTable({
 
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
+  console.log(id);
 
-  const sections = getSectionsOpers(map, id);
+  const sections = useMemo(() => getSectionsOpers(map, id), [map.opers]);
+  console.log(sections);
+
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
   operData.forEach((el) => {
@@ -116,6 +119,7 @@ function OpersTable({
           {map.isLoading ? <Loader /> : <></>}
           {sections.map((el) => (
             <OperTableSection
+              key={id}
               arr={el.arr}
               title={el.title}
               id={id}
