@@ -20,16 +20,17 @@ import {
 } from "@chakra-ui/icons";
 import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
 import { BusinessProps } from "../../CreateBusiness/CreateBusinessPlan";
+import { iChild, iName } from "../../../pages/BusinessPlanPage";
 
 interface props {
-  e: { id: number; name: string; label: string; children?: any };
+  e: { id: number; name: string; label: iName; children?: any };
   // deleteFunc: (BusinessId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   // setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
   // setRes: Dispatch<SetStateAction<BusinessProps>>;
   // agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
-  getData: (name: string, children: string, infCartId?: number) => void;
+  getData: (name: iName, children: iChild, infCartId: number | null) => void;
 }
 import names from "../names";
 const CartsTableItem = observer(
@@ -66,28 +67,7 @@ const CartsTableItem = observer(
             <PlusSquareIcon w={"20px"} h={"auto"} />
           </Td>
 
-          <Td>
-            {/* {(user.role == "ADMIN" ||
-              user.role == "AUTHOR" ||
-              user.role == "service_role") && (
-              <div
-                onClick={() => {
-                  if (e.isPublic) {
-                    setIsPublicBusiness(map, business, {
-                      BusinessId: e.id!,
-                      isPublic: false,
-                    });
-                  } else {
-                    agreeFunc(e.id!, true);
-                  }
-                }}
-              >
-                <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>
-                  опублікувати
-                </Checkbox>
-              </div>
-            )} */}
-          </Td>
+          <Td></Td>
         </Tr>
         {!!e.children &&
           props?.map((el) => {
@@ -95,14 +75,19 @@ const CartsTableItem = observer(
               el != "id" &&
               el != "createdAt" &&
               el != "updatedAt" &&
+              el != "id_tableInvestment" &&
               el != "businessPlanId"
-            )
-              if (e.children[el])
+            ) {
+              if (e.children[el]) {
                 return (
                   <Tr>
                     <Td
                       onClick={() => {
-                        getData(e.label, el, e.children.id_tableInvestment);
+                        getData(
+                          e.label,
+                          el as iChild,
+                          e.children.id_tableInvestment
+                        );
                       }}
                       cursor={"pointer"}
                       _hover={{ color: "blue.400" }}
@@ -116,6 +101,10 @@ const CartsTableItem = observer(
                     <Td></Td>
                   </Tr>
                 );
+              } else {
+                return null;
+              }
+            }
           })}
       </>
     );

@@ -41,7 +41,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -64,6 +64,7 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
     if (!opers) return;
     for (let j = 0; j < opers.length; j++) {
       const oper = opers[j];
+
       map.newOper = opers[j];
 
       if (oper.aggregate) {
@@ -98,7 +99,7 @@ export async function getCarts(map: MapStore) {
   map.isLoading = true;
 
   await client.cart.get.query().then((carts) => {
-    console.log(carts);
+    // console.log(carts);
     map.maps = [];
     map.costMechanical = [];
     map.costMaterials = [];
@@ -196,28 +197,7 @@ export async function updateMap(map: MapStore, dat: any) {
       );
     });
     operationsFilter(res, map);
-    // map.maps.sort((a, b) => a.id! - b.id!);
-    // for (let i = 0; i < res.length; i++) {
-    //   const opers = res[i].tech_operations;
-    //   if (!opers) return;
-    //   for (let j = 0; j < opers.length; j++) {
-    //     const oper = opers[j];
 
-    //     map.newOper = opers[j];
-
-    //     if (oper.aggregate) {
-    //       map.newCostMechanical = oper.aggregate;
-    //     } else if (oper.cost_service) {
-    //       map.newCostServices = oper.cost_service;
-    //     } else if (oper.cost_transport) {
-    //       map.newCostTransport = oper.cost_transport;
-    //     } else if (oper.cost_material) {
-    //       map.newCostMaterials = oper.cost_material;
-    //     } else if (oper.cost_hand_work) {
-    //       map.newCostHandWork = oper.cost_hand_work;
-    //     }
-    //   }
-    // }
     map.isLoading = false;
   });
 }
@@ -622,15 +602,31 @@ export function patchResume(
   }
 ) {
   client.resume.patch.query(data).then((res) => {
-    console.log(res);
+    const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
+    if (!plan) {
+      return;
+    }
+    plan.resume = res!;
   });
 }
-
 export function setIdTableInvestment(
   Bus: BusinessStore,
   data: { cartId: number; businessPlanId: number }
 ) {
   client.resume.setId_tableInvestment.query(data).then((res) => {
     console.log(res);
+  });
+}
+
+export function patchTitlePage(
+  Bus: BusinessStore,
+  data: { businessId: number; title: string }
+) {
+  client.titlePage.patch.query(data).then((res) => {
+    const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
+    if (!plan) {
+      return;
+    }
+    plan.titlePage = res!;
   });
 }

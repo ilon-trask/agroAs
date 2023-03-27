@@ -16,8 +16,8 @@ import { Itech_cart } from "../../../../../tRPC serv/models/models";
 import { makeCopyCarts, setIdTableInvestment } from "../../../http/requests";
 import { useParams } from "react-router-dom";
 
-type props = { open: boolean; setOpen: (open: boolean) => void; cild: string };
-function CopyCartPopUp({ open, setOpen, cild }: props) {
+type props = { open: boolean; setOpen: (open: boolean) => void; child: string };
+function CopyCartPopUp({ open, setOpen, child }: props) {
   const [checked, setChecked] = useState(0);
   const { map, business } = useContext(Context);
   const { id } = useParams();
@@ -78,9 +78,9 @@ function CopyCartPopUp({ open, setOpen, cild }: props) {
             isActive={checked == 0}
             onClick={() => {
               if (checked != 0) {
-                console.log(cild);
+                console.log(child);
 
-                if (cild == "investment") {
+                if (child == "investment") {
                   setIdTableInvestment(business, {
                     cartId: checked,
                     businessPlanId: +id!,

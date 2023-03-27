@@ -3,7 +3,6 @@ import { Icell } from "../../../../../tRPC serv/controllers/OperService";
 import { resTechCartsWithOpers } from "../../../../../tRPC serv/controllers/TechCartService";
 import { Context } from "../../../main";
 import OpersTableItem from "./OpersTableItem";
-import style from "./Table.module.css";
 import { Tr, Td, Divider, Heading } from "@chakra-ui/react";
 type props = {
   arr: any[];
@@ -20,7 +19,7 @@ type props = {
   setDeleteOpen: (deleteOpen: boolean) => void;
 };
 
-export default function OperTableSection({
+function OperTableSection({
   arr,
   title,
   sum,
@@ -34,11 +33,7 @@ export default function OperTableSection({
   deleteOpen,
   setDeleteOpen,
 }: props) {
-  const line: {} = {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-  };
+  console.log(arr);
 
   return (
     <>
@@ -108,3 +103,4 @@ export default function OperTableSection({
     </>
   );
 }
+export default OperTableSection;

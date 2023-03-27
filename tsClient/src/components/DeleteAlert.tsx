@@ -18,8 +18,6 @@ type props = {
 };
 
 export default function DeleteAlert({ open, setOpen, text, func }: props) {
-  console.log(func);
-
   return (
     //@ts-ignore
     <AlertDialog onClose={() => setOpen(false)} isOpen={open} isCentered>

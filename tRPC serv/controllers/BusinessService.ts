@@ -4,7 +4,9 @@ import {
   businessPlan,
   IbusinessPlan,
   Iresume,
+  ItitlePage,
   resume,
+  titlePage,
 } from "../models/models";
 import {
   CreateBusinessPlan,
@@ -15,7 +17,9 @@ import {
 } from "../routes/businessRouter";
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
+  titlePage: ItitlePage;
 }
+const includes = [{ model: resume }, { model: titlePage }];
 class BusinessService {
   async getCategory() {
     const category = await businessCategory.findAll();
@@ -26,7 +30,7 @@ class BusinessService {
       //@ts-ignore
       const plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { userId: user.sub },
-        include: [{ model: resume }],
+        include: includes,
       });
 
       return plans;
@@ -34,7 +38,7 @@ class BusinessService {
       //@ts-ignore
       const plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
-        include: [{ model: resume }],
+        include: includes,
       });
       return plans;
     }
@@ -63,7 +67,7 @@ class BusinessService {
       //@ts-ignore
       res = await businessPlan.findOne({
         where: { id: data.planId },
-        include: [{ model: resume }],
+        include: includes,
       });
     }
     return res;
@@ -93,7 +97,7 @@ class BusinessService {
       //@ts-ignore
       res = await businessPlan.findOne({
         where: { id: data.BusinessId },
-        include: [{ model: resume }],
+        include: includes,
       });
     }
     return res;
@@ -102,7 +106,7 @@ class BusinessService {
     //@ts-ignore
     const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true, isAgree: false },
-      include: [{ model: resume }],
+      include: includes,
     });
     return res;
   }

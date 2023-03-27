@@ -570,6 +570,25 @@ resume.init(
   },
   { sequelize }
 );
+export interface ItitlePage {
+  id?: number;
+  title: string | null;
+  businessPlanId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export class titlePage extends Model<ItitlePage> {
+  declare id?: number;
+  declare title: string;
+}
+
+titlePage.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    title: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
 
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
@@ -608,3 +627,5 @@ cultures_types.hasMany(tech_cart);
 businessCategory.hasMany(businessPlan);
 
 businessPlan.hasOne(resume);
+
+businessPlan.hasOne(titlePage);

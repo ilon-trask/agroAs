@@ -25,10 +25,9 @@ import gradeService from "./controllers/gradeService";
 import businessRouter from "./routes/businessRouter";
 import feedBackRouter from "./routes/feedBackRouter";
 import { resumeRouter } from "./routes/resumeRouter";
+import { titleRouter } from "./routes/titleRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
-
-let users = [{ id: 1, name: "bob" }];
 
 const appRouter = router({
   cart: cartRouter,
@@ -52,28 +51,9 @@ const appRouter = router({
   business: businessRouter,
   feedBack: feedBackRouter,
   resume: resumeRouter,
+  titlePage: titleRouter,
   "": publicProcedure.query(() => "some text"),
-  getUser: publicProcedure.query(() => {
-    console.log(users);
-    return users;
-  }),
-
-  createUser: publicProcedure
-    .input(z.object({ name: z.string() }))
-    .query(({ input }) => {
-      let item = { id: users[users.length - 1].id++, name: input.name };
-      console.log(item);
-      users.push(item);
-      return "done";
-    }),
 });
-
-// createHTTPServer({
-//   router: appRouter,
-//   createContext() {
-//     return {};
-//   },
-// }).listen(5000);
 
 export type IUserRole =
   | "ADMIN"

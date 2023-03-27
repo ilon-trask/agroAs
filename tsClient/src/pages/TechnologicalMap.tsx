@@ -33,7 +33,7 @@ export type createOperProps<T> = {
   setIsErr: (isErr: boolean) => void;
 };
 
-const DevicePage = observer(() => {
+const TechnologicalMap = observer(() => {
   const [open, setOpen] = useState(false);
   const [secondOpen, setSecondOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -215,4 +215,4 @@ const DevicePage = observer(() => {
     </Box>
   );
 });
-export default DevicePage;
+export default TechnologicalMap;
