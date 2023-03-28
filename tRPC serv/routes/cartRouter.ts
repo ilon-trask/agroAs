@@ -5,24 +5,28 @@ import { Itech_cart } from "../models/models";
 import TechCartService, {
   resTechCartsWithOpers,
 } from "../controllers/TechCartService";
-
+const createCartProps = z.object({
+  nameCart: z.string(),
+  area: z.number(),
+  salary: z.number(),
+  isPublic: z.boolean().optional(),
+  priceDiesel: z.number(),
+});
+export type CreateCartType = z.infer<typeof createCartProps>;
 export const cartRouter = router({
-  get: publicProcedure.query(async ({ ctx }) => {
-    const carts = await TechCartService.getAll(ctx.user);
+  getCart: publicProcedure
+    .input(z.object({ cartId: z.number() }))
+    .query(async ({ input }) => {
+      const carts = await TechCartService.getCart(input.cartId);
 
+      return carts;
+    }),
+  getOnlyCart: publicProcedure.query(async ({ ctx }) => {
+    const carts = await TechCartService.getOnlyCarts(ctx.user);
     return carts;
   }),
-
   create: publicProcedure
-    .input(
-      z.object({
-        nameCart: z.string(),
-        area: z.number(),
-        salary: z.number(),
-        isPublic: z.boolean().optional(),
-        priceDiesel: z.number(),
-      })
-    )
+    .input(createCartProps)
     .query(async ({ input, ctx }) => {
       const cart = await TechCartService.create(input, ctx.user);
       return cart;

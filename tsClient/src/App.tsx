@@ -17,6 +17,7 @@ import {
   getBusinessCategory,
   getBusinessPlans,
   getNoAgreeBusiness,
+  getOnlyCart,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -30,31 +31,25 @@ function App() {
 
   const [ind, setInd] = useState(0);
   useEffect(() => {
-    (async () => {
-      if (ind > 0) {
-        getWorks(map);
-        getSection(map);
-        getTractor(map);
-        getMachine(map);
-        getGrades(map);
-        getCultural(map);
-        getBusinessCategory(map, business);
-        getBusinessPlans(map, business);
-        getCarts(map);
+    if (ind > 0) {
+      // getWorks(map);
 
-        console.log(123);
-        if (user.role == "ADMIN" || user.role == "service_role") {
-          getNoAgreeBusiness(map, business);
-          getIsAgreeCarts(map);
-        }
-        if (
-          user.role == "ADMIN" ||
-          user.role == "service_role" ||
-          user.role == ""
-        )
-          agreeCarts(map);
+      getCultural(map);
+
+      getOnlyCart(map);
+
+      console.log(123);
+      if (user.role == "ADMIN" || user.role == "service_role") {
+        getNoAgreeBusiness(map, business);
+        getIsAgreeCarts(map);
       }
-    })();
+      if (
+        // user.role == "ADMIN" ||
+        // user.role == "service_role" ||
+        user.role == ""
+      )
+        agreeCarts(map);
+    }
   }, [user.isAuth, ind]);
 
   useEffect(() => {

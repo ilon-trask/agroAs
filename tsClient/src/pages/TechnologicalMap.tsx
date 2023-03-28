@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,7 +17,14 @@ import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Text, Button, Box } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
-import { deleteOper } from "../http/requests";
+import {
+  deleteOper,
+  getCarts,
+  getGrades,
+  getMachine,
+  getSection,
+  getTractor,
+} from "../http/requests";
 import { CALENDAR_ROUTER } from "../utils/consts";
 export type createOperProps<T> = {
   open: boolean;
@@ -51,6 +58,18 @@ const TechnologicalMap = observer(() => {
     cartId: null,
   });
   const navigate = useNavigate();
+  useEffect(() => {
+    const myMap = map.maps.find((el) => el.id == id);
+    console.log(myMap);
+    if (!myMap?.tech_operations) {
+      getCarts(map, +id!);
+      getSection(map);
+      getTractor(map);
+      getMachine(map);
+      getGrades(map);
+    }
+  }, []);
+
   return (
     <Box pb={"25px"}>
       <Box px={"40px"}>

@@ -2,7 +2,6 @@ import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { type AppRouter } from "../../../tRPC serv/index";
 import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
 import {
-  Idata,
   resTechCartsWithOpers,
   resTechOperation,
 } from "../../../tRPC serv/controllers/TechCartService";
@@ -30,13 +29,6 @@ export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
 );
-// (async () => {
-//   console.log(
-//     await (
-//       await supabase.auth.getSession()
-//     ).data.session?.access_token
-//   );
-// })();
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
@@ -59,7 +51,10 @@ const client = createTRPCProxyClient<AppRouter>({
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
+    map.maps = map.maps.filter((el) => el.id != cart.id);
     map.newMap = cart;
+    console.log(map.maps);
+
     const opers = carts[i].tech_operations;
     if (!opers) return;
     for (let j = 0; j < opers.length; j++) {
@@ -95,17 +90,17 @@ function operValue(oper: Itech_operation) {
     0
   );
 }
-export async function getCarts(map: MapStore) {
+export async function getCarts(map: MapStore, cartId: number) {
   map.isLoading = true;
 
-  await client.cart.get.query().then((carts) => {
-    // console.log(carts);
-    map.maps = [];
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.opers = [];
+  await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
+    console.log(carts);
+
+    // map.costMechanical = [];
+    // map.costMaterials = [];
+    // map.costServices = [];
+    // map.costTransport = [];
+    map.opers = map.opers.filter((el) => el.techCartId != carts[0].id);
     operationsFilter(carts, map);
     map.isLoading = false;
   });
@@ -214,7 +209,7 @@ export async function deleteOper(
     .then((data: any) => {
       map.opers = map.opers.filter((el) => el.id != data.id);
       let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
-      mapData.totalCost! -= operValue(data);
+      mapData.costHectare! -= operValue(data);
       map.isLoading = false;
     });
 }
@@ -242,7 +237,8 @@ export async function createOperation(
       const { oper, prope } = data;
       map.newOper = oper;
       let [mapData] = map.maps.filter((el) => el.id == oper.techCartId);
-      mapData.totalCost! += operValue(oper);
+      mapData.tech_operations?.push(oper);
+      mapData.costHectare! += operValue(oper);
       if ("nameMaterials" in prope) {
         map.newCostMaterials = prope;
       } else if ("nameService" in prope) {
@@ -269,15 +265,20 @@ export async function patchOperation(
   map.isLoading = true;
 
   let [mapData] = map.maps.filter((el) => el.id == id);
+  console.log(map.maps);
+
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
+  console.log(operData);
   //@ts-ignore
-  let [mapOperData] = mapData.tech_operations?.filter(
-    (el) => el.id == arr.res.operId
-  );
+  let [mapOperData] = mapData.tech_operations?.filter((el) => {
+    console.log(el?.id);
+    console.log(arr.res.operId);
+    return el?.id == arr.res.operId;
+  });
   console.log(mapData);
   console.log(mapOperData);
 
-  mapData.totalCost! -= operValue(operData);
+  mapData.costHectare! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
       cartId: +id,
@@ -289,7 +290,7 @@ export async function patchOperation(
       map.newOper = res;
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
 
-      mapData.totalCost! += operValue(res);
+      mapData.costHectare! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
         (el) => el.techOperationId != arr.res.operId
       );
@@ -564,8 +565,6 @@ export function sendFeedBack(data: FeedBackProps) {
 export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.getNoAgree.query().then((res) => {
-    console.log(res);
-
     Bus.noAgreeBusinessPlan = res;
     map.isLoading = false;
   });
@@ -577,8 +576,6 @@ export function setIsAgreeBusiness(
 ) {
   map.isLoading = true;
   client.business.setIsAgree.query(data).then((res) => {
-    console.log(res);
-
     if (res)
       if (res[0]) {
         Bus.noAgreeBusinessPlan = Bus.noAgreeBusinessPlan.filter(
@@ -615,6 +612,12 @@ export function setIdTableInvestment(
 ) {
   client.resume.setId_tableInvestment.query(data).then((res) => {
     console.log(res);
+
+    const plan = Bus.businessPlan.find((el) => el.id == data.businessPlanId);
+    if (!plan) {
+      return;
+    }
+    plan.resume = res!;
   });
 }
 
@@ -628,5 +631,18 @@ export function patchTitlePage(
       return;
     }
     plan.titlePage = res!;
+  });
+}
+export function getOnlyCart(map: MapStore) {
+  map.isLoading = true;
+  client.cart.getOnlyCart.query().then((res) => {
+    res.forEach((el) => {
+      let myMap = map.maps.find((e) => e.id == el.id);
+
+      if (!myMap) {
+        map.newMap = el;
+      }
+    });
+    map.isLoading = false;
   });
 }

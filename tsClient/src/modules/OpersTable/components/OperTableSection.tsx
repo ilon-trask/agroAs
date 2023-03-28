@@ -33,8 +33,6 @@ function OperTableSection({
   deleteOpen,
   setDeleteOpen,
 }: props) {
-  console.log(arr);
-
   return (
     <>
       {arr[0] && (

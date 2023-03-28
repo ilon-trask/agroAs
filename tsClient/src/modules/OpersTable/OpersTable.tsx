@@ -41,10 +41,14 @@ function OpersTable({
 
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
-  console.log(id);
+  console.log(operData);
 
-  const sections = useMemo(() => getSectionsOpers(map, id), [map.opers]);
-  console.log(sections);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, id);
+    console.log(a);
+
+    return a;
+  }, [map.opers, operData]);
 
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;

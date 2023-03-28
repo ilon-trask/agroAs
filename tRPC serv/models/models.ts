@@ -38,7 +38,14 @@ export interface Itech_cart {
   id?: number;
   nameCart: string;
   area: number;
-  totalCost?: number;
+  costHectare?: number;
+  totalCostMachines?: number;
+  totalCostServices?: number;
+  totalCostTransport?: number;
+  totalCostMaterials?: number;
+  totalCostMachineWork?: number;
+  totalCostFuel?: number;
+  totalCostHandWork?: number;
   salary: number;
   priceDiesel: number;
   isPublic?: boolean;
@@ -61,6 +68,14 @@ export class tech_cart extends Model<Itech_cart> {
   declare authorName?: string;
   declare isAgree?: boolean;
   declare description?: string;
+  declare costHectare?: number;
+  declare totalCostMachines?: number;
+  declare totalCostServices?: number;
+  declare totalCostTransport?: number;
+  declare totalCostMaterials?: number;
+  declare totalCostMachineWork?: number;
+  declare totalCostFuel?: number;
+  declare totalCostHandWork?: number;
 }
 
 tech_cart.init(
@@ -75,6 +90,14 @@ tech_cart.init(
     authorName: { type: DataTypes.STRING },
     isAgree: { type: DataTypes.BOOLEAN, defaultValue: false },
     description: { type: DataTypes.STRING },
+    costHectare: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostMachines: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostServices: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostTransport: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostMaterials: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostMachineWork: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostFuel: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostHandWork: { type: DataTypes.NUMBER, defaultValue: 0 },
   },
   { sequelize }
   // { sequelize, timestamps: false }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, TableContainer, Button } from "@chakra-ui/react";
 
 import BusinessTable from "../modules/BusinessTable/BusinessTable";
@@ -7,13 +7,24 @@ import CreateBusinessPlan from "../modules/CreateBusiness";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 
-import { deleteBusinessPlan } from "../http/requests";
+import {
+  deleteBusinessPlan,
+  getBusinessCategory,
+  getBusinessPlans,
+} from "../http/requests";
 import { Context } from "../main";
 import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import { useNavigate } from "react-router-dom";
 
 function Business() {
+  useEffect(() => {
+    if (!business.businessPlan) {
+      getBusinessCategory(map, business);
+      getBusinessPlans(map, business);
+    }
+  }, []);
+
   const { map, business, user } = useContext(Context);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
