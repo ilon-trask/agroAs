@@ -15,6 +15,7 @@ import {
   ModalFooter,
   Input,
 } from "@chakra-ui/react";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 const createCartFunc: func<cartProps> = (
   id,
   map,
@@ -39,7 +40,7 @@ const createCartFunc: func<cartProps> = (
     res.priceDiesel = +res.priceDiesel;
     setRes(CartProps);
     if (update) {
-      updateMap(map, res);
+      updateMap(map, res as resTechCartsWithOpers);
     } else {
       createCart(map, res as Itech_cart);
     }
@@ -52,6 +53,7 @@ type props = {
   setIsErr: (isErr: boolean) => void;
   setOpen: (open: boolean) => void;
   update: boolean;
+  noBtn?: boolean;
 };
 
 export default function MapInputs({
@@ -60,9 +62,12 @@ export default function MapInputs({
   setIsErr,
   setOpen,
   update,
+  noBtn,
 }: props) {
   const { map } = useContext(Context);
   const { id } = useParams();
+  console.log(res);
+
   return (
     <ModalBody>
       <Heading as={"h4"} size="md" textAlign={"center"}>
@@ -129,13 +134,15 @@ export default function MapInputs({
         </div>
       </Box>
       <ModalFooter p={"15px 5px"}>
-        <Button
-          onClick={() =>
-            createCartFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
-          }
-        >
-          Зберегти
-        </Button>
+        {!noBtn && (
+          <Button
+            onClick={() =>
+              createCartFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
+            }
+          >
+            Зберегти
+          </Button>
+        )}
       </ModalFooter>
     </ModalBody>
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -26,6 +26,7 @@ import {
   getTractor,
 } from "../http/requests";
 import { CALENDAR_ROUTER } from "../utils/consts";
+import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -50,6 +51,7 @@ const TechnologicalMap = observer(() => {
   const [res, setRes] = useState({});
   const [isErr, setIsErr] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [openConstructor, setOpenConstructor] = useState<boolean>(false);
   const { map, user } = useContext(Context);
   let { id } = useParams();
   const [deleteOpen, setDeleteOpen] = useState<any>({
@@ -58,6 +60,7 @@ const TechnologicalMap = observer(() => {
     cartId: null,
   });
   const navigate = useNavigate();
+  const pdfContent = useRef();
   useEffect(() => {
     const myMap = map.maps.find((el) => el.id == id);
     console.log(myMap);
@@ -81,23 +84,39 @@ const TechnologicalMap = observer(() => {
         <Text textAlign={"center"} fontSize={"25px"}>
           Технологічна карта
         </Text>
-        <div>
-          <GeneralDataTable
-            id={+id!}
-            setMapOpen={setMapOpen}
-            setRes={setRes}
-            setUpdate={setUpdate}
-          />
-          <OpersTable
-            id={+id!}
-            setRes={setRes}
-            setSecondOpen={setSecondOpen}
-            setCell={setCell}
-            setUpdate={setUpdate}
-            setShowAlert={setShowAlert}
-            deleteOpen={deleteOpen}
-            setDeleteOpen={setDeleteOpen}
-          />
+        <Box>
+          <Box ref={pdfContent}>
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              justifyContent={"space-between"}
+            >
+              <GeneralDataTable
+                id={+id!}
+                setMapOpen={setMapOpen}
+                setRes={setRes}
+                setUpdate={setUpdate}
+              />
+              {user.role == "" && (
+                <>
+                  <Button onClick={() => setOpenConstructor(true)}>
+                    Конструктор
+                  </Button>
+                  <Button>Отримати ПДФ</Button>
+                </>
+              )}
+            </Box>
+            <OpersTable
+              id={+id!}
+              setRes={setRes}
+              setSecondOpen={setSecondOpen}
+              setCell={setCell}
+              setUpdate={setUpdate}
+              setShowAlert={setShowAlert}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
+            />
+          </Box>
           <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
             <Button
               onClick={
@@ -127,7 +146,7 @@ const TechnologicalMap = observer(() => {
               ""
             )}
           </Box>
-        </div>
+        </Box>
         <OperSection
           open={open}
           setOpen={setOpen}
@@ -231,6 +250,7 @@ const TechnologicalMap = observer(() => {
           deleteOper(map, deleteOpen.operId!, deleteOpen.cartId);
         }}
       />
+      <ConstructorPopUp open={openConstructor} setOpen={setOpenConstructor} />
     </Box>
   );
 });

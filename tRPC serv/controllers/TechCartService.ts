@@ -109,7 +109,7 @@ async function guestPatchCart(data: resTechCartsWithOpers) {
   let sum = 0;
   if (!cart.tech_operations) return;
   for (let j = 0; j < cart.tech_operations.length; j++) {
-    let oper: resTechOperation = cart.tech_operations[j];
+    let oper = cart.tech_operations[j];
 
     let el = await changeOper(
       oper,
@@ -141,6 +141,7 @@ async function guestPatchCart(data: resTechCartsWithOpers) {
   cart.costHectare = sum;
   // console.log(cart.tech_operations.map((el) => el));
   // console.log(cart.tech_operations.map((el) => el.cost_hand_work));
+  // console.log(cart);
 
   return [cart];
 }
@@ -220,6 +221,8 @@ class TechCartService {
       res[0].costHectare = costHectare;
       return res;
     } else {
+      console.log(123);
+
       return await guestPatchCart(data);
     }
   }

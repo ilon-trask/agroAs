@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { Icell } from "../../../../../tRPC serv/controllers/OperService";
 import { resTechCartsWithOpers } from "../../../../../tRPC serv/controllers/TechCartService";
-import { Context } from "../../../main";
 import OpersTableItem from "./OpersTableItem";
 import { Tr, Td, Divider, Heading } from "@chakra-ui/react";
 type props = {
