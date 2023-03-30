@@ -5,6 +5,7 @@ import React, {
   useState,
   Dispatch,
   SetStateAction,
+  RefObject,
 } from "react";
 import Dialog from "../../components/Dialog";
 import First from "./first/First";
@@ -23,9 +24,13 @@ import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCar
 function ConstructorPopUp({
   open,
   setOpen,
+  pdfContent,
+  print,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  pdfContent: RefObject<HTMLDivElement>;
+  print: () => void;
 }) {
   const { id } = useParams();
   const { map } = useContext(Context);
@@ -57,8 +62,11 @@ function ConstructorPopUp({
     3: () => {},
     4: () => {},
     5: () => {},
-    6: () => {},
-    7: () => {},
+    6: () => {
+      console.log("print");
+
+      print();
+    },
   };
   return (
     <Dialog
@@ -72,7 +80,7 @@ function ConstructorPopUp({
       setUpdate={() => {}}
       props={{}}
     >
-      <>
+      <Box py={"20px"}>
         {/* <Heading as={"h4"} size={"md"} textAlign={"center"} mt={3}>
           Змінити загальні данні
         </Heading> */}
@@ -81,7 +89,10 @@ function ConstructorPopUp({
           {cont != 0 && (
             <Button
               onClick={() => {
-                setCont((prev) => prev - 1);
+                setCont((prev) => {
+                  if (prev > 0) return prev - 1;
+                  else return prev;
+                });
               }}
             >
               Назад
@@ -92,13 +103,16 @@ function ConstructorPopUp({
               //@ts-ignore
               funcs[cont]();
 
-              setCont((prev) => prev + 1);
+              setCont((prev) => {
+                if (prev < content.length - 1) return prev + 1;
+                else return prev;
+              });
             }}
           >
             {cont != content.length - 1 ? "Далі" : "Отримати"}
           </Button>
         </Box>
-      </>
+      </Box>
     </Dialog>
   );
 }

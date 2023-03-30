@@ -24,7 +24,7 @@ function First({
   console.log(res);
   return (
     <Box h={"300px"}>
-      <Heading as={"h4"} size={"md"} textAlign={"center"} mt={3}>
+      <Heading as={"h4"} size={"md"} textAlign={"center"}>
         Змінити загальні данні
       </Heading>
       <MapInputs

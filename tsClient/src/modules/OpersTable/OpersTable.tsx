@@ -67,7 +67,7 @@ function OpersTable({
   });
 
   return (
-    <TableContainer overflowX={"scroll"}>
+    <TableContainer overflowX={"scroll"} as={"div"}>
       <Table size={"sm"}>
         <Thead>
           <Tr>

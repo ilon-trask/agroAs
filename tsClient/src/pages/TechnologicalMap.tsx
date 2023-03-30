@@ -27,6 +27,7 @@ import {
 } from "../http/requests";
 import { CALENDAR_ROUTER } from "../utils/consts";
 import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
+
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -60,7 +61,7 @@ const TechnologicalMap = observer(() => {
     cartId: null,
   });
   const navigate = useNavigate();
-  const pdfContent = useRef();
+  const pdfContent = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const myMap = map.maps.find((el) => el.id == id);
     console.log(myMap);
@@ -73,19 +74,35 @@ const TechnologicalMap = observer(() => {
     }
   }, []);
 
+  const print = () => {};
+
   return (
     <Box pb={"25px"}>
       <Box px={"40px"}>
-        <div style={{ fontSize: "20px" }}>
-          <Button mt={"30px"} onClick={() => navigate("/")}>
-            {"НА ГОЛОВНУ"}
-          </Button>
-        </div>
-        <Text textAlign={"center"} fontSize={"25px"}>
-          Технологічна карта
-        </Text>
-        <Box>
-          <Box ref={pdfContent}>
+        <Box
+          mt={"30px"}
+          display={"flex"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+          style={{ fontSize: "20px" }}
+        >
+          <Button onClick={() => navigate("/")}>{"НА ГОЛОВНУ"}</Button>
+          {user.role == "" && (
+            <Box>
+              <Button onClick={() => setOpenConstructor(true)} as={"button"}>
+                Конструктор
+              </Button>
+              <Button ml={"30px"} as={"button"} onClick={() => print()}>
+                Отримати ПДФ
+              </Button>
+            </Box>
+          )}
+        </Box>
+        <Box ref={pdfContent} className="print-container">
+          <Text textAlign={"center"} fontSize={"25px"}>
+            Технологічна карта
+          </Text>
+          <Box>
             <Box
               display={"flex"}
               alignItems={"center"}
@@ -97,14 +114,6 @@ const TechnologicalMap = observer(() => {
                 setRes={setRes}
                 setUpdate={setUpdate}
               />
-              {user.role == "" && (
-                <>
-                  <Button onClick={() => setOpenConstructor(true)}>
-                    Конструктор
-                  </Button>
-                  <Button>Отримати ПДФ</Button>
-                </>
-              )}
             </Box>
             <OpersTable
               id={+id!}
@@ -117,35 +126,35 @@ const TechnologicalMap = observer(() => {
               setDeleteOpen={setDeleteOpen}
             />
           </Box>
-          <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
+        </Box>
+        <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
+          <Button
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setUpdate(false);
+                    setOpen(true);
+                  }
+            }
+          >
+            Додати технологічну операцію
+          </Button>
+          {user.role == "ADMIN" ? (
             <Button
-              onClick={
-                user.role == ""
-                  ? () => {
-                      setShowAlert(true);
-                    }
-                  : () => {
-                      setUpdate(false);
-                      setOpen(true);
-                    }
-              }
-            >
-              Додати технологічну операцію
-            </Button>
-            {user.role == "ADMIN" ? (
-              <Button
-                onClick={() => {
-                  console.log(CALENDAR_ROUTER + "/" + id);
+              onClick={() => {
+                console.log(CALENDAR_ROUTER + "/" + id);
 
-                  navigate(CALENDAR_ROUTER + "/" + id);
-                }}
-              >
-                Створити календар робіт
-              </Button>
-            ) : (
-              ""
-            )}
-          </Box>
+                navigate(CALENDAR_ROUTER + "/" + id);
+              }}
+            >
+              Створити календар робіт
+            </Button>
+          ) : (
+            ""
+          )}
         </Box>
         <OperSection
           open={open}
@@ -250,7 +259,12 @@ const TechnologicalMap = observer(() => {
           deleteOper(map, deleteOpen.operId!, deleteOpen.cartId);
         }}
       />
-      <ConstructorPopUp open={openConstructor} setOpen={setOpenConstructor} />
+      <ConstructorPopUp
+        open={openConstructor}
+        setOpen={setOpenConstructor}
+        pdfContent={pdfContent}
+        print={print}
+      />
     </Box>
   );
 });
