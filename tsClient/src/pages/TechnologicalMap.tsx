@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -27,7 +27,9 @@ import {
 } from "../http/requests";
 import { CALENDAR_ROUTER } from "../utils/consts";
 import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
-
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import TechnologicalMapPdf from "./pdf/TechnologicalMapPdf";
+import getSectionsOpers from "../store/GetSectionsOpers";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -62,6 +64,15 @@ const TechnologicalMap = observer(() => {
   });
   const navigate = useNavigate();
   const pdfContent = useRef<HTMLDivElement>(null);
+  const myMap = map.maps.find((el) => el.id == id);
+  const operData = map.opers.filter((el) => el?.techCartId == id);
+  operData.sort((a, b) => a.id! - b.id!);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, +id!);
+    console.log(a);
+
+    return a;
+  }, [map.opers, operData]);
   useEffect(() => {
     const myMap = map.maps.find((el) => el.id == id);
     console.log(myMap);
@@ -73,8 +84,6 @@ const TechnologicalMap = observer(() => {
       getGrades(map);
     }
   }, []);
-
-  const print = () => {};
 
   return (
     <Box pb={"25px"}>
@@ -92,9 +101,19 @@ const TechnologicalMap = observer(() => {
               <Button onClick={() => setOpenConstructor(true)} as={"button"}>
                 Конструктор
               </Button>
-              <Button ml={"30px"} as={"button"} onClick={() => print()}>
+              <PDFDownloadLink
+                document={
+                  <TechnologicalMapPdf cart={myMap!} sections={sections} />
+                }
+                fileName={"tech_cart"}
+              >
+                <Button ml={"30px"} as={"button"}>
+                  Отримати ПДФ
+                </Button>
+              </PDFDownloadLink>
+              {/* <Button ml={"30px"} as={"button"} onClick={() => print()}>
                 Отримати ПДФ
-              </Button>
+              </Button> */}
             </Box>
           )}
         </Box>
@@ -264,6 +283,7 @@ const TechnologicalMap = observer(() => {
         setOpen={setOpenConstructor}
         pdfContent={pdfContent}
         print={print}
+        sections={sections}
       />
     </Box>
   );

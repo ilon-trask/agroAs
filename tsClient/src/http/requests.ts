@@ -168,34 +168,34 @@ export async function createCart(map: MapStore, data: Itech_cart) {
 export async function updateMap(map: MapStore, dat: resTechCartsWithOpers) {
   map.isLoading = true;
   let data: resTechCartsWithOpers = JSON.parse(JSON.stringify(dat));
-    
+
   //@ts-ignore
-    await client.cart.patch.mutate(data).then((res) => {
-      console.log(res);
-      map.maps = map.maps.filter((el) => el.id != res[0].id);
+  await client.cart.patch.mutate(data).then((res) => {
+    console.log(res);
+    map.maps = map.maps.filter((el) => el.id != res[0].id);
 
-      map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
-      res[0].tech_operations?.forEach((oper) => {
-        map.costMechanical = map.costMechanical.filter(
-          (el) => el.techOperationId != oper.id
-        );
-        map.costMaterials = map.costMaterials.filter(
-          (el) => el.techOperationId != oper.id
-        );
-        map.costServices = map.costServices.filter(
-          (el) => el.techOperationId != oper.id
-        );
-        map.costTransport = map.costTransport.filter(
-          (el) => el.techOperationId != oper.id
-        );
-        map.costHandWork = map.costHandWork.filter(
-          (el) => el.techOperationId != oper.id
-        );
-      });
-      operationsFilter(res, map);
-
-      map.isLoading = false;
+    map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
+    res[0].tech_operations?.forEach((oper) => {
+      map.costMechanical = map.costMechanical.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costMaterials = map.costMaterials.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costServices = map.costServices.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costTransport = map.costTransport.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costHandWork = map.costHandWork.filter(
+        (el) => el.techOperationId != oper.id
+      );
     });
+    operationsFilter(res, map);
+
+    map.isLoading = false;
+  });
 }
 
 export async function deleteOper(
@@ -266,14 +266,10 @@ export async function patchOperation(
   map.isLoading = true;
 
   let [mapData] = map.maps.filter((el) => el.id == id);
-  console.log(map.maps);
 
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
-  console.log(operData);
   //@ts-ignore
   let [mapOperData] = mapData.tech_operations?.filter((el) => {
-    console.log(el?.id);
-    console.log(arr.res.operId);
     return el?.id == arr.res.operId;
   });
   console.log(mapData);

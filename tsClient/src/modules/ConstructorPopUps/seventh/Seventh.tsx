@@ -40,12 +40,9 @@ function Seventh() {
           </Box>
         </Box>
       </Box>
-      <Heading as={"h3"} size={"sm"} textAlign={"center"} mt={3}>
+      {/* <Heading as={"h3"} size={"sm"} textAlign={"center"} mt={3}>
         Для отримання даних(pdf) вкажіть email
-      </Heading>
-      <Box display={"flex"} justifyContent={"center"}>
-        <Input mt={2} w={"50%"} autoFocus border={"2px"} />
-      </Box>
+      </Heading> */}
     </Box>
   );
 }

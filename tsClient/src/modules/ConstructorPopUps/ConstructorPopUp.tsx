@@ -20,17 +20,22 @@ import { useParams } from "react-router-dom";
 import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import TechnologicalMapPdf from "../../pages/pdf/TechnologicalMapPdf";
+import { sectionsOpers } from "../../store/GetSectionsOpers";
 
 function ConstructorPopUp({
   open,
   setOpen,
   pdfContent,
   print,
+  sections,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   pdfContent: RefObject<HTMLDivElement>;
   print: () => void;
+  sections: sectionsOpers;
 }) {
   const { id } = useParams();
   const { map } = useContext(Context);
@@ -51,11 +56,18 @@ function ConstructorPopUp({
   ];
   const funcs = {
     0: () => {
-      console.log(res);
-      res.salary = +res?.salary;
-      res.area = +res?.area;
-      res.priceDiesel = +res?.priceDiesel;
-      updateMap(map, res!);
+      if (
+        res.area != myMap?.area ||
+        res.salary != myMap?.salary ||
+        res.priceDiesel != myMap?.priceDiesel ||
+        res.nameCart != myMap?.nameCart
+      ) {
+        console.log(res);
+        res.salary = +res?.salary;
+        res.area = +res?.area;
+        res.priceDiesel = +res?.priceDiesel;
+        updateMap(map, res!);
+      }
     },
     1: () => {},
     2: () => {},
@@ -98,19 +110,30 @@ function ConstructorPopUp({
               Назад
             </Button>
           )}
-          <Button
-            onClick={() => {
-              //@ts-ignore
-              funcs[cont]();
+          {cont != content.length - 1 ? (
+            <Button
+              onClick={() => {
+                //@ts-ignore
+                funcs[cont]();
 
-              setCont((prev) => {
-                if (prev < content.length - 1) return prev + 1;
-                else return prev;
-              });
-            }}
-          >
-            {cont != content.length - 1 ? "Далі" : "Отримати"}
-          </Button>
+                setCont((prev) => {
+                  if (prev < content.length - 1) return prev + 1;
+                  else return prev;
+                });
+              }}
+            >
+              Далі
+            </Button>
+          ) : (
+            <PDFDownloadLink
+              document={
+                <TechnologicalMapPdf cart={myMap!} sections={sections} />
+              }
+              fileName={"tech_cart"}
+            >
+              <Button as={"button"}>Отримати</Button>
+            </PDFDownloadLink>
+          )}
         </Box>
       </Box>
     </Dialog>
