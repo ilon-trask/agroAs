@@ -1128,7 +1128,9 @@ class OperService {
       };
 
       (oper.aggregate.fuelConsumption = fuelConsumption),
+        (oper.aggregate.tractor.fuelConsumption = fuelConsumption),
         (oper.aggregate.workingSpeed = workingSpeed),
+        (oper.aggregate.agricultural_machine.workingSpeed = workingSpeed),
         (oper.aggregate.tractorId = idTractor),
         (oper.aggregate.agriculturalMachineId = idMachine),
         (oper.nameOperation = nameOper),

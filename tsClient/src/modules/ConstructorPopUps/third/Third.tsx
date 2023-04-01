@@ -1,5 +1,6 @@
 import {
   Box,
+  Heading,
   Input,
   Table,
   Tbody,
@@ -47,7 +48,9 @@ function Third({
   }, []);
   return (
     <Box h={"300px"}>
-      <Text textAlign={"center"}>Змінити вартість ручних робіт</Text>
+      <Heading as={"h4"} size={"md"} textAlign={"center"} mt={3}>
+        Змінити вартість ручних робіт
+      </Heading>
       <Box height={"270px"} overflowY={"scroll"}>
         <Table size={"sm"}>
           <Thead>

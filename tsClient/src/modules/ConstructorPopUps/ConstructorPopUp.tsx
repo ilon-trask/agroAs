@@ -56,7 +56,7 @@ function ConstructorPopUp({
   const [propRes, setPropRes] = useState<resTechOperation[]>([]);
   const content = [
     <First res={res} setRes={setRes as any} />,
-    <Second />,
+    <Second prop={propRes} setProp={setPropRes} />,
     <Third prop={propRes} setProp={setPropRes} />,
     <Fourth prop={propRes} setProp={setPropRes} />,
     <Fifth prop={propRes} setProp={setPropRes} />,
@@ -78,7 +78,29 @@ function ConstructorPopUp({
         updateMap(map, res!);
       }
     },
-    1: () => {},
+    1: () => {
+      propRes.forEach((el) => {
+        const myMech = map.costMechanical.find(
+          (e) => e.id == el?.aggregate?.id
+        );
+        //@ts-ignore
+        el.operId = el.id;
+        //@ts-ignore
+        el.nameOper = el.nameOperation;
+        //@ts-ignore
+        el.salary = myMap?.salary;
+        //@ts-ignore
+        el.priceDiesel = myMap?.priceDiesel;
+        if (
+          //@ts-ignore
+          myMech?.workingSpeed != el.workingSpeed ||
+          //@ts-ignore
+          myMech?.fuelConsumption != el.fuelConsumption
+        ) {
+          patchOperation(map, { cell: "costMechanical", res: el }, myMap?.id!);
+        }
+      });
+    },
     2: () => {
       propRes.forEach((el) => {
         const myHand = map.costHandWork.find(
@@ -104,8 +126,6 @@ function ConstructorPopUp({
           //@ts-ignore
           myHand?.productionRateAmount != el.productionRateAmount
         ) {
-          console.log(123);
-
           patchOperation(map, { cell: "costHandWork", res: el }, myMap?.id!);
         }
       });
@@ -167,11 +187,7 @@ function ConstructorPopUp({
         }
       });
     },
-    6: () => {
-      console.log("print");
-
-      print();
-    },
+    6: () => {},
   };
   return (
     <Dialog
