@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
-import { getCarts, getWorks, supabase } from "../http/requests";
+import { getCarts, getOnlyCart, getWorks, supabase } from "../http/requests";
 import style from "./auth.module.css";
 import { useContext } from "react";
 import { Context } from "../main";
@@ -18,7 +18,7 @@ export default function AuthPage() {
       if (data.session) {
         user.role = data.session.user.role as IUserRole;
         user.isAuth = true;
-        getCarts(map);
+        getOnlyCart(map);
         getWorks(map);
       }
     }
