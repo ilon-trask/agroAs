@@ -15,14 +15,22 @@ import Fourth from "./fourth/Fourth";
 import Fifth from "./fifth/Fifth";
 import Sixth from "./sixth/Sixth";
 import Seventh from "./seventh/Seventh";
-import { updateMap } from "../../http/requests";
+import { patchOperation, updateMap } from "../../http/requests";
 import { useParams } from "react-router-dom";
 import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
+import {
+  resTechCartsWithOpers,
+  resTechOperation,
+} from "../../../../tRPC serv/controllers/TechCartService";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import TechnologicalMapPdf from "../../pages/pdf/TechnologicalMapPdf";
 import { sectionsOpers } from "../../store/GetSectionsOpers";
+import { prope2 } from "../../../../tRPC serv/controllers/OperService";
+import {
+  cost_service,
+  Icost_service,
+} from "../../../../tRPC serv/models/models";
 
 function ConstructorPopUp({
   open,
@@ -45,13 +53,14 @@ function ConstructorPopUp({
   useEffect(() => {
     setRes(myMap!);
   }, [myMap]);
+  const [propRes, setPropRes] = useState<resTechOperation[]>([]);
   const content = [
     <First res={res} setRes={setRes as any} />,
     <Second />,
-    <Third />,
-    <Fourth />,
-    <Fifth />,
-    <Sixth />,
+    <Third prop={propRes} setProp={setPropRes} />,
+    <Fourth prop={propRes} setProp={setPropRes} />,
+    <Fifth prop={propRes} setProp={setPropRes} />,
+    <Sixth prop={propRes} setProp={setPropRes} />,
     <Seventh />,
   ];
   const funcs = {
@@ -70,10 +79,94 @@ function ConstructorPopUp({
       }
     },
     1: () => {},
-    2: () => {},
-    3: () => {},
-    4: () => {},
-    5: () => {},
+    2: () => {
+      propRes.forEach((el) => {
+        const myHand = map.costHandWork.find(
+          (e) => e.id == el?.cost_hand_work?.id
+        );
+        //@ts-ignore
+        el.operId = el.id;
+        //@ts-ignore
+        el.nameOper = el.nameOperation;
+        //@ts-ignore
+        el.salary = myMap?.salary;
+        // //@ts-ignore
+        // el.unitsOfCost = el.cost_material?.unitsOfCost;
+        if (
+          //@ts-ignore
+          myHand?.productionRateTime != el.productionRateTime ||
+          //@ts-ignore
+          myHand?.yieldСapacity != el.yieldСapacity ||
+          //@ts-ignore
+          myHand?.productionRateWeight != el.productionRateWeight ||
+          //@ts-ignore
+          myHand?.spending != el.spending ||
+          //@ts-ignore
+          myHand?.productionRateAmount != el.productionRateAmount
+        ) {
+          console.log(123);
+
+          patchOperation(map, { cell: "costHandWork", res: el }, myMap?.id!);
+        }
+      });
+    },
+    3: () => {
+      propRes.forEach((el) => {
+        const myMater = map.costMaterials.find(
+          (e) => e.id == el?.cost_material?.id
+        );
+        //@ts-ignore
+        el.operId = el.id;
+        //@ts-ignore
+        el.nameOper = el.nameOperation;
+        //@ts-ignore
+        el.unitsOfConsumption = el?.cost_material?.unitsOfConsumption;
+        //@ts-ignore
+        el.unitsOfCost = el.cost_material?.unitsOfCost;
+        //@ts-ignore
+        if (myMater?.price != el.price) {
+          patchOperation(map, { cell: "costMaterials", res: el }, myMap?.id!);
+        }
+      });
+    },
+    4: () => {
+      propRes.forEach((el) => {
+        const myService = map.costServices.find(
+          (e) => e.id == el?.cost_service?.id
+        );
+        //@ts-ignore
+        el.operId = el.id;
+        //@ts-ignore
+        el.nameOper = el.nameOperation;
+        //@ts-ignore
+        el.price = +el.costServices;
+        //@ts-ignore
+        el.unitsOfCost = el.cost_service?.unitsOfCost;
+
+        if (myService?.price != el.costServices) {
+          patchOperation(map, { cell: "costServices", res: el }, myMap?.id!);
+        }
+      });
+    },
+    5: () => {
+      propRes.forEach((el) => {
+        const myTransp = map.costTransport.find(
+          (e) => e.id == el?.cost_transport?.id
+        );
+        //@ts-ignore
+        el.operId = el.id;
+        //@ts-ignore
+        el.nameOper = el.nameOperation;
+        //@ts-ignore
+        el.price = +el.costTransport;
+        //@ts-ignore
+        el.unitsOfCost = el.cost_transport?.unitsOfCost;
+
+        if (myTransp?.price != el.costTransport) {
+          patchOperation(map, { cell: "costTransport", res: el }, myMap?.id!);
+        }
+      });
+    },
     6: () => {
       console.log("print");
 

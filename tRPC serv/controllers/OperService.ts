@@ -419,6 +419,14 @@ export async function changeOper(
             Grade.coefficient
         );
       }
+      console.log(CostHandWork.type);
+      console.log(costHandWork);
+      console.log(
+        CostHandWork.productionRateTime!
+        // *
+        // Grade.coefficient *
+        // 10000
+      );
 
       elem.costHandWork = costHandWork;
       return elem;

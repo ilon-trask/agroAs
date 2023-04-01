@@ -290,7 +290,7 @@ function TechnologicalMapPdf({
 
             return (
               el?.arr[0] && (
-                <>
+                <View key={ind}>
                   <View style={style.tableRow}>
                     <View style={{ width: "70px" }}></View>
                     <Text
@@ -337,7 +337,7 @@ function TechnologicalMapPdf({
                   </View> */}
                   </View>
                   {opers}
-                </>
+                </View>
               )
             );
           })}

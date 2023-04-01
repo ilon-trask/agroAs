@@ -120,6 +120,7 @@ export default function OpersTableItem({
   setDeleteOpen,
 }: props) {
   const { map, user } = useContext(Context);
+
   return (
     <Tr key={el.id!}>
       {user.role != "" && (

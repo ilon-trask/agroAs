@@ -76,8 +76,8 @@ const TechnologicalMap = observer(() => {
   useEffect(() => {
     const myMap = map.maps.find((el) => el.id == id);
     console.log(myMap);
+    getCarts(map, +id!);
     if (!myMap?.tech_operations) {
-      getCarts(map, +id!);
       getSection(map);
       getTractor(map);
       getMachine(map);

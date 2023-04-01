@@ -96,10 +96,11 @@ export async function getCarts(map: MapStore, cartId: number) {
   await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
     console.log(carts);
 
-    // map.costMechanical = [];
-    // map.costMaterials = [];
-    // map.costServices = [];
-    // map.costTransport = [];
+    map.costMechanical = [];
+    map.costMaterials = [];
+    map.costServices = [];
+    map.costTransport = [];
+    map.opers = [];
     map.opers = map.opers.filter((el) => el.techCartId != carts[0].id);
     operationsFilter(carts, map);
     map.isLoading = false;
@@ -261,12 +262,13 @@ export async function patchOperation(
     cell: Icell;
     res: any;
   },
-  id: number
+  cartId: number
 ) {
   map.isLoading = true;
 
-  let [mapData] = map.maps.filter((el) => el.id == id);
+  let [mapData] = map.maps.filter((el) => el.id == cartId);
 
+  console.log(arr.res);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   //@ts-ignore
   let [mapOperData] = mapData.tech_operations?.filter((el) => {
@@ -274,11 +276,12 @@ export async function patchOperation(
   });
   console.log(mapData);
   console.log(mapOperData);
+  console.log(operData);
 
   mapData.costHectare! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
-      cartId: +id,
+      cartId: +cartId,
       arr: arr,
     })
     //@ts-ignore
@@ -286,6 +289,7 @@ export async function patchOperation(
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
       map.newOper = res;
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
+      console.log(res);
 
       mapData.costHectare! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
