@@ -14,8 +14,16 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
 import BusinessCatalogItem from "../components/BusinessCatalogItem";
+import { getBusinessCategory, getBusinessPlans } from "../http/requests";
 
 function MainPage() {
+  useEffect(() => {
+    if (!business.businessPlan) {
+      getBusinessCategory(map, business);
+      getBusinessPlans(map, business);
+    }
+  }, []);
+
   const { map, business } = useContext(Context);
 
   const [windW, setWindW] = useState(window.innerWidth);

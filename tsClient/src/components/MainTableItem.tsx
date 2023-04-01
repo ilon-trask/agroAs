@@ -57,11 +57,11 @@ function MainTable({ e }: props) {
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Загальна вартість </Box>
-            <Box>{e?.area! * e?.totalCost! || "0"}</Box>
+            <Box>{e?.area! * e?.costHectare! || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>
-            <Box>{e?.totalCost || "0"}</Box>
+            <Box>{e?.costHectare || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Оновлено</Box>

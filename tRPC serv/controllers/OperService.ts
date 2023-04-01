@@ -59,20 +59,6 @@ export type IresPatch = {
   gradeId?: number;
 };
 
-export interface Ioper {
-  id?: number;
-  nameOperation: string;
-  cell: Icell;
-  costCars?: number;
-  costFuel?: number;
-  costMachineWork?: number;
-  costHandWork?: number;
-  costMaterials?: number;
-  costTransport?: number;
-  costServices?: number;
-  techCartId?: number;
-  sectionId?: number;
-}
 export type Icell =
   | "costMaterials"
   | "costServices"
@@ -243,12 +229,14 @@ export async function changeOper(
       let costMaterials = elem.cost_material;
       if (!costMaterials) return elem;
 
-      elem.costMaterials =
-        costMaterials.price * costMaterials.consumptionPerHectare;
+      elem.costMaterials = Math.round(
+        costMaterials.price * costMaterials.consumptionPerHectare
+      );
       return elem;
     } else {
-      elem.costMaterials =
-        CostMaterials.price * CostMaterials.consumptionPerHectare;
+      elem.costMaterials = Math.round(
+        CostMaterials.price * CostMaterials.consumptionPerHectare
+      );
       return elem;
     }
   } else if (elem.cell == "costTransport") {
@@ -431,6 +419,14 @@ export async function changeOper(
             Grade.coefficient
         );
       }
+      console.log(CostHandWork.type);
+      console.log(costHandWork);
+      console.log(
+        CostHandWork.productionRateTime!
+        // *
+        // Grade.coefficient *
+        // 10000
+      );
 
       elem.costHandWork = costHandWork;
       return elem;
@@ -452,8 +448,8 @@ async function updateOper(
     },
     { where: { id: operId } }
   );
-  //@ts-ignore
-  let oper: resTechOperation = await tech_operation.findOne({
+
+  let oper: resTechOperation | undefined | null = await tech_operation.findOne({
     where: { id: operId },
     include: [
       cost_material,
@@ -463,6 +459,7 @@ async function updateOper(
       { model: aggregate, include: [tractor, agricultural_machine] },
     ],
   });
+  oper = await changeOper(oper!, oper?.techCartId!);
   return oper;
 }
 
@@ -497,6 +494,15 @@ class OperService {
       unitsOfConsumption,
       techOperationId: operId,
     });
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    tech_cart.update(
+      {
+        costHectare:
+          cart?.costHectare! +
+          costMaterial.price * costMaterial.consumptionPerHectare,
+      },
+      { where: { id: cartId } }
+    );
     oper.costMaterials =
       costMaterial.price * costMaterial.consumptionPerHectare;
     return { oper, prope: costMaterial };
@@ -519,6 +525,13 @@ class OperService {
       unitsOfCost,
       techOperationId: operId,
     });
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    tech_cart.update(
+      {
+        costHectare: cart?.costHectare! + costService.price,
+      },
+      { where: { id: cartId } }
+    );
     oper.costServices = costService.price;
     return { oper, prope: costService };
   }
@@ -540,6 +553,13 @@ class OperService {
       unitsOfCost,
       techOperationId: operId,
     });
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    tech_cart.update(
+      {
+        costHectare: cart?.costHectare! + costTransport.price,
+      },
+      { where: { id: cartId } }
+    );
     oper.costTransport = costTransport.price;
     return { oper, prope: costTransport };
   }
@@ -610,7 +630,17 @@ class OperService {
         (machine.numberOfServicePersonnel ?? 0) *
         gradeMachine?.coefficient!
     );
-
+    tech_cart.update(
+      {
+        costHectare:
+          cart.costHectare! +
+          costMachineWork +
+          costCars +
+          costFuel +
+          costHandWork,
+      },
+      { where: { id: cartId } }
+    );
     oper.costMachineWork = costMachineWork;
     oper.costCars = costCars;
     oper.costFuel = costFuel;
@@ -682,6 +712,10 @@ class OperService {
           Grade.coefficient
       );
     }
+    tech_cart.update(
+      { costHectare: cart.costHectare! + cost },
+      { where: { id: cartId } }
+    );
     oper.costHandWork = cost;
 
     return { oper, prope: costHandWork };
@@ -734,6 +768,37 @@ class OperService {
         (oper.nameOperation = nameOper),
         (oper = await changeOper(oper, oper.techCartId!, CostMaterials));
     } else {
+      //@ts-ignore
+      let inOper: resTechOperation | null | undefined =
+        await tech_operation.findOne({
+          where: { id: operId },
+          include: [
+            cost_material,
+            cost_service,
+            cost_transport,
+            cost_hand_work,
+            { model: aggregate, include: [tractor, agricultural_machine] },
+          ],
+        });
+      let cart: Itech_cart = JSON.parse(
+        JSON.stringify(
+          await tech_cart.findOne({ where: { id: inOper?.techCartId } })
+        )
+      );
+      let operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      let costHectare = cart.costHectare!;
+      if (operCalc) {
+        costHectare -=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+      }
       const costMaterial = await cost_material.update(
         {
           nameMaterials: nameOper,
@@ -745,11 +810,40 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
+      inOper = await tech_operation.findOne({
+        where: { id: operId },
+        include: [
+          cost_material,
+          cost_service,
+          cost_transport,
+          cost_hand_work,
+          { model: aggregate, include: [tractor, agricultural_machine] },
+        ],
+      });
+      operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      if (operCalc) {
+        costHectare +=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+
+        tech_cart.update(
+          { costHectare },
+          { where: { id: inOper?.techCartId } }
+        );
+      }
       oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
       oper = await changeOper(oper, oper.techCartId!);
     }
+
     return oper;
   }
   async patchCostService(
@@ -795,6 +889,37 @@ class OperService {
           CostService
         ));
     } else {
+      //@ts-ignore
+      let inOper: resTechOperation | null | undefined =
+        await tech_operation.findOne({
+          where: { id: operId },
+          include: [
+            cost_material,
+            cost_service,
+            cost_transport,
+            cost_hand_work,
+            { model: aggregate, include: [tractor, agricultural_machine] },
+          ],
+        });
+      let cart: Itech_cart = JSON.parse(
+        JSON.stringify(
+          await tech_cart.findOne({ where: { id: inOper?.techCartId } })
+        )
+      );
+      let operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      let costHectare = cart.costHectare!;
+      if (operCalc) {
+        costHectare -=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+      }
       const costService = await cost_service.update(
         {
           nameService: nameOper,
@@ -804,6 +929,34 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
+      inOper = await tech_operation.findOne({
+        where: { id: operId },
+        include: [
+          cost_material,
+          cost_service,
+          cost_transport,
+          cost_hand_work,
+          { model: aggregate, include: [tractor, agricultural_machine] },
+        ],
+      });
+      operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      if (operCalc) {
+        costHectare +=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+
+        tech_cart.update(
+          { costHectare },
+          { where: { id: inOper?.techCartId } }
+        );
+      }
       oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
@@ -854,6 +1007,37 @@ class OperService {
           CostTransport
         ));
     } else {
+      //@ts-ignore
+      let inOper: resTechOperation | null | undefined =
+        await tech_operation.findOne({
+          where: { id: operId },
+          include: [
+            cost_material,
+            cost_service,
+            cost_transport,
+            cost_hand_work,
+            { model: aggregate, include: [tractor, agricultural_machine] },
+          ],
+        });
+      let cart: Itech_cart = JSON.parse(
+        JSON.stringify(
+          await tech_cart.findOne({ where: { id: inOper?.techCartId } })
+        )
+      );
+      let operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      let costHectare = cart.costHectare!;
+      if (operCalc) {
+        costHectare -=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+      }
       const costTransport = await cost_transport.update(
         {
           nameTransport: nameOper,
@@ -863,6 +1047,34 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
+      inOper = await tech_operation.findOne({
+        where: { id: operId },
+        include: [
+          cost_material,
+          cost_service,
+          cost_transport,
+          cost_hand_work,
+          { model: aggregate, include: [tractor, agricultural_machine] },
+        ],
+      });
+      operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      if (operCalc) {
+        costHectare +=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+
+        tech_cart.update(
+          { costHectare },
+          { where: { id: inOper?.techCartId } }
+        );
+      }
       oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
@@ -916,7 +1128,9 @@ class OperService {
       };
 
       (oper.aggregate.fuelConsumption = fuelConsumption),
+        (oper.aggregate.tractor.fuelConsumption = fuelConsumption),
         (oper.aggregate.workingSpeed = workingSpeed),
+        (oper.aggregate.agricultural_machine.workingSpeed = workingSpeed),
         (oper.aggregate.tractorId = idTractor),
         (oper.aggregate.agriculturalMachineId = idMachine),
         (oper.nameOperation = nameOper),
@@ -929,6 +1143,38 @@ class OperService {
           costMechanical
         ));
     } else {
+      //@ts-ignore
+      let inOper: resTechOperation | null | undefined =
+        await tech_operation.findOne({
+          where: { id: operId },
+          include: [
+            cost_material,
+            cost_service,
+            cost_transport,
+            cost_hand_work,
+            { model: aggregate, include: [tractor, agricultural_machine] },
+          ],
+        });
+
+      let InCart: Itech_cart = JSON.parse(
+        JSON.stringify(
+          await tech_cart.findOne({ where: { id: inOper?.techCartId } })
+        )
+      );
+      let operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      let costHectare = InCart.costHectare!;
+      if (operCalc) {
+        costHectare -=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+      }
       const Tractor = await tractor.findOne({ where: { id: idTractor } });
       const machine = await agricultural_machine.findOne({
         where: { id: idMachine },
@@ -944,6 +1190,34 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
+      inOper = await tech_operation.findOne({
+        where: { id: operId },
+        include: [
+          cost_material,
+          cost_service,
+          cost_transport,
+          cost_hand_work,
+          { model: aggregate, include: [tractor, agricultural_machine] },
+        ],
+      });
+      operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      if (operCalc) {
+        costHectare +=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+
+        tech_cart.update(
+          { costHectare },
+          { where: { id: inOper?.techCartId } }
+        );
+      }
       oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
@@ -1024,6 +1298,37 @@ class OperService {
         CostHandWork
       );
     } else {
+      //@ts-ignore
+      let inOper: resTechOperation | null | undefined =
+        await tech_operation.findOne({
+          where: { id: operId },
+          include: [
+            cost_material,
+            cost_service,
+            cost_transport,
+            cost_hand_work,
+            { model: aggregate, include: [tractor, agricultural_machine] },
+          ],
+        });
+      let cart: Itech_cart = JSON.parse(
+        JSON.stringify(
+          await tech_cart.findOne({ where: { id: inOper?.techCartId } })
+        )
+      );
+      let operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      let costHectare = cart.costHectare!;
+      if (operCalc) {
+        costHectare -=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+      }
       await cost_hand_work.update(
         {
           nameOper,
@@ -1040,7 +1345,33 @@ class OperService {
         },
         { where: { techOperationId: operId } }
       );
-
+      inOper = await tech_operation.findOne({
+        where: { id: operId },
+        include: [
+          cost_material,
+          cost_service,
+          cost_transport,
+          cost_hand_work,
+          { model: aggregate, include: [tractor, agricultural_machine] },
+        ],
+      });
+      operCalc = await changeOper(inOper!, inOper?.techCartId!);
+      if (operCalc) {
+        costHectare +=
+          operCalc.costMachineWork! +
+            operCalc.costCars! +
+            operCalc.costFuel! +
+            operCalc.costHandWork! ||
+          operCalc.costHandWork ||
+          operCalc.costServices ||
+          operCalc.costTransport ||
+          operCalc.costMaterials ||
+          0;
+        tech_cart.update(
+          { costHectare },
+          { where: { id: inOper?.techCartId } }
+        );
+      }
       oper = await updateOper(nameOper, cell, operId, date);
       if (!oper) return;
 
@@ -1065,7 +1396,23 @@ class OperService {
     elem = await changeOper(elem, elem.techCartId!);
 
     if (!elem) throw new Error("");
-    await changeOper(elem, cartId);
+    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    tech_cart.update(
+      {
+        costHectare:
+          cart?.costHectare! -
+          (elem.costMachineWork! +
+            elem.costCars! +
+            elem.costFuel! +
+            elem.costHandWork! ||
+            elem.costHandWork ||
+            elem.costServices ||
+            elem.costTransport ||
+            elem.costMaterials ||
+            0),
+      },
+      { where: { id: cartId } }
+    );
     if (elem.cell == "costHandWork") {
       await cost_hand_work.destroy({ where: { techOperationId: elem.id } });
     } else if (elem.cell == "costMaterials") {

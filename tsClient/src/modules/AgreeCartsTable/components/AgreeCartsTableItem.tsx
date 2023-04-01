@@ -35,8 +35,8 @@ const CartsTableItem = observer(
           <Link to={TEHMAP_ROUTER + `/${e.id}`}>{e.nameCart}</Link>
         </Td>
         <Td>{e.area}</Td>
-        <Td>{Math.round(10 * (e.totalCost! * +e.area)) / 10 || "0"}</Td>
-        <Td>{e.totalCost || "0"}</Td>
+        <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
+        <Td>{e.costHectare || "0"}</Td>
         <Td>{e.authorName || "нема"}</Td>
         <Td>{cultural?.nameCulture || "нема"}</Td>
 

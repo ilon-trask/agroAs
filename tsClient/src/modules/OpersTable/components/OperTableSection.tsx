@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { Icell } from "../../../../../tRPC serv/controllers/OperService";
 import { resTechCartsWithOpers } from "../../../../../tRPC serv/controllers/TechCartService";
-import { Context } from "../../../main";
 import OpersTableItem from "./OpersTableItem";
 import { Tr, Td, Divider, Heading } from "@chakra-ui/react";
+import { Context } from "../../../main";
 type props = {
   arr: any[];
   title: string;
@@ -33,15 +33,16 @@ function OperTableSection({
   deleteOpen,
   setDeleteOpen,
 }: props) {
-  console.log(arr);
-
+  const { user } = useContext(Context);
   return (
     <>
       {arr[0] && (
         <Tr>
-          <Td h={"auto"} padding={"0"}>
-            <Divider orientation="horizontal" opacity={"1"} />
-          </Td>
+          {user.role != "" && (
+            <Td h={"auto"} padding={"0"}>
+              <Divider orientation="horizontal" opacity={"1"} />
+            </Td>
+          )}
           <Td h={"auto"} padding={"0"}>
             <Divider orientation="horizontal" opacity={"1"} />
           </Td>

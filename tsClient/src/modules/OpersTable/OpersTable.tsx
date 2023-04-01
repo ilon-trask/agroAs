@@ -37,14 +37,18 @@ function OpersTable({
   deleteOpen,
   setDeleteOpen,
 }: props) {
-  const { map } = useContext(Context);
+  const { map, user } = useContext(Context);
 
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
-  console.log(id);
+  console.log(operData);
 
-  const sections = useMemo(() => getSectionsOpers(map, id), [map.opers]);
-  console.log(sections);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, id);
+    console.log(a);
+
+    return a;
+  }, [map.opers, operData]);
 
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
@@ -61,12 +65,13 @@ function OpersTable({
         el.costHandWork ||
         0);
   });
+
   return (
-    <TableContainer overflowX={"scroll"}>
+    <TableContainer overflowX={"scroll"} as={"div"}>
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th></Th>
+            {user.role != "" && <Th></Th>}
             <Th>
               Дата <br />
               початку
@@ -112,7 +117,7 @@ function OpersTable({
               Вартість <br />
               послуг
             </Th>
-            <Th></Th>
+            {user.role != "" && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -137,7 +142,7 @@ function OpersTable({
         </Tbody>
 
         <Tfoot>
-          <Td></Td>
+          {user.role != "" && <Td></Td>}
           <Td></Td>
           <Td fontWeight={"bold"}>Загальні витрати</Td>
           <Td></Td>
@@ -145,7 +150,7 @@ function OpersTable({
           <Td px={"10px"} fontWeight={"bold"}>
             {sum}
           </Td>
-          <Td></Td>
+          {user.role != "" && <Td></Td>}
         </Tfoot>
       </Table>
     </TableContainer>

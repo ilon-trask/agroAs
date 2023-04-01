@@ -49,11 +49,8 @@ function BiznesPlanPage() {
   let data = name && child ? myBusiness[name][child] : "";
   const [nData, setNData] = useState<string>();
   function getData(name: iName, children: iChild, infCartId: number | null) {
-    console.log(children);
-
     setInfCartId(infCartId || 0);
     setChild(children);
-    //@ts-ignore
     setName(name);
   }
   const [isActiveInput, setIsActiveInput] = useState(false);
@@ -80,8 +77,8 @@ function BiznesPlanPage() {
         </TableContainer>
         <Box
           mt={4}
-          minW={"720px"}
-          minH={`${720 * 1.4}px`}
+          w={"720px"}
+          h={`${720 * 1.4}px`}
           border={"black 2px solid"}
           p={"30px"}
           px={"60px"}

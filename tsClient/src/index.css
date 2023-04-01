@@ -77,3 +77,21 @@ button:focus-visible {
 *::-webkit-scrollbar {
   /* display: none; */
 }
+@media print {
+  .print-container {
+    width: 100%;
+    height: 100%;
+    /* transform: rotate(90deg); */
+    /* transform-origin: top left; */
+    /* size: "A3"; */
+  }
+
+  .print-container > button {
+    display: none;
+  }
+  .print-container > div {
+    overflow-x: visible;
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+}

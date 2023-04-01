@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,8 +17,19 @@ import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Text, Button, Box } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
-import { deleteOper } from "../http/requests";
+import {
+  deleteOper,
+  getCarts,
+  getGrades,
+  getMachine,
+  getSection,
+  getTractor,
+} from "../http/requests";
 import { CALENDAR_ROUTER } from "../utils/consts";
+import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import TechnologicalMapPdf from "./pdf/TechnologicalMapPdf";
+import getSectionsOpers from "../store/GetSectionsOpers";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -43,6 +54,7 @@ const TechnologicalMap = observer(() => {
   const [res, setRes] = useState({});
   const [isErr, setIsErr] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [openConstructor, setOpenConstructor] = useState<boolean>(false);
   const { map, user } = useContext(Context);
   let { id } = useParams();
   const [deleteOpen, setDeleteOpen] = useState<any>({
@@ -51,64 +63,118 @@ const TechnologicalMap = observer(() => {
     cartId: null,
   });
   const navigate = useNavigate();
+  const pdfContent = useRef<HTMLDivElement>(null);
+  const myMap = map.maps.find((el) => el.id == id);
+  const operData = map.opers.filter((el) => el?.techCartId == id);
+  operData.sort((a, b) => a.id! - b.id!);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, +id!);
+    console.log(a);
+
+    return a;
+  }, [map.opers, operData]);
+  useEffect(() => {
+    const myMap = map.maps.find((el) => el.id == id);
+    console.log(myMap);
+    getCarts(map, +id!);
+    if (!myMap?.tech_operations) {
+      getSection(map);
+      getTractor(map);
+      getMachine(map);
+      getGrades(map);
+    }
+  }, []);
+
   return (
     <Box pb={"25px"}>
       <Box px={"40px"}>
-        <div style={{ fontSize: "20px" }}>
-          <Button mt={"30px"} onClick={() => navigate("/")}>
-            {"НА ГОЛОВНУ"}
-          </Button>
-        </div>
-        <Text textAlign={"center"} fontSize={"25px"}>
-          Технологічна карта
-        </Text>
-        <div>
-          <GeneralDataTable
-            id={+id!}
-            setMapOpen={setMapOpen}
-            setRes={setRes}
-            setUpdate={setUpdate}
-          />
-          <OpersTable
-            id={+id!}
-            setRes={setRes}
-            setSecondOpen={setSecondOpen}
-            setCell={setCell}
-            setUpdate={setUpdate}
-            setShowAlert={setShowAlert}
-            deleteOpen={deleteOpen}
-            setDeleteOpen={setDeleteOpen}
-          />
-          <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
-            <Button
-              onClick={
-                user.role == ""
-                  ? () => {
-                      setShowAlert(true);
-                    }
-                  : () => {
-                      setUpdate(false);
-                      setOpen(true);
-                    }
-              }
-            >
-              Додати технологічну операцію
-            </Button>
-            {user.role == "ADMIN" ? (
-              <Button
-                onClick={() => {
-                  console.log(CALENDAR_ROUTER + "/" + id);
-
-                  navigate(CALENDAR_ROUTER + "/" + id);
-                }}
-              >
-                Створити календар робіт
+        <Box
+          mt={"30px"}
+          display={"flex"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+          style={{ fontSize: "20px" }}
+        >
+          <Button onClick={() => navigate("/")}>{"НА ГОЛОВНУ"}</Button>
+          {user.role == "" && (
+            <Box>
+              <Button onClick={() => setOpenConstructor(true)} as={"button"}>
+                Конструктор
               </Button>
-            ) : (
-              ""
-            )}
+              <PDFDownloadLink
+                document={
+                  <TechnologicalMapPdf cart={myMap!} sections={sections} />
+                }
+                fileName={"tech_cart"}
+              >
+                <Button ml={"30px"} as={"button"}>
+                  Отримати ПДФ
+                </Button>
+              </PDFDownloadLink>
+              {/* <Button ml={"30px"} as={"button"} onClick={() => print()}>
+                Отримати ПДФ
+              </Button> */}
+            </Box>
+          )}
+        </Box>
+        <Box ref={pdfContent} className="print-container">
+          <Text textAlign={"center"} fontSize={"25px"}>
+            Технологічна карта
+          </Text>
+          <Box>
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              justifyContent={"space-between"}
+            >
+              <GeneralDataTable
+                id={+id!}
+                setMapOpen={setMapOpen}
+                setRes={setRes}
+                setUpdate={setUpdate}
+              />
+            </Box>
+            <OpersTable
+              id={+id!}
+              setRes={setRes}
+              setSecondOpen={setSecondOpen}
+              setCell={setCell}
+              setUpdate={setUpdate}
+              setShowAlert={setShowAlert}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
+            />
           </Box>
-        </div>
+        </Box>
+        <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
+          <Button
+            onClick={
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setUpdate(false);
+                    setOpen(true);
+                  }
+            }
+          >
+            Додати технологічну операцію
+          </Button>
+          {user.role == "ADMIN" ? (
+            <Button
+              onClick={() => {
+                console.log(CALENDAR_ROUTER + "/" + id);
+
+                navigate(CALENDAR_ROUTER + "/" + id);
+              }}
+            >
+              Створити календар робіт
+            </Button>
+          ) : (
+            ""
+          )}
+        </Box>
         <OperSection
           open={open}
           setOpen={setOpen}
@@ -211,6 +277,13 @@ const TechnologicalMap = observer(() => {
           setDeleteOpen({ ...deleteOpen, isOpen: false });
           deleteOper(map, deleteOpen.operId!, deleteOpen.cartId);
         }}
+      />
+      <ConstructorPopUp
+        open={openConstructor}
+        setOpen={setOpenConstructor}
+        pdfContent={pdfContent}
+        print={print}
+        sections={sections}
       />
     </Box>
   );

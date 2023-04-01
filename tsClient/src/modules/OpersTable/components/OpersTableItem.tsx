@@ -120,15 +120,23 @@ export default function OpersTableItem({
   setDeleteOpen,
 }: props) {
   const { map, user } = useContext(Context);
+
   return (
     <Tr key={el.id!}>
-      <Td
-        onClick={() =>
-          patch(map, el, setRes, setSecondOpen, setCell, setUpdate)
-        }
-      >
-        <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
-      </Td>
+      {user.role != "" && (
+        <Td
+          onClick={() =>
+            patch(map, el, setRes, setSecondOpen, setCell, setUpdate)
+          }
+        >
+          <EditIcon
+            color={"blue.400"}
+            w={"20px"}
+            h={"auto"}
+            cursor={"pointer"}
+          />
+        </Td>
+      )}
       <Td>{el.date || 0}</Td>
       <Td>{el.nameOperation}</Td>
       <Td>{mapData.area}</Td>
@@ -152,20 +160,23 @@ export default function OpersTableItem({
       <Td>{el.costTransport! * mapData.area || "0"}</Td>
       <Td>{el.costServices! * mapData.area || "0"}</Td>
 
-      <Td
-        textAlign={"center"}
-        cursor={"pointer"}
-        color={"red"}
-        onClick={
-          user.role == ""
-            ? () => setShowAlert(true)
-            : () => {
-                setDeleteOpen({ isOpen: true, operId: el.id, cartId: id });
-              }
-        }
-      >
-        <DeleteIcon w={"20px"} h={"auto"} />
-      </Td>
+      {user.role != "" && (
+        <Td
+          textAlign={"center"}
+          cursor={"pointer"}
+          color={"red"}
+          onClick={
+            // user.role == ""
+            //   ? () => setShowAlert(true)
+            //   :
+            () => {
+              setDeleteOpen({ isOpen: true, operId: el.id, cartId: id });
+            }
+          }
+        >
+          <DeleteIcon w={"20px"} h={"auto"} />
+        </Td>
+      )}
     </Tr>
   );
 }

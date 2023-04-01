@@ -14,40 +14,42 @@ type props = {
 
 function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
   let th = { fontSize: "18px", padding: "0 10px " };
-  const { map } = useContext(Context);
+  const { map, user } = useContext(Context);
   let [mapData] = map.maps.filter((el) => el.id == id);
   return (
     <Table my={"15px"} maxW={"3xl"}>
       <Thead>
         <Tr>
-          <Th></Th>
+          {user.role != "" && <Th></Th>}
           <Th>Назва культури</Th>
           <Th>Площа</Th>
           <Th>Розрахункова ЗП</Th>
           <Th>Вартість ДП</Th>
-          <Th></Th>
+          {user.role != "" && <Th></Th>}
         </Tr>
       </Thead>
       <Tbody>
         {
           <Tr key={mapData?.id}>
-            <Td
-              onClick={() => {
-                setMapOpen(true);
-                setUpdate(true);
+            {user.role != "" && (
+              <Td
+                onClick={() => {
+                  setMapOpen(true);
+                  setUpdate(true);
 
-                setRes({
-                  ...mapData,
-                });
-              }}
-            >
-              <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
-            </Td>
+                  setRes({
+                    ...mapData,
+                  });
+                }}
+              >
+                <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
+              </Td>
+            )}
             <Td>{mapData?.nameCart}</Td>
             <Td>{mapData?.area}</Td>
             <Td>{mapData?.salary}</Td>
             <Td>{mapData?.priceDiesel}</Td>
-            <Td></Td>
+            {user.role != "" && <Td></Td>}
           </Tr>
         }
       </Tbody>

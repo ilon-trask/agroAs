@@ -27,77 +27,7 @@ import {
   guest_cost_hand_work,
   Icell,
 } from "./OperService";
-
-export interface Idata {
-  id?: number;
-  nameCart: string;
-  area: number;
-  totalCost?: number;
-  salary: number;
-  isPublic?: boolean | undefined;
-  priceDiesel: number;
-  tech_operations?: [
-    {
-      aggregate: {
-        agriculturalMachineId: number;
-        fuelConsumption: number;
-        id: number;
-        techOperationId: number;
-        tractorId: number;
-        workingSpeed: number;
-      } | null;
-      cell: Icell;
-      costCars: number | null;
-      costFuel: number | null;
-      costHandWork: number | null;
-      costMachineWork: number | null;
-      cost_hand_work: {
-        gradeId: number;
-        id: number;
-        nameOper: string;
-        pricePerHourPersonnel: number | null;
-        productionPerShift: number | null;
-        productionRateAmount: number;
-        productionRateTime: number;
-        productionRateWeight: number;
-        salaryPerShift: number;
-        spending: number;
-        techOperationId: number;
-        type: number;
-        unitOfMeasurement: string;
-        yieldСapacity: number;
-      } | null;
-      cost_material: {
-        consumptionPerHectare: number;
-        id: number;
-        nameMaterials: string;
-        price: number;
-        techOperationId: number;
-        unitsOfConsumption: string;
-        unitsOfCost: string;
-      } | null;
-      cost_service: {
-        id: number;
-        nameService: string;
-        price: number;
-        techOperationId: number;
-        unitsOfCost: string;
-      } | null;
-      cost_transport: {
-        id: number;
-        nameTransport: string;
-        price: number;
-        unitsOfCost: string;
-        techOperationId: number;
-      } | null;
-      nameOperation: string;
-      sectionId: number;
-      techCartId: number;
-      id: number;
-    }
-  ];
-  userId?: number;
-}
+import { CreateCartType } from "../routes/cartRouter";
 interface resTechOperationAggreagte extends Iaggregate {
   tractor: Itractor;
   agricultural_machine: Imachine;
@@ -140,10 +70,11 @@ const cartsIncludes = [
 async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
   const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
+
   let promises = [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
-    cart.totalCost = 0;
+    let costHectare = 0;
     if (!cart.tech_operations) throw new Error("");
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
@@ -152,9 +83,9 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
       promise.then((el) => {
         if (!cart.tech_operations) throw new Error("");
         if (!el) throw new Error("");
-        if (cart.totalCost == undefined) throw new Error("");
+        if (cart.costHectare == undefined) throw new Error("");
         cart.tech_operations[j] = el;
-        cart.totalCost +=
+        costHectare +=
           el.costMachineWork! +
             el.costCars! +
             el.costFuel! +
@@ -164,6 +95,8 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
           el.costTransport ||
           el.costMaterials ||
           0;
+
+        tech_cart.update({ costHectare }, { where: { id: oper.techCartId } });
       });
     }
   }
@@ -176,7 +109,7 @@ async function guestPatchCart(data: resTechCartsWithOpers) {
   let sum = 0;
   if (!cart.tech_operations) return;
   for (let j = 0; j < cart.tech_operations.length; j++) {
-    let oper: resTechOperation = cart.tech_operations[j];
+    let oper = cart.tech_operations[j];
 
     let el = await changeOper(
       oper,
@@ -205,48 +138,49 @@ async function guestPatchCart(data: resTechCartsWithOpers) {
       0;
     cart.tech_operations[j] = el;
   }
-  cart.totalCost = sum;
+  cart.costHectare = sum;
   // console.log(cart.tech_operations.map((el) => el));
   // console.log(cart.tech_operations.map((el) => el.cost_hand_work));
+  // console.log(cart);
 
   return [cart];
 }
 
 class TechCartService {
-  async getAll(user: Principal | undefined) {
+  async getCart(cartId: number) {
     let Scarts: resTechCartsWithOpers[];
-    if (!user?.sub) {
-      //@ts-ignore
-      Scarts = await tech_cart.findAll({
-        include: cartsIncludes,
-        where: { isPublic: true },
-      });
-    } else {
-      //@ts-ignore
-      Scarts = await tech_cart.findAll({
-        include: cartsIncludes,
-        where: { userId: user.sub },
-      });
-    }
+
+    //@ts-ignore
+    Scarts = await tech_cart.findAll({
+      include: cartsIncludes,
+      where: { id: cartId },
+    });
 
     const carts = await changeCarts(Scarts);
 
     return carts;
   }
-  async create(data: Idata, user: Principal | undefined) {
-    const {
-      nameCart,
-      area,
-      salary,
-      priceDiesel,
+  async getOnlyCarts(user: Principal | undefined) {
+    let carts: Itech_cart[];
+    if (!user?.sub) {
+      carts = await tech_cart.findAll({
+        where: { isPublic: true },
+      });
+    } else {
+      carts = await tech_cart.findAll({
+        where: { userId: user.sub },
+      });
+    }
 
-      totalCost = 0,
-    } = data;
+    return carts;
+  }
+  async create(data: CreateCartType, user: Principal | undefined) {
+    const { nameCart, area, salary, priceDiesel } = data;
+
     if (!user) return;
     const techCart: Itech_cart = await tech_cart.create({
       nameCart,
       area,
-      totalCost,
       salary,
       priceDiesel,
       userId: user?.sub,
@@ -267,8 +201,28 @@ class TechCartService {
         where: { id: id },
         include: cartsIncludes,
       });
-      return await changeCarts(techCart);
+      const res = await changeCarts(techCart);
+      let costHectare = 0;
+      res.forEach((cart) => {
+        cart.tech_operations?.forEach((el) => {
+          costHectare +=
+            el.costMachineWork! +
+              el.costCars! +
+              el.costFuel! +
+              el.costHandWork! ||
+            el.costHandWork ||
+            el.costServices ||
+            el.costTransport ||
+            el.costMaterials ||
+            0;
+        });
+      });
+      tech_cart.update({ costHectare }, { where: { id: id } });
+      res[0].costHectare = costHectare;
+      return res;
     } else {
+      console.log(123);
+
       return await guestPatchCart(data);
     }
   }
@@ -337,7 +291,7 @@ class TechCartService {
       include: cartsIncludes,
     });
 
-    carts = await changeCarts(carts);
+    // carts = await changeCarts(carts);
     return carts;
   }
   async getCopyCarts(user: Principal | undefined) {
@@ -563,7 +517,7 @@ class TechCartService {
       where: { isPublic: true, isAgree: false },
       include: cartsIncludes,
     });
-    carts = await changeCarts(carts);
+    // carts = await changeCarts(carts);
     return carts;
   }
   async setIsAgreeCarts(
@@ -597,7 +551,7 @@ class TechCartService {
         where: { id: cartId },
         include: cartsIncludes,
       });
-      carts = await changeCarts(carts);
+      // carts = await changeCarts(carts);
       return carts;
     }
     return 1;
@@ -607,7 +561,7 @@ class TechCartService {
       where: { isPublic: true, isAgree: true },
       include: cartsIncludes,
     });
-    carts = await changeCarts(carts);
+    // carts = await changeCarts(carts);
     return carts;
   }
 }

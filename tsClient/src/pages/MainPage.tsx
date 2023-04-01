@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Image,
@@ -8,6 +8,7 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Button,
 } from "@chakra-ui/react";
 import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
@@ -49,6 +50,7 @@ function MainPage() {
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
             </Text>
+            <Button>Як це працює?</Button>
           </Box>
         </Box>
         {/* @ts-ignore */}
