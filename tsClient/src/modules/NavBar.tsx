@@ -24,7 +24,7 @@ const NavBar = observer(() => {
         >
           <Image src={verticalLogo} h={"50px"} w={"111px"} />
         </Link>
-        {user.role !== "" && (
+        {user.role == "service_role" && (
           <Box gap={4} display={"flex"}>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
