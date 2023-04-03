@@ -5,7 +5,7 @@ import {
   IbusinessPlan,
 } from "../../../tRPC serv/models/models";
 
-export default class MapStore {
+export default class BusinessStore {
   private _businessCategory: IbusinessCategory[] = [];
   private _businessPlans: resBusinessPlan[] = [];
   private _noAgreeBusinessPlan: IbusinessPlan[] = [];

@@ -91,13 +91,20 @@ const TechnologicalMap = observer(() => {
         <Box
           mt={"30px"}
           display={"flex"}
+          flexDirection={["column", "row"]}
+          rowGap={"10px"}
           justifyContent={"space-between"}
           alignItems={"center"}
           style={{ fontSize: "20px" }}
         >
           <Button onClick={() => navigate("/")}>{"НА ГОЛОВНУ"}</Button>
           {user.role == "" && (
-            <Box>
+            <Box
+              display={"flex"}
+              flexDirection={["column", "row"]}
+              columnGap={"30px"}
+              rowGap={"10px"}
+            >
               <Button onClick={() => setOpenConstructor(true)} as={"button"}>
                 Конструктор
               </Button>
@@ -107,9 +114,7 @@ const TechnologicalMap = observer(() => {
                 }
                 fileName={"tech_cart"}
               >
-                <Button ml={"30px"} as={"button"}>
-                  Отримати ПДФ
-                </Button>
+                <Button as={"button"}>Отримати ПДФ</Button>
               </PDFDownloadLink>
               {/* <Button ml={"30px"} as={"button"} onClick={() => print()}>
                 Отримати ПДФ

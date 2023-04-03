@@ -637,6 +637,7 @@ export function patchTitlePage(
 export function getOnlyCart(map: MapStore) {
   map.isLoading = true;
   client.cart.getOnlyCart.query().then((res) => {
+    map.maps = [];
     res.forEach((el) => {
       let myMap = map.maps.find((e) => e.id == el.id);
 

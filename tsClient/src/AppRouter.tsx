@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Context } from "./main";
+import HowThisWork from "./pages/HowThisWork";
 import { authRoutes, publicRoutes } from "./routes";
 
 export default function AppRouter() {
@@ -14,6 +15,7 @@ export default function AppRouter() {
       {publicRoutes.map(({ path, Component }) => (
         <Route key={path} path={path} element={Component} />
       ))}
+      <Route path="/how" element={<HowThisWork />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

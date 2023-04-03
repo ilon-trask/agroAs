@@ -14,10 +14,12 @@ import MainTableItem from "../components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
+import { useNavigate } from "react-router-dom";
+import { HOW_ROUTER } from "../utils/consts";
 
 function MainPage() {
   const { map } = useContext(Context);
-
+  const navigate = useNavigate();
   const windW = window.innerWidth;
 
   return (
@@ -45,12 +47,12 @@ function MainPage() {
           backgroundSize={"cover"}
         >
           <Box textAlign={"center"} fontWeight={"bold"} fontSize={24}>
-            <Text color={"#20401e"}>AgroDiBi</Text>
+            <Text color={"#20401e"}>AgroDataBase</Text>
             <Text fontSize={"20px"}>
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
             </Text>
-            <Button>Як це працює?</Button>
+            <Button onClick={() => navigate(HOW_ROUTER)}>Як це працює?</Button>
           </Box>
         </Box>
         {/* @ts-ignore */}

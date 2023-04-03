@@ -15,17 +15,11 @@ import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
 import BusinessCatalogItem from "../components/BusinessCatalogItem";
 import { getBusinessCategory, getBusinessPlans } from "../http/requests";
+import useBusiness from "./hook/useBusiness";
 
 function MainPage() {
-  useEffect(() => {
-    if (!business.businessPlan) {
-      getBusinessCategory(map, business);
-      getBusinessPlans(map, business);
-    }
-  }, []);
-
   const { map, business } = useContext(Context);
-
+  useBusiness(business, map);
   const [windW, setWindW] = useState(window.innerWidth);
 
   return (
