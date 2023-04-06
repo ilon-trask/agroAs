@@ -653,8 +653,12 @@ export function getOnlyCart(map: MapStore) {
 
 export function downloaded(map: MapStore, cartId: number, value: number) {
   client.cart.downloaded.query({ cartId, value }).then((res) => {
+    console.log("couter");
+    console.log(value);
+
     const cart = map.maps.find((el) => el.id == cartId);
     if (!cart) return;
+    console.log(res);
 
     cart.timesDow = res?.timesDow;
   });
