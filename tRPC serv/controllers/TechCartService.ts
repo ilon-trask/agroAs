@@ -565,7 +565,13 @@ class TechCartService {
     return carts;
   }
   async downloaded({ cartId, value }: { cartId: number; value: number }) {
-    await tech_cart.update({ timesDow: value++ }, { where: { id: cartId } });
+    await tech_cart.update({ timesDow: ++value }, { where: { id: cartId } });
+
+    let cart: resTechCartsWithOpers | null = await tech_cart.findOne({
+      where: { id: cartId },
+      include: cartsIncludes,
+    });
+    return cart;
   }
 }
 

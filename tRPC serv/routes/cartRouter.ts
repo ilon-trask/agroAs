@@ -296,6 +296,8 @@ export const cartRouter = router({
       })
     )
     .query(async ({ input }) => {
-      await TechCartService.downloaded(input);
+      const cart: resTechCartsWithOpers | null =
+        await TechCartService.downloaded(input);
+      return cart;
     }),
 });
