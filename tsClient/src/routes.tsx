@@ -13,8 +13,10 @@ import {
   BUSINESSpLAN_ROUTER,
   BUSINESScATALOG_ROUTER,
   BUSINESS_ROUTER,
+  HOW_ROUTER,
 } from "./utils/consts";
 import BusinessPage from "./pages/BusinessPage";
+import HowThisWork from "./pages/HowThisWork";
 
 export const authRoutes = [];
 
@@ -50,5 +52,9 @@ export const publicRoutes = [
   {
     path: BUSINESS_ROUTER,
     Component: <BusinessPage />,
+  },
+  {
+    patch: HOW_ROUTER,
+    Component: <HowThisWork />,
   },
 ];

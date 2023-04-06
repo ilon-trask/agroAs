@@ -19,6 +19,7 @@ import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import {
   deleteOper,
+  downloaded,
   getCarts,
   getGrades,
   getMachine,
@@ -69,7 +70,6 @@ const TechnologicalMap = observer(() => {
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, +id!);
-    console.log(a);
 
     return a;
   }, [map.opers, operData]);
@@ -87,17 +87,24 @@ const TechnologicalMap = observer(() => {
 
   return (
     <Box pb={"25px"}>
-      <Box px={"40px"}>
+      <Box px={["10px", "40px"]}>
         <Box
           mt={"30px"}
           display={"flex"}
+          flexDirection={["column", "row"]}
+          rowGap={"10px"}
           justifyContent={"space-between"}
           alignItems={"center"}
           style={{ fontSize: "20px" }}
         >
           <Button onClick={() => navigate("/")}>{"НА ГОЛОВНУ"}</Button>
           {user.role == "" && (
-            <Box>
+            <Box
+              display={"flex"}
+              flexDirection={["column", "row"]}
+              columnGap={"30px"}
+              rowGap={"10px"}
+            >
               <Button onClick={() => setOpenConstructor(true)} as={"button"}>
                 Конструктор
               </Button>
@@ -107,7 +114,12 @@ const TechnologicalMap = observer(() => {
                 }
                 fileName={"tech_cart"}
               >
-                <Button ml={"30px"} as={"button"}>
+                <Button
+                  as={"button"}
+                  onClick={() => {
+                    downloaded(map, myMap?.id!, myMap?.timesDow!);
+                  }}
+                >
                   Отримати ПДФ
                 </Button>
               </PDFDownloadLink>
@@ -126,6 +138,7 @@ const TechnologicalMap = observer(() => {
               display={"flex"}
               alignItems={"center"}
               justifyContent={"space-between"}
+              overflowX={"scroll"}
             >
               <GeneralDataTable
                 id={+id!}

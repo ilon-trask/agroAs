@@ -8,7 +8,7 @@ const patchProps = z.object({
 });
 export type PatchProps = z.infer<typeof patchProps>;
 export const titleRouter = router({
-  patch: publicProcedure.input(patchProps).query(async ({ input }) => {
+  patch: publicProcedure.input(patchProps).mutation(async ({ input }) => {
     const title: ItitlePage | null | undefined = await titleService.patch(
       input
     );

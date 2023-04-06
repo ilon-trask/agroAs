@@ -25,6 +25,7 @@ import SelectCart from "../modules/BusinessConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
 import { patchResume, patchTitlePage } from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
+import useBusiness from "./hook/useBusiness";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -40,6 +41,7 @@ function BiznesPlanPage() {
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
   const [infCartId, setInfCartId] = useState<number>(0);
   const { map, user, business } = useContext(Context);
+  useBusiness(business, map);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
     JSON.stringify(business.businessPlan)
@@ -53,6 +55,8 @@ function BiznesPlanPage() {
     setChild(children);
     setName(name);
   }
+  console.log(1);
+
   const [isActiveInput, setIsActiveInput] = useState(false);
   return (
     <Box overflowX={"scroll"}>
@@ -82,6 +86,7 @@ function BiznesPlanPage() {
           border={"black 2px solid"}
           p={"30px"}
           px={"60px"}
+          overflowY={"scroll"}
         >
           {data && (
             <>

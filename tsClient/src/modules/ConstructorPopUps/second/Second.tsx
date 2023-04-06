@@ -45,7 +45,7 @@ function Second({
   return (
     <Box h={"300px"}>
       <Heading as={"h4"} size={"md"} textAlign={"center"} mt={3}>
-        Змінити Вартість механізованих робіт
+        Змінити вартість механізованих робіт
       </Heading>
       <Box height={"270px"} overflowY={"scroll"}>
         <Table size={"sm"}>
@@ -57,7 +57,7 @@ function Second({
                 Розхід <br /> палива
               </Th>
               <Th>
-                СГ <br /> маниша
+                СГ <br /> машина
               </Th>
               <Th>
                 Робоча <br /> швидкість

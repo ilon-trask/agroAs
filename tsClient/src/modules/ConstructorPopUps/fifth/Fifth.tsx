@@ -44,8 +44,11 @@ function Fifth({
           <Thead>
             <Tr>
               <Th>Назва</Th>
-              <Th>Ціна</Th>
-              <Th>Одиниця виміру</Th>
+              <Th>Ціна </Th>
+              <Th>
+                Одини.
+                <br /> вим.
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -55,8 +58,8 @@ function Fifth({
                   <Td>{el.nameOperation}</Td>
                   <Td>
                     <Input
+                      minW={"fit-content"}
                       value={el.costServices}
-                      autoFocus
                       onChange={(e) => {
                         //@ts-ignore
                         setProp((prev) => [

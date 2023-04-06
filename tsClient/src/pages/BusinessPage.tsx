@@ -16,16 +16,11 @@ import { Context } from "../main";
 import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import { useNavigate } from "react-router-dom";
+import useBusiness from "./hook/useBusiness";
 
 function Business() {
-  useEffect(() => {
-    if (!business.businessPlan) {
-      getBusinessCategory(map, business);
-      getBusinessPlans(map, business);
-    }
-  }, []);
-
   const { map, business, user } = useContext(Context);
+  useBusiness(business, map);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [res, setRes] = useState<{

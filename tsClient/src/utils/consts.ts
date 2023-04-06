@@ -9,3 +9,4 @@ export const CALENDAR_ROUTER = "/calendar";
 export const BUSINESSpLAN_ROUTER = "/businessPlan";
 export const BUSINESScATALOG_ROUTER = "/businessCatalog";
 export const BUSINESS_ROUTER = "/business";
+export const HOW_ROUTER = "/how";

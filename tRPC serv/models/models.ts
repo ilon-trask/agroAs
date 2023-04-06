@@ -56,6 +56,7 @@ export interface Itech_cart {
   description?: string;
   createdAt?: string;
   updatedAt?: string;
+  timesDow?: number;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -76,6 +77,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare totalCostMachineWork?: number;
   declare totalCostFuel?: number;
   declare totalCostHandWork?: number;
+  declare timesDow?: number;
 }
 
 tech_cart.init(
@@ -98,6 +100,7 @@ tech_cart.init(
     totalCostMachineWork: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostFuel: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostHandWork: { type: DataTypes.NUMBER, defaultValue: 0 },
+    timesDow: { type: DataTypes.NUMBER, defaultValue: 0 },
   },
   { sequelize }
   // { sequelize, timestamps: false }
