@@ -288,4 +288,14 @@ export const cartRouter = router({
     const res = await TechCartService.getAgreeCarts();
     return res;
   }),
+  downloaded: publicProcedure
+    .input(
+      z.object({
+        cartId: z.number(),
+        value: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      await TechCartService.downloaded(input);
+    }),
 });

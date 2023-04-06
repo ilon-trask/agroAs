@@ -19,6 +19,7 @@ import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import {
   deleteOper,
+  downloaded,
   getCarts,
   getGrades,
   getMachine,
@@ -69,7 +70,6 @@ const TechnologicalMap = observer(() => {
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, +id!);
-    console.log(a);
 
     return a;
   }, [map.opers, operData]);
@@ -87,7 +87,7 @@ const TechnologicalMap = observer(() => {
 
   return (
     <Box pb={"25px"}>
-      <Box px={"40px"}>
+      <Box px={["10px", "40px"]}>
         <Box
           mt={"30px"}
           display={"flex"}
@@ -114,7 +114,14 @@ const TechnologicalMap = observer(() => {
                 }
                 fileName={"tech_cart"}
               >
-                <Button as={"button"}>Отримати ПДФ</Button>
+                <Button
+                  as={"button"}
+                  onClick={() => {
+                    downloaded(map, myMap?.id!, myMap?.timesDow!);
+                  }}
+                >
+                  Отримати ПДФ
+                </Button>
               </PDFDownloadLink>
               {/* <Button ml={"30px"} as={"button"} onClick={() => print()}>
                 Отримати ПДФ
@@ -131,6 +138,7 @@ const TechnologicalMap = observer(() => {
               display={"flex"}
               alignItems={"center"}
               justifyContent={"space-between"}
+              overflowX={"scroll"}
             >
               <GeneralDataTable
                 id={+id!}

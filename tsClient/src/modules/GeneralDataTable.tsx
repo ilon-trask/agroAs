@@ -22,10 +22,9 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
         <Tr>
           {user.role != "" && <Th></Th>}
           <Th>Назва культури</Th>
-          <Th>Площа</Th>
-          <Th>Розрахункова ЗП</Th>
-          <Th>Вартість ДП</Th>
-          {user.role != "" && <Th></Th>}
+          <Th>Площа, га</Th>
+          <Th>Розрахункова ЗП грн/міс</Th>
+          <Th>Вартість ДП грн/&nbsp;л</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -49,7 +48,6 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
             <Td>{mapData?.area}</Td>
             <Td>{mapData?.salary}</Td>
             <Td>{mapData?.priceDiesel}</Td>
-            {user.role != "" && <Td></Td>}
           </Tr>
         }
       </Tbody>

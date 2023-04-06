@@ -150,6 +150,13 @@ function OpersTable({
           <Td px={"10px"} fontWeight={"bold"}>
             {sum}
           </Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
           {user.role != "" && <Td></Td>}
         </Tfoot>
       </Table>

@@ -38,7 +38,10 @@ function Sixth({
             <Tr>
               <Th>Назва</Th>
               <Th>Ціна</Th>
-              <Th>Одиниця виміру</Th>
+              <Th>
+                Одини.
+                <br /> вим.
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -49,7 +52,6 @@ function Sixth({
                   <Td>
                     <Input
                       value={el.costTransport}
-                      autoFocus
                       onChange={(e) => {
                         //@ts-ignore
                         setProp((prev) => [

@@ -33,7 +33,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -626,7 +626,9 @@ export function patchTitlePage(
   Bus: BusinessStore,
   data: { businessId: number; title: string }
 ) {
-  client.titlePage.patch.query(data).then((res) => {
+  client.titlePage.patch.mutate(data).then((res) => {
+    console.log(res);
+
     const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
     if (!plan) {
       return;
@@ -647,4 +649,9 @@ export function getOnlyCart(map: MapStore) {
     });
     map.isLoading = false;
   });
+}
+
+export function downloaded(map: MapStore, cartId: number, value: number) {
+  map.isLoading = true;
+  client.cart.downloaded.query({ cartId, value });
 }

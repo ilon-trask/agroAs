@@ -95,9 +95,11 @@ export default function MapInputs({
       <Box display={"flex"} gap={3} mt={"15px"}>
         <div>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Площа, га
+            Площа,
+            <br /> гектари
           </Heading>
           <Input
+            mt={"auto"}
             placeholder="Вкажіть площу"
             type="number"
             onChange={(e) => {
@@ -107,8 +109,8 @@ export default function MapInputs({
           />
         </div>
         <div>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Розрахункова ЗП, грн
+          <Heading as={"h4"} size="sm">
+            Розрахункова <br /> ЗП, грн/міс
           </Heading>
           <Input
             placeholder="Вкажіть ЗП"
@@ -121,7 +123,8 @@ export default function MapInputs({
         </div>
         <div>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Ціна ДП, грн
+            Ціна ДП, <br />
+            грн/л
           </Heading>
           <Input
             placeholder="Вкажіть ціну ДП"

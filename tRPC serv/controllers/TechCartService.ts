@@ -564,6 +564,9 @@ class TechCartService {
     // carts = await changeCarts(carts);
     return carts;
   }
+  async downloaded({ cartId, value }: { cartId: number; value: number }) {
+    await tech_cart.update({ timesDow: value++ }, { where: { id: cartId } });
+  }
 }
 
 export default new TechCartService();

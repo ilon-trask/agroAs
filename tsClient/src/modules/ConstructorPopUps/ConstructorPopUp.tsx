@@ -15,7 +15,7 @@ import Fourth from "./fourth/Fourth";
 import Fifth from "./fifth/Fifth";
 import Sixth from "./sixth/Sixth";
 import Seventh from "./seventh/Seventh";
-import { patchOperation, updateMap } from "../../http/requests";
+import { downloaded, patchOperation, updateMap } from "../../http/requests";
 import { useParams } from "react-router-dom";
 import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
@@ -240,7 +240,14 @@ function ConstructorPopUp({
               }
               fileName={"tech_cart"}
             >
-              <Button as={"button"}>Отримати</Button>
+              <Button
+                as={"button"}
+                onClick={() => {
+                  downloaded(map, myMap?.id!, myMap?.timesDow!);
+                }}
+              >
+                Отримати
+              </Button>
             </PDFDownloadLink>
           )}
         </Box>
