@@ -12,7 +12,6 @@ export default function getSections(map: MapStore, id: number): sectionsOpers {
   const care = operData.filter((el) => el.sectionId == 3);
   const feeding = operData.filter((el) => el.sectionId == 4);
   const monitoring = operData.filter((el) => el.sectionId == 5);
-
   const protection = operData.filter((el) => el.sectionId == 6);
   const gathering = operData.filter((el) => el.sectionId == 7);
   const storage = operData.filter((el) => el.sectionId == 8);

@@ -14,9 +14,13 @@ import {
   BUSINESScATALOG_ROUTER,
   BUSINESS_ROUTER,
   HOW_ROUTER,
+  INCOME_ROUTER,
+  YIELD_CALC_ROUTER,
 } from "./utils/consts";
 import BusinessPage from "./pages/BusinessPage";
 import HowThisWork from "./pages/HowThisWork";
+import Income from "./pages/Income";
+import YieldСalculation from "./pages/YieldСalculation";
 
 export const authRoutes = [];
 
@@ -56,5 +60,13 @@ export const publicRoutes = [
   {
     patch: HOW_ROUTER,
     Component: <HowThisWork />,
+  },
+  {
+    patch: INCOME_ROUTER,
+    Component: <Income />,
+  },
+  {
+    patch: YIELD_CALC_ROUTER,
+    Component: <YieldСalculation />,
   },
 ];

@@ -51,7 +51,7 @@ interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
   res: resType;
-  setRes: (res: resType | ((res: resType) => resType)) => void;
+  setRes: (res: any | ((res: any) => any)) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
   children: ReactChild | ReactNode;
@@ -73,9 +73,10 @@ const Dialog: FC<props> = observer(
     isErr,
     setIsErr,
   }) => {
-    useEffect(() => {
-      setRes(res);
-    }, [res]);
+    // useEffect(() => {
+    //   setRes(res);
+    //   // console.log(123);
+    // }, [res]);
     useEffect(() => {
       if (!update) {
         setRes(props);

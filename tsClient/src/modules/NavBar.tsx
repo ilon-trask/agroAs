@@ -1,7 +1,12 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
-import { BUSINESS_ROUTER, LOGIN_ROUTE, MAP_ROUTE } from "../utils/consts";
+import {
+  BUSINESS_ROUTER,
+  INCOME_ROUTER,
+  LOGIN_ROUTE,
+  MAP_ROUTE,
+} from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { getCarts, supabase } from "../http/requests";
 import { Button, Box, Image } from "@chakra-ui/react";
@@ -30,7 +35,13 @@ const NavBar = observer(() => {
               style={{ color: "#20401e", textDecoration: "none" }}
               to={MAP_ROUTE}
             >
-              Калькулятор витрат
+              Витрати
+            </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={INCOME_ROUTER}
+            >
+              Доходи
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}

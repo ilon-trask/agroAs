@@ -18,6 +18,8 @@ import {
   getBusinessPlans,
   getNoAgreeBusiness,
   getOnlyCart,
+  getCulturalInc,
+  getYieldPlants,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -27,14 +29,16 @@ import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
 import { observer } from "mobx-react-lite";
 function App() {
-  const { map, user, business } = useContext(Context);
+  const { map, user, business, income } = useContext(Context);
 
   const [ind, setInd] = useState(0);
   useEffect(() => {
     if (ind > 0) {
       // getWorks(map);
-
+      getCulturalInc(income);
+      getYieldPlants(income);
       getCultural(map);
+
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);

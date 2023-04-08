@@ -52,6 +52,13 @@ function OpersTable({
 
   const [mapData] = map.maps.filter((el) => el.id == id);
   let sum = 0;
+  let technic = 0;
+  let fuel = 0;
+  let machineWork = 0;
+  let handWork = 0;
+  let materials = 0;
+  let transport = 0;
+  let services = 0;
   operData.forEach((el) => {
     sum +=
       mapData.area *
@@ -64,6 +71,13 @@ function OpersTable({
           +el.costMachineWork! ||
         el.costHandWork ||
         0);
+    technic += mapData.area * +(el.costCars || 0);
+    fuel += mapData.area * +(el.costFuel || 0);
+    machineWork += mapData.area * +(el.costMachineWork || 0);
+    handWork += mapData.area * +(el.costHandWork || 0);
+    materials += mapData.area * +(el.costMaterials || 0);
+    transport += mapData.area * +(el.costTransport || 0);
+    services += mapData.area * +(el.costServices || 0);
   });
 
   return (
@@ -122,9 +136,9 @@ function OpersTable({
         </Thead>
         <Tbody>
           {map.isLoading ? <Loader /> : <></>}
-          {sections.map((el) => (
+          {sections.map((el, ind) => (
             <OperTableSection
-              key={id}
+              key={ind}
               arr={el.arr}
               title={el.title}
               id={id}
@@ -141,22 +155,20 @@ function OpersTable({
           ))}
         </Tbody>
 
-        <Tfoot>
+        <Tfoot fontWeight={"bold"}>
           {user.role != "" && <Td></Td>}
           <Td></Td>
           <Td fontWeight={"bold"}>Загальні витрати</Td>
           <Td></Td>
           <Td></Td>
-          <Td px={"10px"} fontWeight={"bold"}>
-            {sum}
-          </Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
+          <Td px={"10px"}>{sum}</Td>
+          <Td>{technic}</Td>
+          <Td>{fuel}</Td>
+          <Td>{machineWork}</Td>
+          <Td>{handWork}</Td>
+          <Td>{materials}</Td>
+          <Td>{transport}</Td>
+          <Td>{services}</Td>
           {user.role != "" && <Td></Td>}
         </Tfoot>
       </Table>

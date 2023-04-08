@@ -164,42 +164,42 @@ const MapJornal = observer(function () {
           </TableContainer>
         )}
       </Box>
-      {/* <Box>
+      <Box>
         <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Журнал спеціалізованих робіт
+          Журнал спеціалізованих робіт
         </Text>
         <TableContainer
-        maxW="1000px"
-        mx="auto"
-        mt={"20px"}
-        overflowX={"scroll"}
+          maxW="1000px"
+          mx="auto"
+          mt={"20px"}
+          overflowX={"scroll"}
         >
-        <WorkTable
-        works={works}
-        setRes={setWorkRes}
-        setOpen={setWorkOpen}
-        setUpdate={setUpdate}
+          <WorkTable
+            works={works}
+            setRes={setWorkRes}
+            setOpen={setWorkOpen}
+            setUpdate={setUpdate}
             setShowAlert={setShowAlert}
             deleteOpen={deleteOpen}
             setDeleteOpen={setDeleteOpen}
-            ></WorkTable>
-            </TableContainer>
-            <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
-            <Button
+          ></WorkTable>
+        </TableContainer>
+        <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+          <Button
             onClick={
               user.role == ""
-              ? () => {
-                setShowAlert(true);
-              }
-              : () => {
-                setWorkOpen(true);
-              }
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => {
+                    setWorkOpen(true);
+                  }
             }
-            >
+          >
             Добавити спеціалізовані роботи
-            </Button>
-            </Box>
-          </Box> */}
+          </Button>
+        </Box>
+      </Box>
       <CreateCart
         open={open}
         setOpen={setOpen}

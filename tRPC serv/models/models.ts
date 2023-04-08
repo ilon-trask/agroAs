@@ -615,7 +615,82 @@ titlePage.init(
   },
   { sequelize }
 );
+export interface IyieldPlant {
+  id?: number;
+  userId?: string;
+  comment: string;
+  plantingDensity: number;
+  yieldPerHectare: number;
+  yieldPerRoll: number;
+  timesDow: number;
+  cultureId?: number;
+}
+export class yieldPlant extends Model<IyieldPlant> {
+  declare id?: number;
+  declare userId?: string;
+  declare comment: string;
+  declare plantingDensity: number;
+  declare yieldPerHectare: number;
+  declare yieldPerRoll: number;
+  declare timesDow: number;
+}
+yieldPlant.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.STRING, allowNull: false },
+    comment: { type: DataTypes.STRING },
+    plantingDensity: { type: DataTypes.FLOAT },
+    yieldPerHectare: { type: DataTypes.FLOAT },
+    yieldPerRoll: { type: DataTypes.FLOAT },
+    timesDow: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
+export interface IyieldCalculation {
+  id?: number;
+  numberFruit: number;
+  fruitWeight: number;
+  numberFlower: number;
+  numberSocket: number;
+  numberPlantsPerHectare: number;
+  yieldPlantId?: number;
+}
+export class yieldCalculation extends Model<IyieldCalculation> {
+  declare id?: number;
+  declare numberFruit: number;
+  declare fruitWeight: number;
+  declare numberFlower: number;
+  declare numberSocket: number;
+  declare numberPlantsPerHectare: number;
+  declare yieldPlantId?: number;
+}
+yieldCalculation.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    numberFruit: { type: DataTypes.FLOAT },
+    fruitWeight: { type: DataTypes.FLOAT },
+    numberSocket: { type: DataTypes.FLOAT },
+    numberFlower: { type: DataTypes.FLOAT },
+    numberPlantsPerHectare: { type: DataTypes.FLOAT },
+  },
+  { sequelize }
+);
+export interface Iculture {
+  id?: number;
+  name: string;
+}
+export class culture extends Model<Iculture> {
+  declare id?: number;
+  declare name: string;
+}
+culture.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+  },
 
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -655,3 +730,9 @@ businessCategory.hasMany(businessPlan);
 businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
+
+yieldPlant.hasOne(yieldCalculation);
+yieldCalculation.belongsTo(yieldPlant);
+
+culture.hasMany(yieldPlant);
+yieldPlant.belongsTo(culture);

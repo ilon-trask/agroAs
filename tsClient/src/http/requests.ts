@@ -24,16 +24,18 @@ import { createClient } from "@supabase/supabase-js";
 import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
+import IncomeStore from "../store/IncomeStore";
+import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
+import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
 );
-
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -653,13 +655,59 @@ export function getOnlyCart(map: MapStore) {
 
 export function downloaded(map: MapStore, cartId: number, value: number) {
   client.cart.downloaded.query({ cartId, value }).then((res) => {
-    console.log("couter");
-    console.log(value);
-
     const cart = map.maps.find((el) => el.id == cartId);
     if (!cart) return;
+    cart.timesDow = res?.timesDow;
+  });
+}
+export function createYieldPlant(
+  income: IncomeStore,
+  data: { culturalId: number; comment: string }
+) {
+  client.income.create.query(data).then((res) => {
+    income.newYieldPlant = res;
+  });
+}
+export function getCulturalInc(income: IncomeStore) {
+  client.income.getCultural.query().then((res) => {
+    income.cultural = res;
+  });
+}
+export function getYieldPlants(income: IncomeStore) {
+  client.income.get.query().then((res) => {
+    income.yieldPlant = res;
+    res.forEach((el) => {
+      income.newYieldCalc = el.yieldCalculation;
+    });
+  });
+}
+export function createYieldCalc(
+  income: IncomeStore,
+  data: createYieldCalcType
+) {
+  client.income.createCalc.query(data).then((res) => {
+    income.newYieldCalc = res;
+  });
+}
+export function updateYieldCalc(
+  income: IncomeStore,
+  data: createYieldCalcType
+) {
+  client.income.updateCalc.query(data).then((res) => {
+    if (!res) return;
+    income.yieldCalc = income.yieldCalc.filter((el) => el?.id != res.id);
+    income.newYieldCalc = res;
+  });
+}
+
+export function deleteYieldPlant(
+  income: IncomeStore,
+  data: { yieldPlantId: number }
+) {
+  client.income.delete.query(data).then((res) => {
+    if (!res) return;
     console.log(res);
 
-    cart.timesDow = res?.timesDow;
+    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
   });
 }
