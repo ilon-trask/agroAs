@@ -3,6 +3,8 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import { createYieldCalc, updateYieldCalc } from "../../../http/requests";
 import { Context } from "../../../main";
 import { yieldCalcProp } from "../CreateYieldCalc";
+
+import { plantsHeads } from "../../../pages/YieldСalculation";
 type props = {
   res: yieldCalcProp;
   setRes: Dispatch<SetStateAction<yieldCalcProp>>;
@@ -10,11 +12,12 @@ type props = {
   id: number;
   update: boolean;
 };
-
 function YieldCalc({ res, setRes, setOpen, id, update }: props) {
   const { income } = useContext(Context);
   console.log(res);
-
+  const myPlant = income.yieldPlant.find((el) => el.id == id);
+  //@ts-ignore
+  const myHeads = plantsHeads[myPlant?.culture.name];
   return (
     <Box>
       <Heading as={"h4"} size="md" textAlign={"center"} mt={3}>
@@ -39,7 +42,7 @@ function YieldCalc({ res, setRes, setOpen, id, update }: props) {
           </Box>
           <Box>
             <Heading as={"h4"} size="sm">
-              Кількість розеток
+              {myHeads[myHeads.length - 4]}
             </Heading>
             <Input
               placeholder="Введіть кількість"
@@ -54,7 +57,7 @@ function YieldCalc({ res, setRes, setOpen, id, update }: props) {
           </Box>
           <Box>
             <Heading as={"h4"} size="sm">
-              Кількість квітконосів
+              {myHeads[myHeads.length - 3]}
             </Heading>
             <Input
               placeholder="Введіть кількість"
@@ -71,7 +74,7 @@ function YieldCalc({ res, setRes, setOpen, id, update }: props) {
         <Box display={"flex"} justifyContent={"space-around"} mt={2}>
           <Box>
             <Heading as={"h4"} size="sm">
-              Кількість ягід
+              {myHeads[myHeads.length - 2]}
             </Heading>
             <Input
               placeholder="Введіть кількість"
@@ -86,10 +89,10 @@ function YieldCalc({ res, setRes, setOpen, id, update }: props) {
           </Box>
           <Box>
             <Heading as={"h4"} size="sm">
-              Вага ягоди
+              {myHeads[myHeads.length - 1]}
             </Heading>
             <Input
-              placeholder="Введіть кількість"
+              placeholder="Введіть вагу"
               size={"sm"}
               type={"number"}
               mt={2}

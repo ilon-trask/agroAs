@@ -662,7 +662,7 @@ export function downloaded(map: MapStore, cartId: number, value: number) {
 }
 export function createYieldPlant(
   income: IncomeStore,
-  data: { culturalId: number; comment: string }
+  data: { cultureId: number; comment: string }
 ) {
   client.income.create.query(data).then((res) => {
     income.newYieldPlant = res;
@@ -676,7 +676,7 @@ export function getCulturalInc(income: IncomeStore) {
 export function getYieldPlants(income: IncomeStore) {
   client.income.get.query().then((res) => {
     income.yieldPlant = res;
-    res.forEach((el) => {
+    res?.forEach((el) => {
       income.newYieldCalc = el.yieldCalculation;
     });
   });
@@ -686,7 +686,9 @@ export function createYieldCalc(
   data: createYieldCalcType
 ) {
   client.income.createCalc.query(data).then((res) => {
-    income.newYieldCalc = res;
+    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
+    income.newYieldPlant = res;
+    income.newYieldCalc = res.yieldCalculation;
   });
 }
 export function updateYieldCalc(
@@ -695,8 +697,13 @@ export function updateYieldCalc(
 ) {
   client.income.updateCalc.query(data).then((res) => {
     if (!res) return;
-    income.yieldCalc = income.yieldCalc.filter((el) => el?.id != res.id);
-    income.newYieldCalc = res;
+
+    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
+    income.newYieldPlant = res;
+    income.yieldCalc = income.yieldCalc.filter(
+      (el) => el?.id != res.yieldCalculation.id
+    );
+    income.newYieldCalc = res.yieldCalculation;
   });
 }
 
@@ -709,5 +716,17 @@ export function deleteYieldPlant(
     console.log(res);
 
     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
+  });
+}
+
+export function updateYieldPlant(
+  income: IncomeStore,
+  data: { yieldPlantId: number; cultureId: number; comment: string }
+) {
+  client.income.update.query(data).then((res) => {
+    if (res) {
+      income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
+      income.newYieldPlant = res;
+    }
   });
 }

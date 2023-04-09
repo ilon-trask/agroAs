@@ -49,6 +49,14 @@ function CreateYieldCalc({ open, setOpen, id, myCalc }: props) {
         numberSocket: myCalc.numberSocket,
         numberPlantsPerHectare: myCalc.numberPlantsPerHectare,
       };
+    } else {
+      prop = {
+        numberFruit: "",
+        fruitWeight: "",
+        numberFlower: "",
+        numberSocket: "",
+        numberPlantsPerHectare: "",
+      };
     }
   }, [update]);
 

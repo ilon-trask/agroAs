@@ -8,18 +8,20 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
-import { createYieldPlant } from "../../../http/requests";
+import { useNavigate, useParams } from "react-router-dom";
+import { createYieldPlant, updateYieldPlant } from "../../../http/requests";
 import { Context } from "../../../main";
 import { incProp } from "../CreateIncome";
 type props = {
   res: incProp;
   setRes: Dispatch<SetStateAction<incProp>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  plantId: number;
 };
-function Income({ res, setRes, setOpen }: props) {
+function Income({ res, setRes, setOpen, update, plantId }: props) {
   const { income } = useContext(Context);
   //   const [focus, setFocus] = useState(false);
-
   return (
     <Box>
       <Heading as={"h4"} size="md" textAlign={"center"} mt={3}>
@@ -69,12 +71,20 @@ function Income({ res, setRes, setOpen }: props) {
       </Box>
       <ModalFooter p={"15px 67px"}>
         <Button
-          isDisabled={!res.cultureId || !res.comment}
+          isDisabled={!res.cultureId}
           onClick={() => {
-            createYieldPlant(income, {
-              culturalId: +res.cultureId,
-              comment: res.comment,
-            });
+            if (!update) {
+              createYieldPlant(income, {
+                cultureId: +res.cultureId,
+                comment: res.comment,
+              });
+            } else {
+              updateYieldPlant(income, {
+                cultureId: +res.cultureId,
+                comment: res.comment,
+                yieldPlantId: plantId,
+              });
+            }
             setOpen(false);
           }}
         >

@@ -16,6 +16,12 @@ const createYieldCalc = z.object({
   yieldPlantId: z.number(),
 });
 export type createYieldCalcType = z.infer<typeof createYieldCalc>;
+const updateYieldPlant = z.object({
+  yieldPlantId: z.number(),
+  cultureId: z.number(),
+  comment: z.string(),
+});
+export type updateYieldPlantType = z.infer<typeof updateYieldPlant>;
 export const incomeRouter = router({
   getCultural: publicProcedure.query(async () => {
     const cultures: Iculture[] | undefined = await incomeService.getCultural();
@@ -29,7 +35,7 @@ export const incomeRouter = router({
   create: publicProcedure
     .input(
       z.object({
-        culturalId: z.number(),
+        cultureId: z.number(),
         comment: z.string(),
       })
     )
@@ -43,14 +49,14 @@ export const incomeRouter = router({
   createCalc: publicProcedure
     .input(createYieldCalc)
     .query(async ({ input, ctx }) => {
-      const yieldCalc: IyieldCalculation | undefined =
+      const yieldCalc: resYieldPlant | undefined =
         await incomeService.createCalc(input, ctx.user);
       if (yieldCalc) return yieldCalc;
     }),
   updateCalc: publicProcedure
     .input(createYieldCalc)
     .query(async ({ input, ctx }) => {
-      const res: IyieldCalculation | null | undefined =
+      const res: resYieldPlant | null | undefined =
         await incomeService.updateCalc(input, ctx.user);
       return res;
     }),
@@ -58,6 +64,15 @@ export const incomeRouter = router({
     .input(z.object({ yieldPlantId: z.number() }))
     .query(async ({ input, ctx }) => {
       const res = await incomeService.delete(input, ctx.user);
+      return res;
+    }),
+  update: publicProcedure
+    .input(updateYieldPlant)
+    .query(async ({ input, ctx }) => {
+      const res: resYieldPlant | null | undefined = await incomeService.update(
+        input,
+        ctx.user
+      );
       return res;
     }),
 });

@@ -17,14 +17,22 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import { Link } from "react-router-dom";
 import { YIELD_CALC_ROUTER } from "../utils/consts";
-import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import { deleteYieldPlant } from "../http/requests";
+import { incProp } from "../modules/CreateIncome/CreateIncome";
+import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 
 function Income() {
   const { income, user } = useContext(Context);
+  const yieldPlants: resYieldPlant[] = JSON.parse(
+    JSON.stringify(income.yieldPlant)
+  );
+  yieldPlants.sort((a, b) => a.id! - b.id!);
   const [open, setOpen] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [res, setRes] = useState<incProp>({ cultureId: "", comment: "" });
   const [showAlert, setShowAlert] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState<any>({
     idOpen: false,
@@ -34,7 +42,7 @@ function Income() {
     cartId: null,
   });
   console.log(1);
-
+  const [plantId, setPlantId] = useState(0);
   return (
     <Container maxW="container.lg">
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -44,6 +52,7 @@ function Income() {
         <Table size={"sm"}>
           <Thead>
             <Tr>
+              <Th></Th>
               <Th>Культура</Th>
               <Th>Коментар</Th>
               <Th>Густота насаджень</Th>
@@ -53,9 +62,28 @@ function Income() {
             </Tr>
           </Thead>
           <Tbody>
-            {income.yieldPlant.map((el) => {
+            {yieldPlants.map((el) => {
               return (
                 <Tr key={el.id!}>
+                  <Td
+                    textAlign={"center"}
+                    onClick={() => {
+                      setPlantId(el.id!);
+                      setUpdate(true);
+                      setOpen(true);
+                      setRes({
+                        comment: el.comment,
+                        cultureId: el.cultureId!,
+                      });
+                    }}
+                  >
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
                   <Td>
                     <Link to={YIELD_CALC_ROUTER + "/" + el.id}>
                       <ViewIcon boxSize={5} /> {el?.culture?.name}
@@ -99,7 +127,14 @@ function Income() {
       <Button mt={"15px"} onClick={() => setOpen(true)}>
         Добавити культуру
       </Button>
-      <CreateIncome open={open} setOpen={setOpen} />
+      <CreateIncome
+        open={open}
+        setOpen={setOpen}
+        res={res}
+        setRes={setRes}
+        update={update}
+        plantId={plantId}
+      />
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
       {!!deleteOpen.isOpen && (
         <DeleteAlert
@@ -109,6 +144,35 @@ function Income() {
           func={deleteOpen.func}
         />
       )}
+      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування виробництва
+      </Heading>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th>Назва культури</Th>
+            <Th>Площа га</Th>
+            <Th>Урожайність т/га</Th>
+            <Th>Валовий збір</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Button>Додати розрахунок</Button>
+      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування збуту
+      </Heading>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th>Назва культури</Th>
+            <Th>Продукт</Th>
+            <Th>Кількість т</Th>
+            <Th>Ціна грн/т</Th>
+            <Th>Сума грн</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Button>Додати розрахунок</Button>
     </Container>
   );
 }

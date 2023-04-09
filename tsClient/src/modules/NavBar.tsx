@@ -49,6 +49,12 @@ const NavBar = observer(() => {
             >
               Бізнес-плани
             </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={BUSINESS_ROUTER}
+            >
+              Культури
+            </Link>
           </Box>
         )}
         {user.isAuth ? (

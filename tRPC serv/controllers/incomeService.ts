@@ -7,11 +7,15 @@ import {
   yieldCalculation,
   yieldPlant,
 } from "../models/models";
-import { createYieldCalcType } from "../routes/incomeRouter";
+import {
+  createYieldCalcType,
+  updateYieldPlantType,
+} from "../routes/incomeRouter";
 export interface resYieldPlant extends IyieldPlant {
   culture: Iculture;
   yieldCalculation: IyieldCalculation;
 }
+const plantInclude = [{ model: culture }, { model: yieldCalculation }];
 class incomeService {
   async getCultural() {
     const cultures: Iculture[] = await culture.findAll();
@@ -23,13 +27,13 @@ class incomeService {
     //@ts-ignore
     const res: resYieldPlant[] | undefined = await yieldPlant.findAll({
       where: { userId: user.sub },
-      include: [{ model: culture }, { model: yieldCalculation }],
+      include: plantInclude,
     });
 
     return res;
   }
   async create(
-    data: { culturalId: number; comment: string },
+    data: { cultureId: number; comment: string },
     user: Principal | undefined
   ) {
     if (!user) return;
@@ -40,12 +44,12 @@ class incomeService {
       yieldPerHectare: 0,
       yieldPerRoll: 0,
       timesDow: 0,
-      cultureId: data.culturalId,
+      cultureId: data.cultureId,
     });
     //@ts-ignore
     const res: resYieldPlant = await yieldPlant.findOne({
       where: { id: YieldPlant.id! },
-      include: [{ model: culture }, { model: yieldCalculation }],
+      include: plantInclude,
     });
     return res;
   }
@@ -59,7 +63,26 @@ class incomeService {
       numberSocket: data.numberSocket,
       yieldPlantId: data.yieldPlantId,
     });
-    return YieldCalc;
+    const yieldPerRoll =
+      (data?.numberSocket! *
+        data?.numberFlower! *
+        data?.numberFruit! *
+        data?.fruitWeight!) /
+      1000;
+    await yieldPlant.update(
+      {
+        plantingDensity: data.numberPlantsPerHectare,
+        yieldPerRoll,
+        yieldPerHectare: (yieldPerRoll * data.numberPlantsPerHectare) / 1000,
+      },
+      { where: { id: data.yieldPlantId } }
+    );
+    //@ts-ignore
+    const res: resYieldPlant = await yieldPlant.findOne({
+      where: { id: data.yieldPlantId! },
+      include: plantInclude,
+    });
+    return res;
   }
   async updateCalc(data: createYieldCalcType, user: Principal | undefined) {
     if (!user) return;
@@ -73,8 +96,24 @@ class incomeService {
       },
       { where: { yieldPlantId: data.yieldPlantId } }
     );
-    const res = await yieldCalculation.findOne({
-      where: { yieldPlantId: data.yieldPlantId },
+    const yieldPerRoll =
+      (data?.numberSocket! *
+        data?.numberFlower! *
+        data?.numberFruit! *
+        data?.fruitWeight!) /
+      1000;
+    await yieldPlant.update(
+      {
+        plantingDensity: data.numberPlantsPerHectare,
+        yieldPerRoll,
+        yieldPerHectare: (yieldPerRoll * data.numberPlantsPerHectare) / 1000,
+      },
+      { where: { id: data.yieldPlantId } }
+    );
+    //@ts-ignore
+    const res: resYieldPlant = await yieldPlant.findOne({
+      where: { id: data.yieldPlantId! },
+      include: plantInclude,
     });
     return res;
   }
@@ -85,6 +124,23 @@ class incomeService {
     });
     await yieldPlant.destroy({ where: { id: data.yieldPlantId } });
     return data.yieldPlantId;
+  }
+  async update(data: updateYieldPlantType, user: Principal | undefined) {
+    if (!user) return;
+
+    const plants = await yieldPlant.update(
+      {
+        comment: data.comment,
+        cultureId: data.cultureId,
+      },
+      { where: { id: data.yieldPlantId } }
+    );
+    //@ts-ignore
+    const res: resYieldPlant | null = await yieldPlant.findOne({
+      where: { id: data.yieldPlantId },
+      include: plantInclude,
+    });
+    return res;
   }
 }
 export default new incomeService();

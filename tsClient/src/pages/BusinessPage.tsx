@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, TableContainer, Button } from "@chakra-ui/react";
+import {
+  Box,
+  TableContainer,
+  Button,
+  Text,
+  Table,
+  Thead,
+  Th,
+} from "@chakra-ui/react";
 
 import BusinessTable from "../modules/BusinessTable/BusinessTable";
 import BusinessAgreeTable from "../modules/BusinessAgreeTable/";
@@ -63,6 +71,52 @@ function Business() {
   const [showAlert, setShowAlert] = useState(false);
   return (
     <Box>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування доходів
+      </Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th>Продукт або послуга</Th>
+            <Th>Кількість т</Th>
+            <Th>Ціна грн/т</Th>
+            <Th>Сума грн</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування витрат
+      </Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th>Вид витрат</Th>
+            <Th>Кількість т</Th>
+            <Th>Ціна грн/т</Th>
+            <Th>Сума грн</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування грошового потоку
+      </Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th>Залишок на початок періоду</Th>
+            <Th>Прихід</Th>
+            <Th>Розхід</Th>
+            <Th>Залишов на кінець періоду</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування графіку доходів та витрат
+      </Text>
+      <Box h={10}></Box>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Приклади типових бізнес-планів
+      </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <BusinessTable
           setCreate={setCreateOpen}
