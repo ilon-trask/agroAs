@@ -52,7 +52,17 @@ function MainPage() {
               Онлайн - сервіс для планування,
               <br /> обліку та аналізу витрат фермерського господарства
             </Text>
-            <Button onClick={() => navigate(HOW_ROUTER)}>Як це працює?</Button>
+            <Button
+              bg={"rgba( 93, 160, 93, 0.55 )"}
+              borderRadius={100}
+              size={"lg"}
+              fontSize={"20px"}
+              h={"min-content"}
+              py={2}
+              onClick={() => navigate(HOW_ROUTER)}
+            >
+              Як це працює?
+            </Button>
           </Box>
         </Box>
         {/* @ts-ignore */}

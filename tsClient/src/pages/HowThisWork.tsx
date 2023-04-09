@@ -19,6 +19,7 @@ import expTransport from "/expTransport.jpg";
 import expService from "/expService.jpg";
 import expRes from "/expRes.jpg";
 import expPick from "/expPick.jpg";
+import expFront from "/expFront.jpg";
 
 function HowThisWork() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function HowThisWork() {
         mx={"auto"}
         mt={"15px"}
       >
-        <Box fontSize={"20px"} fontWeight={700} textAlign={"center"}>
+        <Box fontSize={"18px"} fontWeight={700} textAlign={"center"}>
           <Text>
             Кожен господар, який має земельну ділянку хоче ефективно її
             використовувати, і зважди оцінює свої власні витрати на вирощування
@@ -56,7 +57,33 @@ function HowThisWork() {
         </Box>
       </Box>
       <Heading mt={"30px"} mb={"20px"} textAlign={"center"}>
-        Вибір культури
+        Перше знайомство
+      </Heading>
+      <Box
+        display={"grid"}
+        gridTemplateColumns={["1fr", "1fr", "2fr 2fr"]}
+        gridColumnGap={"15px"}
+        gridGap={"15px"}
+        maxW={"1200px"}
+        mx={"auto"}
+        mt={"15px"}
+      >
+        <Box>
+          <Image w={"100%"} h={"auto"} src={expFront}></Image>
+        </Box>
+        <Box>
+          <Text fontWeight={700}>На цій сторінці ви можете</Text>
+          <OrderedList>
+            <ListItem>Вибрати культуру та ознайомитися з розрахунком</ListItem>
+            <ListItem>Перейти до розрахунку</ListItem>
+            <ListItem>Сортувати за категоріями</ListItem>
+            <ListItem>Ознайомитися з можливостями сервісу</ListItem>
+          </OrderedList>
+          <Button onClick={() => navigate(MAP_ROUTE)}>Спробувати зараз</Button>
+        </Box>
+      </Box>
+      <Heading mt={"30px"} mb={"20px"} textAlign={"center"}>
+        Розрахунки та редагування
       </Heading>
       <Box
         display={"grid"}
@@ -71,15 +98,18 @@ function HowThisWork() {
           <Image w={"100%"} h={"auto"} src={expPick}></Image>
         </Box>
         <Box>
-          <Text fontWeight={700}>
-            На головній сторіні ви можете вибрати культуру
-          </Text>
+          <Text fontWeight={700}>На головній сторіні ви можете:</Text>
           <OrderedList>
-            <ListItem>Можна перейти на технологічну карту</ListItem>
+            <ListItem>Отримати pdf файл з розрахунками</ListItem>
+            <ListItem>
+              За допомогою конструктора вносити власні дані і отримати pdf файл
+              з індивідуальними показниками
+            </ListItem>
           </OrderedList>
           <Button onClick={() => navigate(MAP_ROUTE)}>Спробувати зараз</Button>
         </Box>
       </Box>
+
       <Heading mt={"30px"} mb={"20px"} textAlign={"center"}>
         Змінити загальні показники
       </Heading>

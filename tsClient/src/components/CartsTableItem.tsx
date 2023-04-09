@@ -66,7 +66,7 @@ const CartsTableItem = observer(
         </Td>
         <Td>
           <Link to={TEHMAP_ROUTER + `/${e.id}`}>
-            <ViewIcon boxSize={5} /> {e.nameCart}
+            <ViewIcon boxSize={5} color={"blue.400"} /> {e.nameCart}
           </Link>
         </Td>
         <Td>{e.area}</Td>
