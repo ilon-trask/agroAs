@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Card,
   CardBody,
@@ -17,11 +17,24 @@ import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { TEHMAP_ROUTER } from "../utils/consts";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import TechnologicalMapPdf from "../pages/pdf/TechnologicalMapPdf";
+import { downloaded, getCarts } from "../http/requests";
+import getSectionsOpers from "../store/GetSectionsOpers";
+import { Context } from "../main";
 const IMGuRL =
   "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/unUsed";
 type props = { e: Itech_cart | undefined };
+
 function MainTable({ e }: props) {
   const navigate = useNavigate();
+  const { map } = useContext(Context);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, e?.id!);
+    console.log(a);
+
+    return a;
+  }, [map.opers]);
   return (
     <Card maxW="sm" mx={"auto"}>
       <CardBody

@@ -51,6 +51,7 @@ function BiznesPlanPage() {
   let data = name && child ? myBusiness[name][child] : "";
   const [nData, setNData] = useState<string>();
   function getData(name: iName, children: iChild, infCartId: number | null) {
+    setIsActiveInput(false);
     setInfCartId(infCartId || 0);
     setChild(children);
     setName(name);

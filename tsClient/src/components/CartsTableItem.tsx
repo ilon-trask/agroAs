@@ -8,7 +8,12 @@ import MapStore from "../store/MapStore";
 import { TEHMAP_ROUTER } from "../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
+import {
+  EditIcon,
+  DeleteIcon,
+  QuestionOutlineIcon,
+  ViewIcon,
+} from "@chakra-ui/icons";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 
 interface props {
@@ -60,7 +65,9 @@ const CartsTableItem = observer(
           />
         </Td>
         <Td>
-          <Link to={TEHMAP_ROUTER + `/${e.id}`}>{e.nameCart}</Link>
+          <Link to={TEHMAP_ROUTER + `/${e.id}`}>
+            <ViewIcon boxSize={5} /> {e.nameCart}
+          </Link>
         </Td>
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>

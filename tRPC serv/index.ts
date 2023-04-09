@@ -26,6 +26,7 @@ import businessRouter from "./routes/businessRouter";
 import feedBackRouter from "./routes/feedBackRouter";
 import { resumeRouter } from "./routes/resumeRouter";
 import { titleRouter } from "./routes/titleRouter";
+import { incomeRouter } from "./routes/incomeRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -52,6 +53,7 @@ const appRouter = router({
   feedBack: feedBackRouter,
   resume: resumeRouter,
   titlePage: titleRouter,
+  income: incomeRouter,
   "": publicProcedure.query(() => "some text"),
 });
 

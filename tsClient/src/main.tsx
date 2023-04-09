@@ -6,11 +6,13 @@ import "./index.css";
 import MapStore from "./store/MapStore";
 import UserStore from "./store/UserStore";
 import BusinessStore from "./store/BusinessStore";
+import IncomeStore from "./store/IncomeStore";
 
 export const Context = createContext({
   user: new UserStore(),
   map: new MapStore(),
   business: new BusinessStore(),
+  income: new IncomeStore(),
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -19,6 +21,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       user: new UserStore(),
       map: new MapStore(),
       business: new BusinessStore(),
+      income: new IncomeStore(),
     }}
   >
     <App />
