@@ -2,6 +2,7 @@ import { router, publicProcedure } from "../trpc";
 import z from "zod";
 
 import OperService from "../controllers/OperService";
+import { Ipurpose_material } from "../models/models";
 
 export const operRouter = router({
   create: router({
@@ -84,6 +85,7 @@ export const operRouter = router({
               price: z.number(),
               unitsOfConsumption: z.string(),
               unitsOfCost: z.string(),
+              purposeMaterialId: z.number(),
             }),
             section: z.number(),
           }),
@@ -159,6 +161,7 @@ export const operRouter = router({
               price: z.number(),
               unitsOfConsumption: z.string(),
               unitsOfCost: z.string(),
+              purposeMaterialId: z.number(),
             }),
           }),
         })
@@ -302,4 +305,9 @@ export const operRouter = router({
       const oper = await OperService.getProps(input);
       return oper;
     }),
+  getPurposesMaterial: publicProcedure.query(async () => {
+    const purpose: Ipurpose_material[] =
+      await OperService.getPurposesMaterial();
+    return purpose;
+  }),
 });

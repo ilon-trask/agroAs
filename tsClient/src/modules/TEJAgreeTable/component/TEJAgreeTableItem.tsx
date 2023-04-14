@@ -15,8 +15,7 @@ import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
 import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
-import { BusinessProps } from "../../CreateBusiness/CreateBusinessPlan";
-
+import { BusinessProps } from "../../CreateTEJ/CreateTEJ";
 interface props {
   e: IbusinessPlan;
   deleteFunc: (BusinessId: number) => void;
@@ -62,6 +61,7 @@ const CartsTableItem = observer(
         <Td>
           <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.name}</Link>
         </Td>
+        <Td></Td>
 
         <Td
           textAlign={"center"}

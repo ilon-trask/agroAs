@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { BusinessProps, businessProps } from "../CreateBusinessPlan";
+import { TEJProps, tejProps } from "../CreateTEJ";
 import { func, InputProps } from "../../../components/Dialog";
 import { Context } from "../../../main";
 import { useParams } from "react-router-dom";
@@ -17,45 +17,40 @@ import {
 } from "@chakra-ui/react";
 import MapStore from "../../../store/MapStore";
 import BusinessStore from "../../../store/BusinessStore";
-import { createBusinessPlan, patchBusinessPlan } from "../../../http/requests";
+import { createBusinessPlan, createTEJ } from "../../../http/requests";
+import TEJStore from "../../../store/TEJStore";
 
-const createBusiness: (
-  map: MapStore,
-  bus: BusinessStore,
+const CreateTEJ: (
+  TEJ: TEJStore,
   update: boolean,
   setUpdate: Dispatch<SetStateAction<boolean>>,
-  res: BusinessProps,
+  res: TEJProps,
   setIsErr: (isErr: boolean) => void,
   setOpen: (open: boolean) => void,
-  setRes: (res: BusinessProps) => void
-) => void = function (
-  map,
-  bus,
-  update,
-  setUpdate,
-  res,
-  setIsErr,
-  setOpen,
-  setRes
-) {
-  if (res.name == "" || res.businessCategoryId == "") {
+  setRes: (res: TEJProps) => void
+) => void = function (TEJ, update, setUpdate, res, setIsErr, setOpen, setRes) {
+  if (res.cartId == "") {
     setIsErr(true);
   } else {
+    // res.cultureId = +res.cultureId;
     setOpen(false);
-    setRes(businessProps);
+    setRes(tejProps);
     setUpdate(false);
     setIsErr(false);
     if (update) {
-      patchBusinessPlan(map, bus, res);
+      // patchBusinessPlan(map, bus, res);
     } else {
-      createBusinessPlan(map, bus, {
-        name: res.name,
-        businessCategoryId: res.businessCategoryId,
-      });
+      createTEJ(
+        {
+          cartId: res.cartId,
+          comment: res.comment,
+        },
+        TEJ
+      );
     }
   }
 };
-const Plan = observer(
+const TEJ = observer(
   ({
     res,
     setRes,
@@ -64,16 +59,14 @@ const Plan = observer(
     update,
     setUpdate,
   }: {
-    res: BusinessProps;
-    setRes: (
-      res: BusinessProps | ((res: BusinessProps) => BusinessProps)
-    ) => void;
+    res: TEJProps;
+    setRes: (res: TEJProps | ((res: TEJProps) => TEJProps)) => void;
     setIsErr: (isErr: boolean) => void;
     setOpen: (open: boolean) => void;
     update: boolean;
     setUpdate: Dispatch<SetStateAction<boolean>>;
   }) => {
-    const { map, business } = useContext(Context);
+    const { map, business, TEJ } = useContext(Context);
 
     // useEffect(() => {
     //   if (!update) {
@@ -83,10 +76,11 @@ const Plan = observer(
     //     console.log(123);
     //   }
     // }, [res]);
+
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>
-          Внесіть дані для розрахунку бізнес-плану
+          Виберіть дані для розрахунку ТЕО
         </Heading>
         <Box
           mt={3}
@@ -98,55 +92,47 @@ const Plan = observer(
         >
           <Box>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
-              Назва бізнес-плану
-            </Heading>
-            <Input
-              type={"text"}
-              size={"sm"}
-              value={res.name}
-              onChange={(e) => {
-                setRes((prev) => ({ ...prev, name: e.target.value }));
-              }}
-            ></Input>
-          </Box>
-          <Box>
-            <Heading as={"h4"} size="sm" minW={"max-content"}>
-              напрям бізнес-плану
+              Виберіть карту
             </Heading>
             <Select
               size={"sm"}
               onChange={(e) => {
                 setRes((prev) => ({
                   ...prev,
-                  businessCategoryId: +e.target.value,
+                  cartId: +e.target.value,
                 }));
               }}
-              value={res.businessCategoryId}
+              value={res.cartId}
             >
               <option disabled hidden value="">
                 Виберіть напрямок
               </option>
-              {business.businessCategory?.map((el) => (
+              {map.maps?.map((el) => (
                 <option key={el.id} value={el.id}>
-                  {el.name}
+                  {el.nameCart +
+                    "|" +
+                    (el.cultivationTechnology?.name || "не визначений")}
                 </option>
               ))}
             </Select>
+          </Box>
+          <Box>
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Впишіть коментар
+            </Heading>
+            <Input
+              value={res.comment}
+              onChange={(e) => {
+                setRes((prev) => ({ ...prev, comment: e.target.value }));
+              }}
+              size={"sm"}
+            />
           </Box>
         </Box>
         <ModalFooter p={"15px 67px"}>
           <Button
             onClick={() =>
-              createBusiness(
-                map,
-                business,
-                update,
-                setUpdate,
-                res,
-                setIsErr,
-                setOpen,
-                setRes
-              )
+              CreateTEJ(TEJ, update, setUpdate, res, setIsErr, setOpen, setRes)
             }
           >
             Зберегти
@@ -157,4 +143,4 @@ const Plan = observer(
   }
 );
 
-export default Plan;
+export default TEJ;

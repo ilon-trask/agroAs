@@ -2,13 +2,13 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Context } from "../../main";
-import BusinessTableItem from "./component/BusinessTableItem";
+import BusinessAgreeTableItem from "./component/TEJAgreeTableItem";
 
 import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { BusinessProps } from "../CreateBusiness/CreateBusinessPlan";
+import { BusinessProps } from "../CreateTEJ/CreateTEJ";
 import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 
 interface props {
@@ -19,9 +19,19 @@ interface props {
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setRes: Dispatch<SetStateAction<BusinessProps>>;
   agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  // setOpen: (open: boolean) => void;
+  // deleteOpen: any;
+  // setDeleteOpen: (deleteOpen: any) => void;
+  // setPublicationOpen: ({
+  //   isOpen,
+  //   data: { id, isPublic },
+  // }: {
+  //   isOpen: boolean;
+  //   data: { id: number; isPublic: boolean; agree: boolean };
+  // }) => void;
 }
 
-const CartsTable = observer(
+const BusinessAgreeTable = observer(
   ({
     setCreate,
     deleteFunc,
@@ -29,10 +39,15 @@ const CartsTable = observer(
     setUpdate,
     setRes,
     agreeFunc,
-  }: props) => {
+  }: // maps,
+  // setOpen,
+  // deleteOpen,
+  // setDeleteOpen,
+  // setPublicationOpen,
+  props) => {
     const { map, user, business } = useContext(Context);
     const Business: IbusinessPlan[] = JSON.parse(
-      JSON.stringify(business.businessPlan)
+      JSON.stringify(business.noAgreeBusinessPlan)
     );
     Business.sort((a, b) => a.id! - b.id!);
     return (
@@ -41,6 +56,7 @@ const CartsTable = observer(
           <Tr>
             <Th></Th>
             <Th>Назва </Th>
+            <Th>Технології</Th>
             <Th></Th>
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
@@ -56,7 +72,7 @@ const CartsTable = observer(
             <></>
           )}
           {Business.map((e) => (
-            <BusinessTableItem
+            <BusinessAgreeTableItem
               key={e.id}
               e={e}
               deleteFunc={deleteFunc}
@@ -72,27 +88,10 @@ const CartsTable = observer(
               // setPublicationOpen={setPublicationOpen}
             />
           ))}
-          <Tr>
-            <Th>
-              <PlusSquareIcon
-                h={6}
-                w={6}
-                color={"blue.400"}
-                onClick={() => {
-                  console.log(23423);
-
-                  setCreate(true);
-                }}
-              />
-            </Th>
-            <Th></Th>
-            <Th></Th>
-            <Th></Th>
-          </Tr>
         </Tbody>
       </Table>
     );
   }
 );
 
-export default CartsTable;
+export default BusinessAgreeTable;

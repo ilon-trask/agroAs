@@ -9,15 +9,15 @@ import {
   Th,
 } from "@chakra-ui/react";
 
-import BusinessTable from "../modules/BusinessTable/BusinessTable";
-import BusinessAgreeTable from "../modules/BusinessAgreeTable/";
-import CreateBusinessPlan from "../modules/CreateBusiness";
+import TEJTable from "../modules/TEJTable";
+import TEJAgreeTable from "../modules/TEJAgreeTable";
+import CreateTEJ from "../modules/CreateTEJ";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 
 import {
   deleteBusinessPlan,
-  getBusinessCategory,
+  // getBusinessCategory,
   getBusinessPlans,
 } from "../http/requests";
 import { Context } from "../main";
@@ -25,19 +25,15 @@ import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import { useNavigate } from "react-router-dom";
 import useBusiness from "./hook/useBusiness";
+import useTEJ from "./hook/useTEJ";
+import { TEJProps } from "../modules/CreateTEJ/CreateTEJ";
 
-function Business() {
-  const { map, business, user } = useContext(Context);
-  useBusiness(business, map);
+function TEJJornal() {
+  const { map, user, TEJ } = useContext(Context);
+  // useBusiness(business, map);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
-  const [res, setRes] = useState<{
-    name: string;
-    businessCategoryId: "" | number;
-  }>({
-    name: "",
-    businessCategoryId: "",
-  });
+  const [res, setRes] = useState<TEJProps>({ cartId: "", comment: "" });
   const [isErr, setIsErr] = useState(false);
   const [update, setUpdate] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -51,80 +47,39 @@ function Business() {
     isPublic: false,
   });
   const [func, setFunc] = useState<any>();
-  function deleteFunc(BusinessId: number) {
-    setDeleteOpen(true);
-    setFunc({
-      func() {
-        deleteBusinessPlan(map, business, BusinessId);
-        setDeleteOpen(false);
-      },
-    });
-  }
-  function agreeFunc(BusinessId: number, isPublic: boolean, isAgree?: boolean) {
-    setAgreeOpen(true);
-    setAgreeData({
-      BusinessId: BusinessId,
-      isPublic: isPublic,
-      isAgree: isAgree,
-    });
-  }
+  useTEJ(TEJ);
+  // function deleteFunc(BusinessId: number) {
+  //   setDeleteOpen(true);
+  //   setFunc({
+  //     func() {
+  //       deleteBusinessPlan(map, business, BusinessId);
+  //       setDeleteOpen(false);
+  //     },
+  //   });
+  // }
+
+  // function agreeFunc(BusinessId: number, isPublic: boolean, isAgree?: boolean) {
+  //   setAgreeOpen(true);
+  //   setAgreeData({
+  //     BusinessId: BusinessId,
+  //     isPublic: isPublic,
+  //     isAgree: isAgree,
+  //   });
+  // }
   const [showAlert, setShowAlert] = useState(false);
   return (
     <Box>
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування доходів
+        Приклади типових техніко-економічних обгрунтувань
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Th>Продукт або послуга</Th>
-            <Th>Кількість т</Th>
-            <Th>Ціна грн/т</Th>
-            <Th>Сума грн</Th>
-          </Thead>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування витрат
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Th>Вид витрат</Th>
-            <Th>Кількість т</Th>
-            <Th>Ціна грн/т</Th>
-            <Th>Сума грн</Th>
-          </Thead>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування грошового потоку
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Th>Залишок на початок періоду</Th>
-            <Th>Прихід</Th>
-            <Th>Розхід</Th>
-            <Th>Залишов на кінець періоду</Th>
-          </Thead>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування графіку доходів та витрат
-      </Text>
-      <Box h={10}></Box>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Приклади типових бізнес-планів
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <BusinessTable
+        <TEJTable
           setCreate={setCreateOpen}
-          deleteFunc={deleteFunc}
+          deleteFunc={() => {}}
           setShowAlert={setShowAlert}
           setRes={setRes}
           setUpdate={setUpdate}
-          agreeFunc={agreeFunc}
+          agreeFunc={() => {}}
           //   maps={maps}
           //   setOpen={setOpen}
           //   deleteOpen={deleteOpen}
@@ -140,13 +95,13 @@ function Business() {
             mt={"20px"}
             overflowX={"scroll"}
           >
-            <BusinessAgreeTable
+            <TEJAgreeTable
               setCreate={setCreateOpen}
-              deleteFunc={deleteFunc}
+              deleteFunc={() => {}}
               setShowAlert={setShowAlert}
               setRes={setRes}
               setUpdate={setUpdate}
-              agreeFunc={agreeFunc}
+              agreeFunc={() => {}}
 
               //   maps={maps}
               //   setOpen={setOpen}
@@ -165,7 +120,7 @@ function Business() {
           </Button>
         </Box>
       )}
-      <CreateBusinessPlan
+      <CreateTEJ
         open={createOpen}
         setOpen={setCreateOpen}
         isErr={isErr}
@@ -196,4 +151,4 @@ function Business() {
   );
 }
 
-export default Business;
+export default TEJJornal;

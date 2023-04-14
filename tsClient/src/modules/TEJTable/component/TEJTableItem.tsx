@@ -9,20 +9,33 @@ import {
 import { Context } from "../../../main";
 import { cartProps } from "../../CreateCart";
 import MapStore from "../../../store/MapStore";
-import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
+import {
+  BUSINESSpLAN_ROUTER,
+  TEHMAP_ROUTER,
+  TEJ_ROUTER,
+} from "../../../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
-import { BusinessProps } from "../../CreateBusiness/CreateBusinessPlan";
+import {
+  EditIcon,
+  DeleteIcon,
+  QuestionOutlineIcon,
+  ViewIcon,
+} from "@chakra-ui/icons";
+import {
+  IbusinessPlan,
+  ItechnologicalEconomicJustification,
+} from "../../../../../tRPC serv/models/models";
+import { TEJProps } from "../../CreateTEJ/CreateTEJ";
+import { resTechnologicalEconomicJustification } from "../../../../../tRPC serv/controllers/TEJService";
 
 interface props {
-  e: IbusinessPlan;
+  e: resTechnologicalEconomicJustification;
   deleteFunc: (BusinessId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<BusinessProps>>;
+  setRes: Dispatch<SetStateAction<TEJProps>>;
   agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
 }
 
@@ -46,8 +59,8 @@ const CartsTableItem = observer(
             setOpen(true);
             setRes({
               id: e.id,
-              businessCategoryId: e.businessCategoryId as number | "",
-              name: e.name,
+              cartId: e.techCartId!,
+              comment: e.comment!,
             });
           }}
         >
@@ -59,8 +72,11 @@ const CartsTableItem = observer(
           />
         </Td>
         <Td>
-          <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.name}</Link>
+          <Link to={TEJ_ROUTER + `/${e.id}`}>
+            <ViewIcon boxSize={5} color={"blue.400"} /> {e.culture.name}
+          </Link>
         </Td>
+        <Td>{e.cultivationTechnology?.name}</Td>
 
         <Td
           textAlign={"center"}
@@ -78,7 +94,7 @@ const CartsTableItem = observer(
           <DeleteIcon w={"20px"} h={"auto"} />
         </Td>
 
-        <Td>
+        {/* <Td>
           {(user.role == "ADMIN" ||
             user.role == "AUTHOR" ||
             user.role == "service_role") && (
@@ -99,7 +115,7 @@ const CartsTableItem = observer(
               </Checkbox>
             </div>
           )}
-        </Td>
+        </Td> */}
       </Tr>
     );
   }

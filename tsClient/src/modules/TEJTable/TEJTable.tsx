@@ -1,15 +1,16 @@
-import React, { Dispatch, SetStateAction, useContext } from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Context } from "../../main";
-import BusinessAgreeTableItem from "./component/BusinessAgreeTableItem";
+import TEJTableItem from "./component/TEJTableItem";
 
 import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { BusinessProps } from "../CreateBusiness/CreateBusinessPlan";
-import { IbusinessPlan } from "../../../../tRPC serv/models/models";
+import { TEJProps } from "../CreateTEJ/CreateTEJ";
+import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
+import { getTEJ } from "../../http/requests";
 
 interface props {
   // maps: resTechCartsWithOpers[] | [];
@@ -17,21 +18,11 @@ interface props {
   deleteFunc: (BusinessId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<BusinessProps>>;
+  setRes: Dispatch<SetStateAction<TEJProps>>;
   agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
-  // setOpen: (open: boolean) => void;
-  // deleteOpen: any;
-  // setDeleteOpen: (deleteOpen: any) => void;
-  // setPublicationOpen: ({
-  //   isOpen,
-  //   data: { id, isPublic },
-  // }: {
-  //   isOpen: boolean;
-  //   data: { id: number; isPublic: boolean; agree: boolean };
-  // }) => void;
 }
 
-const BusinessAgreeTable = observer(
+const CartsTable = observer(
   ({
     setCreate,
     deleteFunc,
@@ -39,24 +30,24 @@ const BusinessAgreeTable = observer(
     setUpdate,
     setRes,
     agreeFunc,
-  }: // maps,
-  // setOpen,
-  // deleteOpen,
-  // setDeleteOpen,
-  // setPublicationOpen,
-  props) => {
-    const { map, user, business } = useContext(Context);
-    const Business: IbusinessPlan[] = JSON.parse(
-      JSON.stringify(business.noAgreeBusinessPlan)
+  }: props) => {
+    const { map, user, TEJ } = useContext(Context);
+    console.log(TEJ.justification);
+    const Justification: resTechnologicalEconomicJustification[] = JSON.parse(
+      JSON.stringify(TEJ.justification)
     );
-    Business.sort((a, b) => a.id! - b.id!);
+    Justification.sort((a, b) => a.id! - b.id!);
+
+    useEffect(() => {
+      getTEJ(TEJ);
+    }, []);
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
           <Tr>
             <Th></Th>
-            <Th>Назва </Th>
-            <Th></Th>
+            <Th>Культура</Th>
+            <Th>Технологія</Th>
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
               user.role == "service_role") && <Th></Th>}
@@ -70,8 +61,8 @@ const BusinessAgreeTable = observer(
           ) : (
             <></>
           )}
-          {Business.map((e) => (
-            <BusinessAgreeTableItem
+          {Justification.map((e) => (
+            <TEJTableItem
               key={e.id}
               e={e}
               deleteFunc={deleteFunc}
@@ -87,10 +78,27 @@ const BusinessAgreeTable = observer(
               // setPublicationOpen={setPublicationOpen}
             />
           ))}
+          <Tr>
+            <Th>
+              <PlusSquareIcon
+                h={6}
+                w={6}
+                color={"blue.400"}
+                onClick={() => {
+                  console.log(23423);
+
+                  setCreate(true);
+                }}
+              />
+            </Th>
+            <Th></Th>
+            <Th></Th>
+            <Th></Th>
+          </Tr>
         </Tbody>
       </Table>
     );
   }
 );
 
-export default BusinessAgreeTable;
+export default CartsTable;

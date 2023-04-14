@@ -14,12 +14,14 @@ import {
   getCultural,
   getIsAgreeCarts,
   agreeCarts,
-  getBusinessCategory,
   getBusinessPlans,
   getNoAgreeBusiness,
   getOnlyCart,
   getCulturalInc,
   getYieldPlants,
+  getPurposesMaterial,
+  getCultureTEJMap,
+  getCultivationTechnologiesMap,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -38,7 +40,9 @@ function App() {
       getCulturalInc(income);
       getYieldPlants(income);
       getCultural(map);
-
+      getPurposesMaterial(map);
+      getCultureTEJMap(map);
+      getCultivationTechnologiesMap(map);
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);

@@ -3,7 +3,7 @@ import z from "zod";
 import BusinessService, {
   resBusinessPlan,
 } from "../controllers/BusinessService";
-import { IbusinessCategory, IbusinessPlan } from "../models/models";
+import { IbusinessPlan } from "../models/models";
 const createType = z.object({
   name: z.string(),
   businessCategoryId: z.number(),
@@ -33,10 +33,10 @@ const setIsAgree = z.object({
 export type SetIsAgreeBusinessPlan = z.infer<typeof setIsAgree>;
 
 const businessRouter = router({
-  getCategory: publicProcedure.query(async () => {
-    const res: IbusinessCategory[] = await BusinessService.getCategory();
-    return res;
-  }),
+  // getCategory: publicProcedure.query(async () => {
+  //   const res = await BusinessService.getCategory();
+  //   return res;
+  // }),
   get: publicProcedure.query(async ({ ctx }) => {
     const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
 

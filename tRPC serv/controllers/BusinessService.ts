@@ -1,6 +1,5 @@
 import { Principal } from "..";
 import {
-  businessCategory,
   businessPlan,
   IbusinessPlan,
   Iresume,
@@ -21,10 +20,10 @@ export interface resBusinessPlan extends IbusinessPlan {
 }
 const includes = [{ model: resume }, { model: titlePage }];
 class BusinessService {
-  async getCategory() {
-    const category = await businessCategory.findAll();
-    return category;
-  }
+  // async getCategory() {
+  //   const category = await businessCategory.findAll();
+  //   return category;
+  // }
   async get(user: Principal | undefined) {
     if (user) {
       //@ts-ignore

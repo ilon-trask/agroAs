@@ -70,6 +70,7 @@ const Materials = observer(
   }: InputProps<MaterialsProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
+    console.log(res);
 
     return (
       <ModalBody>
@@ -99,22 +100,43 @@ const Materials = observer(
           </Box>
           <Box
             display={"flex"}
-            justifyContent={"space-evenly"}
+            justifyContent={"space-between"}
             alignItems={"center"}
             maxW={"490px"}
             mx={"auto"}
             mt={"10px"}
           >
-            <Heading as={"h4"} size="sm" minW={"max-content"} mr={"20px"}>
-              Дата використання
-            </Heading>
-            <Input
-              placeholder="Select Date and Time"
-              size="sm"
-              type="date"
-              value={res.date}
-              onChange={(e) => setRes({ ...res, date: e.target.value })}
-            />
+            <Box>
+              <Heading as={"h4"} size="sm" minW={"max-content"} mr={"20px"}>
+                Дата використання
+              </Heading>
+              <Input
+                placeholder="Select Date and Time"
+                size="sm"
+                type="date"
+                value={res.date}
+                onChange={(e) => setRes({ ...res, date: e.target.value })}
+              />
+            </Box>
+            <Box>
+              <Heading as={"h4"} size="sm" minW={"max-content"} mr={"20px"}>
+                Призначення матеріалу
+              </Heading>
+              <Select
+                size="sm"
+                value={res.purposeMaterialId}
+                onChange={(e) => {
+                  setRes((prev) => ({
+                    ...prev,
+                    purposeMaterialId: +e.target.value,
+                  }));
+                }}
+              >
+                {map.purposeMaterial.map((el) => (
+                  <option value={el.id}>{el.purpose}</option>
+                ))}
+              </Select>
+            </Box>
           </Box>
           <Box
             display={"flex"}

@@ -12,6 +12,8 @@ export type cartProps = {
   isPublic?: boolean;
   priceDiesel: number | "";
   totalCost?: number;
+  cultureId: number;
+  cultivationTechnologyId: number;
 };
 export const CartProps: cartProps = {
   nameCart: "",
@@ -19,6 +21,8 @@ export const CartProps: cartProps = {
   salary: "",
   isPublic: false,
   priceDiesel: "",
+  cultivationTechnologyId: 6,
+  cultureId: 4,
 };
 
 interface props {

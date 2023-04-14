@@ -36,7 +36,7 @@ function Income({ res, setRes, setOpen, update, plantId }: props) {
       >
         <Box>
           <Heading as={"h4"} size="sm">
-            Виберіть культур
+            Виберіть культуру
           </Heading>
           <Select
             size={"sm"}

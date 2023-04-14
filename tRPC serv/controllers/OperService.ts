@@ -17,6 +17,7 @@ import {
   Icost_transport,
   Icost_hand_work,
   Iaggregate,
+  purpose_material,
 } from "../models/models";
 
 import { resTechOperation } from "./TechCartService";
@@ -82,6 +83,7 @@ interface IdataCreateCostMaterials
     price: number;
     unitsOfConsumption: string;
     unitsOfCost: string;
+    purposeMaterialId: number;
   }> {}
 
 interface IdataCreateCostServices
@@ -138,6 +140,7 @@ interface IdataPatchCostMaterial
     price: number;
     unitsOfConsumption: string;
     unitsOfCost: string;
+    purposeMaterialId: number;
   }> {}
 interface IdataPatchCostServices
   extends IdataPatch<{
@@ -452,7 +455,7 @@ async function updateOper(
   let oper: resTechOperation | undefined | null = await tech_operation.findOne({
     where: { id: operId },
     include: [
-      cost_material,
+      { model: cost_material, include: [purpose_material] },
       cost_service,
       cost_transport,
       cost_hand_work,
@@ -476,6 +479,7 @@ class OperService {
           price,
           unitsOfConsumption,
           unitsOfCost,
+          purposeMaterialId,
         },
         section,
       },
@@ -493,6 +497,7 @@ class OperService {
       consumptionPerHectare,
       unitsOfConsumption,
       techOperationId: operId,
+      purposeMaterialId,
     });
     const cart = await tech_cart.findOne({ where: { id: cartId } });
     tech_cart.update(
@@ -736,6 +741,7 @@ class OperService {
           price,
           unitsOfConsumption,
           unitsOfCost,
+          purposeMaterialId,
         },
       },
     } = data;
@@ -759,12 +765,14 @@ class OperService {
         price: price,
         unitsOfConsumption: unitsOfConsumption,
         unitsOfCost: unitsOfCost,
+        techOperationId: purposeMaterialId,
       };
 
       (oper.cost_material.consumptionPerHectare = consumptionPerHectare),
         (oper.cost_material.price = price),
         (oper.cost_material.unitsOfConsumption = unitsOfConsumption),
         (oper.cost_material.unitsOfCost = unitsOfCost),
+        (oper.cost_material.purposeMaterialId = purposeMaterialId),
         (oper.nameOperation = nameOper),
         (oper = await changeOper(oper, oper.techCartId!, CostMaterials));
     } else {
@@ -807,6 +815,7 @@ class OperService {
           consumptionPerHectare: +consumptionPerHectare,
           unitsOfConsumption,
           techOperationId: operId,
+          purposeMaterialId: purposeMaterialId,
         },
         { where: { techOperationId: operId } }
       );
@@ -1463,6 +1472,10 @@ class OperService {
     }
 
     return get();
+  }
+  async getPurposesMaterial() {
+    const purposes = await purpose_material.findAll();
+    return purposes;
   }
 }
 export default new OperService();

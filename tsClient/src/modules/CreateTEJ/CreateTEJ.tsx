@@ -1,17 +1,17 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
-import BusinessPlan from "./components/BusinessPlan";
+import TEJ from "./components/TEJ";
 import { createOperProps } from "../../pages/TechnologicalMap";
 
-export type BusinessProps = {
+export type TEJProps = {
   id?: number;
-  name: string;
-  businessCategoryId: number | "";
+  cartId: number | "";
+  comment: string;
 };
 
-export const businessProps: BusinessProps = {
-  name: "",
-  businessCategoryId: "",
+export const tejProps: TEJProps = {
+  cartId: "",
+  comment: "",
 };
 
 export default function CreateBusiness({
@@ -27,8 +27,8 @@ export default function CreateBusiness({
   open: boolean;
 
   setOpen: (open: boolean) => void;
-  res: BusinessProps;
-  setRes: (res: BusinessProps) => void;
+  res: TEJProps;
+  setRes: (res: TEJProps) => void;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   isErr: boolean;
@@ -42,12 +42,12 @@ export default function CreateBusiness({
       setRes={setRes as any}
       update={update}
       setUpdate={setUpdate}
-      props={businessProps}
+      props={tejProps}
       isErr={isErr}
       setIsErr={setIsErr}
     >
-      <BusinessPlan
-        res={res as BusinessProps}
+      <TEJ
+        res={res as TEJProps}
         setRes={setRes as any}
         setOpen={setOpen}
         setIsErr={setIsErr}

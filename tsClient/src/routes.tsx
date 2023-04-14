@@ -16,13 +16,15 @@ import {
   HOW_ROUTER,
   INCOME_ROUTER,
   YIELD_CALC_ROUTER,
+  TEJ_JORNAL_ROUTER,
+  TEJ_ROUTER,
 } from "./utils/consts";
-import BusinessPage from "./pages/BusinessPage";
+import TEJJornal from "./pages/TEJJornal";
 import HowThisWork from "./pages/HowThisWork";
 import Income from "./pages/Income";
 import YieldСalculation from "./pages/YieldСalculation";
-
-export const authRoutes = [];
+import TEJustification from "./pages/TEJustification";
+// export const authRoutes = [];
 
 export const publicRoutes = [
   {
@@ -55,7 +57,7 @@ export const publicRoutes = [
   },
   {
     path: BUSINESS_ROUTER,
-    Component: <BusinessPage />,
+    Component: <TEJJornal />,
   },
   {
     patch: HOW_ROUTER,
@@ -68,5 +70,13 @@ export const publicRoutes = [
   {
     patch: YIELD_CALC_ROUTER,
     Component: <YieldСalculation />,
+  },
+  {
+    patch: TEJ_JORNAL_ROUTER,
+    Component: <TEJJornal />,
+  },
+  {
+    patch: TEJ_ROUTER,
+    Component: <TEJustification />,
   },
 ];

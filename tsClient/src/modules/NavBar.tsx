@@ -6,6 +6,7 @@ import {
   INCOME_ROUTER,
   LOGIN_ROUTE,
   MAP_ROUTE,
+  TEJ_JORNAL_ROUTER,
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { getCarts, supabase } from "../http/requests";
@@ -30,7 +31,7 @@ const NavBar = observer(() => {
           <Image src={verticalLogo} h={"50px"} w={"111px"} />
         </Link>
         {user.role == "service_role" && (
-          <Box gap={4} display={"flex"}>
+          <Box as={"nav"} gap={4} display={"flex"}>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
               to={MAP_ROUTE}
@@ -45,9 +46,9 @@ const NavBar = observer(() => {
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
-              to={BUSINESS_ROUTER}
+              to={TEJ_JORNAL_ROUTER}
             >
-              Бізнес-плани
+              Техніко-економічне обгрунтування
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}

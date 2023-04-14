@@ -57,6 +57,8 @@ export interface Itech_cart {
   createdAt?: string;
   updatedAt?: string;
   timesDow?: number;
+  cultureId?: number;
+  cultivationTechnologyId?: number;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -78,6 +80,8 @@ export class tech_cart extends Model<Itech_cart> {
   declare totalCostFuel?: number;
   declare totalCostHandWork?: number;
   declare timesDow?: number;
+  declare cultureId?: number;
+  declare cultivationTechnologyId?: number;
 }
 
 tech_cart.init(
@@ -187,6 +191,7 @@ export interface Icost_material {
   consumptionPerHectare: number;
   unitsOfConsumption: string;
   techOperationId?: number;
+  purposeMaterialId?: number;
 }
 
 export class cost_material extends Model<Icost_material> {
@@ -197,6 +202,7 @@ export class cost_material extends Model<Icost_material> {
   declare consumptionPerHectare: number;
   declare unitsOfConsumption: string;
   declare techOperationId?: number;
+  declare purposeMaterialId?: number;
 }
 
 cost_material.init(
@@ -549,15 +555,15 @@ businessPlan.init(
   { sequelize }
 );
 
-export interface IbusinessCategory {
+export interface IcultivationTechnologies {
   id?: number;
   name: string;
 }
-export class businessCategory extends Model<IbusinessCategory> {
+export class cultivationTechnologies extends Model<IcultivationTechnologies> {
   declare id?: number;
   declare name: string;
 }
-businessCategory.init(
+cultivationTechnologies.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
@@ -678,17 +684,61 @@ yieldCalculation.init(
 export interface Iculture {
   id?: number;
   name: string;
+  product: string;
+  priceBerry: number;
 }
 export class culture extends Model<Iculture> {
   declare id?: number;
   declare name: string;
+  declare product: string;
+  declare priceBerry: number;
 }
 culture.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING },
+    product: { type: DataTypes.STRING },
+    priceBerry: { type: DataTypes.INTEGER },
   },
-
+  { sequelize }
+);
+export interface Ipurpose_material {
+  id?: number;
+  purpose: string;
+}
+export class purpose_material extends Model<Ipurpose_material> {
+  declare id?: number;
+  declare purpose: string;
+}
+purpose_material.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    purpose: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface ItechnologicalEconomicJustification {
+  id?: number;
+  comment: string | null;
+  techCartId?: number;
+  cultureId?: number;
+  cultivationTechnologyId?: number;
+  userId?: string;
+}
+export class technologicalEconomicJustification extends Model<ItechnologicalEconomicJustification> {
+  declare id?: number;
+  declare comment: string;
+  declare techCartId?: number;
+  declare cultureId?: number;
+  declare cultivationTechnologyId?: number;
+  declare userId: string;
+}
+technologicalEconomicJustification.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    comment: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING },
+  },
   { sequelize }
 );
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
@@ -725,7 +775,7 @@ tech_operation.hasOne(cost_hand_work);
 
 cultures_types.hasMany(tech_cart);
 
-businessCategory.hasMany(businessPlan);
+// businessCategory.hasMany(businessPlan);
 
 businessPlan.hasOne(resume);
 
@@ -734,5 +784,23 @@ businessPlan.hasOne(titlePage);
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
 
-culture.hasMany(yieldPlant);
+culture.hasOne(yieldPlant);
 yieldPlant.belongsTo(culture);
+
+purpose_material.hasMany(cost_material);
+cost_material.belongsTo(purpose_material);
+
+culture.hasMany(technologicalEconomicJustification);
+technologicalEconomicJustification.belongsTo(culture);
+
+tech_cart.hasMany(technologicalEconomicJustification);
+technologicalEconomicJustification.belongsTo(tech_cart);
+
+cultivationTechnologies.hasMany(technologicalEconomicJustification);
+technologicalEconomicJustification.belongsTo(cultivationTechnologies);
+
+culture.hasMany(tech_cart);
+tech_cart.belongsTo(culture);
+
+cultivationTechnologies.hasMany(tech_cart);
+tech_cart.belongsTo(cultivationTechnologies);

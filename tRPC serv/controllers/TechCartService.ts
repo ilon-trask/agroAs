@@ -7,16 +7,22 @@ import {
   cost_material,
   cost_service,
   cost_transport,
+  cultivationTechnologies,
+  culture,
   grade,
   Iaggregate,
   Icost_hand_work,
   Icost_material,
   Icost_service,
   Icost_transport,
+  IcultivationTechnologies,
+  Iculture,
   Imachine,
+  Ipurpose_material,
   Itech_cart,
   Itech_operation,
   Itractor,
+  purpose_material,
   tech_cart,
   tech_operation,
   tractor,
@@ -28,6 +34,9 @@ import {
   Icell,
 } from "./OperService";
 import { CreateCartType } from "../routes/cartRouter";
+export interface resMater extends Icost_material {
+  purpose_material: Ipurpose_material;
+}
 interface resTechOperationAggreagte extends Iaggregate {
   tractor: Itractor;
   agricultural_machine: Imachine;
@@ -35,12 +44,14 @@ interface resTechOperationAggreagte extends Iaggregate {
 export interface resTechOperation extends Itech_operation {
   aggregate?: resTechOperationAggreagte | null;
   cost_hand_work?: Icost_hand_work | null;
-  cost_material?: Icost_material | null;
+  cost_material?: resMater | null;
   cost_service?: Icost_service | null;
   cost_transport?: Icost_transport | null;
 }
 export interface resTechCartsWithOpers extends Itech_cart {
   tech_operations?: resTechOperation[];
+  cultivationTechnology?: IcultivationTechnologies;
+  culture?: Iculture;
 }
 let cellNames: {
   costHandWork: "cost_hand_work";
@@ -59,14 +70,17 @@ const cartsIncludes = [
   {
     model: tech_operation,
     include: [
-      cost_material,
+      { model: cost_material, include: [purpose_material] },
       cost_service,
       cost_transport,
       cost_hand_work,
       { model: aggregate, include: [tractor, agricultural_machine] },
     ],
   },
+  { model: cultivationTechnologies },
+  { model: culture },
 ];
+const includeOnlyCart = [cultivationTechnologies];
 async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
   const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
@@ -165,17 +179,26 @@ class TechCartService {
     if (!user?.sub) {
       carts = await tech_cart.findAll({
         where: { isPublic: true },
+        include: includeOnlyCart,
       });
     } else {
       carts = await tech_cart.findAll({
         where: { userId: user.sub },
+        include: includeOnlyCart,
       });
     }
 
     return carts;
   }
   async create(data: CreateCartType, user: Principal | undefined) {
-    const { nameCart, area, salary, priceDiesel } = data;
+    const {
+      nameCart,
+      area,
+      salary,
+      priceDiesel,
+      cultureId,
+      cultivationTechnologyId,
+    } = data;
 
     if (!user) return;
     const techCart: Itech_cart = await tech_cart.create({
@@ -184,17 +207,35 @@ class TechCartService {
       salary,
       priceDiesel,
       userId: user?.sub,
+      cultureId,
+      cultivationTechnologyId,
     });
 
     return techCart;
   }
   async patchCart(data: resTechCartsWithOpers, user: Principal | undefined) {
-    const { id, nameCart, area, salary, isPublic, priceDiesel } = data;
-    // console.log(user);
+    const {
+      id,
+      nameCart,
+      area,
+      salary,
+      isPublic,
+      priceDiesel,
+      cultureId,
+      cultivationTechnologyId,
+    } = data;
 
     if (user) {
       await tech_cart.update(
-        { nameCart, area, salary, isPublic, priceDiesel },
+        {
+          nameCart,
+          area,
+          salary,
+          isPublic,
+          priceDiesel,
+          cultureId,
+          cultivationTechnologyId,
+        },
         { where: { id: id } }
       );
       const techCart: resTechCartsWithOpers[] = await tech_cart.findAll({

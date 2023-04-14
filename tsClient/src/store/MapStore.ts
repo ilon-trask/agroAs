@@ -1,5 +1,8 @@
 import { makeAutoObservable } from "mobx";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import {
+  resMater,
+  resTechCartsWithOpers,
+} from "../../../tRPC serv/controllers/TechCartService";
 import {
   Itech_operation,
   Itech_cart,
@@ -14,12 +17,15 @@ import {
   Icost_hand_work,
   Ispecial_work,
   Icultures_types,
+  Ipurpose_material,
+  Iculture,
+  IcultivationTechnologies,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
   private _maps: resTechCartsWithOpers[] = [];
   private _opers: Itech_operation[] = [];
-  private _costMaterials: Icost_material[] = [];
+  private _costMaterials: resMater[] = [];
   private _costServices: Icost_service[] = [];
   private _costTransport: Icost_transport[] = [];
   private _section: Isection[] = [];
@@ -36,6 +42,9 @@ export default class MapStore {
   private _cultural: Icultures_types[] = [];
   private _NoAgreeCarts: resTechCartsWithOpers[] = [];
   private _agreeCarts: resTechCartsWithOpers[] = [];
+  private _purposeMaterial: Ipurpose_material[] = [];
+  private _culture: Iculture[] = [];
+  private _cultivationTechnologies: IcultivationTechnologies[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -52,7 +61,7 @@ export default class MapStore {
   public set newOper(opers: Itech_operation) {
     this._opers.push(opers);
   }
-  public set newCostMaterials(mat: Icost_material) {
+  public set newCostMaterials(mat: resMater) {
     this._costMaterials.push(mat);
   }
   public set costMaterials(mat) {
@@ -130,6 +139,17 @@ export default class MapStore {
   public set newAgreeCarts(maps: resTechCartsWithOpers) {
     this._agreeCarts.push(maps);
   }
+  public set purposeMaterial(purpose: Ipurpose_material[]) {
+    this._purposeMaterial = purpose;
+  }
+  public set culture(culture: Iculture[]) {
+    this._culture = culture;
+  }
+  public set cultivationTechnologies(
+    cultivationTechnologies: IcultivationTechnologies[]
+  ) {
+    this._cultivationTechnologies = cultivationTechnologies;
+  }
   public get maps() {
     return this._maps;
   }
@@ -183,5 +203,14 @@ export default class MapStore {
   }
   public get agreeCarts() {
     return this._agreeCarts;
+  }
+  public get purposeMaterial() {
+    return this._purposeMaterial;
+  }
+  public get culture() {
+    return this._culture;
+  }
+  public get cultivationTechnologies() {
+    return this._cultivationTechnologies;
   }
 }

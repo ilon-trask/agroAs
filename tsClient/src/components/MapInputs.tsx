@@ -42,7 +42,7 @@ const createCartFunc: func<cartProps> = (
     if (update) {
       updateMap(map, res as resTechCartsWithOpers);
     } else {
-      createCart(map, res as Itech_cart);
+      createCart(map, res);
     }
   }
 };
@@ -66,7 +66,6 @@ export default function MapInputs({
 }: props) {
   const { map } = useContext(Context);
   const { id } = useParams();
-  console.log(res);
 
   return (
     <ModalBody>
@@ -75,24 +74,62 @@ export default function MapInputs({
       </Heading>
       <Box
         display={"flex"}
-        alignItems={"center"}
-        gap={3}
-        mx={"auto"}
+        justifyContent={"space-between"}
         mt={"15px"}
+        gap={3}
       >
-        <Heading as={"h4"} size="sm" minW={"max-content"}>
-          Назва культури
-        </Heading>
-        <Input
-          placeholder="Вкажіть культуру"
-          type="text"
-          value={res?.nameCart}
-          onChange={(e) => {
-            setRes({ ...res, nameCart: e.target.value });
-          }}
-        />
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Назва карти
+          </Heading>
+          <Input
+            placeholder="Вкажіть назву"
+            type="text"
+            value={res?.nameCart}
+            onChange={(e) => {
+              setRes({ ...res, nameCart: e.target.value });
+            }}
+          />
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Виберіть культуру
+          </Heading>
+          <Select
+            value={res.cultureId}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, cultureId: +e.target.value }))
+            }
+          >
+            {map.culture.map((el) => (
+              <option key={el.id} value={el.id!}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Виберіть технологію
+          </Heading>
+          <Select
+            value={res.cultivationTechnologyId}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                cultivationTechnologyId: +e.target.value,
+              }))
+            }
+          >
+            {map.cultivationTechnologies.map((el) => (
+              <option key={el.id} value={el.id!}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
       </Box>
-      <Box display={"flex"} gap={3} mt={"15px"}>
+      <Box display={"flex"} mt={"15px"}>
         <div>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
             Площа,

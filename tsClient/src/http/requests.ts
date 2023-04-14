@@ -21,12 +21,15 @@ import {
 } from "../../../tRPC serv/models/models";
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
-import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
+// import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
+import TEJStore from "../store/TEJStore";
+import { createTEJType } from "../../../tRPC serv/routes/TEJRouter";
+import { cartProps } from "../modules/CreateCart";
+import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -35,7 +38,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -55,7 +58,6 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
     const cart = carts[i];
     map.maps = map.maps.filter((el) => el.id != cart.id);
     map.newMap = cart;
-    console.log(map.maps);
 
     const opers = carts[i].tech_operations;
     if (!opers) return;
@@ -159,7 +161,7 @@ export async function deleteCart(map: MapStore, id: number) {
   });
 }
 
-export async function createCart(map: MapStore, data: Itech_cart) {
+export async function createCart(map: MapStore, data: CreateCartType) {
   map.isLoading = true;
 
   await client.cart.create.query(data).then((res) => {
@@ -485,13 +487,13 @@ export function agreeCarts(map: MapStore) {
     map.isLoading = false;
   });
 }
-export function getBusinessCategory(map: MapStore, Bus: BusinessStore) {
-  map.isLoading = true;
-  client.business.getCategory.query().then((res) => {
-    Bus.businessCategory = res;
-    map.isLoading = false;
-  });
-}
+// export function getBusinessCategory(map: MapStore, Bus: BusinessStore) {
+//   map.isLoading = true;
+//   client.business.getCategory.query().then((res) => {
+//     Bus.businessCategory = res;
+//     map.isLoading = false;
+//   });
+// }
 
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
@@ -525,26 +527,26 @@ export function deleteBusinessPlan(
     map.isLoading = false;
   });
 }
-export function patchBusinessPlan(
-  map: MapStore,
-  Bus: BusinessStore,
-  data: BusinessProps
-) {
-  map.isLoading = true;
-  client.business.patch
-    .query({
-      businessCategoryId: +data.businessCategoryId!,
-      name: data.name,
-      planId: data.id!,
-    })
-    .then((res) => {
-      if (res) {
-        Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
-        Bus.newBusinessPlan = res;
-      }
-      map.isLoading = false;
-    });
-}
+// export function patchBusinessPlan(
+//   map: MapStore,
+//   Bus: BusinessStore,
+//   data: BusinessProps
+// ) {
+//   map.isLoading = true;
+//   client.business.patch
+//     .query({
+//       businessCategoryId: +data.businessCategoryId!,
+//       name: data.name,
+//       planId: data.id!,
+//     })
+//     .then((res) => {
+//       if (res) {
+//         Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
+//         Bus.newBusinessPlan = res;
+//       }
+//       map.isLoading = false;
+//     });
+// }
 export function setIsPublicBusiness(
   map: MapStore,
   Bus: BusinessStore,
@@ -642,6 +644,7 @@ export function getOnlyCart(map: MapStore) {
   map.isLoading = true;
   client.cart.getOnlyCart.query().then((res) => {
     map.maps = [];
+
     res.forEach((el) => {
       let myMap = map.maps.find((e) => e.id == el.id);
 
@@ -728,5 +731,43 @@ export function updateYieldPlant(
       income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
       income.newYieldPlant = res;
     }
+  });
+}
+export function getPurposesMaterial(map: MapStore) {
+  client.oper.getPurposesMaterial.query().then((res) => {
+    map.purposeMaterial = res;
+  });
+}
+
+// export function getCultureTEJ(TEJ: TEJStore) {
+//   client.income.getCultural.query().then((res) => {
+//     TEJ.culture = res;
+//   });
+// }
+export function getCultureTEJMap(map: MapStore) {
+  client.income.getCultural.query().then((res) => {
+    map.culture = res;
+  });
+}
+export function getCultivationTechnologiesMap(map: MapStore) {
+  client.TEJ.getCultivationTechnologies.query().then((res) => {
+    map.cultivationTechnologies = res;
+  });
+}
+// export function getCultivationTechnologies(TEJ: TEJStore) {
+//   client.TEJ.getCultivationTechnologies.query().then((res) => {
+//     TEJ.cultivationTechnologies = res;
+//   });
+// }
+
+export function getTEJ(TEJ: TEJStore) {
+  client.TEJ.get.query().then((res) => {
+    TEJ.justification = res;
+  });
+}
+
+export function createTEJ(data: createTEJType, TEJ: TEJStore) {
+  client.TEJ.create.query(data).then((res) => {
+    TEJ.newJustification = res;
   });
 }
