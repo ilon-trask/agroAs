@@ -418,6 +418,7 @@ export interface Iaggregate {
   techOperationId?: number;
   tractorId?: number;
   agriculturalMachineId?: number;
+  mechHours?: number;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -23,18 +23,27 @@ import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../main";
-import { IbusinessPlan } from "../../../tRPC serv/models/models";
+import { grade, IbusinessPlan, Igrade } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { names } from "../modules/TEJConceptTable/";
 import SelectCart from "../modules/TEJConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
-import { getCarts, patchResume, patchTitlePage } from "../http/requests";
+import {
+  getCarts,
+  getGrades,
+  getMachine,
+  getTractor,
+  patchResume,
+  patchTitlePage,
+} from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
 import { BUSINESSpLAN_ROUTER } from "../utils/consts";
 import useTEJ from "./hook/useTEJ";
+import UpdateAreaCart from "../modules/UpdateAreaCart";
+import { cartProps } from "../modules/CreateCart";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -73,17 +82,36 @@ function BiznesPlanPage() {
   );
   useEffect(() => {
     if (!myCart?.tech_operations && myJustification?.techCartId) {
-      console.log("las");
-      console.log(myJustification?.techCartId);
       getCarts(map, myJustification?.techCartId!);
+      getGrades(map);
+      getTractor(map);
+      getMachine(map);
     }
   }, [myJustification?.techCartId]);
+  const grades = map.grade;
   let costHand = 0;
+  let costMech = 0;
   myCart?.tech_operations?.forEach((el) => {
     costHand += (el?.costHandWork || 0) * myCart.area;
+    costMech += (el?.costMachineWork || 0) * myCart.area;
   });
 
-  const [isActiveInput, setIsActiveInput] = useState(false);
+  const [updCartOpen, setUpdCartOpen] = useState(false);
+  const [updCartRes, setUpdCartRes] = useState<cartProps>({
+    area: myCart?.area!,
+    cultivationTechnologyId: myCart?.cultivationTechnologyId!,
+    cultureId: myCart?.cultureId!,
+    nameCart: myCart?.nameCart!,
+    priceDiesel: myCart?.priceDiesel!,
+    salary: myCart?.salary!,
+    id: myCart?.id!,
+    isPublic: myCart?.isPublic!,
+  });
+
+  let costMechTot = 0;
+  let peopleHourTot = 0;
+  let medCostHand = 0;
+  let medCostHandCounter = 0;
   return (
     <Box>
       <Box display={"flex"} flexDirection={"row-reverse"}>
@@ -110,6 +138,7 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
+            <Th></Th>
             <Th>Культура</Th>
             <Th>Вид витрат</Th>
             <Th>Кількість га</Th>
@@ -117,6 +146,7 @@ function BiznesPlanPage() {
             <Th>Сума грн</Th>
           </Thead>
           <Tbody>
+            <Td></Td>
             <Td>{myCart?.nameCart}</Td>
             <Td></Td>
             <Td>{myCart?.area}</Td>
@@ -140,29 +170,90 @@ function BiznesPlanPage() {
         <Table size={"sm"}>
           <Thead>
             <Th>Види робіт</Th>
-            <Th>Одиниця виміру</Th>
+            <Th>Операція</Th>
             <Th>Кількість</Th>
             <Th>Середня ціна</Th>
             <Th>Сума</Th>
           </Thead>
           <Tbody>
-            <Tr>
+            <Tr fontWeight={"bold"}>
               <Td>Механізовані роботи</Td>
+              <Td></Td>
               <Td>Люд/год</Td>
+              <Td>Грн/год</Td>
+              <Td></Td>
             </Tr>
-            <Tr>
+            {map.opers.map((el) => {
+              const totalCost = el.costMachineWork! * myCart?.area!;
+              const peopleHour =
+                Math.round(
+                  (totalCost /
+                    ((myCart?.salary! / 176) *
+                      map.grade.find(
+                        (e) => e.id! == el.aggregate?.tractor.gradeId
+                      )?.coefficient!)) *
+                    100
+                ) / 100;
+              const costMech = Math.round(
+                ((totalCost / peopleHour) * 100) / 100
+              );
+              if (el.cell == "costMechanical")
+                return (
+                  <Tr>
+                    <Td>{}</Td>
+                    <Td>{el.nameOperation}</Td>
+                    <Td>{peopleHour}</Td>
+                    <Td>{costMech}</Td>
+                    <Td>{el.costMachineWork! * myCart?.area!}</Td>
+                  </Tr>
+                );
+            })}
+            <Tr fontWeight={"bold"}>
               <Td>Ручні роботи</Td>
+              <Td></Td>
               <Td>Люд/год</Td>
+              <Td>Грн/год</Td>
               <Td></Td>
-              <Td></Td>
-              <Td>{costHand}</Td>
             </Tr>
-            <Tr>
-              <Td fontWeight={"bold"}>Всього по праці</Td>
+            {map.opers.map((el) => {
+              const totalCost = el.costHandWork! * myCart?.area!;
+              const peopleHour =
+                Math.round(
+                  (totalCost /
+                    ((myCart?.salary! / 176) *
+                      map.grade.find(
+                        (e) =>
+                          e.id! == el.cost_hand_work?.gradeId! ||
+                          el.aggregate?.agricultural_machine.gradeId
+                      )?.coefficient!)) *
+                    100
+                ) / 100;
+              peopleHourTot += peopleHour;
+              const costHand = Math.round(
+                ((totalCost / peopleHour) * 100) / 100
+              );
+              medCostHand += costHand;
+              medCostHandCounter += 1;
+              if (
+                el.cell == "costHandWork" ||
+                (el.cell == "costMechanical" && el.costHandWork)
+              )
+                return (
+                  <Tr>
+                    <Td>{}</Td>
+                    <Td>{el.nameOperation}</Td>
+                    <Td>{peopleHour}</Td>
+                    <Td>{costHand}</Td>
+                    <Td>{totalCost}</Td>
+                  </Tr>
+                );
+            })}
+            <Tr fontWeight={"bold"}>
+              <Td>Всього по оплаті праці</Td>
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td>{0}</Td>
+              <Td>{costHand + costMech}</Td>
             </Tr>
           </Tbody>
         </Table>
@@ -178,30 +269,138 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Назва</Th>
-            <Th>Марка</Th>
-            <Th>Одиниця виміру</Th>
-            <Th>Кількість</Th>
-            <Th>Середня ціна</Th>
-            <Th>Сума</Th>
+            <Tr>
+              <Th>Назва</Th>
+              <Th>Марка</Th>
+              <Th>Одиниця виміру</Th>
+              <Th>Кількість</Th>
+              <Th>Ціна</Th>
+              <Th>Сума</Th>
+            </Tr>
           </Thead>
           <Tbody>
-            {map.tractor.map((el) => (
-              <Tr>
-                <Td>{el.nameTractor}</Td>
-                <Td>{el.brand}</Td>
-                <Td>Маш/год</Td>
-                <Td>{}</Td>
-                <Td>{}</Td>
-              </Tr>
-            ))}
+            <Tr fontWeight={"bold"}>
+              <Td>Трактори</Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+            </Tr>
+            {(() => {
+              let acc: number[] = [];
+              let mechHours = 0;
+              return map.opers.map((el, ind) => {
+                if (el.cell == "costMechanical") {
+                  let amountOfTractorDepreciationPerHour =
+                    el?.aggregate?.amountOfTractorDepreciationPerHour;
+                  const id = el.aggregate?.tractorId;
+                  const ex = acc.includes(id!);
+
+                  if (ex) return null;
+                  mechHours = el?.aggregate?.mechHours!;
+
+                  map.opers.forEach((e, indx) => {
+                    if (e.aggregate?.tractorId == id && ind != indx) {
+                      mechHours += e?.aggregate?.mechHours!;
+                    }
+                  });
+                  acc.push(id!);
+                  costMechTot +=
+                    mechHours *
+                    amountOfTractorDepreciationPerHour! *
+                    myCart?.area! *
+                    1.05;
+                  return (
+                    <Tr>
+                      <Td>{el.aggregate?.tractor.nameTractor}</Td>
+                      <Td>{el?.aggregate?.tractor.brand}</Td>
+                      <Td>маш/год</Td>
+                      <Td>{Math.round(mechHours * 100) / 100}</Td>
+                      <Td>
+                        {Math.round(amountOfTractorDepreciationPerHour! * 100) /
+                          100}
+                      </Td>
+                      <Td>
+                        {Math.round(
+                          mechHours *
+                            amountOfTractorDepreciationPerHour! *
+                            myCart?.area! *
+                            1.05 *
+                            100
+                        ) / 100}
+                      </Td>
+                    </Tr>
+                  );
+                }
+              });
+            })()}
+            <Tr fontWeight={"bold"}>
+              <Td>СГ машини</Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+            </Tr>
+            {(() => {
+              let acc: number[] = [];
+              let mechHours = 0;
+              return map.opers.map((el, ind) => {
+                if (el.cell == "costMechanical") {
+                  let amountOfMachineDepreciationPerHour =
+                    el?.aggregate?.amountOfMachineDepreciationPerHour;
+                  const id = el.aggregate?.agriculturalMachineId;
+                  const ex = acc.includes(id!);
+
+                  if (ex) return null;
+                  mechHours = el?.aggregate?.mechHours!;
+
+                  map.opers.forEach((e, indx) => {
+                    if (
+                      e.aggregate?.agriculturalMachineId == id &&
+                      ind != indx
+                    ) {
+                      mechHours += e?.aggregate?.mechHours!;
+                    }
+                  });
+                  acc.push(id!);
+                  costMechTot +=
+                    mechHours *
+                    amountOfMachineDepreciationPerHour! *
+                    myCart?.area! *
+                    1.05;
+                  return (
+                    <Tr>
+                      <Td>{el.aggregate?.agricultural_machine.nameMachine}</Td>
+                      <Td>{el?.aggregate?.agricultural_machine.brand}</Td>
+                      <Td>маш/год</Td>
+                      <Td>{Math.round(mechHours * 100) / 100}</Td>
+                      <Td>
+                        {Math.round(amountOfMachineDepreciationPerHour! * 100) /
+                          100}
+                      </Td>
+                      <Td>
+                        {Math.round(
+                          mechHours *
+                            amountOfMachineDepreciationPerHour! *
+                            myCart?.area! *
+                            1.05 *
+                            100
+                        ) / 100}
+                      </Td>
+                    </Tr>
+                  );
+                }
+              });
+            })()}
             <Tr>
               <Td fontWeight={"bold"}>Всього по техніці та обладнанню</Td>
               <Td></Td>
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td>{0}</Td>
+              <Td>{Math.round(costMechTot)}</Td>
             </Tr>
           </Tbody>
         </Table>
@@ -217,12 +416,14 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Призначення</Th>
-            <Th>Назва</Th>
-            <Th>Одиниця виміру</Th>
-            <Th>Кількість</Th>
-            <Th>Ціна</Th>
-            <Th>Сума</Th>
+            <Tr>
+              <Th>Призначення</Th>
+              <Th>Назва</Th>
+              <Th>Одиниця виміру</Th>
+              <Th>Кількість</Th>
+              <Th>Ціна</Th>
+              <Th>Сума</Th>
+            </Tr>
           </Thead>
           <Tbody>
             {(() => {
@@ -615,6 +816,14 @@ function BiznesPlanPage() {
         open={showSelectCart}
         setOpen={setShowSelectCart}
         child={child!}
+      />
+      <UpdateAreaCart
+        open={updCartOpen}
+        setOpen={setUpdCartOpen}
+        update={true}
+        setUpdate={() => {}}
+        res={updCartRes}
+        setRes={setUpdCartRes}
       />
       <CreateResume open={openResume} setOpen={setOpenResume} />
       <CreateTitlePage open={openTitle} setOpen={setOpenTitle} />

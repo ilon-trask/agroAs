@@ -98,8 +98,6 @@ export async function getCarts(map: MapStore, cartId: number) {
   map.isLoading = true;
 
   await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
-    console.log(carts);
-
     map.costMechanical = [];
     map.costMaterials = [];
     map.costServices = [];
@@ -154,8 +152,6 @@ export async function setIsPublic(
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
   await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
-    console.log(data.id);
-
     map.maps = map.maps.filter((el) => el.id != data.id);
     map.isLoading = false;
   });
@@ -176,7 +172,6 @@ export async function updateMap(map: MapStore, dat: resTechCartsWithOpers) {
 
   //@ts-ignore
   await client.cart.patch.mutate(data).then((res) => {
-    console.log(res);
     map.maps = map.maps.filter((el) => el.id != res[0].id);
 
     map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
@@ -230,8 +225,6 @@ export async function createOperation(
   id: number
 ) {
   map.isLoading = true;
-  console.log(arr.res);
-
   //@ts-ignore
   await client.oper.create[arr.cell]
     .query({
@@ -272,16 +265,11 @@ export async function patchOperation(
 
   let [mapData] = map.maps.filter((el) => el.id == cartId);
 
-  console.log(arr.res);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   //@ts-ignore
   let [mapOperData] = mapData.tech_operations?.filter((el) => {
     return el?.id == arr.res.operId;
   });
-  console.log(mapData);
-  console.log(mapOperData);
-  console.log(operData);
-
   mapData.costHectare! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
@@ -293,7 +281,6 @@ export async function patchOperation(
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
       map.newOper = res;
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
-      console.log(res);
 
       mapData.costHectare! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
@@ -328,7 +315,6 @@ export async function patchOperation(
         mapOperData.cost_hand_work = res.cost_hand_work;
         map.newCostHandWork = res.cost_hand_work;
       }
-      console.log(mapOperData);
       map.isLoading = false;
     });
 }
@@ -616,8 +602,6 @@ export function setIdTableInvestment(
   data: { cartId: number; businessPlanId: number }
 ) {
   client.resume.setId_tableInvestment.query(data).then((res) => {
-    console.log(res);
-
     const plan = Bus.businessPlan.find((el) => el.id == data.businessPlanId);
     if (!plan) {
       return;
@@ -631,8 +615,6 @@ export function patchTitlePage(
   data: { businessId: number; title: string }
 ) {
   client.titlePage.patch.mutate(data).then((res) => {
-    console.log(res);
-
     const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
     if (!plan) {
       return;
@@ -716,8 +698,6 @@ export function deleteYieldPlant(
 ) {
   client.income.delete.query(data).then((res) => {
     if (!res) return;
-    console.log(res);
-
     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
   });
 }

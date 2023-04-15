@@ -283,17 +283,22 @@ export async function changeOper(
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
       const rareOfProduction =
         (machine.widthOfCapture * (aggregateData.workingSpeed * 1000)) / 10000;
+      const mechHours = 1 / rareOfProduction;
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) / rareOfProduction
       );
-      //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
+      const amountOfTractorDepreciationPerHour =
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8;
+      const amountOfMachineDepreciationPerHour =
+        +machine.marketCost /
+        //@ts-ignore
+        (+machine.depreciationPeri || +machine.depreciationPeriod) /
+        220 /
+        8;
+      //не знаю чого воно обрізає період це стається до JSON.parse
       const costCars = Math.round(
-        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost /
-            //@ts-ignore
-            (+machine.depreciationPeri || +machine.depreciationPeriod) /
-            220 /
-            8) *
+        ((amountOfTractorDepreciationPerHour +
+          amountOfMachineDepreciationPerHour) *
           1.05) /
           rareOfProduction
       );
@@ -313,10 +318,14 @@ export async function changeOper(
       );
 
       elem.costMachineWork = costMachineWork;
-
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      elem.aggregate.amountOfMachineDepreciationPerHour =
+        amountOfMachineDepreciationPerHour;
+      elem.aggregate.amountOfTractorDepreciationPerHour =
+        amountOfTractorDepreciationPerHour;
+      elem.aggregate.mechHours = mechHours;
       return elem;
     } else {
       const Tractor = await tractor.findOne({
@@ -334,13 +343,18 @@ export async function changeOper(
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
       const rareOfProduction =
         (machine.widthOfCapture * (CostMechanical.workingSpeed * 1000)) / 10000;
+      const mechHours = 1 / rareOfProduction;
       const costFuel = Math.round(
         (+CostMechanical.fuelConsumption * +CostMechanical.priceDiesel) /
           rareOfProduction
       );
+      const amountOfTractorDepreciationPerHour =
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8;
+      const amountOfMachineDepreciationPerHour =
+        +machine.marketCost / +machine.depreciationPeriod / 220 / 8;
       const costCars = Math.round(
-        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
+        ((amountOfTractorDepreciationPerHour +
+          amountOfMachineDepreciationPerHour) *
           1.05) /
           rareOfProduction
       );
@@ -359,6 +373,11 @@ export async function changeOper(
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      elem.aggregate.amountOfMachineDepreciationPerHour =
+        amountOfMachineDepreciationPerHour;
+      elem.aggregate.amountOfTractorDepreciationPerHour =
+        amountOfTractorDepreciationPerHour;
+      elem.aggregate.mechHours = mechHours;
       return elem;
     }
   } else if (elem.cell == "costHandWork") {
