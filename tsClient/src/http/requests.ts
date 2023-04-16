@@ -27,7 +27,10 @@ import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
 import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
-import { createTEJType } from "../../../tRPC serv/routes/TEJRouter";
+import {
+  createTEJType,
+  setIsPublicTEJType,
+} from "../../../tRPC serv/routes/TEJRouter";
 import { cartProps } from "../modules/CreateCart";
 import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
 let user = new User();
@@ -749,5 +752,64 @@ export function getTEJ(TEJ: TEJStore) {
 export function createTEJ(data: createTEJType, TEJ: TEJStore) {
   client.TEJ.create.query(data).then((res) => {
     TEJ.newJustification = res;
+  });
+}
+
+export function deleteTEJ(data: { TEJId: number }, TEJ: TEJStore) {
+  client.TEJ.delete.query(data).then((res) => {
+    if (res == 1) {
+      TEJ.justification = TEJ.justification.filter((el) => el.id != data.TEJId);
+    }
+  });
+}
+
+export function patchTEJ(
+  data: { TEJId: number; cartId: number; comment: string; area: number },
+  TEJ: TEJStore
+) {
+  client.TEJ.patch.query(data).then((res) => {
+    if (res) {
+      TEJ.justification = TEJ.justification.filter((el) => el.id != res?.id);
+      TEJ.newJustification = res;
+    }
+  });
+}
+
+export function setIsPublicTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
+  console.log("work");
+
+  client.TEJ.setIsPublic.query(data).then((res) => {
+    if (!res) return;
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
+    TEJ.newJustification = res;
+    if (data.isPublic) TEJ.newNoAgreeJustification = res;
+    else
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
+  });
+}
+
+export function getNoAgreeJustification(TEJ: TEJStore) {
+  client.TEJ.getNoAgree.query().then((res) => {
+    if (res[0]) TEJ.noAgreeJustification = res;
+  });
+}
+
+export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
+  console.log(data.isAgree);
+
+  client.TEJ.setIsAgree.query(data).then((res) => {
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
+    TEJ.newJustification = res;
+    if (data.isAgree) {
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
+      TEJ.newNoAgreeJustification = res;
+    } else
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
   });
 }

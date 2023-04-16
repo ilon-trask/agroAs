@@ -17,8 +17,11 @@ import DeleteAlert from "../components/DeleteAlert";
 
 import {
   deleteBusinessPlan,
+  deleteTEJ,
   // getBusinessCategory,
   getBusinessPlans,
+  setIsAgreeTEJ,
+  setIsPublicTEJ,
 } from "../http/requests";
 import { Context } from "../main";
 import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
@@ -27,13 +30,18 @@ import { useNavigate } from "react-router-dom";
 import useBusiness from "./hook/useBusiness";
 import useTEJ from "./hook/useTEJ";
 import { TEJProps } from "../modules/CreateTEJ/CreateTEJ";
+import TEJPublicationPopUp from "../modules/TEJPublicationPopUp";
 
 function TEJJornal() {
   const { map, user, TEJ } = useContext(Context);
   // useBusiness(business, map);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
-  const [res, setRes] = useState<TEJProps>({ cartId: "", comment: "" });
+  const [res, setRes] = useState<TEJProps>({
+    cartId: "",
+    comment: "",
+    area: 0,
+  });
   const [isErr, setIsErr] = useState(false);
   const [update, setUpdate] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -48,24 +56,54 @@ function TEJJornal() {
   });
   const [func, setFunc] = useState<any>();
   useTEJ(TEJ);
-  // function deleteFunc(BusinessId: number) {
-  //   setDeleteOpen(true);
-  //   setFunc({
-  //     func() {
-  //       deleteBusinessPlan(map, business, BusinessId);
-  //       setDeleteOpen(false);
-  //     },
-  //   });
-  // }
+  function deleteFunc(TEJId: number) {
+    setDeleteOpen(true);
+    setFunc({
+      func() {
+        deleteTEJ({ TEJId }, TEJ);
+        setDeleteOpen(false);
+      },
+    });
+  }
+  const [TEJPubOpen, setTEJPubOpen] = useState(false);
+  const [TEJData, setTEJData] = useState({
+    TEJId: 0,
+    isPublic: false,
+    isAgree: false,
+    authorName: "",
+    publicComment: "",
+  });
 
-  // function agreeFunc(BusinessId: number, isPublic: boolean, isAgree?: boolean) {
-  //   setAgreeOpen(true);
-  //   setAgreeData({
-  //     BusinessId: BusinessId,
-  //     isPublic: isPublic,
-  //     isAgree: isAgree,
-  //   });
-  // }
+  function TEJPubOpenFunc(
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string,
+    agreeThere?: boolean
+  ) {
+    if (!agreeThere) {
+      if (isPublic) {
+        setTEJPubOpen(true);
+        setTEJData({ TEJId, isPublic, isAgree, authorName, publicComment });
+      } else {
+        setIsPublicTEJ(TEJ, { publicComment, TEJId, isPublic, authorName });
+      }
+    } else {
+      if (isAgree) {
+        setTEJPubOpen(true);
+        setTEJData({ TEJId, isPublic, isAgree, authorName, publicComment });
+      } else {
+        setIsAgreeTEJ(TEJ, {
+          publicComment,
+          TEJId,
+          isPublic,
+          authorName,
+          isAgree,
+        });
+      }
+    }
+  }
   const [showAlert, setShowAlert] = useState(false);
   return (
     <Box>
@@ -75,16 +113,11 @@ function TEJJornal() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <TEJTable
           setCreate={setCreateOpen}
-          deleteFunc={() => {}}
+          deleteFunc={deleteFunc}
           setShowAlert={setShowAlert}
           setRes={setRes}
           setUpdate={setUpdate}
-          agreeFunc={() => {}}
-          //   maps={maps}
-          //   setOpen={setOpen}
-          //   deleteOpen={deleteOpen}
-          //   setDeleteOpen={setDeleteOpen}
-          //   setPublicationOpen={setPublicationOpen}
+          TEJPubOpenFunc={TEJPubOpenFunc}
         />
       </TableContainer>
       {!!(user.role == "service_role" || user.role == "ADMIN") && (
@@ -97,17 +130,7 @@ function TEJJornal() {
           >
             <TEJAgreeTable
               setCreate={setCreateOpen}
-              deleteFunc={() => {}}
-              setShowAlert={setShowAlert}
-              setRes={setRes}
-              setUpdate={setUpdate}
-              agreeFunc={() => {}}
-
-              //   maps={maps}
-              //   setOpen={setOpen}
-              //   deleteOpen={deleteOpen}
-              //   setDeleteOpen={setDeleteOpen}
-              //   setPublicationOpen={setPublicationOpen}
+              TEJPubOpenFunc={TEJPubOpenFunc}
             />
           </TableContainer>
 
@@ -130,12 +153,7 @@ function TEJJornal() {
         setUpdate={setUpdate}
         update={update}
       />
-      <BusinessPublicationPopUp
-        open={agreeOpen}
-        setOpen={setAgreeOpen}
-        data={agreeData}
-        setData={setAgreeData}
-      />
+
       {!!deleteOpen && (
         <DeleteAlert
           open={deleteOpen}
@@ -146,6 +164,13 @@ function TEJJornal() {
       )}
       {!!showAlert && (
         <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
+      )}
+      {!!TEJPubOpen && (
+        <TEJPublicationPopUp
+          TEJData={TEJData}
+          open={TEJPubOpen}
+          setOpen={setTEJPubOpen}
+        />
       )}
     </Box>
   );

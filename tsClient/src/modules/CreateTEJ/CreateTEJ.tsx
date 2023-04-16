@@ -4,14 +4,16 @@ import TEJ from "./components/TEJ";
 import { createOperProps } from "../../pages/TechnologicalMap";
 
 export type TEJProps = {
-  id?: number;
+  TEJId?: number;
   cartId: number | "";
   comment: string;
+  area: number;
 };
 
 export const tejProps: TEJProps = {
   cartId: "",
   comment: "",
+  area: 0,
 };
 
 export default function CreateBusiness({

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   deleteCart,
   setIsAgreeBusiness,
+  setIsAgreeTEJ,
   setIsPublic,
   setIsPublicBusiness,
 } from "../../../http/requests";
@@ -14,95 +15,77 @@ import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
-import { BusinessProps } from "../../CreateTEJ/CreateTEJ";
+import { resTechnologicalEconomicJustification } from "../../../../../tRPC serv/controllers/TEJService";
 interface props {
-  e: IbusinessPlan;
-  deleteFunc: (BusinessId: number) => void;
-  setShowAlert: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<BusinessProps>>;
-  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  e: resTechnologicalEconomicJustification;
+  TEJPubOpenFunc: (
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string
+  ) => void;
 }
 
-const CartsTableItem = observer(
-  ({
-    e,
-    deleteFunc,
-    setShowAlert,
-    setUpdate,
-    setOpen,
-    setRes,
-    agreeFunc,
-  }: props) => {
-    const { map, business, user } = useContext(Context);
-    return (
-      <Tr key={e.id!}>
-        <Td
-          textAlign={"center"}
-          onClick={() => {
-            setUpdate(true);
-            setOpen(true);
-            setRes({
-              id: e.id,
-              businessCategoryId: e.businessCategoryId as number | "",
-              name: e.name,
-            });
-          }}
-        >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
-        </Td>
-        <Td>
-          <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.name}</Link>
-        </Td>
-        <Td></Td>
+const TEJAgreeTableItem = observer(({ e, TEJPubOpenFunc }: props) => {
+  const { TEJ, user } = useContext(Context);
+  return (
+    <Tr key={e.id!}>
+      <Td>
+        <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.culture.name}</Link>
+      </Td>
+      <Td>{e.cultivationTechnology.name}</Td>
+      <Td>{e.publicComment}</Td>
 
-        <Td
-          textAlign={"center"}
-          cursor={"pointer"}
-          color={"red"}
-          onClick={
-            user.role == ""
-              ? () => setShowAlert(true)
-              : () => {
-                  console.log(e.id);
-                  deleteFunc(e.id!);
-                }
-          }
-        >
-          <DeleteIcon w={"20px"} h={"auto"} />
-        </Td>
+      <Td
+        textAlign={"center"}
+        cursor={"pointer"}
+        color={"red"}
+        onClick={() => {
+          setIsAgreeTEJ(TEJ, {
+            publicComment: e.publicComment,
+            authorName: e.authorName,
+            isPublic: false,
+            TEJId: e.id,
+            isAgree: false,
+          });
+        }}
+      >
+        <DeleteIcon w={"20px"} h={"auto"} />
+      </Td>
 
-        <Td>
-          {(user.role == "ADMIN" ||
-            user.role == "AUTHOR" ||
-            user.role == "service_role") && (
-            <div
-              onClick={() => {
-                if (e.isAgree) {
-                  setIsAgreeBusiness(map, business, {
-                    BusinessId: e.id!,
-                    isAgree: false,
-                  });
-                } else {
-                  agreeFunc(e.id!, true, true);
-                }
-              }}
-            >
-              <Checkbox size="md" colorScheme="green" isChecked={e.isAgree}>
-                дозволити
-              </Checkbox>
-            </div>
-          )}
-        </Td>
-      </Tr>
-    );
-  }
-);
-export default CartsTableItem;
+      <Td>
+        {(user.role == "ADMIN" ||
+          user.role == "AUTHOR" ||
+          user.role == "service_role") && (
+          <div
+            onClick={() => {
+              if (e.isAgree) {
+                setIsAgreeTEJ(TEJ, {
+                  publicComment: e.publicComment,
+                  authorName: e.authorName,
+                  isPublic: false,
+                  TEJId: e.id,
+                  isAgree: false,
+                });
+              } else {
+                TEJPubOpenFunc(
+                  e.id!,
+                  e.isPublic!,
+                  !e.isAgree!,
+                  e.authorName,
+                  e.publicComment
+                );
+              }
+            }}
+          >
+            <Checkbox size="md" colorScheme="green" isChecked={e.isAgree}>
+              дозволити
+            </Checkbox>
+          </div>
+        )}
+      </Td>
+    </Tr>
+  );
+});
+export default TEJAgreeTableItem;

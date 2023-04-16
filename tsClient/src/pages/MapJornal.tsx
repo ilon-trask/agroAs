@@ -22,7 +22,6 @@ import CreateWork, { workProps } from "../modules/CreateWork";
 import WorkTable from "../modules/WorkTable";
 import PublicationPopUp from "../modules/CartPublicationPopUp";
 import AgreeCartsTable from "../modules/AgreeCartsTable";
-// import Button from "@mui/material/Button";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -39,6 +38,8 @@ const MapJornal = observer(function () {
     area: "",
     salary: "",
     priceDiesel: "",
+    cultivationTechnologyId: 6,
+    cultureId: 4,
   });
   const [workRes, setWorkRes] = useState<workProps>({
     nameWork: "",

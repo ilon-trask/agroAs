@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Tab,
   Tabs,
@@ -23,7 +23,12 @@ import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../main";
-import { grade, IbusinessPlan, Igrade } from "../../../tRPC serv/models/models";
+import {
+  grade,
+  IbusinessPlan,
+  Igrade,
+  ItechnologicalEconomicJustification,
+} from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { names } from "../modules/TEJConceptTable/";
@@ -40,10 +45,16 @@ import {
 import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
-import { BUSINESSpLAN_ROUTER } from "../utils/consts";
+import {
+  BUSINESSpLAN_ROUTER,
+  TEJ_JORNAL_ROUTER,
+  TEJ_ROUTER,
+} from "../utils/consts";
 import useTEJ from "./hook/useTEJ";
-import UpdateAreaCart from "../modules/UpdateAreaCart";
+import UpdateAreaCart from "../modules/UpdateAreaTEJ";
 import { cartProps } from "../modules/CreateCart";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import TEJPublicationPopUp from "../modules/TEJPublicationPopUp";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -51,7 +62,7 @@ export type iChild =
   | "finIndicators"
   | "deduction"
   | "title";
-function BiznesPlanPage() {
+function TEJjustification() {
   const [openResume, setOpenResume] = useState<boolean>(false);
   const [openTitle, setOpenTitle] = useState<boolean>(false);
   const [name, setName] = useState<iName>();
@@ -75,13 +86,13 @@ function BiznesPlanPage() {
   //   setChild(children);
   //   setName(name);
   // }
-  const myJustification = TEJ.justification.find((el) => el.id! == +id!);
-  const myCart = map.maps.find((el) => el.id == myJustification?.techCartId);
-  const myIncome = income.yieldPlant.find(
+  const myJustification = TEJ.justification?.find((el) => el.id! == +id!);
+  const myCart = map.maps?.find((el) => el.id == myJustification?.techCartId);
+  const myIncome = income.yieldPlant?.find(
     (el) => el.culture.id == myCart?.culture?.id
   );
   useEffect(() => {
-    if (!myCart?.tech_operations && myJustification?.techCartId) {
+    if (myJustification?.techCartId) {
       getCarts(map, myJustification?.techCartId!);
       getGrades(map);
       getTractor(map);
@@ -92,21 +103,14 @@ function BiznesPlanPage() {
   let costHand = 0;
   let costMech = 0;
   myCart?.tech_operations?.forEach((el) => {
-    costHand += (el?.costHandWork || 0) * myCart.area;
-    costMech += (el?.costMachineWork || 0) * myCart.area;
+    costHand += (el?.costHandWork || 0) * myJustification?.area!;
+    costMech += (el?.costMachineWork || 0) * myJustification?.area!;
   });
 
   const [updCartOpen, setUpdCartOpen] = useState(false);
-  const [updCartRes, setUpdCartRes] = useState<cartProps>({
-    area: myCart?.area!,
-    cultivationTechnologyId: myCart?.cultivationTechnologyId!,
-    cultureId: myCart?.cultureId!,
-    nameCart: myCart?.nameCart!,
-    priceDiesel: myCart?.priceDiesel!,
-    salary: myCart?.salary!,
-    id: myCart?.id!,
-    isPublic: myCart?.isPublic!,
-  });
+
+  const [updCartRes, setUpdCartRes] =
+    useState<ItechnologicalEconomicJustification>();
 
   let costMechTot = 0;
   let peopleHourTot = 0;
@@ -114,15 +118,34 @@ function BiznesPlanPage() {
   let medCostHandCounter = 0;
   return (
     <Box>
-      <Box display={"flex"} flexDirection={"row-reverse"}>
+      <Box
+        display={"flex"}
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        maxW={"1000px"}
+        mx={"auto"}
+      >
         <Button
-          mr={8}
           onClick={() => {
-            navigate(BUSINESSpLAN_ROUTER + "/" + id);
+            navigate(TEJ_JORNAL_ROUTER);
           }}
         >
-          Бізенс-план
+          Назвад
         </Button>
+        <Box display={"flex"}>
+          <Box display={"flex"}>
+            <Button>Конструктор</Button>
+            <Button>Отримати ПДФ</Button>
+          </Box>
+          <Button
+            ml={4}
+            onClick={() => {
+              navigate(BUSINESSpLAN_ROUTER + "/" + id);
+            }}
+          >
+            Бізенс-план
+          </Button>
+        </Box>
       </Box>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Техніко економічне обгрунтування <br />
@@ -138,25 +161,43 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th></Th>
-            <Th>Культура</Th>
-            <Th>Вид витрат</Th>
-            <Th>Кількість га</Th>
-            <Th>Ціна грн/га</Th>
-            <Th>Сума грн</Th>
+            <Tr>
+              <Th></Th>
+              <Th>Культура</Th>
+              <Th>Вид витрат</Th>
+              <Th>Кількість га</Th>
+              <Th>Ціна грн/га</Th>
+              <Th>Сума грн</Th>
+            </Tr>
           </Thead>
           <Tbody>
-            <Td></Td>
-            <Td>{myCart?.nameCart}</Td>
-            <Td></Td>
-            <Td>{myCart?.area}</Td>
-            <Td>{myCart?.costHectare}</Td>
-            <Td>{myCart?.costHectare! * myCart?.area!}</Td>
+            <Tr>
+              <Td
+                onClick={() => {
+                  setUpdCartOpen(true);
+                  setUpdCartRes({
+                    ...myJustification!,
+                  });
+                }}
+              >
+                <EditIcon
+                  color={"blue.400"}
+                  w={"20px"}
+                  h={"auto"}
+                  cursor={"pointer"}
+                />
+              </Td>
+              <Td>{myCart?.nameCart}</Td>
+              <Td></Td>
+              <Td>{myJustification?.area}</Td>
+              <Td>{myCart?.costHectare}</Td>
+              <Td>{myCart?.costHectare! * myJustification?.area!}</Td>
+            </Tr>
           </Tbody>
         </Table>
       </TableContainer>
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Відомість ресурсів
+        Планування потреби в ресурсах
       </Text>
       <Text
         textAlign={"center"}
@@ -169,11 +210,13 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Види робіт</Th>
-            <Th>Операція</Th>
-            <Th>Кількість</Th>
-            <Th>Середня ціна</Th>
-            <Th>Сума</Th>
+            <Tr>
+              <Th>Види робіт</Th>
+              <Th>Операція</Th>
+              <Th>Кількість</Th>
+              <Th>Середня ціна</Th>
+              <Th>Сума</Th>
+            </Tr>
           </Thead>
           <Tbody>
             <Tr fontWeight={"bold"}>
@@ -184,13 +227,13 @@ function BiznesPlanPage() {
               <Td></Td>
             </Tr>
             {map.opers.map((el) => {
-              const totalCost = el.costMachineWork! * myCart?.area!;
+              const totalCost = el.costMachineWork! * myJustification?.area!;
               const peopleHour =
                 Math.round(
                   (totalCost /
                     ((myCart?.salary! / 176) *
                       map.grade.find(
-                        (e) => e.id! == el.aggregate?.tractor.gradeId
+                        (e) => e?.id! == el?.aggregate?.tractor.gradeId
                       )?.coefficient!)) *
                     100
                 ) / 100;
@@ -199,12 +242,12 @@ function BiznesPlanPage() {
               );
               if (el.cell == "costMechanical")
                 return (
-                  <Tr>
+                  <Tr key={el.id}>
                     <Td>{}</Td>
                     <Td>{el.nameOperation}</Td>
                     <Td>{peopleHour}</Td>
                     <Td>{costMech}</Td>
-                    <Td>{el.costMachineWork! * myCart?.area!}</Td>
+                    <Td>{el.costMachineWork! * myJustification?.area!}</Td>
                   </Tr>
                 );
             })}
@@ -216,7 +259,7 @@ function BiznesPlanPage() {
               <Td></Td>
             </Tr>
             {map.opers.map((el) => {
-              const totalCost = el.costHandWork! * myCart?.area!;
+              const totalCost = el.costHandWork! * myJustification?.area!;
               const peopleHour =
                 Math.round(
                   (totalCost /
@@ -239,7 +282,7 @@ function BiznesPlanPage() {
                 (el.cell == "costMechanical" && el.costHandWork)
               )
                 return (
-                  <Tr>
+                  <Tr key={el.id}>
                     <Td>{}</Td>
                     <Td>{el.nameOperation}</Td>
                     <Td>{peopleHour}</Td>
@@ -309,10 +352,10 @@ function BiznesPlanPage() {
                   costMechTot +=
                     mechHours *
                     amountOfTractorDepreciationPerHour! *
-                    myCart?.area! *
+                    myJustification?.area! *
                     1.05;
                   return (
-                    <Tr>
+                    <Tr key={el.id}>
                       <Td>{el.aggregate?.tractor.nameTractor}</Td>
                       <Td>{el?.aggregate?.tractor.brand}</Td>
                       <Td>маш/год</Td>
@@ -325,7 +368,7 @@ function BiznesPlanPage() {
                         {Math.round(
                           mechHours *
                             amountOfTractorDepreciationPerHour! *
-                            myCart?.area! *
+                            myJustification?.area! *
                             1.05 *
                             100
                         ) / 100}
@@ -368,11 +411,11 @@ function BiznesPlanPage() {
                   costMechTot +=
                     mechHours *
                     amountOfMachineDepreciationPerHour! *
-                    myCart?.area! *
+                    myJustification?.area! *
                     1.05;
                   return (
-                    <Tr>
-                      <Td>{el.aggregate?.agricultural_machine.nameMachine}</Td>
+                    <Tr key={el.id}>
+                      <Td>{el?.aggregate?.agricultural_machine.nameMachine}</Td>
                       <Td>{el?.aggregate?.agricultural_machine.brand}</Td>
                       <Td>маш/год</Td>
                       <Td>{Math.round(mechHours * 100) / 100}</Td>
@@ -384,7 +427,7 @@ function BiznesPlanPage() {
                         {Math.round(
                           mechHours *
                             amountOfMachineDepreciationPerHour! *
-                            myCart?.area! *
+                            myJustification?.area! *
                             1.05 *
                             100
                         ) / 100}
@@ -432,12 +475,12 @@ function BiznesPlanPage() {
                 <>
                   {map.purposeMaterial.map((el) => {
                     const mat = map.costMaterials.filter(
-                      (e) => e.purpose_material.id == el.id
+                      (e) => e?.purpose_material?.id == el?.id
                     );
                     if (mat[0])
                       return (
                         <>
-                          <Tr>
+                          <Tr key={el.id}>
                             <Td fontWeight={"bold"}>{el.purpose}</Td>
                             <Td></Td>
                             <Td></Td>
@@ -447,11 +490,12 @@ function BiznesPlanPage() {
                           </Tr>
                           {mat.map((elem) => {
                             const hco =
-                              elem.consumptionPerHectare * myCart?.area!;
+                              elem.consumptionPerHectare *
+                              myJustification?.area!;
                             const hp = hco * elem.price;
                             cost += hp;
                             return (
-                              <Tr>
+                              <Tr key={elem.id}>
                                 <Td></Td>
                                 <Td>{elem.nameMaterials}</Td>
                                 <Td>{elem.unitsOfConsumption}</Td>
@@ -489,11 +533,13 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Назва</Th>
-            <Th>Одиниця виміру</Th>
-            <Th>Кількість</Th>
-            <Th>Ціна</Th>
-            <Th>Сума</Th>
+            <Tr>
+              <Th>Назва</Th>
+              <Th>Одиниця виміру</Th>
+              <Th>Кількість</Th>
+              <Th>Ціна</Th>
+              <Th>Сума</Th>
+            </Tr>
           </Thead>
           <Tbody>
             {(() => {
@@ -502,14 +548,14 @@ function BiznesPlanPage() {
               return (
                 <>
                   {serv.map((elem) => {
-                    cost += myCart?.area! * elem.price;
+                    cost += myJustification?.area! * elem.price;
                     return (
-                      <Tr>
+                      <Tr key={elem.id}>
                         <Td>{elem.nameService}</Td>
                         <Td>{elem.unitsOfCost}</Td>
-                        <Td>{myCart?.area}</Td>
+                        <Td>{myJustification?.area}</Td>
                         <Td>{elem.price}</Td>
-                        <Td>{myCart?.area! * elem.price}</Td>
+                        <Td>{myJustification?.area! * elem.price}</Td>
                       </Tr>
                     );
                   })}
@@ -537,11 +583,13 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Назва</Th>
-            <Th>Одиниця виміру</Th>
-            <Th>Кількість</Th>
-            <Th>Ціна</Th>
-            <Th>Сума</Th>
+            <Tr>
+              <Th>Назва</Th>
+              <Th>Одиниця виміру</Th>
+              <Th>Кількість</Th>
+              <Th>Ціна</Th>
+              <Th>Сума</Th>
+            </Tr>
           </Thead>
           <Tbody>
             {(() => {
@@ -550,14 +598,14 @@ function BiznesPlanPage() {
               return (
                 <>
                   {trans.map((elem) => {
-                    cost += myCart?.area! * elem.price;
+                    cost += myJustification?.area! * elem.price;
                     return (
-                      <Tr>
+                      <Tr key={elem.id}>
                         <Td>{elem.nameTransport}</Td>
                         <Td>{elem.unitsOfCost}</Td>
-                        <Td>{myCart?.area}</Td>
+                        <Td>{myJustification?.area}</Td>
                         <Td>{elem.price}</Td>
-                        <Td>{myCart?.area! * elem.price}</Td>
+                        <Td>{myJustification?.area! * elem.price}</Td>
                       </Tr>
                     );
                   })}
@@ -574,25 +622,40 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"80px"}>
         Планування доходів
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Продукт або послуга</Th>
-            <Th>Кількість</Th>
-            <Th>Ціна грн/га</Th>
-            <Th>Сума грн</Th>
+            <Tr>
+              <Th></Th>
+              <Th>Продукт або послуга</Th>
+              <Th>Кількість</Th>
+              <Th>Ціна грн/га</Th>
+              <Th>Сума грн</Th>
+            </Tr>
           </Thead>
           <Tbody>
             <Tr>
+              <Td>
+                <EditIcon
+                  color={"blue.400"}
+                  w={"20px"}
+                  h={"auto"}
+                  cursor={"pointer"}
+                />
+              </Td>
               <Td>{myCart?.culture?.product}</Td>
-              <Td>{myCart?.area! * myIncome?.yieldPerHectare!}</Td>
+              <Td>
+                {Math.round(
+                  myJustification?.area! * myIncome?.yieldPerHectare! * 1000
+                ) / 1000}
+              </Td>
               <Td>{myCart?.culture?.priceBerry}</Td>
               <Td>
                 {Math.round(
-                  myCart?.area! *
+                  myJustification?.area! *
                     myIncome?.yieldPerHectare! *
                     myCart?.culture?.priceBerry! *
                     1000
@@ -608,10 +671,12 @@ function BiznesPlanPage() {
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
-            <Th>Залишок на початок періоду</Th>
-            <Th>Прихід</Th>
-            <Th>Розхід</Th>
-            <Th>Залишов на кінець періоду</Th>
+            <Tr>
+              <Th>Залишок на початок періоду</Th>
+              <Th>Прихід</Th>
+              <Th>Розхід</Th>
+              <Th>Залишов на кінець періоду</Th>
+            </Tr>
           </Thead>
         </Table>
       </TableContainer>
@@ -817,18 +882,20 @@ function BiznesPlanPage() {
         setOpen={setShowSelectCart}
         child={child!}
       />
-      <UpdateAreaCart
-        open={updCartOpen}
-        setOpen={setUpdCartOpen}
-        update={true}
-        setUpdate={() => {}}
-        res={updCartRes}
-        setRes={setUpdCartRes}
-      />
+      {!!updCartOpen && (
+        <UpdateAreaCart
+          open={updCartOpen}
+          setOpen={setUpdCartOpen}
+          update={true}
+          setUpdate={() => {}}
+          res={updCartRes!}
+          setRes={setUpdCartRes!}
+        />
+      )}
       <CreateResume open={openResume} setOpen={setOpenResume} />
       <CreateTitlePage open={openTitle} setOpen={setOpenTitle} />
     </Box>
   );
 }
 
-export default observer(BiznesPlanPage);
+export default observer(TEJjustification);

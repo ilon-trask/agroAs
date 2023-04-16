@@ -8,8 +8,10 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { ItechnologicalEconomicJustification } from "../../../tRPC serv/models/models";
 import Dialog from "../components/Dialog";
-import { updateMap } from "../http/requests";
+import { patchTEJ, updateMap } from "../http/requests";
 import { Context } from "../main";
 import { cartProps } from "./CreateCart";
 
@@ -28,8 +30,10 @@ interface props {
   setOpen: (open: boolean) => void;
   update: boolean;
   setUpdate: (update: boolean) => void;
-  res: cartProps;
-  setRes: Dispatch<SetStateAction<cartProps>>;
+  res: ItechnologicalEconomicJustification;
+  setRes: Dispatch<
+    SetStateAction<ItechnologicalEconomicJustification | undefined>
+  >;
 }
 function UpdateAreaCart({
   open,
@@ -39,8 +43,9 @@ function UpdateAreaCart({
   setUpdate,
   update,
 }: props) {
-  const { map } = useContext(Context);
+  const { TEJ } = useContext(Context);
   const [isErr, setIsErr] = useState<boolean>(false);
+
   return (
     <Dialog
       open={open}
@@ -54,6 +59,9 @@ function UpdateAreaCart({
       setIsErr={setIsErr}
     >
       <ModalBody>
+        <Heading as={"h4"} size="md" textAlign={"center"}>
+          Редагування площі для ТЕО
+        </Heading>
         <Box>
           <Heading size="sm" minW={"max-content"}>
             Площа
@@ -62,15 +70,24 @@ function UpdateAreaCart({
             value={res.area}
             placeholder="Введіть площу"
             type="number"
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, area: +e.target.value }))
+            onChange={
+              //@ts-ignore
+              (e) => setRes((prev) => ({ ...prev, area: e.target.value }))
             }
           />
         </Box>
         <ModalFooter>
           <Button
             onClick={() => {
-              updateMap(map, res);
+              patchTEJ(
+                {
+                  cartId: res.techCartId!,
+                  comment: res.comment!,
+                  TEJId: res.id!,
+                  area: +res.area,
+                },
+                TEJ
+              );
             }}
           >
             Зберегти

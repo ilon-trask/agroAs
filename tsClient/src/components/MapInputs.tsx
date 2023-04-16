@@ -42,7 +42,15 @@ const createCartFunc: func<cartProps> = (
     if (update) {
       updateMap(map, res as resTechCartsWithOpers);
     } else {
-      createCart(map, res);
+      createCart(map, {
+        area: res.area,
+        cultivationTechnologyId: res.cultivationTechnologyId,
+        cultureId: res.cultureId,
+        nameCart: res.nameCart,
+        priceDiesel: res.priceDiesel,
+        salary: res.salary,
+        isPublic: res.isPublic,
+      });
     }
   }
 };

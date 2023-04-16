@@ -14,10 +14,10 @@ import {
   QuestionOutlineIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
-import { Itech_cart } from "../../../tRPC serv/models/models";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 
 interface props {
-  e: Itech_cart;
+  e: resTechCartsWithOpers;
   setUpdate: (update: boolean) => void;
   setOpen: (open: boolean) => void;
   setRes: (res: cartProps) => void;
@@ -54,6 +54,8 @@ const CartsTableItem = observer(
             setOpen(true);
             setRes({
               ...e,
+              cultureId: e.cultureId!,
+              cultivationTechnologyId: e.cultivationTechnologyId!,
             });
           }}
         >

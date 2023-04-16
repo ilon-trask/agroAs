@@ -1,6 +1,8 @@
 import { observer } from "mobx-react-lite";
 import React, {
   ChangeEvent,
+  Dispatch,
+  SetStateAction,
   useContext,
   useEffect,
   useRef,
@@ -8,7 +10,6 @@ import React, {
 } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
-import css from "./Dialog.module.css";
 import {
   Box,
   Heading,
@@ -23,54 +24,48 @@ import {
   Input,
   Image,
 } from "@chakra-ui/react";
-import { setIsAgreeCarts, setIsPublic, supabase } from "../http/requests";
+import {
+  setIsAgreeCarts,
+  setIsAgreeTEJ,
+  setIsPublic,
+  setIsPublicTEJ,
+  supabase,
+} from "../http/requests";
 type props = {
-  data: {
-    isOpen: boolean;
-    data: { id: number; isPublic: boolean; agree: boolean };
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  TEJData: {
+    TEJId: number;
+    isPublic: boolean;
+    isAgree: boolean;
+    authorName: string;
+    publicComment: string;
   };
-  setData: (
-    data:
-      | {
-          isOpen: boolean;
-          data: { id: number; isPublic: boolean };
-        }
-      | ((a: any) => void)
-  ) => void;
 };
 
-function CartPublicationPopUp({ data, setData }: props) {
+function TEJPublicationPopUp({ open, setOpen, TEJData }: props) {
   const [isErr, setIsErr] = useState(false);
-  const { map, user } = useContext(Context);
+  const { TEJ, user } = useContext(Context);
   const imgRef = useRef(null);
-  const [cart] = map.NoAgreeCarts.filter((el) => el.id == data.data.id);
-  const [myCart] = map.maps.filter((el) => el.id == data.data.id);
-  useEffect(() => {
-    setCultural(cart?.culturesTypeId || myCart?.culturesTypeId || 0);
-    setAuthorName(cart?.authorName || myCart?.authorName || "");
-
-    setDescription(cart?.description || myCart?.description || "");
-  }, [cart, myCart]);
-
-  const [cultural, setCultural] = useState(
-    cart?.culturesTypeId || myCart?.culturesTypeId || 0
-  );
-  const [authorName, setAuthorName] = useState(
-    cart?.authorName || myCart?.authorName || ""
-  );
-  const [description, setDescription] = useState(
-    cart?.description || myCart?.description || ""
-  );
+  const [data, setData] = useState<{
+    authorName: string;
+    publicComment: string;
+  }>({
+    authorName: TEJData.authorName,
+    publicComment: TEJData.publicComment,
+  });
 
   return (
     //@ts-ignore
     <Modal
-      isOpen={data.isOpen}
+      isOpen={open}
       onClose={() => {
-        setData({ isOpen: false, data: { id: 0, isPublic: false } });
         setIsErr(false);
-        setCultural(0);
-        setAuthorName("");
+        setOpen(false);
+        setData({
+          authorName: "",
+          publicComment: "",
+        });
       }}
       isCentered
     >
@@ -84,54 +79,43 @@ function CartPublicationPopUp({ data, setData }: props) {
           <Box as={"div"} display={"flex"} gap={10} mt={"15px"}>
             <Box>
               <Heading as={"h4"} size="sm">
-                Виберіть категорію
-              </Heading>
-              <Box>
-                <Select
-                  size={"sm"}
-                  onChange={(e) => {
-                    setCultural(+e.target.value);
-                  }}
-                  value={cultural}
-                >
-                  <option disabled hidden value={0}>
-                    Виберіть розділ
-                  </option>
-                  {map.cultural?.map((el) => (
-                    <option key={el.id} value={el.id}>
-                      {el.nameCulture}
-                    </option>
-                  ))}
-                </Select>
-              </Box>
-            </Box>
-            <Box>
-              <Heading as={"h4"} size="sm">
                 Впишіть автора
               </Heading>
               <Box>
                 <Input
                   type="text"
-                  value={authorName}
+                  value={data?.authorName}
                   onChange={(e) => {
-                    setAuthorName(e.target.value);
+                    setData((prev) => ({
+                      ...prev,
+                      authorName: e.target.value,
+                    }));
                   }}
                   placeholder={"Впишіть"}
                   size={"sm"}
                 />
               </Box>
             </Box>
+            <Box>
+              <Heading as={"h4"} size="sm">
+                Впишіть опис
+              </Heading>
+              <Input
+                size={"sm"}
+                type="text"
+                placeholder={"Впишіть"}
+                maxLength={45}
+                value={data?.publicComment}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    publicComment: e.target.value,
+                  }));
+                }}
+              />
+            </Box>
           </Box>
           <Box display={"flex"} mt={3}>
-            <Input
-              type="text"
-              maxLength={45}
-              value={description}
-              placeholder="Впишіть опис"
-              onChange={(e) => {
-                setDescription(e.target.value);
-              }}
-            />
             {user.role == "ADMIN" || user.role == "service_role" ? (
               <Box>
                 <Button
@@ -160,12 +144,12 @@ function CartPublicationPopUp({ data, setData }: props) {
                     //   });
                     const res = await supabase.storage
                       .from("images")
-                      .upload("unUsed/" + data.data.id, file);
+                      .upload("unUsed/" + TEJData.TEJId, file);
                     //@ts-ignore
                     if (res.error?.error == "Duplicate") {
                       const res = await supabase.storage
                         .from("images")
-                        .update("unUsed/" + data.data.id, file);
+                        .update("unUsed/" + TEJData.TEJId, file);
                     }
                   }}
                 />
@@ -177,29 +161,30 @@ function CartPublicationPopUp({ data, setData }: props) {
         <ModalFooter>
           <Box>
             <Button
-              mt={"10px"}
               onClick={() => {
-                if (authorName === "" || cultural === 0) {
+                if (data?.authorName === "") {
                   setIsErr(true);
                 } else {
                   setIsErr(false);
-                  setData({ isOpen: false, data: { id: 0, isPublic: false } });
-                  if (data.data.agree) {
-                    setIsAgreeCarts(
-                      map,
-                      true,
-                      data.data.id,
-                      authorName,
-                      cultural,
-                      description
-                    );
+                  setData({
+                    authorName: "",
+                    publicComment: "",
+                  });
+                  setOpen(false);
+                  if (TEJData.isAgree) {
+                    setIsAgreeTEJ(TEJ, {
+                      publicComment: data.publicComment,
+                      authorName: data.authorName,
+                      isPublic: TEJData.isPublic,
+                      TEJId: TEJData.TEJId,
+                      isAgree: TEJData.isAgree,
+                    });
                   } else {
-                    setIsPublic(map, {
-                      id: data.data.id,
-                      isPublic: data.data.isPublic,
-                      authorName,
-                      cultural,
-                      description,
+                    setIsPublicTEJ(TEJ, {
+                      authorName: data.authorName,
+                      isPublic: TEJData.isPublic,
+                      TEJId: TEJData.TEJId,
+                      publicComment: data.publicComment,
                     });
                   }
                 }
@@ -214,4 +199,4 @@ function CartPublicationPopUp({ data, setData }: props) {
   );
 }
 
-export default observer(CartPublicationPopUp);
+export default observer(TEJPublicationPopUp);

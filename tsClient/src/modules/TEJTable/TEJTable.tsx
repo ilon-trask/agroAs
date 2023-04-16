@@ -15,28 +15,36 @@ import { getTEJ } from "../../http/requests";
 interface props {
   // maps: resTechCartsWithOpers[] | [];
   setCreate: Dispatch<SetStateAction<boolean>>;
-  deleteFunc: (BusinessId: number) => void;
+  deleteFunc: (TEJId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setRes: Dispatch<SetStateAction<TEJProps>>;
-  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  TEJPubOpenFunc: (
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string
+  ) => void;
 }
 
-const CartsTable = observer(
+const TEJTable = observer(
   ({
     setCreate,
     deleteFunc,
     setShowAlert,
     setUpdate,
     setRes,
-    agreeFunc,
+    TEJPubOpenFunc,
   }: props) => {
     const { map, user, TEJ } = useContext(Context);
-    console.log(TEJ.justification);
-    const Justification: resTechnologicalEconomicJustification[] = JSON.parse(
-      JSON.stringify(TEJ.justification)
+    const Justification: resTechnologicalEconomicJustification[] | undefined =
+      JSON.parse(JSON.stringify(TEJ.justification));
+    Justification?.sort(
+      //@ts-ignore
+      (a, b) => new Date(a.createdAt!) - new Date(b.createdAt!)
     );
-    Justification.sort((a, b) => a.id! - b.id!);
+    console.log(Justification);
 
     useEffect(() => {
       getTEJ(TEJ);
@@ -48,6 +56,8 @@ const CartsTable = observer(
             <Th></Th>
             <Th>Культура</Th>
             <Th>Технологія</Th>
+            <Th>Коментар</Th>
+            <Th></Th>
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
               user.role == "service_role") && <Th></Th>}
@@ -61,7 +71,7 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {Justification.map((e) => (
+          {Justification?.map((e) => (
             <TEJTableItem
               key={e.id}
               e={e}
@@ -70,12 +80,7 @@ const CartsTable = observer(
               setOpen={setCreate}
               setUpdate={setUpdate}
               setRes={setRes}
-              agreeFunc={agreeFunc}
-              // setOpen={setOpen}
-              // setUpdate={setUpdate}
-              // deleteOpen={deleteOpen}
-              // setDeleteOpen={setDeleteOpen}
-              // setPublicationOpen={setPublicationOpen}
+              TEJPubOpenFunc={TEJPubOpenFunc}
             />
           ))}
           <Tr>
@@ -85,8 +90,6 @@ const CartsTable = observer(
                 w={6}
                 color={"blue.400"}
                 onClick={() => {
-                  console.log(23423);
-
                   setCreate(true);
                 }}
               />
@@ -101,4 +104,4 @@ const CartsTable = observer(
   }
 );
 
-export default CartsTable;
+export default TEJTable;

@@ -721,14 +721,27 @@ purpose_material.init(
 export interface ItechnologicalEconomicJustification {
   id?: number;
   comment: string | null;
+  area: number;
+  isPublic?: boolean;
+  isAgree?: boolean;
+  authorName?: string;
+  publicComment?: string;
   techCartId?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
+
+  createdAt?: string;
+  updatedAt?: string;
   userId?: string;
 }
 export class technologicalEconomicJustification extends Model<ItechnologicalEconomicJustification> {
   declare id?: number;
   declare comment: string;
+  declare area: number;
+  declare isPublic?: boolean;
+  declare isAgree?: boolean;
+  declare publicComment?: string;
+  declare authorName?: string;
   declare techCartId?: number;
   declare cultureId?: number;
   declare cultivationTechnologyId?: number;
@@ -738,6 +751,15 @@ technologicalEconomicJustification.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     comment: { type: DataTypes.STRING },
+    area: { type: DataTypes.INTEGER, allowNull: false },
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isAgree: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    publicComment: { type: DataTypes.STRING },
+    authorName: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING },
   },
   { sequelize }
@@ -794,7 +816,7 @@ cost_material.belongsTo(purpose_material);
 culture.hasMany(technologicalEconomicJustification);
 technologicalEconomicJustification.belongsTo(culture);
 
-tech_cart.hasMany(technologicalEconomicJustification);
+tech_cart.hasOne(technologicalEconomicJustification);
 technologicalEconomicJustification.belongsTo(tech_cart);
 
 cultivationTechnologies.hasMany(technologicalEconomicJustification);

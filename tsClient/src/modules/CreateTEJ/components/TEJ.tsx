@@ -17,7 +17,11 @@ import {
 } from "@chakra-ui/react";
 import MapStore from "../../../store/MapStore";
 import BusinessStore from "../../../store/BusinessStore";
-import { createBusinessPlan, createTEJ } from "../../../http/requests";
+import {
+  createBusinessPlan,
+  createTEJ,
+  patchTEJ,
+} from "../../../http/requests";
 import TEJStore from "../../../store/TEJStore";
 
 const CreateTEJ: (
@@ -38,7 +42,15 @@ const CreateTEJ: (
     setUpdate(false);
     setIsErr(false);
     if (update) {
-      // patchBusinessPlan(map, bus, res);
+      patchTEJ(
+        {
+          TEJId: res.TEJId!,
+          cartId: res.cartId,
+          comment: res.comment,
+          area: res.area,
+        },
+        TEJ
+      );
     } else {
       createTEJ(
         {
@@ -110,8 +122,9 @@ const TEJ = observer(
               {map.maps?.map((el) => (
                 <option key={el.id} value={el.id}>
                   {el.nameCart +
-                    "|" +
-                    (el.cultivationTechnology?.name || "не визначений")}
+                    "(" +
+                    (el.cultivationTechnology?.name || "не визначений") +
+                    ")"}
                 </option>
               ))}
             </Select>

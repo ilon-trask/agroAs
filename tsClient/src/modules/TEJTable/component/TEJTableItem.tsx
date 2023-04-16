@@ -31,12 +31,18 @@ import { resTechnologicalEconomicJustification } from "../../../../../tRPC serv/
 
 interface props {
   e: resTechnologicalEconomicJustification;
-  deleteFunc: (BusinessId: number) => void;
+  deleteFunc: (TEJId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setRes: Dispatch<SetStateAction<TEJProps>>;
-  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  TEJPubOpenFunc: (
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string
+  ) => void;
 }
 
 const CartsTableItem = observer(
@@ -47,7 +53,7 @@ const CartsTableItem = observer(
     setUpdate,
     setOpen,
     setRes,
-    agreeFunc,
+    TEJPubOpenFunc,
   }: props) => {
     const { map, business, user } = useContext(Context);
     return (
@@ -58,9 +64,10 @@ const CartsTableItem = observer(
             setUpdate(true);
             setOpen(true);
             setRes({
-              id: e.id,
+              TEJId: e.id,
               cartId: e.techCartId!,
               comment: e.comment!,
+              area: e.area,
             });
           }}
         >
@@ -77,6 +84,7 @@ const CartsTableItem = observer(
           </Link>
         </Td>
         <Td>{e.cultivationTechnology?.name}</Td>
+        <Td>{e.comment}</Td>
 
         <Td
           textAlign={"center"}
@@ -94,20 +102,19 @@ const CartsTableItem = observer(
           <DeleteIcon w={"20px"} h={"auto"} />
         </Td>
 
-        {/* <Td>
+        <Td>
           {(user.role == "ADMIN" ||
             user.role == "AUTHOR" ||
             user.role == "service_role") && (
             <div
               onClick={() => {
-                if (e.isPublic) {
-                  setIsPublicBusiness(map, business, {
-                    BusinessId: e.id!,
-                    isPublic: false,
-                  });
-                } else {
-                  agreeFunc(e.id!, true);
-                }
+                TEJPubOpenFunc(
+                  e.id!,
+                  !e.isPublic,
+                  e.isAgree!,
+                  e.authorName!,
+                  e.publicComment!
+                );
               }}
             >
               <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>
@@ -115,7 +122,7 @@ const CartsTableItem = observer(
               </Checkbox>
             </div>
           )}
-        </Td> */}
+        </Td>
       </Tr>
     );
   }

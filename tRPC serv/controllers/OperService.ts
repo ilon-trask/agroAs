@@ -20,17 +20,17 @@ import {
   purpose_material,
 } from "../models/models";
 
-import { resTechOperation } from "./TechCartService";
+import { resMater, resTechOperation } from "./TechCartService";
 
 export type prope =
-  | cost_material
+  | resMater
   | cost_service
   | cost_transport
   | aggregate
   | cost_hand_work;
 
 export type prope2 =
-  | cost_material[]
+  | resMater[]
   | cost_service[]
   | cost_transport[]
   | aggregate[]
@@ -321,10 +321,13 @@ export async function changeOper(
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      //@ts-ignore
       elem.aggregate.amountOfMachineDepreciationPerHour =
         amountOfMachineDepreciationPerHour;
+      //@ts-ignore
       elem.aggregate.amountOfTractorDepreciationPerHour =
         amountOfTractorDepreciationPerHour;
+      //@ts-ignore
       elem.aggregate.mechHours = mechHours;
       return elem;
     } else {
@@ -373,10 +376,13 @@ export async function changeOper(
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      //@ts-ignore
       elem.aggregate.amountOfMachineDepreciationPerHour =
         amountOfMachineDepreciationPerHour;
+      //@ts-ignore
       elem.aggregate.amountOfTractorDepreciationPerHour =
         amountOfTractorDepreciationPerHour;
+      //@ts-ignore
       elem.aggregate.mechHours = mechHours;
       return elem;
     }
@@ -503,13 +509,11 @@ class OperService {
         section,
       },
     } = data;
-    // console.log("date1");
-    // console.log(date);
 
     const oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;
 
-    const costMaterial = await cost_material.create({
+    const costMaterialPre = await cost_material.create({
       nameMaterials: nameOper,
       price,
       unitsOfCost,
@@ -517,6 +521,11 @@ class OperService {
       unitsOfConsumption,
       techOperationId: operId,
       purposeMaterialId,
+    });
+    //@ts-ignore
+    const costMaterial: resMater = await cost_material.findOne({
+      where: { id: costMaterialPre.id },
+      include: purpose_material,
     });
     const cart = await tech_cart.findOne({ where: { id: cartId } });
     tech_cart.update(
@@ -1462,8 +1471,10 @@ class OperService {
     const cell: Icell = oper.cell;
     async function get(): Promise<prope[]> {
       if (cell == "costMaterials") {
-        const costMaterials = await cost_material.findAll({
+        //@ts-ignore
+        const costMaterials: resMater[] = await cost_material.findAll({
           where: { techOperationId: operId },
+          include: purpose_material,
         });
         return costMaterials;
       } else if (cell == "costServices") {

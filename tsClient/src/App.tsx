@@ -5,12 +5,6 @@ import Footer from "./modules/Footer";
 import { useEffect, useContext, useState } from "react";
 import { Context } from "./main";
 import {
-  getCarts,
-  getSection,
-  getTractor,
-  getMachine,
-  getGrades,
-  getWorks,
   getCultural,
   getIsAgreeCarts,
   agreeCarts,
