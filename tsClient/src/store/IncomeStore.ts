@@ -18,10 +18,13 @@ export default class IncomeStore {
   public set yieldPlant(data: resYieldPlant[]) {
     this._yieldPlant = data;
   }
-
   public set newYieldPlant(data: resYieldPlant) {
-    this._yieldPlant.push(data);
+    if (!Array.isArray(this._yieldPlant)) {
+      this._yieldPlant = [];
+    }
+    this._yieldPlant = [...this._yieldPlant, data];
   }
+
   public set cultural(data: Iculture[]) {
     this._cultural = data;
   }

@@ -141,5 +141,18 @@ class TEJService {
       });
     return res;
   }
+  async getAgree() {
+    //@ts-ignore
+    const res: resTechnologicalEconomicJustification[] =
+      await technologicalEconomicJustification.findAll({
+        where: { isAgree: true, isPublic: true },
+        include: include,
+      });
+    return res;
+  }
+  async getTechnologies() {
+    const res = await cultivationTechnologies.findAll();
+    return res;
+  }
 }
 export default new TEJService();

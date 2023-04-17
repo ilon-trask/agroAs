@@ -43,7 +43,7 @@ function UpdateAreaCart({
   setUpdate,
   update,
 }: props) {
-  const { TEJ } = useContext(Context);
+  const { TEJ, user } = useContext(Context);
   const [isErr, setIsErr] = useState<boolean>(false);
 
   return (
@@ -79,15 +79,22 @@ function UpdateAreaCart({
         <ModalFooter>
           <Button
             onClick={() => {
-              patchTEJ(
-                {
-                  cartId: res.techCartId!,
-                  comment: res.comment!,
-                  TEJId: res.id!,
-                  area: +res.area,
-                },
-                TEJ
-              );
+              setOpen(false);
+              if (user.role != "") {
+                patchTEJ(
+                  {
+                    cartId: res.techCartId!,
+                    comment: res.comment!,
+                    TEJId: res.id!,
+                    area: +res.area,
+                  },
+                  TEJ
+                );
+              } else {
+                let jus = TEJ.agreeJustification.find((el) => el.id == res.id);
+                //@ts-ignore
+                jus.area = res.area;
+              }
             }}
           >
             Зберегти

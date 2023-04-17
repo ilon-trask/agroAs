@@ -44,9 +44,9 @@ const TEJAgreeTableItem = observer(({ e, TEJPubOpenFunc }: props) => {
         onClick={() => {
           setIsAgreeTEJ(TEJ, {
             publicComment: e.publicComment,
-            authorName: e.authorName,
+            authorName: e.authorName!,
             isPublic: false,
-            TEJId: e.id,
+            TEJId: e.id!,
             isAgree: false,
           });
         }}
@@ -63,9 +63,9 @@ const TEJAgreeTableItem = observer(({ e, TEJPubOpenFunc }: props) => {
               if (e.isAgree) {
                 setIsAgreeTEJ(TEJ, {
                   publicComment: e.publicComment,
-                  authorName: e.authorName,
+                  authorName: e.authorName!,
                   isPublic: false,
-                  TEJId: e.id,
+                  TEJId: e.id!,
                   isAgree: false,
                 });
               } else {
@@ -73,8 +73,8 @@ const TEJAgreeTableItem = observer(({ e, TEJPubOpenFunc }: props) => {
                   e.id!,
                   e.isPublic!,
                   !e.isAgree!,
-                  e.authorName,
-                  e.publicComment
+                  e.authorName!,
+                  e.publicComment!
                 );
               }
             }}

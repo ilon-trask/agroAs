@@ -144,12 +144,12 @@ function TEJPublicationPopUp({ open, setOpen, TEJData }: props) {
                     //   });
                     const res = await supabase.storage
                       .from("images")
-                      .upload("unUsed/" + TEJData.TEJId, file);
+                      .upload("TEJ/" + TEJData.TEJId, file);
                     //@ts-ignore
                     if (res.error?.error == "Duplicate") {
                       const res = await supabase.storage
                         .from("images")
-                        .update("unUsed/" + TEJData.TEJId, file);
+                        .update("TEJ/" + TEJData.TEJId, file);
                     }
                   }}
                 />

@@ -39,7 +39,7 @@ const TEJTable = observer(
   }: props) => {
     const { map, user, TEJ } = useContext(Context);
     const Justification: resTechnologicalEconomicJustification[] | undefined =
-      JSON.parse(JSON.stringify(TEJ.justification));
+      JSON.parse(JSON.stringify(TEJ.justification || []));
     Justification?.sort(
       //@ts-ignore
       (a, b) => new Date(a.createdAt!) - new Date(b.createdAt!)

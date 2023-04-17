@@ -32,6 +32,12 @@ export const incomeRouter = router({
     const res: resYieldPlant[] | undefined = await incomeService.get(ctx.user);
     return res;
   }),
+  getOne: publicProcedure
+    .input(z.object({ plantId: z.number() }))
+    .query(async ({ input }) => {
+      const res: resYieldPlant = await incomeService.getOne(input.plantId);
+      return res;
+    }),
   create: publicProcedure
     .input(
       z.object({

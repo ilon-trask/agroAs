@@ -39,6 +39,7 @@ import {
   getGrades,
   getMachine,
   getTractor,
+  getYieldPlant,
   patchResume,
   patchTitlePage,
 } from "../http/requests";
@@ -55,6 +56,7 @@ import UpdateAreaCart from "../modules/UpdateAreaTEJ";
 import { cartProps } from "../modules/CreateCart";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import TEJPublicationPopUp from "../modules/TEJPublicationPopUp";
+import { resTechnologicalEconomicJustification } from "../../../tRPC serv/controllers/TEJService";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -73,32 +75,32 @@ function TEJjustification() {
   useTEJ(TEJ);
   const { id } = useParams();
   const navigate = useNavigate();
-  // const Business: resBusinessPlan[] = JSON.parse(
-  //   JSON.stringify(business.businessPlan)
-  // );
-  // const [myBusiness] = Business.filter((el) => el.id == id);
-  //@ts-ignore
-  // let data = name && child ? myBusiness[name][child] : "";
-  // const [nData, setNData] = useState<string>();
-  // function getData(name: iName, children: iChild, infCartId: number | null) {
-  //   setIsActiveInput(false);
-  //   setInfCartId(infCartId || 0);
-  //   setChild(children);
-  //   setName(name);
-  // }
-  const myJustification = TEJ.justification?.find((el) => el.id! == +id!);
+
+  let myJustification: resTechnologicalEconomicJustification | undefined;
+  if (user.role == "") {
+    myJustification = TEJ.agreeJustification?.find((el) => el.id! == +id!);
+  } else {
+    myJustification = TEJ.justification?.find((el) => el.id! == +id!);
+  }
   const myCart = map.maps?.find((el) => el.id == myJustification?.techCartId);
   const myIncome = income.yieldPlant?.find(
-    (el) => el.culture.id == myCart?.culture?.id
+    (el) => el?.culture?.id == myCart?.culture?.id
   );
   useEffect(() => {
     if (myJustification?.techCartId) {
+      console.log("try2");
       getCarts(map, myJustification?.techCartId!);
       getGrades(map);
       getTractor(map);
       getMachine(map);
     }
   }, [myJustification?.techCartId]);
+  useEffect(() => {
+    if (user.role == "" && myCart?.culture?.id)
+      getYieldPlant(income, myCart?.culture?.id!);
+  }, [myCart?.culture?.id]);
+  console.log(myIncome);
+
   const grades = map.grade;
   let costHand = 0;
   let costMech = 0;
@@ -125,13 +127,15 @@ function TEJjustification() {
         maxW={"1000px"}
         mx={"auto"}
       >
-        <Button
-          onClick={() => {
-            navigate(TEJ_JORNAL_ROUTER);
-          }}
-        >
-          Назвад
-        </Button>
+        {user.role != "" && (
+          <Button
+            onClick={() => {
+              navigate(TEJ_JORNAL_ROUTER);
+            }}
+          >
+            Назвад
+          </Button>
+        )}
         <Box display={"flex"}>
           <Box display={"flex"}>
             <Button>Конструктор</Button>
@@ -437,8 +441,8 @@ function TEJjustification() {
                 }
               });
             })()}
-            <Tr>
-              <Td fontWeight={"bold"}>Всього по техніці та обладнанню</Td>
+            <Tr fontWeight={"bold"}>
+              <Td>Всього по техніці та обладнанню</Td>
               <Td></Td>
               <Td></Td>
               <Td></Td>

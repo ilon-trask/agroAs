@@ -99,6 +99,7 @@ function operValue(oper: Itech_operation) {
 }
 export async function getCarts(map: MapStore, cartId: number) {
   map.isLoading = true;
+  console.log("try");
 
   await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
     map.costMechanical = [];
@@ -669,6 +670,11 @@ export function getYieldPlants(income: IncomeStore) {
     });
   });
 }
+export function getYieldPlant(income: IncomeStore, plantId: number) {
+  client.income.getOne.query({ plantId }).then((res) => {
+    income.newYieldPlant = res;
+  });
+}
 export function createYieldCalc(
   income: IncomeStore,
   data: createYieldCalcType
@@ -745,7 +751,7 @@ export function getCultivationTechnologiesMap(map: MapStore) {
 
 export function getTEJ(TEJ: TEJStore) {
   client.TEJ.get.query().then((res) => {
-    TEJ.justification = res;
+    if (res) TEJ.justification = res;
   });
 }
 
@@ -812,4 +818,13 @@ export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
         (el) => el.id != res.id
       );
   });
+}
+export function getAgreeTEJ(TEJ: TEJStore) {
+  client.TEJ.getAgreeTEJ.query().then((res) => {
+    TEJ.agreeJustification = res;
+  });
+}
+
+export function getTechnologiesTEJ(TEJ: TEJStore) {
+  client.TEJ.getTechnologies.query().then((res) => (TEJ.technologies = res));
 }

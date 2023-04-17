@@ -76,4 +76,12 @@ export const TEJRouter = router({
         await TEJService.setIsAgree(input, ctx.user);
       return res;
     }),
+  getAgreeTEJ: publicProcedure.query(async () => {
+    const res = await TEJService.getAgree();
+    return res;
+  }),
+  getTechnologies: publicProcedure.query(async () => {
+    const res: IcultivationTechnologies[] = await TEJService.getTechnologies();
+    return res;
+  }),
 });

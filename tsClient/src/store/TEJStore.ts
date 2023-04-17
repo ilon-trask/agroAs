@@ -11,6 +11,8 @@ export default class TEJStore {
   // private _cultivationTechnologies: IcultivationTechnologies[] = [];
   private _justification: resTechnologicalEconomicJustification[] = [];
   private _noAgreeJustification: resTechnologicalEconomicJustification[] = [];
+  private _agreeJustification: resTechnologicalEconomicJustification[] = [];
+  private _technologies: IcultivationTechnologies[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -26,6 +28,12 @@ export default class TEJStore {
   }
   public get noAgreeJustification() {
     return this._noAgreeJustification;
+  }
+  public get agreeJustification() {
+    return this._agreeJustification;
+  }
+  public get technologies() {
+    return this._technologies;
   }
 
   // public set culture(culture: Iculture[]) {
@@ -55,5 +63,18 @@ export default class TEJStore {
     justification: resTechnologicalEconomicJustification
   ) {
     this._noAgreeJustification.push(justification);
+  }
+  public set agreeJustification(
+    justification: resTechnologicalEconomicJustification[]
+  ) {
+    this._agreeJustification = justification;
+  }
+  public set newAgreeJustification(
+    justification: resTechnologicalEconomicJustification
+  ) {
+    this._agreeJustification.push(justification);
+  }
+  public set technologies(tech: IcultivationTechnologies[]) {
+    this._technologies = tech;
   }
 }
