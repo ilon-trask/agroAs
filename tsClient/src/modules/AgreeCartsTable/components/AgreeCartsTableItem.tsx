@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { FC, useContext } from "react";
+import React, { Dispatch, FC, SetStateAction, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Itech_cart } from "../../../../../tRPC serv/models/models";
 // import { deleteCart, setIsPublic } from "../http/requests";
@@ -14,7 +14,7 @@ import { setIsPublic } from "../../../http/requests";
 interface props {
   e: Itech_cart;
   setOpen: (open: boolean) => void;
-  setRes: (res: Itech_cart) => void;
+  setRes: Dispatch<SetStateAction<cartProps>>;
   setPublicationOpen: ({
     isOpen,
     data: { id, isPublic, agree },

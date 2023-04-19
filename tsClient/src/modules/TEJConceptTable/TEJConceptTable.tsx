@@ -8,7 +8,6 @@ import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { BusinessProps } from "../CreateTEJ/CreateTEJ";
 import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 import { useParams } from "react-router-dom";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";

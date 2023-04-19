@@ -424,6 +424,7 @@ export async function changeOper(
             Grade.coefficient
         );
       }
+      console.log(handWork.productionRateAmount);
 
       elem.costHandWork = costHandWork;
       return elem;

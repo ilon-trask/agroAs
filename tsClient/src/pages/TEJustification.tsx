@@ -47,7 +47,9 @@ import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
 import {
+  BUSINESScATALOG_ROUTER,
   BUSINESSpLAN_ROUTER,
+  BUSINESS_ROUTER,
   TEJ_JORNAL_ROUTER,
   TEJ_ROUTER,
 } from "../utils/consts";
@@ -141,14 +143,16 @@ function TEJjustification() {
             <Button>Конструктор</Button>
             <Button>Отримати ПДФ</Button>
           </Box>
-          <Button
-            ml={4}
-            onClick={() => {
-              navigate(BUSINESSpLAN_ROUTER + "/" + id);
-            }}
-          >
-            Бізенс-план
-          </Button>
+          {user.role != "" && (
+            <Button
+              ml={4}
+              onClick={() => {
+                navigate(BUSINESScATALOG_ROUTER);
+              }}
+            >
+              Бізенс-план
+            </Button>
+          )}
         </Box>
       </Box>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>

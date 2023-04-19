@@ -47,7 +47,7 @@ class BusinessService {
     //@ts-ignore
     const plan: resBusinessPlan = await businessPlan.create({
       name: data.name,
-      businessCategoryId: data.businessCategoryId,
+      // businessCategoryId: data.businessCategoryId,
       userId: user.sub,
     });
     return plan;

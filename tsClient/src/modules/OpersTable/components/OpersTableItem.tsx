@@ -66,7 +66,7 @@ const patch: funcProps = function (
       date: el.date,
       pricePerHourPersonnel: +second.pricePerHourPersonnel || "",
       productionPerShift: +second.productionPerShift || "",
-      productionRaeAmount: +second.productionRateAmount || "",
+      productionRateAmount: +second.productionRateAmount || "",
       productionRateTime: +second.productionRateTime || "",
       productionRateWeight: +second.productionRateWeight || "",
       salaryPerShift: +second.salaryPerShift,

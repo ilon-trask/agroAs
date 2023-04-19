@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Context } from "../../main";
@@ -12,7 +12,7 @@ import { Itech_cart } from "../../../../tRPC serv/models/models";
 import { cartProps } from "../CreateCart";
 
 interface props {
-  setRes: (res: cartProps) => void;
+  setRes: Dispatch<SetStateAction<cartProps>>;
   setOpen: (open: boolean) => void;
   setPublicationOpen: ({
     isOpen,

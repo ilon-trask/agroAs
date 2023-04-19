@@ -14,7 +14,7 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
 import BusinessCatalogItem from "../components/BusinessCatalogItem";
-import { getBusinessCategory, getBusinessPlans } from "../http/requests";
+import { getBusinessPlans } from "../http/requests";
 import useBusiness from "./hook/useBusiness";
 
 function MainPage() {
@@ -69,13 +69,13 @@ function MainPage() {
               >
                 Бізнес-плани
               </Tab>
-              {business.businessCategory.map((el) => (
+              {map.cultural.map((el) => (
                 <Tab
                   display={"block"}
                   textAlign={"left"}
                   _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
                 >
-                  {el.name}
+                  {el.nameCulture}
                 </Tab>
               ))}
             </TabList>
@@ -98,7 +98,7 @@ function MainPage() {
                   )) || <Text>Немає жодного бізнес-плану</Text>}
             </Box>
           </TabPanel>
-          {business.businessCategory.map((el) => (
+          {/* {business.businessCategory.map((el) => (
             <TabPanel>
               <Box
                 display={"grid"}
@@ -113,7 +113,7 @@ function MainPage() {
                     }) || <Text>Немає жодного бізнес-плану</Text>}
               </Box>
             </TabPanel>
-          ))}
+          ))} */}
         </TabPanels>
       </Box>
     </Tabs>

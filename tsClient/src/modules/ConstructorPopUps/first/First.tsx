@@ -21,13 +21,13 @@ function First({
   res: resTechCartsWithOpers;
   setRes: Dispatch<SetStateAction<cartProps>>;
 }) {
-  console.log(res);
   return (
     <Box h={"300px"}>
       <Heading as={"h4"} size={"md"} textAlign={"center"}>
         Змінити загальні данні
       </Heading>
       <MapInputs
+        //@ts-ignore
         res={res}
         setRes={setRes as any}
         setIsErr={() => {}}

@@ -7,6 +7,9 @@ import {
   Table,
   Thead,
   Th,
+  Tr,
+  Td,
+  Tbody,
 } from "@chakra-ui/react";
 
 import TEJTable from "../modules/TEJTable";
@@ -25,22 +28,26 @@ import {
 } from "../http/requests";
 import { Context } from "../main";
 import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
-import { BUSINESScATALOG_ROUTER } from "../utils/consts";
-import { useNavigate } from "react-router-dom";
+import { BUSINESScATALOG_ROUTER, BUSINESSpLAN_ROUTER } from "../utils/consts";
+import { Link, useNavigate } from "react-router-dom";
 import useBusiness from "./hook/useBusiness";
 import useTEJ from "./hook/useTEJ";
 import { TEJProps } from "../modules/CreateTEJ/CreateTEJ";
 import TEJPublicationPopUp from "../modules/TEJPublicationPopUp";
+import CreateBusiness from "../modules/CreateBusiness";
+import { observer } from "mobx-react-lite";
+import BusinessTable from "../modules/BusinessTable";
 
 function TEJJornal() {
-  const { map, user, TEJ } = useContext(Context);
-  // useBusiness(business, map);
+  const { map, user, TEJ, business } = useContext(Context);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [res, setRes] = useState<TEJProps>({
     cartId: "",
     comment: "",
     area: 0,
+    cultivationTechnologyId: "",
+    cultureId: "",
   });
   const [isErr, setIsErr] = useState(false);
   const [update, setUpdate] = useState(false);
@@ -56,6 +63,7 @@ function TEJJornal() {
   });
   const [func, setFunc] = useState<any>();
   useTEJ(TEJ);
+  useBusiness(business, map);
   function deleteFunc(TEJId: number) {
     setDeleteOpen(true);
     setFunc({
@@ -105,6 +113,7 @@ function TEJJornal() {
     }
   }
   const [showAlert, setShowAlert] = useState(false);
+  const [openBusiness, setOpenBusiness] = useState(false);
   return (
     <Box>
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -143,6 +152,22 @@ function TEJJornal() {
           </Button>
         </Box>
       )}
+      {!!(user.role == "service_role" || user.role == "ADMIN") && (
+        <Box maxW="1000px" mx="auto">
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <BusinessTable />
+          </TableContainer>
+          <Button onClick={() => setOpenBusiness(true)}>
+            Створити бізнес-план
+          </Button>
+          <Button>Добавити ТЕО</Button>
+        </Box>
+      )}
       <CreateTEJ
         open={createOpen}
         setOpen={setCreateOpen}
@@ -172,8 +197,9 @@ function TEJJornal() {
           setOpen={setTEJPubOpen}
         />
       )}
+      <CreateBusiness open={openBusiness} setOpen={setOpenBusiness} />
     </Box>
   );
 }
 
-export default TEJJornal;
+export default observer(TEJJornal);
