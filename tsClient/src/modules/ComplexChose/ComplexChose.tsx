@@ -15,8 +15,8 @@ const Item = () => <Box>asdf</Box>;
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  section: number;
-  setSection: Dispatch<SetStateAction<number>>;
+  section: number | "";
+  setSection: Dispatch<SetStateAction<number | "">>;
 };
 function ComplexChose({ open, setOpen, section, setSection }: props) {
   const { map } = useContext(Context);
