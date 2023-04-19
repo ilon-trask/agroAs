@@ -11,8 +11,8 @@ const createCartProps = z.object({
   salary: z.number(),
   isPublic: z.boolean().optional(),
   priceDiesel: z.number(),
-  cultureId: z.number(),
-  cultivationTechnologyId: z.number(),
+  isComplex: z.boolean().optional(),
+  sectionId: z.number().optional(),
 });
 export type CreateCartType = z.infer<typeof createCartProps>;
 export const cartRouter = router({
@@ -55,8 +55,8 @@ export const cartRouter = router({
         isPublic: z.boolean().optional().nullable(),
         priceDiesel: z.number(),
         userId: z.string().optional().nullish(),
-        cultureId: z.number(),
-        cultivationTechnologyId: z.number(),
+        isComplex: z.boolean().optional(),
+        sectionId: z.number().optional(),
         tech_operations: z
           .array(
             z.object({

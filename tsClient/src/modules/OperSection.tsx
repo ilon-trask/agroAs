@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
 import css from "./Dialog.module.css";
@@ -23,6 +23,7 @@ type props = {
   setCell: (cell: Icell | "") => void;
   section: number | "";
   setSection: (section: number | "") => void;
+  sectionId: number | null | undefined;
 };
 function OperSection({
   open,
@@ -32,10 +33,15 @@ function OperSection({
   setCell,
   section,
   setSection,
+  sectionId,
 }: props) {
   const [isErr, setIsErr] = useState(false);
-  const { map } = useContext(Context);
-  const cancelRef = React.useRef();
+  const { map, user } = useContext(Context);
+  useEffect(() => {
+    if (sectionId) {
+      setSection(sectionId);
+    }
+  }, [sectionId]);
   return (
     //@ts-ignore
     <Modal
@@ -52,7 +58,7 @@ function OperSection({
       <ModalContent w={"max-content"}>
         <ModalBody w={"max-content"}>
           <Heading as={"h4"} size="md" textAlign={"center"}>
-            Виберіть розділ та тип робіт
+            {sectionId ? "Виберіть тип робіт" : "Виберіть розділ та тип робіт"}
           </Heading>
           <Box as={"div"} display={"flex"} gap={10} mt={"15px"}>
             <Box>
@@ -66,6 +72,7 @@ function OperSection({
                     setSection(+e.target.value);
                   }}
                   value={section}
+                  disabled={!!sectionId}
                 >
                   <option disabled hidden value="">
                     Виберіть розділ
@@ -99,6 +106,9 @@ function OperSection({
                   <option value="costMaterials">Матеріали</option>
                   <option value="costServices">Послуги</option>
                   <option value="costTransport">Транспортування</option>
+                  {user.role == "service_role" && !sectionId && (
+                    <option value="complex">Комплекс</option>
+                  )}
                 </Select>
               </Box>
             </Box>

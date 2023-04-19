@@ -68,6 +68,8 @@ const CartsTableItem = observer(
               cartId: e.techCartId!,
               comment: e.comment!,
               area: e.area,
+              cultivationTechnologyId: e.cultivationTechnologyId!,
+              cultureId: e.cultureId!,
             });
           }}
         >

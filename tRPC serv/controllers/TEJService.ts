@@ -9,7 +9,11 @@ import {
   tech_cart,
   technologicalEconomicJustification,
 } from "../models/models";
-import { createTEJType, setIsPublicTEJType } from "../routes/TEJRouter";
+import {
+  createTEJType,
+  patchTEJType,
+  setIsPublicTEJType,
+} from "../routes/TEJRouter";
 
 const include = [cultivationTechnologies, culture, tech_cart];
 
@@ -30,8 +34,8 @@ class TEJService {
     const cart = await tech_cart.findOne({ where: { id: data.cartId } });
     if (!cart) return;
     const TEJ = await technologicalEconomicJustification.create({
-      cultivationTechnologyId: cart.cultivationTechnologyId,
-      cultureId: cart.cultureId,
+      cultivationTechnologyId: data.cultivationTechnologyId,
+      cultureId: data.cultureId,
       comment: data.comment,
       area: cart.area,
       techCartId: data.cartId,
@@ -63,20 +67,15 @@ class TEJService {
     });
     return res;
   }
-  async patch(
-    data: { TEJId: number; cartId: number; comment: string; area: number },
-    user: Principal | undefined
-  ) {
+  async patch(data: patchTEJType, user: Principal | undefined) {
     if (!user) return;
-    const cart = await tech_cart.findOne({ where: { id: data.cartId } });
-    if (!cart) return;
     const prev = await technologicalEconomicJustification.update(
       {
         comment: data.comment,
         area: data.area,
-        cultivationTechnologyId: cart.cultivationTechnologyId,
-        cultureId: cart.cultureId,
-        techCartId: cart.id,
+        cultivationTechnologyId: data.cultivationTechnologyId,
+        cultureId: data.cultureId,
+        techCartId: data.cartId,
       },
       { where: { id: data.TEJId } }
     );
@@ -110,7 +109,7 @@ class TEJService {
       });
     return res;
   }
-  async getNoAgree(user: Principal | undefined) {
+  async getNoAgree() {
     //@ts-ignore
     const res: resTechnologicalEconomicJustification[] =
       await technologicalEconomicJustification.findAll({

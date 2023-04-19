@@ -54,8 +54,7 @@ const CartsTableItem = observer(
             setOpen(true);
             setRes({
               ...e,
-              cultureId: e.cultureId!,
-              cultivationTechnologyId: e.cultivationTechnologyId!,
+              sectionId: e.sectionId!,
             });
           }}
         >

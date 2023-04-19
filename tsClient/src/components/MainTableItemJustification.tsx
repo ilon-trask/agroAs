@@ -77,12 +77,12 @@ function MainTableItemJustification({ e }: props) {
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>
             <Box>{e?.costHectare || "0"}</Box>
-          </Box>
-          <Box display={"flex"} justifyContent={"space-between"}>
-            <Box fontWeight={"bold"}>Оновлено</Box>
-            <Box>{e?.updatedAt?.slice(0, 10) || "0"}</Box>
-          </Box>
-        </Stack> */}
+          </Box> */}
+        <Box display={"flex"} justifyContent={"space-between"}>
+          <Box fontWeight={"bold"}>Оновлено</Box>
+          <Box>{e?.updatedAt?.slice(0, 10) || "0"}</Box>
+        </Box>
+        {/* </Stack> */}
       </CardBody>
       <CardFooter pt={0}>
         <ButtonGroup spacing="2">

@@ -15,7 +15,10 @@ type props = {
 function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
   let th = { fontSize: "18px", padding: "0 10px " };
   const { map, user } = useContext(Context);
-  let [mapData] = map.maps.filter((el) => el.id == id);
+  let myMap = map.maps.find((el) => el.id == id);
+  if (!myMap) {
+    myMap = map.complex.find((el) => el.id == id);
+  }
   return (
     <Table my={"15px"} maxW={"3xl"}>
       <Thead>
@@ -29,25 +32,23 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
       </Thead>
       <Tbody>
         {
-          <Tr key={mapData?.id}>
+          <Tr key={myMap?.id}>
             {user.role != "" && (
               <Td
                 onClick={() => {
                   setMapOpen(true);
                   setUpdate(true);
-
-                  setRes({
-                    ...mapData,
-                  });
+                  //@ts-ignore
+                  setRes({ ...myMap });
                 }}
               >
                 <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
               </Td>
             )}
-            <Td>{mapData?.nameCart}</Td>
-            <Td>{mapData?.area}</Td>
-            <Td>{mapData?.salary}</Td>
-            <Td>{mapData?.priceDiesel}</Td>
+            <Td>{myMap?.nameCart}</Td>
+            <Td>{myMap?.area}</Td>
+            <Td>{myMap?.salary}</Td>
+            <Td>{myMap?.priceDiesel}</Td>
           </Tr>
         }
       </Tbody>

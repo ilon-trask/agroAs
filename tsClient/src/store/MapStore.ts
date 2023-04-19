@@ -46,6 +46,7 @@ export default class MapStore {
   private _purposeMaterial: Ipurpose_material[] = [];
   private _culture: Iculture[] = [];
   private _cultivationTechnologies: IcultivationTechnologies[] = [];
+  private _complex: resTechCartsWithOpers[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -55,6 +56,12 @@ export default class MapStore {
   }
   public set newMap(maps: resTechCartsWithOpers) {
     this._maps.push(maps);
+  }
+  public set complex(complex: resTechCartsWithOpers[]) {
+    this._complex = complex;
+  }
+  public set newComplex(complex: resTechCartsWithOpers) {
+    this._complex.push(complex);
   }
   public set opers(opers: resTechOperation[]) {
     this._opers = opers;
@@ -153,6 +160,9 @@ export default class MapStore {
   }
   public get maps() {
     return this._maps;
+  }
+  public get complex() {
+    return this._complex;
   }
   get opers() {
     return this._opers;

@@ -84,7 +84,7 @@ function TEJjustification() {
   }
   const myCart = map.maps?.find((el) => el.id == myJustification?.techCartId);
   const myIncome = income.yieldPlant?.find(
-    (el) => el?.culture?.id == myCart?.culture?.id
+    (el) => el?.culture?.id == myJustification?.culture?.id
   );
   useEffect(() => {
     if (myJustification?.techCartId) {
@@ -96,9 +96,9 @@ function TEJjustification() {
     }
   }, [myJustification?.techCartId]);
   useEffect(() => {
-    if (user.role == "" && myCart?.culture?.id)
-      getYieldPlant(income, myCart?.culture?.id!);
-  }, [myCart?.culture?.id]);
+    if (user.role == "" && myJustification?.culture?.id)
+      getYieldPlant(income, myJustification?.culture?.id!);
+  }, [myJustification?.culture?.id]);
   console.log(myIncome);
 
   const grades = map.grade;
@@ -650,18 +650,18 @@ function TEJjustification() {
                   cursor={"pointer"}
                 />
               </Td>
-              <Td>{myCart?.culture?.product}</Td>
+              <Td>{myJustification?.culture?.product}</Td>
               <Td>
                 {Math.round(
                   myJustification?.area! * myIncome?.yieldPerHectare! * 1000
                 ) / 1000}
               </Td>
-              <Td>{myCart?.culture?.priceBerry}</Td>
+              <Td>{myJustification?.culture?.priceBerry}</Td>
               <Td>
                 {Math.round(
                   myJustification?.area! *
                     myIncome?.yieldPerHectare! *
-                    myCart?.culture?.priceBerry! *
+                    myJustification?.culture?.priceBerry! *
                     1000
                 )}
               </Td>

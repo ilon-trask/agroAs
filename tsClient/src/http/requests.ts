@@ -38,6 +38,7 @@ export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
 );
+
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
@@ -59,8 +60,16 @@ const client = createTRPCProxyClient<AppRouter>({
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
+    console.log(map.maps);
     map.maps = map.maps.filter((el) => el.id != cart.id);
-    map.newMap = cart;
+    console.log(map.maps);
+
+    map.complex = map.complex.filter((el) => el.id != cart.id);
+    if (cart.isComplex) {
+      map.newComplex = cart;
+    } else {
+      map.newMap = cart;
+    }
 
     const opers = carts[i].tech_operations;
     if (!opers) return;
@@ -165,7 +174,11 @@ export async function createCart(map: MapStore, data: CreateCartType) {
   map.isLoading = true;
 
   await client.cart.create.query(data).then((res) => {
-    map.newMap = res as resTechCartsWithOpers;
+    if (res.isComplex) {
+      map.newComplex = res as resTechCartsWithOpers;
+    } else {
+      map.newMap = res as resTechCartsWithOpers;
+    }
     map.isLoading = false;
   });
 }
@@ -213,7 +226,10 @@ export async function deleteOper(
     //@ts-ignore
     .then((data: any) => {
       map.opers = map.opers.filter((el) => el.id != data.id);
-      let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
+      let mapData = map.maps.find((el) => el.id == data.techCartId);
+      if (!mapData) {
+        mapData = map.complex.find((el) => el.id == data.techCartId)!;
+      }
       mapData.costHectare! -= operValue(data);
       map.isLoading = false;
     });
@@ -239,7 +255,10 @@ export async function createOperation(
     .then((data: { oper: tech_operation; prope: prope }) => {
       const { oper, prope } = data;
       map.newOper = oper;
-      let [mapData] = map.maps.filter((el) => el.id == oper.techCartId);
+      let mapData = map.maps.find((el) => el.id == oper.techCartId);
+      if (!mapData) {
+        mapData = map.complex.find((el) => el.id == oper.techCartId)!;
+      }
       mapData.tech_operations?.push(oper);
       mapData.costHectare! += operValue(oper);
       if ("nameMaterials" in prope) {
@@ -631,11 +650,18 @@ export function getOnlyCart(map: MapStore) {
   client.cart.getOnlyCart.query().then((res) => {
     map.maps = [];
 
+    console.log(res);
     res.forEach((el) => {
-      let myMap = map.maps.find((e) => e.id == el.id);
+      let myMap = map.maps.find((e) => {
+        return e.id == el.id;
+      });
 
-      if (!myMap) {
+      if (!myMap && el.isComplex == false) {
         map.newMap = el;
+      }
+      let myComplex = map.complex.find((e) => e.id == el.id);
+      if (!myComplex && el.isComplex == true) {
+        map.newComplex = el;
       }
     });
     map.isLoading = false;
@@ -770,7 +796,14 @@ export function deleteTEJ(data: { TEJId: number }, TEJ: TEJStore) {
 }
 
 export function patchTEJ(
-  data: { TEJId: number; cartId: number; comment: string; area: number },
+  data: {
+    TEJId: number;
+    cartId: number;
+    comment: string;
+    area: number;
+    cultureId: number;
+    cultivationTechnologyId: number;
+  },
   TEJ: TEJStore
 ) {
   client.TEJ.patch.query(data).then((res) => {

@@ -33,7 +33,11 @@ const CreateTEJ: (
   setOpen: (open: boolean) => void,
   setRes: (res: TEJProps) => void
 ) => void = function (TEJ, update, setUpdate, res, setIsErr, setOpen, setRes) {
-  if (res.cartId == "") {
+  if (
+    res.cartId == "" ||
+    res.cultivationTechnologyId == "" ||
+    res.cultureId == ""
+  ) {
     setIsErr(true);
   } else {
     // res.cultureId = +res.cultureId;
@@ -48,6 +52,8 @@ const CreateTEJ: (
           cartId: res.cartId,
           comment: res.comment,
           area: res.area,
+          cultivationTechnologyId: +res.cultivationTechnologyId,
+          cultureId: +res.cultureId,
         },
         TEJ
       );
@@ -56,6 +62,8 @@ const CreateTEJ: (
         {
           cartId: res.cartId,
           comment: res.comment,
+          cultivationTechnologyId: +res.cultivationTechnologyId,
+          cultureId: +res.cultureId,
         },
         TEJ
       );
@@ -104,7 +112,7 @@ const TEJ = observer(
         >
           <Box>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
-              Виберіть карту
+              Виберіть напрямок
             </Heading>
             <Select
               size={"sm"}
@@ -121,14 +129,44 @@ const TEJ = observer(
               </option>
               {map.maps?.map((el) => (
                 <option key={el.id} value={el.id}>
-                  {el.nameCart +
-                    "(" +
-                    (el.cultivationTechnology?.name || "не визначений") +
-                    ")"}
+                  {el.nameCart}
                 </option>
               ))}
             </Select>
           </Box>
+          <Box>
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Виберіть культуру
+            </Heading>
+            <Select
+              size={"sm"}
+              onChange={(e) => {
+                setRes((prev) => ({
+                  ...prev,
+                  cultureId: +e.target.value,
+                }));
+              }}
+              value={res.cultureId}
+            >
+              <option disabled hidden value="">
+                Виберіть культуру
+              </option>
+              {map.culture?.map((el) => (
+                <option key={el.id} value={el.id}>
+                  {el.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </Box>
+        <Box
+          mt={3}
+          display={"flex"}
+          alignItems={"center"}
+          gap={4}
+          mx={"auto"}
+          w={"fit-content"}
+        >
           <Box>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
               Впишіть коментар
@@ -140,6 +178,30 @@ const TEJ = observer(
               }}
               size={"sm"}
             />
+          </Box>
+          <Box>
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Вибеірть технологію
+            </Heading>
+            <Select
+              size={"sm"}
+              onChange={(e) => {
+                setRes((prev) => ({
+                  ...prev,
+                  cultivationTechnologyId: +e.target.value,
+                }));
+              }}
+              value={res.cultivationTechnologyId}
+            >
+              <option disabled hidden value="">
+                Виберіть технологію
+              </option>
+              {map.cultivationTechnologies?.map((el) => (
+                <option key={el.id} value={el.id}>
+                  {el.name}
+                </option>
+              ))}
+            </Select>
           </Box>
         </Box>
         <ModalFooter p={"15px 67px"}>

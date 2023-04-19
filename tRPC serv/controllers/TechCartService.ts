@@ -7,16 +7,12 @@ import {
   cost_material,
   cost_service,
   cost_transport,
-  cultivationTechnologies,
-  culture,
   grade,
   Iaggregate,
   Icost_hand_work,
   Icost_material,
   Icost_service,
   Icost_transport,
-  IcultivationTechnologies,
-  Iculture,
   Imachine,
   Ipurpose_material,
   Itech_cart,
@@ -50,8 +46,6 @@ export interface resTechOperation extends Itech_operation {
 }
 export interface resTechCartsWithOpers extends Itech_cart {
   tech_operations?: resTechOperation[];
-  cultivationTechnology?: IcultivationTechnologies;
-  culture?: Iculture;
 }
 let cellNames: {
   costHandWork: "cost_hand_work";
@@ -77,10 +71,7 @@ const cartsIncludes = [
       { model: aggregate, include: [tractor, agricultural_machine] },
     ],
   },
-  { model: cultivationTechnologies },
-  { model: culture },
 ];
-const includeOnlyCart = [cultivationTechnologies];
 async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   Scarts.sort((a, b) => a.id! - b.id!);
   const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
@@ -179,26 +170,17 @@ class TechCartService {
     if (!user?.sub) {
       carts = await tech_cart.findAll({
         where: { isPublic: true },
-        include: includeOnlyCart,
       });
     } else {
       carts = await tech_cart.findAll({
         where: { userId: user.sub },
-        include: includeOnlyCart,
       });
     }
 
     return carts;
   }
   async create(data: CreateCartType, user: Principal | undefined) {
-    const {
-      nameCart,
-      area,
-      salary,
-      priceDiesel,
-      cultureId,
-      cultivationTechnologyId,
-    } = data;
+    const { nameCart, area, salary, priceDiesel, isComplex, sectionId } = data;
 
     if (!user) return;
     const techCart: Itech_cart = await tech_cart.create({
@@ -206,9 +188,9 @@ class TechCartService {
       area,
       salary,
       priceDiesel,
+      isComplex: isComplex ? true : false,
+      sectionId: sectionId ? sectionId : null,
       userId: user?.sub,
-      cultureId,
-      cultivationTechnologyId,
     });
 
     return techCart;
@@ -221,8 +203,8 @@ class TechCartService {
       salary,
       isPublic,
       priceDiesel,
-      cultureId,
-      cultivationTechnologyId,
+      isComplex,
+      sectionId,
     } = data;
 
     if (user) {
@@ -233,8 +215,8 @@ class TechCartService {
           salary,
           isPublic,
           priceDiesel,
-          cultureId,
-          cultivationTechnologyId,
+          isComplex: isComplex ? true : false,
+          sectionId: sectionId ? sectionId : null,
         },
         { where: { id: id } }
       );
@@ -242,6 +224,14 @@ class TechCartService {
         where: { id: id },
         include: cartsIncludes,
       });
+      if (isComplex && sectionId) {
+        techCart[0].tech_operations?.forEach(async (el) => {
+          await tech_operation.update(
+            { sectionId: +sectionId },
+            { where: { id: el.id } }
+          );
+        });
+      }
       const res = await changeCarts(techCart);
       let costHectare = 0;
       res.forEach((cart) => {
@@ -600,7 +590,6 @@ class TechCartService {
   async getAgreeCarts() {
     let carts: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { isPublic: true, isAgree: true },
-      include: cartsIncludes,
     });
     // carts = await changeCarts(carts);
     return carts;
@@ -610,7 +599,6 @@ class TechCartService {
 
     let cart: resTechCartsWithOpers | null = await tech_cart.findOne({
       where: { id: cartId },
-      include: cartsIncludes,
     });
     return cart;
   }

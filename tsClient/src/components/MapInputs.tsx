@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Context } from "../main";
 import { createCart, updateMap } from "../http/requests";
 import { CartProps, cartProps } from "../modules/CreateCart";
@@ -23,13 +23,20 @@ const createCartFunc: func<cartProps> = (
   res,
   setIsErr,
   setOpen,
-  setRes
+  setRes,
+  a,
+  b,
+  c,
+  d,
+  complex,
+  setComplex
 ) => {
   if (
     res.nameCart == "" ||
     res.area == "" ||
     res.salary == "" ||
-    res.priceDiesel == ""
+    res.priceDiesel == "" ||
+    (complex && !res.sectionId)
   ) {
     setIsErr(true);
   } else {
@@ -39,17 +46,18 @@ const createCartFunc: func<cartProps> = (
     res.salary = +res.salary;
     res.priceDiesel = +res.priceDiesel;
     setRes(CartProps);
+    if (setComplex) setComplex(false);
     if (update) {
       updateMap(map, res as resTechCartsWithOpers);
     } else {
       createCart(map, {
         area: res.area,
-        cultivationTechnologyId: res.cultivationTechnologyId,
-        cultureId: res.cultureId,
         nameCart: res.nameCart,
         priceDiesel: res.priceDiesel,
         salary: res.salary,
         isPublic: res.isPublic,
+        isComplex: complex ? complex : undefined,
+        sectionId: res.sectionId ? res.sectionId : undefined,
       });
     }
   }
@@ -57,13 +65,35 @@ const createCartFunc: func<cartProps> = (
 
 type props = {
   res: cartProps;
-  setRes: (res: cartProps | ((res: cartProps) => cartProps) | {}) => void;
+  setRes: Dispatch<SetStateAction<cartProps>>;
   setIsErr: (isErr: boolean) => void;
   setOpen: (open: boolean) => void;
   update: boolean;
   noBtn?: boolean;
+  complex?: boolean;
+  setComplex?: Dispatch<SetStateAction<boolean>>;
 };
-
+const Name = ({
+  res,
+  setRes,
+}: {
+  res: cartProps;
+  setRes: Dispatch<SetStateAction<cartProps>>;
+}) => (
+  <>
+    <Heading as={"h4"} size="sm" minW={"max-content"}>
+      Назва карти
+    </Heading>
+    <Input
+      placeholder="Вкажіть назву"
+      type="text"
+      value={res?.nameCart}
+      onChange={(e) => {
+        setRes({ ...res, nameCart: e.target.value });
+      }}
+    />
+  </>
+);
 export default function MapInputs({
   res,
   setRes,
@@ -71,6 +101,8 @@ export default function MapInputs({
   setOpen,
   update,
   noBtn,
+  complex,
+  setComplex,
 }: props) {
   const { map } = useContext(Context);
   const { id } = useParams();
@@ -82,62 +114,37 @@ export default function MapInputs({
       </Heading>
       <Box
         display={"flex"}
-        justifyContent={"space-between"}
+        justifyContent={"space-around"}
+        alignItems={"center"}
         mt={"15px"}
-        gap={3}
       >
-        <Box>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Назва карти
-          </Heading>
-          <Input
-            placeholder="Вкажіть назву"
-            type="text"
-            value={res?.nameCart}
-            onChange={(e) => {
-              setRes({ ...res, nameCart: e.target.value });
-            }}
-          />
-        </Box>
-        <Box>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Виберіть культуру
-          </Heading>
-          <Select
-            value={res.cultureId}
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, cultureId: +e.target.value }))
-            }
-          >
-            {map.culture.map((el) => (
-              <option key={el.id} value={el.id!}>
-                {el.name}
+        {complex ? (
+          <Box>
+            <Name res={res} setRes={setRes} />
+          </Box>
+        ) : (
+          <Name res={res} setRes={setRes} />
+        )}
+        {!!complex && (
+          <Box>
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Виберіть розділ
+            </Heading>
+            <Select
+              value={res.sectionId}
+              onChange={(e) => setRes({ ...res, sectionId: +e.target.value })}
+            >
+              <option disabled hidden value="">
+                Виберіть розділ
               </option>
-            ))}
-          </Select>
-        </Box>
-        <Box>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Виберіть технологію
-          </Heading>
-          <Select
-            value={res.cultivationTechnologyId}
-            onChange={(e) =>
-              setRes((prev) => ({
-                ...prev,
-                cultivationTechnologyId: +e.target.value,
-              }))
-            }
-          >
-            {map.cultivationTechnologies.map((el) => (
-              <option key={el.id} value={el.id!}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
+              {map.section.map((el) => (
+                <option value={el.id}>{el.name}</option>
+              ))}
+            </Select>
+          </Box>
+        )}
       </Box>
-      <Box display={"flex"} mt={"15px"}>
+      <Box display={"flex"} mt={"15px"} gap={3}>
         <div>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
             Площа,
@@ -185,7 +192,21 @@ export default function MapInputs({
         {!noBtn && (
           <Button
             onClick={() =>
-              createCartFunc(+id!, map, update, res, setIsErr, setOpen, setRes)
+              createCartFunc(
+                +id!,
+                map,
+                update,
+                res,
+                setIsErr,
+                setOpen,
+                setRes,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                complex,
+                setComplex
+              )
             }
           >
             Зберегти

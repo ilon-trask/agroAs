@@ -1,4 +1,10 @@
-import React, { ReactChild, ReactNode, useEffect } from "react";
+import React, {
+  Dispatch,
+  ReactChild,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+} from "react";
 import { observer } from "mobx-react-lite";
 // import Button from "../ui/Button/Button";
 import { FC } from "react";
@@ -17,11 +23,13 @@ export type func<T> = (
   res: T,
   setIsErr: (isErr: boolean) => void,
   setOpen: (open: boolean) => void,
-  setRes: (res: T | ((res: T) => T) | {}) => void,
+  setRes: Dispatch<SetStateAction<T>>,
   cell?: Icell | "",
   seCell?: (cell: Icell | "") => void,
   section?: number | "" | undefined,
-  setSection?: (section: number | "") => void
+  setSection?: (section: number | "") => void,
+  complex?: boolean,
+  setComplex?: Dispatch<SetStateAction<boolean>>
 ) => void;
 
 export type InputProps<T> = {
@@ -56,6 +64,7 @@ interface props {
   props: resType;
   isErr: boolean;
   setIsErr: (isErr: boolean) => void;
+  setComplex?: Dispatch<SetStateAction<boolean>>;
 }
 const Dialog: FC<props> = observer(
   ({
@@ -70,6 +79,7 @@ const Dialog: FC<props> = observer(
 
     isErr,
     setIsErr,
+    setComplex,
   }) => {
     // useEffect(() => {
     //   setRes(res);
@@ -89,6 +99,7 @@ const Dialog: FC<props> = observer(
           setIsErr(false);
           setUpdate(false);
           setRes(props);
+          if (setComplex) setComplex(false);
         }}
         isCentered
       >

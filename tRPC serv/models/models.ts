@@ -59,6 +59,8 @@ export interface Itech_cart {
   timesDow?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
+  isComplex?: boolean;
+  sectionId?: number | null;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -80,8 +82,8 @@ export class tech_cart extends Model<Itech_cart> {
   declare totalCostFuel?: number;
   declare totalCostHandWork?: number;
   declare timesDow?: number;
-  declare cultureId?: number;
-  declare cultivationTechnologyId?: number;
+  declare isComplex?: boolean;
+  declare sectionId?: number;
 }
 
 tech_cart.init(
@@ -105,6 +107,11 @@ tech_cart.init(
     totalCostFuel: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostHandWork: { type: DataTypes.NUMBER, defaultValue: 0 },
     timesDow: { type: DataTypes.NUMBER, defaultValue: 0 },
+    isComplex: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -729,7 +736,6 @@ export interface ItechnologicalEconomicJustification {
   techCartId?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
-
   createdAt?: string;
   updatedAt?: string;
   userId?: string;
@@ -822,8 +828,5 @@ technologicalEconomicJustification.belongsTo(tech_cart);
 cultivationTechnologies.hasMany(technologicalEconomicJustification);
 technologicalEconomicJustification.belongsTo(cultivationTechnologies);
 
-culture.hasMany(tech_cart);
-tech_cart.belongsTo(culture);
-
-cultivationTechnologies.hasMany(tech_cart);
-tech_cart.belongsTo(cultivationTechnologies);
+section.hasMany(tech_cart);
+tech_cart.belongsTo(section);

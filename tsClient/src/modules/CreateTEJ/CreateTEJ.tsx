@@ -8,12 +8,16 @@ export type TEJProps = {
   cartId: number | "";
   comment: string;
   area: number;
+  cultivationTechnologyId: number | "";
+  cultureId: number | "";
 };
 
 export const tejProps: TEJProps = {
   cartId: "",
   comment: "",
-  area: 0,
+  area: 1,
+  cultivationTechnologyId: "",
+  cultureId: "",
 };
 
 export default function CreateBusiness({
@@ -27,7 +31,6 @@ export default function CreateBusiness({
   setIsErr,
 }: {
   open: boolean;
-
   setOpen: (open: boolean) => void;
   res: TEJProps;
   setRes: (res: TEJProps) => void;

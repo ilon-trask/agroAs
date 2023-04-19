@@ -11,9 +11,14 @@ import { z } from "zod";
 const createTEJ = z.object({
   cartId: z.number(),
   comment: z.string(),
+  cultureId: z.number(),
+  cultivationTechnologyId: z.number(),
 });
 export type createTEJType = z.infer<typeof createTEJ>;
-
+export interface patchTEJType extends createTEJType {
+  TEJId: number;
+  area: number;
+}
 const setIsPublicTEJ = z.object({
   TEJId: z.number(),
   isPublic: z.boolean(),
@@ -51,6 +56,8 @@ export const TEJRouter = router({
         cartId: z.number(),
         comment: z.string(),
         area: z.number(),
+        cultureId: z.number(),
+        cultivationTechnologyId: z.number(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -65,8 +72,8 @@ export const TEJRouter = router({
         await TEJService.setIsPublic(input, ctx.user);
       return res;
     }),
-  getNoAgree: publicProcedure.query(async ({ ctx }) => {
-    const res = await TEJService.getNoAgree(ctx.user);
+  getNoAgree: publicProcedure.query(async () => {
+    const res = await TEJService.getNoAgree();
     return res;
   }),
   setIsAgree: publicProcedure

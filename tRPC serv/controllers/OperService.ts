@@ -66,6 +66,7 @@ export type Icell =
   | "costMechanical"
   | "costTransport"
   | "costHandWork";
+// | "complex";
 
 interface Idata<T> {
   cartId: number;

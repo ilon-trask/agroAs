@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import Dialog, { func } from "../components/Dialog";
 import MapInputs from "../components/MapInputs";
@@ -7,13 +7,12 @@ import { Icart } from "../pages/MapJornal";
 export type cartProps = {
   id?: number;
   nameCart: string;
-  area: number | "";
-  salary: number | "";
+  area: number | string;
+  salary: number | string;
   isPublic?: boolean;
-  priceDiesel: number | "";
+  priceDiesel: number | string;
   totalCost?: number;
-  cultureId: number;
-  cultivationTechnologyId: number;
+  sectionId?: number | "";
 };
 export const CartProps: cartProps = {
   nameCart: "",
@@ -21,8 +20,7 @@ export const CartProps: cartProps = {
   salary: "",
   isPublic: false,
   priceDiesel: "",
-  cultivationTechnologyId: 6,
-  cultureId: 4,
+  sectionId: "",
 };
 
 interface props {
@@ -32,6 +30,8 @@ interface props {
   setUpdate: (update: boolean) => void;
   res: cartProps;
   setRes: (res: cartProps | ((res: cartProps) => cartProps) | {}) => void;
+  complex?: boolean;
+  setComplex?: Dispatch<SetStateAction<boolean>>;
 }
 export default function CreateCart({
   open,
@@ -40,6 +40,8 @@ export default function CreateCart({
   setUpdate,
   res,
   setRes,
+  complex,
+  setComplex,
 }: props) {
   const [isErr, setIsErr] = useState<boolean>(false);
   return (
@@ -53,6 +55,7 @@ export default function CreateCart({
       props={CartProps}
       isErr={isErr}
       setIsErr={setIsErr}
+      setComplex={setComplex}
     >
       <MapInputs
         res={res}
@@ -60,6 +63,8 @@ export default function CreateCart({
         setIsErr={setIsErr}
         setOpen={setOpen}
         update={update}
+        complex={complex}
+        setComplex={setComplex}
       />
     </Dialog>
   );

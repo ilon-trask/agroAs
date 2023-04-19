@@ -31,6 +31,8 @@ import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import TechnologicalMapPdf from "./pdf/TechnologicalMapPdf";
 import getSectionsOpers from "../store/GetSectionsOpers";
+import Dialog from "../components/Dialog";
+import ComplexChose from "../modules/ComplexChose";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -65,7 +67,10 @@ const TechnologicalMap = observer(() => {
   });
   const navigate = useNavigate();
   const pdfContent = useRef<HTMLDivElement>(null);
-  const myMap = map.maps.find((el) => el.id == id);
+  let myMap = map.maps.find((el) => el.id == id);
+  if (!myMap) {
+    myMap = map.complex.find((el) => el.id == id);
+  }
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {
@@ -78,7 +83,6 @@ const TechnologicalMap = observer(() => {
     console.log(myMap);
     getCarts(map, +id!);
     if (!myMap?.tech_operations) {
-      getSection(map);
       getTractor(map);
       getMachine(map);
       getGrades(map);
@@ -133,6 +137,17 @@ const TechnologicalMap = observer(() => {
           <Text textAlign={"center"} fontSize={"25px"}>
             Технологічна карта
           </Text>
+          {myMap?.isComplex && (
+            <Text textAlign={"center"} fontSize={"25px"}>
+              Комплекс робіт: {myMap.nameCart}
+            </Text>
+          )}
+          {myMap?.isComplex && (
+            <Text textAlign={"center"} fontSize={"25px"}>
+              Розділ:{" "}
+              {map.section.find((el) => el.id == myMap?.sectionId)?.name}
+            </Text>
+          )}
           <Box>
             <Box
               display={"flex"}
@@ -196,6 +211,7 @@ const TechnologicalMap = observer(() => {
           setCell={setCell}
           section={section}
           setSection={setSection}
+          sectionId={myMap?.sectionId}
         />
 
         {cell === "costMaterials" ? (
@@ -269,6 +285,14 @@ const TechnologicalMap = observer(() => {
             isErr={isErr}
             setIsErr={setIsErr}
           />
+        ) : //@ts-ignore
+        cell == "complex" ? (
+          <ComplexChose
+            open={secondOpen}
+            setOpen={setSecondOpen}
+            section={section}
+            setSection={setSection}
+          />
         ) : (
           ""
         )}
@@ -279,6 +303,8 @@ const TechnologicalMap = observer(() => {
           setUpdate={setUpdate}
           res={res as cartProps}
           setRes={setRes}
+          complex={true}
+          setComplex={() => {}}
         />
       </Box>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
