@@ -196,6 +196,13 @@ export interface guestAggregate extends Iaggregate {
 export interface guest_cost_hand_work extends Icost_hand_work {
   salary: number;
 }
+export const opeInclude = [
+  cost_material,
+  cost_service,
+  cost_transport,
+  cost_hand_work,
+  { model: aggregate, include: [tractor, agricultural_machine] },
+];
 async function createOper(
   cartId: number,
   nameOper: string,

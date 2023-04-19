@@ -290,7 +290,9 @@ const TechnologicalMap = observer(() => {
           <ComplexChose
             open={secondOpen}
             setOpen={setSecondOpen}
+            //@ts-ignore
             section={section}
+            //@ts-ignore
             setSection={setSection}
           />
         ) : (

@@ -217,4 +217,14 @@ export const cartRouter = router({
         await TechCartService.downloaded(input);
       return cart;
     }),
+  copyComplex: publicProcedure
+    .input(z.object({ complexId: z.number(), cartId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const res = await TechCartService.copyComplex(
+        input.complexId,
+        input.cartId,
+        ctx.user
+      );
+      return res;
+    }),
 });

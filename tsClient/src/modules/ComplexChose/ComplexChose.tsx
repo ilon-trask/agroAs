@@ -7,7 +7,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useParams } from "react-router-dom";
 import Dialog from "../../components/Dialog";
+import { copyComplex } from "../../http/requests";
 import { Context } from "../../main";
 const Item = () => <Box>asdf</Box>;
 type props = {
@@ -18,6 +20,7 @@ type props = {
 };
 function ComplexChose({ open, setOpen, section, setSection }: props) {
   const { map } = useContext(Context);
+  const { id } = useParams();
   const [res, setRes] = useState<number | "">("");
   const [isErr, setIsErr] = useState(false);
   const thisComplexes = map.complex.filter((el) => el.sectionId == section);
@@ -58,6 +61,9 @@ function ComplexChose({ open, setOpen, section, setSection }: props) {
       <AlertDialogFooter>
         <Button
           onClick={() => {
+            if (res != "") {
+              copyComplex(map, +res, +id!);
+            }
             setOpen(false);
           }}
         >

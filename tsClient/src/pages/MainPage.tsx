@@ -147,7 +147,7 @@ function MainPage() {
         </Box>
       </Tabs>
       <Heading textAlign={"center"} mt={"20px"}>
-        ТЕО
+        Техніко-економічні обгрунтування
       </Heading>
       <Tabs
         orientation={windW < 770 ? "horizontal" : "vertical"}

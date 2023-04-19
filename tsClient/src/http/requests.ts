@@ -861,3 +861,29 @@ export function getAgreeTEJ(TEJ: TEJStore) {
 export function getTechnologiesTEJ(TEJ: TEJStore) {
   client.TEJ.getTechnologies.query().then((res) => (TEJ.technologies = res));
 }
+
+export function copyComplex(map: MapStore, complexId: number, cartId: number) {
+  client.cart.copyComplex.query({ cartId, complexId }).then((res) => {
+    if (!res) return;
+    map.maps = map.maps.filter((el) => el.id != res.id);
+    map.opers = map.opers.filter((el) => el.techCartId != res.id!);
+    res.tech_operations?.forEach((oper) => {
+      map.costMechanical = map.costMechanical.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costMaterials = map.costMaterials.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costServices = map.costServices.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costTransport = map.costTransport.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costHandWork = map.costHandWork.filter(
+        (el) => el.techOperationId != oper.id
+      );
+    });
+    operationsFilter([res], map);
+  });
+}

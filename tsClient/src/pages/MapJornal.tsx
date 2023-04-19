@@ -228,7 +228,9 @@ const MapJornal = observer(function () {
               </Table>
             </TableContainer>
             <Button
+              mt={"15px"}
               onClick={
+                //@ts-ignore
                 user.role == ""
                   ? () => {
                       setShowAlert(true);
