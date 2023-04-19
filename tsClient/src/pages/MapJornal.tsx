@@ -172,7 +172,7 @@ const MapJornal = observer(function () {
         {user.role == "service_role" && (
           <>
             <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-              Комплекс робіт
+              Комплекси робіт
             </Text>
             <TableContainer
               maxW="1000px"
@@ -258,13 +258,6 @@ const MapJornal = observer(function () {
           </TableContainer>
         )}
       </Box>
-      {user.role == "service_role" && (
-        <Box>
-          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            Комплекси робіт
-          </Text>
-        </Box>
-      )}
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
