@@ -31,8 +31,6 @@ function MainTable({ e }: props) {
   const { map } = useContext(Context);
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, e?.id!);
-    console.log(a);
-
     return a;
   }, [map.opers]);
   return (
@@ -87,7 +85,6 @@ function MainTable({ e }: props) {
           <Button
             onClick={() => {
               navigate(TEHMAP_ROUTER + "/" + e?.id);
-              console.log(TEHMAP_ROUTER + "/" + e?.id);
             }}
           >
             До карти

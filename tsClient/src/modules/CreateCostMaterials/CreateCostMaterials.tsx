@@ -10,6 +10,7 @@ export type MaterialsProps = {
   consumptionPerHectare: string | number;
   unitsOfCost: string;
   unitsOfConsumption: string;
+  purposeMaterialId: number;
 };
 
 export const materialsProps: MaterialsProps = {
@@ -19,6 +20,7 @@ export const materialsProps: MaterialsProps = {
   consumptionPerHectare: "",
   unitsOfCost: "",
   unitsOfConsumption: "",
+  purposeMaterialId: 7,
 };
 
 const cell = "costMaterials";

@@ -1,24 +1,21 @@
 import { makeAutoObservable } from "mobx";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
-import {
-  IbusinessCategory,
-  IbusinessPlan,
-} from "../../../tRPC serv/models/models";
+import { IbusinessPlan, Iculture } from "../../../tRPC serv/models/models";
 
 export default class BusinessStore {
-  private _businessCategory: IbusinessCategory[] = [];
+  // private _businessCategory: IbusinessCategory[] = [];
   private _businessPlans: resBusinessPlan[] = [];
   private _noAgreeBusinessPlan: IbusinessPlan[] = [];
   constructor() {
     makeAutoObservable(this);
   }
 
-  public set businessCategory(v: IbusinessCategory[]) {
-    this._businessCategory = v;
-  }
-  public set newBusinessCategory(v: IbusinessCategory) {
-    this._businessCategory.push(v);
-  }
+  // public set businessCategory(v: IbusinessCategory[]) {
+  //   this._businessCategory = v;
+  // }
+  // public set newBusinessCategory(v: IbusinessCategory) {
+  //   this._businessCategory.push(v);
+  // }
   public set businessPlan(v: resBusinessPlan[]) {
     this._businessPlans = v;
   }
@@ -32,9 +29,9 @@ export default class BusinessStore {
     this._noAgreeBusinessPlan.push(v);
   }
 
-  public get businessCategory(): IbusinessCategory[] {
-    return this._businessCategory;
-  }
+  // public get businessCategory(): IbusinessCategory[] {
+  // return this._businessCategory;
+  // }
   public get businessPlan(): resBusinessPlan[] {
     return this._businessPlans;
   }

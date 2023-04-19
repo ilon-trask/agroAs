@@ -1,4 +1,10 @@
-import React, { ReactChild, ReactNode, useEffect } from "react";
+import React, {
+  Dispatch,
+  ReactChild,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+} from "react";
 import { observer } from "mobx-react-lite";
 // import Button from "../ui/Button/Button";
 import { FC } from "react";
@@ -10,7 +16,6 @@ import { MachineProps } from "../modules/CreateMachine/CreateMachine";
 import { CostHandWorkProps } from "../modules/CreateCostHandWork/CreateCostHandWork";
 import { MaterialsProps } from "../modules/CreateCostMaterials/CreateCostMaterials";
 import { Modal, ModalOverlay, ModalContent, Center } from "@chakra-ui/react";
-import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
 export type func<T> = (
   id: number,
   map: MapStore,
@@ -18,11 +23,13 @@ export type func<T> = (
   res: T,
   setIsErr: (isErr: boolean) => void,
   setOpen: (open: boolean) => void,
-  setRes: (res: T | ((res: T) => T) | {}) => void,
+  setRes: Dispatch<SetStateAction<T>>,
   cell?: Icell | "",
   seCell?: (cell: Icell | "") => void,
   section?: number | "" | undefined,
-  setSection?: (section: number | "") => void
+  setSection?: (section: number | "") => void,
+  complex?: boolean,
+  setComplex?: Dispatch<SetStateAction<boolean>>
 ) => void;
 
 export type InputProps<T> = {
@@ -44,7 +51,6 @@ export type resType =
   | CostHandWorkProps
   | MaterialsProps
   | MachineProps
-  | BusinessProps
   | {};
 
 interface props {
@@ -58,6 +64,7 @@ interface props {
   props: resType;
   isErr: boolean;
   setIsErr: (isErr: boolean) => void;
+  setComplex?: Dispatch<SetStateAction<boolean>>;
 }
 const Dialog: FC<props> = observer(
   ({
@@ -72,6 +79,7 @@ const Dialog: FC<props> = observer(
 
     isErr,
     setIsErr,
+    setComplex,
   }) => {
     // useEffect(() => {
     //   setRes(res);
@@ -91,6 +99,7 @@ const Dialog: FC<props> = observer(
           setIsErr(false);
           setUpdate(false);
           setRes(props);
+          if (setComplex) setComplex(false);
         }}
         isCentered
       >

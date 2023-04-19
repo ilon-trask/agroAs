@@ -21,17 +21,24 @@ import {
 } from "../../../tRPC serv/models/models";
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
-import { BusinessProps } from "../modules/CreateBusiness/CreateBusinessPlan";
+// import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
+import TEJStore from "../store/TEJStore";
+import {
+  createTEJType,
+  setIsPublicTEJType,
+} from "../../../tRPC serv/routes/TEJRouter";
+import { cartProps } from "../modules/CreateCart";
+import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
 );
+
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
@@ -53,9 +60,16 @@ const client = createTRPCProxyClient<AppRouter>({
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
-    map.maps = map.maps.filter((el) => el.id != cart.id);
-    map.newMap = cart;
     console.log(map.maps);
+    map.maps = map.maps.filter((el) => el.id != cart.id);
+    console.log(map.maps);
+
+    map.complex = map.complex.filter((el) => el.id != cart.id);
+    if (cart.isComplex) {
+      map.newComplex = cart;
+    } else {
+      map.newMap = cart;
+    }
 
     const opers = carts[i].tech_operations;
     if (!opers) return;
@@ -94,10 +108,9 @@ function operValue(oper: Itech_operation) {
 }
 export async function getCarts(map: MapStore, cartId: number) {
   map.isLoading = true;
+  console.log("try");
 
   await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
-    console.log(carts);
-
     map.costMechanical = [];
     map.costMaterials = [];
     map.costServices = [];
@@ -152,18 +165,20 @@ export async function setIsPublic(
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
   await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
-    console.log(data.id);
-
     map.maps = map.maps.filter((el) => el.id != data.id);
     map.isLoading = false;
   });
 }
 
-export async function createCart(map: MapStore, data: Itech_cart) {
+export async function createCart(map: MapStore, data: CreateCartType) {
   map.isLoading = true;
 
   await client.cart.create.query(data).then((res) => {
-    map.newMap = res as resTechCartsWithOpers;
+    if (res.isComplex) {
+      map.newComplex = res as resTechCartsWithOpers;
+    } else {
+      map.newMap = res as resTechCartsWithOpers;
+    }
     map.isLoading = false;
   });
 }
@@ -174,7 +189,6 @@ export async function updateMap(map: MapStore, dat: resTechCartsWithOpers) {
 
   //@ts-ignore
   await client.cart.patch.mutate(data).then((res) => {
-    console.log(res);
     map.maps = map.maps.filter((el) => el.id != res[0].id);
 
     map.opers = map.opers.filter((el) => el.techCartId != res[0].id!);
@@ -212,7 +226,10 @@ export async function deleteOper(
     //@ts-ignore
     .then((data: any) => {
       map.opers = map.opers.filter((el) => el.id != data.id);
-      let [mapData] = map.maps.filter((el) => el.id == data.techCartId);
+      let mapData = map.maps.find((el) => el.id == data.techCartId);
+      if (!mapData) {
+        mapData = map.complex.find((el) => el.id == data.techCartId)!;
+      }
       mapData.costHectare! -= operValue(data);
       map.isLoading = false;
     });
@@ -228,8 +245,6 @@ export async function createOperation(
   id: number
 ) {
   map.isLoading = true;
-  console.log(arr.res);
-
   //@ts-ignore
   await client.oper.create[arr.cell]
     .query({
@@ -240,7 +255,10 @@ export async function createOperation(
     .then((data: { oper: tech_operation; prope: prope }) => {
       const { oper, prope } = data;
       map.newOper = oper;
-      let [mapData] = map.maps.filter((el) => el.id == oper.techCartId);
+      let mapData = map.maps.find((el) => el.id == oper.techCartId);
+      if (!mapData) {
+        mapData = map.complex.find((el) => el.id == oper.techCartId)!;
+      }
       mapData.tech_operations?.push(oper);
       mapData.costHectare! += operValue(oper);
       if ("nameMaterials" in prope) {
@@ -270,16 +288,11 @@ export async function patchOperation(
 
   let [mapData] = map.maps.filter((el) => el.id == cartId);
 
-  console.log(arr.res);
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   //@ts-ignore
   let [mapOperData] = mapData.tech_operations?.filter((el) => {
     return el?.id == arr.res.operId;
   });
-  console.log(mapData);
-  console.log(mapOperData);
-  console.log(operData);
-
   mapData.costHectare! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
@@ -291,7 +304,6 @@ export async function patchOperation(
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
       map.newOper = res;
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
-      console.log(res);
 
       mapData.costHectare! += operValue(res);
       map.costHandWork = map.costHandWork.filter(
@@ -326,7 +338,6 @@ export async function patchOperation(
         mapOperData.cost_hand_work = res.cost_hand_work;
         map.newCostHandWork = res.cost_hand_work;
       }
-      console.log(mapOperData);
       map.isLoading = false;
     });
 }
@@ -485,13 +496,13 @@ export function agreeCarts(map: MapStore) {
     map.isLoading = false;
   });
 }
-export function getBusinessCategory(map: MapStore, Bus: BusinessStore) {
-  map.isLoading = true;
-  client.business.getCategory.query().then((res) => {
-    Bus.businessCategory = res;
-    map.isLoading = false;
-  });
-}
+// export function getBusinessCategory(map: MapStore, Bus: BusinessStore) {
+//   map.isLoading = true;
+//   client.business.getCategory.query().then((res) => {
+//     Bus.businessCategory = res;
+//     map.isLoading = false;
+//   });
+// }
 
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
@@ -525,26 +536,26 @@ export function deleteBusinessPlan(
     map.isLoading = false;
   });
 }
-export function patchBusinessPlan(
-  map: MapStore,
-  Bus: BusinessStore,
-  data: BusinessProps
-) {
-  map.isLoading = true;
-  client.business.patch
-    .query({
-      businessCategoryId: +data.businessCategoryId!,
-      name: data.name,
-      planId: data.id!,
-    })
-    .then((res) => {
-      if (res) {
-        Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
-        Bus.newBusinessPlan = res;
-      }
-      map.isLoading = false;
-    });
-}
+// export function patchBusinessPlan(
+//   map: MapStore,
+//   Bus: BusinessStore,
+//   data: BusinessProps
+// ) {
+//   map.isLoading = true;
+//   client.business.patch
+//     .query({
+//       businessCategoryId: +data.businessCategoryId!,
+//       name: data.name,
+//       planId: data.id!,
+//     })
+//     .then((res) => {
+//       if (res) {
+//         Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
+//         Bus.newBusinessPlan = res;
+//       }
+//       map.isLoading = false;
+//     });
+// }
 export function setIsPublicBusiness(
   map: MapStore,
   Bus: BusinessStore,
@@ -614,8 +625,6 @@ export function setIdTableInvestment(
   data: { cartId: number; businessPlanId: number }
 ) {
   client.resume.setId_tableInvestment.query(data).then((res) => {
-    console.log(res);
-
     const plan = Bus.businessPlan.find((el) => el.id == data.businessPlanId);
     if (!plan) {
       return;
@@ -629,8 +638,6 @@ export function patchTitlePage(
   data: { businessId: number; title: string }
 ) {
   client.titlePage.patch.mutate(data).then((res) => {
-    console.log(res);
-
     const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
     if (!plan) {
       return;
@@ -642,11 +649,19 @@ export function getOnlyCart(map: MapStore) {
   map.isLoading = true;
   client.cart.getOnlyCart.query().then((res) => {
     map.maps = [];
-    res.forEach((el) => {
-      let myMap = map.maps.find((e) => e.id == el.id);
 
-      if (!myMap) {
+    console.log(res);
+    res.forEach((el) => {
+      let myMap = map.maps.find((e) => {
+        return e.id == el.id;
+      });
+
+      if (!myMap && el.isComplex == false) {
         map.newMap = el;
+      }
+      let myComplex = map.complex.find((e) => e.id == el.id);
+      if (!myComplex && el.isComplex == true) {
+        map.newComplex = el;
       }
     });
     map.isLoading = false;
@@ -681,6 +696,11 @@ export function getYieldPlants(income: IncomeStore) {
     });
   });
 }
+export function getYieldPlant(income: IncomeStore, plantId: number) {
+  client.income.getOne.query({ plantId }).then((res) => {
+    income.newYieldPlant = res;
+  });
+}
 export function createYieldCalc(
   income: IncomeStore,
   data: createYieldCalcType
@@ -713,8 +733,6 @@ export function deleteYieldPlant(
 ) {
   client.income.delete.query(data).then((res) => {
     if (!res) return;
-    console.log(res);
-
     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
   });
 }
@@ -728,5 +746,144 @@ export function updateYieldPlant(
       income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
       income.newYieldPlant = res;
     }
+  });
+}
+export function getPurposesMaterial(map: MapStore) {
+  client.oper.getPurposesMaterial.query().then((res) => {
+    map.purposeMaterial = res;
+  });
+}
+
+// export function getCultureTEJ(TEJ: TEJStore) {
+//   client.income.getCultural.query().then((res) => {
+//     TEJ.culture = res;
+//   });
+// }
+export function getCultureTEJMap(map: MapStore) {
+  client.income.getCultural.query().then((res) => {
+    map.culture = res;
+  });
+}
+export function getCultivationTechnologiesMap(map: MapStore) {
+  client.TEJ.getCultivationTechnologies.query().then((res) => {
+    map.cultivationTechnologies = res;
+  });
+}
+// export function getCultivationTechnologies(TEJ: TEJStore) {
+//   client.TEJ.getCultivationTechnologies.query().then((res) => {
+//     TEJ.cultivationTechnologies = res;
+//   });
+// }
+
+export function getTEJ(TEJ: TEJStore) {
+  client.TEJ.get.query().then((res) => {
+    if (res) TEJ.justification = res;
+  });
+}
+
+export function createTEJ(data: createTEJType, TEJ: TEJStore) {
+  client.TEJ.create.query(data).then((res) => {
+    TEJ.newJustification = res;
+  });
+}
+
+export function deleteTEJ(data: { TEJId: number }, TEJ: TEJStore) {
+  client.TEJ.delete.query(data).then((res) => {
+    if (res == 1) {
+      TEJ.justification = TEJ.justification.filter((el) => el.id != data.TEJId);
+    }
+  });
+}
+
+export function patchTEJ(
+  data: {
+    TEJId: number;
+    cartId: number;
+    comment: string;
+    area: number;
+    cultureId: number;
+    cultivationTechnologyId: number;
+  },
+  TEJ: TEJStore
+) {
+  client.TEJ.patch.query(data).then((res) => {
+    if (res) {
+      TEJ.justification = TEJ.justification.filter((el) => el.id != res?.id);
+      TEJ.newJustification = res;
+    }
+  });
+}
+
+export function setIsPublicTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
+  console.log("work");
+
+  client.TEJ.setIsPublic.query(data).then((res) => {
+    if (!res) return;
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
+    TEJ.newJustification = res;
+    if (data.isPublic) TEJ.newNoAgreeJustification = res;
+    else
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
+  });
+}
+
+export function getNoAgreeJustification(TEJ: TEJStore) {
+  client.TEJ.getNoAgree.query().then((res) => {
+    if (res[0]) TEJ.noAgreeJustification = res;
+  });
+}
+
+export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
+  console.log(data.isAgree);
+
+  client.TEJ.setIsAgree.query(data).then((res) => {
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
+    TEJ.newJustification = res;
+    if (data.isAgree) {
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
+      TEJ.newNoAgreeJustification = res;
+    } else
+      TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
+        (el) => el.id != res.id
+      );
+  });
+}
+export function getAgreeTEJ(TEJ: TEJStore) {
+  client.TEJ.getAgreeTEJ.query().then((res) => {
+    TEJ.agreeJustification = res;
+  });
+}
+
+export function getTechnologiesTEJ(TEJ: TEJStore) {
+  client.TEJ.getTechnologies.query().then((res) => (TEJ.technologies = res));
+}
+
+export function copyComplex(map: MapStore, complexId: number, cartId: number) {
+  client.cart.copyComplex.query({ cartId, complexId }).then((res) => {
+    if (!res) return;
+    map.maps = map.maps.filter((el) => el.id != res.id);
+    map.opers = map.opers.filter((el) => el.techCartId != res.id!);
+    res.tech_operations?.forEach((oper) => {
+      map.costMechanical = map.costMechanical.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costMaterials = map.costMaterials.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costServices = map.costServices.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costTransport = map.costTransport.filter(
+        (el) => el.techOperationId != oper.id
+      );
+      map.costHandWork = map.costHandWork.filter(
+        (el) => el.techOperationId != oper.id
+      );
+    });
+    operationsFilter([res], map);
   });
 }

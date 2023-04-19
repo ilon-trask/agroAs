@@ -32,6 +32,14 @@ class incomeService {
 
     return res;
   }
+  async getOne(plantId: number) {
+    //@ts-ignore
+    const res: resYieldPlant = await yieldPlant.findOne({
+      where: { cultureId: plantId },
+      include: plantInclude,
+    });
+    return res;
+  }
   async create(
     data: { cultureId: number; comment: string },
     user: Principal | undefined

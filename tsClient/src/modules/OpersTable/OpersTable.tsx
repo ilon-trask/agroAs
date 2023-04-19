@@ -50,7 +50,10 @@ function OpersTable({
     return a;
   }, [map.opers, operData]);
 
-  const [mapData] = map.maps.filter((el) => el.id == id);
+  let mapData = map.maps.find((el) => el.id == id);
+  if (!mapData) {
+    mapData = map.complex.find((el) => el.id == id);
+  }
   let sum = 0;
   let technic = 0;
   let fuel = 0;
@@ -61,7 +64,7 @@ function OpersTable({
   let services = 0;
   operData.forEach((el) => {
     sum +=
-      mapData.area *
+      mapData?.area! *
       (el.costMaterials ||
         el.costServices ||
         el.costTransport ||
@@ -71,13 +74,13 @@ function OpersTable({
           +el.costMachineWork! ||
         el.costHandWork ||
         0);
-    technic += mapData.area * +(el.costCars || 0);
-    fuel += mapData.area * +(el.costFuel || 0);
-    machineWork += mapData.area * +(el.costMachineWork || 0);
-    handWork += mapData.area * +(el.costHandWork || 0);
-    materials += mapData.area * +(el.costMaterials || 0);
-    transport += mapData.area * +(el.costTransport || 0);
-    services += mapData.area * +(el.costServices || 0);
+    technic += mapData?.area! * +(el.costCars || 0);
+    fuel += mapData?.area! * +(el.costFuel || 0);
+    machineWork += mapData?.area! * +(el.costMachineWork || 0);
+    handWork += mapData?.area! * +(el.costHandWork || 0);
+    materials += mapData?.area! * +(el.costMaterials || 0);
+    transport += mapData?.area! * +(el.costTransport || 0);
+    services += mapData?.area! * +(el.costServices || 0);
   });
 
   return (
@@ -142,7 +145,7 @@ function OpersTable({
               arr={el.arr}
               title={el.title}
               id={id}
-              mapData={mapData}
+              mapData={mapData!}
               setCell={setCell}
               setOpen={setSecondOpen}
               setRes={setRes}

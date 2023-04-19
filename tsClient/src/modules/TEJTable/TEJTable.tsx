@@ -1,46 +1,62 @@
-import React, { Dispatch, SetStateAction, useContext } from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Context } from "../../main";
-import BusinessTableItem from "./component/BusinessTableItem";
+import TEJTableItem from "./component/TEJTableItem";
 
 import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import { BusinessProps } from "../CreateBusiness/CreateBusinessPlan";
-import { IbusinessPlan } from "../../../../tRPC serv/models/models";
+import { TEJProps } from "../CreateTEJ/CreateTEJ";
+import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
+import { getTEJ } from "../../http/requests";
 
 interface props {
   // maps: resTechCartsWithOpers[] | [];
   setCreate: Dispatch<SetStateAction<boolean>>;
-  deleteFunc: (BusinessId: number) => void;
+  deleteFunc: (TEJId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<BusinessProps>>;
-  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  setRes: Dispatch<SetStateAction<TEJProps>>;
+  TEJPubOpenFunc: (
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string
+  ) => void;
 }
 
-const CartsTable = observer(
+const TEJTable = observer(
   ({
     setCreate,
     deleteFunc,
     setShowAlert,
     setUpdate,
     setRes,
-    agreeFunc,
+    TEJPubOpenFunc,
   }: props) => {
-    const { map, user, business } = useContext(Context);
-    const Business: IbusinessPlan[] = JSON.parse(
-      JSON.stringify(business.businessPlan)
+    const { map, user, TEJ } = useContext(Context);
+    const Justification: resTechnologicalEconomicJustification[] | undefined =
+      JSON.parse(JSON.stringify(TEJ.justification || []));
+    Justification?.sort(
+      //@ts-ignore
+      (a, b) => new Date(a.createdAt!) - new Date(b.createdAt!)
     );
-    Business.sort((a, b) => a.id! - b.id!);
+    console.log(Justification);
+
+    useEffect(() => {
+      getTEJ(TEJ);
+    }, []);
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
           <Tr>
             <Th></Th>
-            <Th>Назва </Th>
+            <Th>Культура</Th>
+            <Th>Технологія</Th>
+            <Th>Коментар</Th>
             <Th></Th>
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
@@ -55,8 +71,8 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {Business.map((e) => (
-            <BusinessTableItem
+          {Justification?.map((e) => (
+            <TEJTableItem
               key={e.id}
               e={e}
               deleteFunc={deleteFunc}
@@ -64,12 +80,7 @@ const CartsTable = observer(
               setOpen={setCreate}
               setUpdate={setUpdate}
               setRes={setRes}
-              agreeFunc={agreeFunc}
-              // setOpen={setOpen}
-              // setUpdate={setUpdate}
-              // deleteOpen={deleteOpen}
-              // setDeleteOpen={setDeleteOpen}
-              // setPublicationOpen={setPublicationOpen}
+              TEJPubOpenFunc={TEJPubOpenFunc}
             />
           ))}
           <Tr>
@@ -79,8 +90,6 @@ const CartsTable = observer(
                 w={6}
                 color={"blue.400"}
                 onClick={() => {
-                  console.log(23423);
-
                   setCreate(true);
                 }}
               />
@@ -95,4 +104,4 @@ const CartsTable = observer(
   }
 );
 
-export default CartsTable;
+export default TEJTable;

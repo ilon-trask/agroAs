@@ -77,6 +77,18 @@ const patch: funcProps = function (
       operId: el.id,
       salary: cart.salary,
     });
+  } else if (el.cell == "costMaterials") {
+    setRes({
+      id: el.id,
+      nameOper: el.nameOperation,
+      date: el.date,
+      price: second.price,
+      unitsOfCost: second.unitsOfCost,
+      consumptionPerHectare: second.consumptionPerHectare,
+      unitsOfConsumption: second.unitsOfConsumption,
+      operId: el.id,
+      purposeMaterialId: second.purposeMaterialId || 7,
+    });
   } else {
     setRes({
       id: el.id,

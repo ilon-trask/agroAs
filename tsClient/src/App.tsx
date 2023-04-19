@@ -5,21 +5,20 @@ import Footer from "./modules/Footer";
 import { useEffect, useContext, useState } from "react";
 import { Context } from "./main";
 import {
-  getCarts,
-  getSection,
-  getTractor,
-  getMachine,
-  getGrades,
-  getWorks,
   getCultural,
   getIsAgreeCarts,
   agreeCarts,
-  getBusinessCategory,
   getBusinessPlans,
   getNoAgreeBusiness,
   getOnlyCart,
   getCulturalInc,
   getYieldPlants,
+  getPurposesMaterial,
+  getCultureTEJMap,
+  getCultivationTechnologiesMap,
+  getAgreeTEJ,
+  getTechnologiesTEJ,
+  getSection,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -29,7 +28,7 @@ import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
 import { observer } from "mobx-react-lite";
 function App() {
-  const { map, user, business, income } = useContext(Context);
+  const { map, user, business, income, TEJ } = useContext(Context);
 
   const [ind, setInd] = useState(0);
   useEffect(() => {
@@ -38,7 +37,10 @@ function App() {
       getCulturalInc(income);
       getYieldPlants(income);
       getCultural(map);
-
+      getPurposesMaterial(map);
+      getCultureTEJMap(map);
+      getCultivationTechnologiesMap(map);
+      getSection(map);
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);
@@ -50,8 +52,11 @@ function App() {
         // user.role == "ADMIN" ||
         // user.role == "service_role" ||
         user.role == ""
-      )
+      ) {
         agreeCarts(map);
+        getAgreeTEJ(TEJ);
+        getTechnologiesTEJ(TEJ);
+      }
     }
   }, [user.isAuth, ind]);
 

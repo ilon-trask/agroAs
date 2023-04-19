@@ -47,8 +47,6 @@ type props = {
 };
 
 function PublicationPopUp({ open, setOpen, data, setData }: props) {
-  console.log(data);
-
   const [isErr, setIsErr] = useState(false);
   const { map, business, user } = useContext(Context);
   const imgRef = useRef(null);
@@ -60,7 +58,6 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
   );
   useEffect(() => {
     setDescription(busines?.description || myBusines?.description || "");
-    console.log(busines?.description || myBusines?.description || "");
   }, [busines, myBusines]);
 
   const [description, setDescription] = useState(
@@ -117,8 +114,6 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
                     if (!e.target.files) return;
                     const file = e.target?.files[0];
 
-                    console.log(file);
-
                     // const { data, error } = await supabase.storage
                     //   .from("images")
                     //   .list("unUsed", {
@@ -129,14 +124,11 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
                     const res = await supabase.storage
                       .from("business-imgs")
                       .upload("" + data.BusinessId, file);
-                    console.log(res.data);
-                    console.log(res.error);
                     //@ts-ignore
                     if (res.error?.error == "Duplicate") {
                       const res = await supabase.storage
                         .from("business-imgs")
                         .update("" + data.BusinessId, file);
-                      console.log(res.data);
                     }
                   }}
                 />

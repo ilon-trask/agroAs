@@ -19,7 +19,7 @@ import {
   PlusSquareIcon,
 } from "@chakra-ui/icons";
 import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
-import { BusinessProps } from "../../CreateBusiness/CreateBusinessPlan";
+// import { BusinessProps } from "../../CreateTEJ/CreateTEJ";
 import { iChild, iName } from "../../../pages/BusinessPlanPage";
 
 interface props {

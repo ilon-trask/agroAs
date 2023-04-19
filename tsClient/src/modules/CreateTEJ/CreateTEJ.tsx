@@ -1,17 +1,23 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
-import BusinessPlan from "./components/BusinessPlan";
+import TEJ from "./components/TEJ";
 import { createOperProps } from "../../pages/TechnologicalMap";
 
-export type BusinessProps = {
-  id?: number;
-  name: string;
-  businessCategoryId: number | "";
+export type TEJProps = {
+  TEJId?: number;
+  cartId: number | "";
+  comment: string;
+  area: number;
+  cultivationTechnologyId: number | "";
+  cultureId: number | "";
 };
 
-export const businessProps: BusinessProps = {
-  name: "",
-  businessCategoryId: "",
+export const tejProps: TEJProps = {
+  cartId: "",
+  comment: "",
+  area: 1,
+  cultivationTechnologyId: "",
+  cultureId: "",
 };
 
 export default function CreateBusiness({
@@ -25,10 +31,9 @@ export default function CreateBusiness({
   setIsErr,
 }: {
   open: boolean;
-
   setOpen: (open: boolean) => void;
-  res: BusinessProps;
-  setRes: (res: BusinessProps) => void;
+  res: TEJProps;
+  setRes: (res: TEJProps) => void;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   isErr: boolean;
@@ -42,12 +47,12 @@ export default function CreateBusiness({
       setRes={setRes as any}
       update={update}
       setUpdate={setUpdate}
-      props={businessProps}
+      props={tejProps}
       isErr={isErr}
       setIsErr={setIsErr}
     >
-      <BusinessPlan
-        res={res as BusinessProps}
+      <TEJ
+        res={res as TEJProps}
         setRes={setRes as any}
         setOpen={setOpen}
         setIsErr={setIsErr}

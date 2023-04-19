@@ -12,6 +12,12 @@ import {
   Container,
   Input,
   Tooltip,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
 } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteCart, getCopyCarts, supabase } from "../http/requests";
@@ -22,7 +28,9 @@ import CreateWork, { workProps } from "../modules/CreateWork";
 import WorkTable from "../modules/WorkTable";
 import PublicationPopUp from "../modules/CartPublicationPopUp";
 import AgreeCartsTable from "../modules/AgreeCartsTable";
-// import Button from "@mui/material/Button";
+import { Link } from "react-router-dom";
+import { EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { TEHMAP_ROUTER } from "../utils/consts";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -63,6 +71,12 @@ const MapJornal = observer(function () {
   maps.sort((a, b) => a.id! - b.id!);
   let works: Ispecial_work[] = JSON.parse(JSON.stringify(map.works));
   works.sort((a, b) => a.id! - b.id!);
+  const [complex, setComplex] = useState(false);
+  const myComplex: resTechCartsWithOpers[] = JSON.parse(
+    JSON.stringify(map.complex)
+  );
+  //@ts-ignore
+  myComplex.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   return (
     <Container maxW="container.lg">
       <Box>
@@ -72,7 +86,7 @@ const MapJornal = observer(function () {
           </Text>
         )}
         <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-          Технологічні карт
+          Технологічні карти
         </Text>
         <TableContainer
           maxW="1000px"
@@ -111,6 +125,7 @@ const MapJornal = observer(function () {
           >
             Добавити технологічну карту
           </Button>
+
           {/* {user.role != "service_role" ? (
             <Tooltip label={"Функція в розробці"}>
               <Button
@@ -154,6 +169,82 @@ const MapJornal = observer(function () {
             </Button>
           )} */}
         </Box>
+        {user.role == "service_role" && (
+          <>
+            <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+              Комплекси робіт
+            </Text>
+            <TableContainer
+              maxW="1000px"
+              mx="auto"
+              mt={"20px"}
+              overflowX={"scroll"}
+            >
+              <Table size={"sm"}>
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>Назва</Th>
+                    <Th>Розділ</Th>
+                    <Th>Площа</Th>
+                    <Th>Собіварість одного га</Th>
+                    <Th>Загальна варість</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {myComplex.map((el) => (
+                    <Tr>
+                      <Td
+                        onClick={() => {
+                          setOpen(true);
+                          setUpdate(true);
+                          //@ts-ignore
+                          setRes({ ...el });
+                          setComplex(true);
+                        }}
+                      >
+                        <EditIcon
+                          color={"blue.400"}
+                          w={"20px"}
+                          h={"auto"}
+                          cursor={"pointer"}
+                        />
+                      </Td>
+                      <Td>
+                        <Link to={TEHMAP_ROUTER + `/${el.id}`}>
+                          <ViewIcon boxSize={5} color={"blue.400"} />{" "}
+                          {el.nameCart}
+                        </Link>
+                      </Td>
+                      <Td>
+                        {map.section.find((e) => e.id == el.sectionId)?.name}
+                      </Td>
+                      <Td>{el.area}</Td>
+                      <Td>{el.costHectare}</Td>
+                      <Td>{el.costHectare! * el.area}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            <Button
+              mt={"15px"}
+              onClick={
+                //@ts-ignore
+                user.role == ""
+                  ? () => {
+                      setShowAlert(true);
+                    }
+                  : () => {
+                      setOpen(true);
+                      setComplex(true);
+                    }
+              }
+            >
+              Добавити комплекс робіт
+            </Button>
+          </>
+        )}
         {(user.role == "ADMIN" || user.role == "service_role") && (
           <TableContainer
             maxW="1000px"
@@ -168,14 +259,7 @@ const MapJornal = observer(function () {
             />
           </TableContainer>
         )}
-      </Box>{" "}
-      {user.role == "service_role" && (
-        <Box>
-          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            Комплекси робіт
-          </Text>
-        </Box>
-      )}
+      </Box>
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -234,14 +318,18 @@ const MapJornal = observer(function () {
           </Text>
         </Box>
       )}
-      <CreateCart
-        open={open}
-        setOpen={setOpen}
-        update={update}
-        setUpdate={setUpdate}
-        res={res}
-        setRes={setRes as any}
-      />
+      {open && (
+        <CreateCart
+          open={open}
+          setOpen={setOpen}
+          update={update}
+          setUpdate={setUpdate}
+          res={res}
+          setRes={setRes as any}
+          complex={complex}
+          setComplex={setComplex}
+        />
+      )}
       {/* <CreateWork
         open={workOpen}
         setOpen={setWorkOpen}

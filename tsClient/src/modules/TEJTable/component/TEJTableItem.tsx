@@ -9,21 +9,40 @@ import {
 import { Context } from "../../../main";
 import { cartProps } from "../../CreateCart";
 import MapStore from "../../../store/MapStore";
-import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
+import {
+  BUSINESSpLAN_ROUTER,
+  TEHMAP_ROUTER,
+  TEJ_ROUTER,
+} from "../../../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
-import { BusinessProps } from "../../CreateBusiness/CreateBusinessPlan";
+import {
+  EditIcon,
+  DeleteIcon,
+  QuestionOutlineIcon,
+  ViewIcon,
+} from "@chakra-ui/icons";
+import {
+  IbusinessPlan,
+  ItechnologicalEconomicJustification,
+} from "../../../../../tRPC serv/models/models";
+import { TEJProps } from "../../CreateTEJ/CreateTEJ";
+import { resTechnologicalEconomicJustification } from "../../../../../tRPC serv/controllers/TEJService";
 
 interface props {
-  e: IbusinessPlan;
-  deleteFunc: (BusinessId: number) => void;
+  e: resTechnologicalEconomicJustification;
+  deleteFunc: (TEJId: number) => void;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<BusinessProps>>;
-  agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
+  setRes: Dispatch<SetStateAction<TEJProps>>;
+  TEJPubOpenFunc: (
+    TEJId: number,
+    isPublic: boolean,
+    isAgree: boolean,
+    authorName: string,
+    publicComment: string
+  ) => void;
 }
 
 const CartsTableItem = observer(
@@ -34,7 +53,7 @@ const CartsTableItem = observer(
     setUpdate,
     setOpen,
     setRes,
-    agreeFunc,
+    TEJPubOpenFunc,
   }: props) => {
     const { map, business, user } = useContext(Context);
     return (
@@ -45,9 +64,12 @@ const CartsTableItem = observer(
             setUpdate(true);
             setOpen(true);
             setRes({
-              id: e.id,
-              businessCategoryId: e.businessCategoryId as number | "",
-              name: e.name,
+              TEJId: e.id,
+              cartId: e.techCartId!,
+              comment: e.comment!,
+              area: e.area,
+              cultivationTechnologyId: e.cultivationTechnologyId!,
+              cultureId: e.cultureId!,
             });
           }}
         >
@@ -59,8 +81,12 @@ const CartsTableItem = observer(
           />
         </Td>
         <Td>
-          <Link to={BUSINESSpLAN_ROUTER + `/${e.id}`}>{e.name}</Link>
+          <Link to={TEJ_ROUTER + `/${e.id}`}>
+            <ViewIcon boxSize={5} color={"blue.400"} /> {e.culture.name}
+          </Link>
         </Td>
+        <Td>{e.cultivationTechnology?.name}</Td>
+        <Td>{e.comment}</Td>
 
         <Td
           textAlign={"center"}
@@ -84,14 +110,13 @@ const CartsTableItem = observer(
             user.role == "service_role") && (
             <div
               onClick={() => {
-                if (e.isPublic) {
-                  setIsPublicBusiness(map, business, {
-                    BusinessId: e.id!,
-                    isPublic: false,
-                  });
-                } else {
-                  agreeFunc(e.id!, true);
-                }
+                TEJPubOpenFunc(
+                  e.id!,
+                  !e.isPublic,
+                  e.isAgree!,
+                  e.authorName!,
+                  e.publicComment!
+                );
               }}
             >
               <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>

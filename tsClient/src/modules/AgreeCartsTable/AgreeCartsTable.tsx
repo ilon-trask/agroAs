@@ -9,9 +9,10 @@ import Loader from "../../components/Loader";
 import { Table, Thead, Tbody, Tr, Th, Box } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Itech_cart } from "../../../../tRPC serv/models/models";
+import { cartProps } from "../CreateCart";
 
 interface props {
-  setRes: (res: Itech_cart) => void;
+  setRes: (res: cartProps) => void;
   setOpen: (open: boolean) => void;
   setPublicationOpen: ({
     isOpen,

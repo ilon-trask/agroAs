@@ -17,19 +17,20 @@ import {
   Icost_transport,
   Icost_hand_work,
   Iaggregate,
+  purpose_material,
 } from "../models/models";
 
-import { resTechOperation } from "./TechCartService";
+import { resMater, resTechOperation } from "./TechCartService";
 
 export type prope =
-  | cost_material
+  | resMater
   | cost_service
   | cost_transport
   | aggregate
   | cost_hand_work;
 
 export type prope2 =
-  | cost_material[]
+  | resMater[]
   | cost_service[]
   | cost_transport[]
   | aggregate[]
@@ -65,6 +66,7 @@ export type Icell =
   | "costMechanical"
   | "costTransport"
   | "costHandWork";
+// | "complex";
 
 interface Idata<T> {
   cartId: number;
@@ -82,6 +84,7 @@ interface IdataCreateCostMaterials
     price: number;
     unitsOfConsumption: string;
     unitsOfCost: string;
+    purposeMaterialId: number;
   }> {}
 
 interface IdataCreateCostServices
@@ -138,6 +141,7 @@ interface IdataPatchCostMaterial
     price: number;
     unitsOfConsumption: string;
     unitsOfCost: string;
+    purposeMaterialId: number;
   }> {}
 interface IdataPatchCostServices
   extends IdataPatch<{
@@ -192,6 +196,13 @@ export interface guestAggregate extends Iaggregate {
 export interface guest_cost_hand_work extends Icost_hand_work {
   salary: number;
 }
+export const opeInclude = [
+  cost_material,
+  cost_service,
+  cost_transport,
+  cost_hand_work,
+  { model: aggregate, include: [tractor, agricultural_machine] },
+];
 async function createOper(
   cartId: number,
   nameOper: string,
@@ -280,17 +291,22 @@ export async function changeOper(
       const pricePerHourPersonnel = Math.round(cart?.salary / 176);
       const rareOfProduction =
         (machine.widthOfCapture * (aggregateData.workingSpeed * 1000)) / 10000;
+      const mechHours = 1 / rareOfProduction;
       const costFuel = Math.round(
         (+aggregateData.fuelConsumption * +cart.priceDiesel) / rareOfProduction
       );
-      //не шарю чого воно обрізає період це стається до JSON.parse ts типи вроді не винні
+      const amountOfTractorDepreciationPerHour =
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8;
+      const amountOfMachineDepreciationPerHour =
+        +machine.marketCost /
+        //@ts-ignore
+        (+machine.depreciationPeri || +machine.depreciationPeriod) /
+        220 /
+        8;
+      //не знаю чого воно обрізає період це стається до JSON.parse
       const costCars = Math.round(
-        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost /
-            //@ts-ignore
-            (+machine.depreciationPeri || +machine.depreciationPeriod) /
-            220 /
-            8) *
+        ((amountOfTractorDepreciationPerHour +
+          amountOfMachineDepreciationPerHour) *
           1.05) /
           rareOfProduction
       );
@@ -310,10 +326,17 @@ export async function changeOper(
       );
 
       elem.costMachineWork = costMachineWork;
-
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      //@ts-ignore
+      elem.aggregate.amountOfMachineDepreciationPerHour =
+        amountOfMachineDepreciationPerHour;
+      //@ts-ignore
+      elem.aggregate.amountOfTractorDepreciationPerHour =
+        amountOfTractorDepreciationPerHour;
+      //@ts-ignore
+      elem.aggregate.mechHours = mechHours;
       return elem;
     } else {
       const Tractor = await tractor.findOne({
@@ -331,13 +354,18 @@ export async function changeOper(
       const pricePerHourPersonnel = Math.round(CostMechanical?.salary / 176);
       const rareOfProduction =
         (machine.widthOfCapture * (CostMechanical.workingSpeed * 1000)) / 10000;
+      const mechHours = 1 / rareOfProduction;
       const costFuel = Math.round(
         (+CostMechanical.fuelConsumption * +CostMechanical.priceDiesel) /
           rareOfProduction
       );
+      const amountOfTractorDepreciationPerHour =
+        +Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8;
+      const amountOfMachineDepreciationPerHour =
+        +machine.marketCost / +machine.depreciationPeriod / 220 / 8;
       const costCars = Math.round(
-        ((+Tractor.marketCost / +Tractor.depreciationPeriod / 220 / 8 +
-          +machine.marketCost / +machine.depreciationPeriod / 220 / 8) *
+        ((amountOfTractorDepreciationPerHour +
+          amountOfMachineDepreciationPerHour) *
           1.05) /
           rareOfProduction
       );
@@ -356,6 +384,14 @@ export async function changeOper(
       elem.costCars = costCars;
       elem.costFuel = costFuel;
       elem.costHandWork = costHandWork;
+      //@ts-ignore
+      elem.aggregate.amountOfMachineDepreciationPerHour =
+        amountOfMachineDepreciationPerHour;
+      //@ts-ignore
+      elem.aggregate.amountOfTractorDepreciationPerHour =
+        amountOfTractorDepreciationPerHour;
+      //@ts-ignore
+      elem.aggregate.mechHours = mechHours;
       return elem;
     }
   } else if (elem.cell == "costHandWork") {
@@ -452,7 +488,7 @@ async function updateOper(
   let oper: resTechOperation | undefined | null = await tech_operation.findOne({
     where: { id: operId },
     include: [
-      cost_material,
+      { model: cost_material, include: [purpose_material] },
       cost_service,
       cost_transport,
       cost_hand_work,
@@ -476,23 +512,28 @@ class OperService {
           price,
           unitsOfConsumption,
           unitsOfCost,
+          purposeMaterialId,
         },
         section,
       },
     } = data;
-    // console.log("date1");
-    // console.log(date);
 
     const oper = await createOper(cartId, nameOper, cell, section, date);
     const operId = oper.id;
 
-    const costMaterial = await cost_material.create({
+    const costMaterialPre = await cost_material.create({
       nameMaterials: nameOper,
       price,
       unitsOfCost,
       consumptionPerHectare,
       unitsOfConsumption,
       techOperationId: operId,
+      purposeMaterialId,
+    });
+    //@ts-ignore
+    const costMaterial: resMater = await cost_material.findOne({
+      where: { id: costMaterialPre.id },
+      include: purpose_material,
     });
     const cart = await tech_cart.findOne({ where: { id: cartId } });
     tech_cart.update(
@@ -736,6 +777,7 @@ class OperService {
           price,
           unitsOfConsumption,
           unitsOfCost,
+          purposeMaterialId,
         },
       },
     } = data;
@@ -759,12 +801,14 @@ class OperService {
         price: price,
         unitsOfConsumption: unitsOfConsumption,
         unitsOfCost: unitsOfCost,
+        techOperationId: purposeMaterialId,
       };
 
       (oper.cost_material.consumptionPerHectare = consumptionPerHectare),
         (oper.cost_material.price = price),
         (oper.cost_material.unitsOfConsumption = unitsOfConsumption),
         (oper.cost_material.unitsOfCost = unitsOfCost),
+        (oper.cost_material.purposeMaterialId = purposeMaterialId),
         (oper.nameOperation = nameOper),
         (oper = await changeOper(oper, oper.techCartId!, CostMaterials));
     } else {
@@ -807,6 +851,7 @@ class OperService {
           consumptionPerHectare: +consumptionPerHectare,
           unitsOfConsumption,
           techOperationId: operId,
+          purposeMaterialId: purposeMaterialId,
         },
         { where: { techOperationId: operId } }
       );
@@ -1434,8 +1479,10 @@ class OperService {
     const cell: Icell = oper.cell;
     async function get(): Promise<prope[]> {
       if (cell == "costMaterials") {
-        const costMaterials = await cost_material.findAll({
+        //@ts-ignore
+        const costMaterials: resMater[] = await cost_material.findAll({
           where: { techOperationId: operId },
+          include: purpose_material,
         });
         return costMaterials;
       } else if (cell == "costServices") {
@@ -1463,6 +1510,10 @@ class OperService {
     }
 
     return get();
+  }
+  async getPurposesMaterial() {
+    const purposes = await purpose_material.findAll();
+    return purposes;
   }
 }
 export default new OperService();
