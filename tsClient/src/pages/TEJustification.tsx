@@ -639,8 +639,22 @@ function TEJjustification() {
             <Tr>
               <Th></Th>
               <Th>Продукт або послуга</Th>
-              <Th>Кількість</Th>
-              <Th>Ціна грн/га</Th>
+              <Th>
+                Планова <br />
+                урожайність (т/га)
+              </Th>
+              <Th>
+                Планове <br />
+                виробництво
+              </Th>
+              <Th>
+                Плонові
+                <br /> продажі
+              </Th>
+              <Th>
+                Ціна <br />
+                грн/кг
+              </Th>
               <Th>Сума грн</Th>
             </Tr>
           </Thead>
@@ -660,6 +674,8 @@ function TEJjustification() {
                   myJustification?.area! * myIncome?.yieldPerHectare! * 1000
                 ) / 1000}
               </Td>
+              <Td></Td>
+              <Td></Td>
               <Td>{myJustification?.culture?.priceBerry}</Td>
               <Td>
                 {Math.round(
@@ -682,7 +698,15 @@ function TEJjustification() {
             <Tr>
               <Th>Залишок на початок періоду</Th>
               <Th>Прихід</Th>
+              <Th>
+                Вид <br />
+                доходу
+              </Th>
               <Th>Розхід</Th>
+              <Th>
+                Вид <br />
+                розходу
+              </Th>
               <Th>Залишов на кінець періоду</Th>
             </Tr>
           </Thead>
