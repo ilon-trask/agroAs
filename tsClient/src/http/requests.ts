@@ -25,7 +25,10 @@ import { createClient } from "@supabase/supabase-js";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
+import {
+  CreateIncome,
+  createYieldCalcType,
+} from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
 import {
   createTEJType,
@@ -33,6 +36,7 @@ import {
 } from "../../../tRPC serv/routes/TEJRouter";
 import { cartProps } from "../modules/CreateCart";
 import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
+import { createOutcomeType } from "../../../tRPC serv/routes/outcomeRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -42,7 +46,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -654,7 +658,6 @@ export function getOnlyCart(map: MapStore) {
   client.cart.getOnlyCart.query().then((res) => {
     map.maps = [];
 
-    console.log(res);
     res.forEach((el) => {
       let myMap = map.maps.find((e) => {
         return e.id == el.id;
@@ -683,7 +686,7 @@ export function createYieldPlant(
   income: IncomeStore,
   data: { cultureId: number; comment: string }
 ) {
-  client.income.create.query(data).then((res) => {
+  client.income.createYieldPlant.query(data).then((res) => {
     income.newYieldPlant = res;
   });
 }
@@ -693,7 +696,7 @@ export function getCulturalInc(income: IncomeStore) {
   });
 }
 export function getYieldPlants(income: IncomeStore) {
-  client.income.get.query().then((res) => {
+  client.income.getYieldPlant.query().then((res) => {
     income.yieldPlant = res;
     res?.forEach((el) => {
       income.newYieldCalc = el.yieldCalculation;
@@ -701,7 +704,7 @@ export function getYieldPlants(income: IncomeStore) {
   });
 }
 export function getYieldPlant(income: IncomeStore, plantId: number) {
-  client.income.getOne.query({ plantId }).then((res) => {
+  client.income.getOneYieldPlant.query({ plantId }).then((res) => {
     income.newYieldPlant = res;
   });
 }
@@ -735,7 +738,7 @@ export function deleteYieldPlant(
   income: IncomeStore,
   data: { yieldPlantId: number }
 ) {
-  client.income.delete.query(data).then((res) => {
+  client.income.deleteYieldPlant.query(data).then((res) => {
     if (!res) return;
     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
   });
@@ -745,7 +748,7 @@ export function updateYieldPlant(
   income: IncomeStore,
   data: { yieldPlantId: number; cultureId: number; comment: string }
 ) {
-  client.income.update.query(data).then((res) => {
+  client.income.updateYieldPlant.query(data).then((res) => {
     if (res) {
       income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
       income.newYieldPlant = res;
@@ -889,5 +892,23 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
       );
     });
     operationsFilter([res], map);
+  });
+}
+
+export function createIncome(Income: IncomeStore, data: CreateIncome) {
+  client.income.create.query(data).then((res) => {
+    Income.newIncome = res;
+  });
+}
+
+export function createOutcome(map: MapStore, data: createOutcomeType) {
+  client.outcome.create.query(data).then((res) => {
+    map.newOutcome = res;
+  });
+}
+
+export function getOutcome(map: MapStore) {
+  client.outcome.get.query().then((res) => {
+    map.outcome = res;
   });
 }

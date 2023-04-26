@@ -21,6 +21,7 @@ import {
   Ipurpose_material,
   Iculture,
   IcultivationTechnologies,
+  Ioutcome,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -47,6 +48,7 @@ export default class MapStore {
   private _culture: Iculture[] = [];
   private _cultivationTechnologies: IcultivationTechnologies[] = [];
   private _complex: resTechCartsWithOpers[] = [];
+  private _outcome: Ioutcome[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -158,6 +160,12 @@ export default class MapStore {
   ) {
     this._cultivationTechnologies = cultivationTechnologies;
   }
+  public set outcome(outcome: Ioutcome[]) {
+    this._outcome = outcome;
+  }
+  public set newOutcome(outcome: Ioutcome) {
+    this._outcome.push(outcome);
+  }
   public get maps() {
     return this._maps;
   }
@@ -223,5 +231,8 @@ export default class MapStore {
   }
   public get cultivationTechnologies() {
     return this._cultivationTechnologies;
+  }
+  public get outcome() {
+    return this._outcome;
   }
 }

@@ -14,3 +14,4 @@ export const INCOME_ROUTER = "/income";
 export const YIELD_CALC_ROUTER = "/yieldCalc";
 export const TEJ_JORNAL_ROUTER = "/TEJJornal";
 export const TEJ_ROUTER = "/TEJ";
+export const CASH_FLOW = "/CashFlow";

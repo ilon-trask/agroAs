@@ -2,6 +2,7 @@ import { makeAutoObservable } from "mobx";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import {
   Iculture,
+  Iincome,
   IyieldCalculation,
   IyieldPlant,
   yieldCalculation,
@@ -11,6 +12,7 @@ export default class IncomeStore {
   private _yieldPlant: resYieldPlant[] = [];
   private _cultural: Iculture[] = [];
   private _yieldCalc: IyieldCalculation[] = [];
+  private _income: Iincome[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -37,7 +39,12 @@ export default class IncomeStore {
   public set newYieldCalc(data: IyieldCalculation) {
     this._yieldCalc.push(data);
   }
-
+  public set income(data: Iincome[]) {
+    this._income = data;
+  }
+  public set newIncome(data: Iincome) {
+    this._income.push(data);
+  }
   public get yieldPlant() {
     return this._yieldPlant;
   }
@@ -46,5 +53,8 @@ export default class IncomeStore {
   }
   public get yieldCalc() {
     return this._yieldCalc;
+  }
+  public get income() {
+    return this._income;
   }
 }

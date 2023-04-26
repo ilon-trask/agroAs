@@ -17,6 +17,7 @@ import {
   Tbody,
   Tr,
   Td,
+  Stack,
 } from "@chakra-ui/react";
 import { EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import CreateResume from "../modules/CreateResume";
@@ -689,32 +690,6 @@ function TEJjustification() {
           </Tbody>
         </Table>
       </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування грошового потоку
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th>Залишок на початок періоду</Th>
-              <Th>Прихід</Th>
-              <Th>
-                Вид <br />
-                доходу
-              </Th>
-              <Th>Розхід</Th>
-              <Th>
-                Вид <br />
-                розходу
-              </Th>
-              <Th>Залишов на кінець періоду</Th>
-            </Tr>
-          </Thead>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування графіку доходів та витрат
-      </Text>
       <Box h={10}></Box>
       {/* <Box
         maxW={"1000px"}

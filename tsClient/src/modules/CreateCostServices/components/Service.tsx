@@ -76,7 +76,7 @@ const Service = observer(
           maxW={"490px"}
           mx={"auto"}
         >
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
+          <Heading size="sm" minW={"max-content"}>
             Назва послуги
           </Heading>
           <Input
@@ -97,7 +97,7 @@ const Service = observer(
           alignItems={"center"}
           mx={"auto"}
         >
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
+          <Heading size="sm" minW={"max-content"}>
             Дата початку
           </Heading>
           <Input
@@ -116,9 +116,7 @@ const Service = observer(
           mx={"auto"}
         >
           <div>
-            <Heading as={"h4"} size="sm">
-              Ціна
-            </Heading>
+            <Heading size="sm">Ціна</Heading>
             <Input
               size={"sm"}
               placeholder="Вкажіть ціну"
@@ -130,9 +128,7 @@ const Service = observer(
             />
           </div>
           <div>
-            <Heading as={"h4"} size="sm">
-              Одиниці виміру ціни
-            </Heading>
+            <Heading size="sm">Одиниці виміру ціни</Heading>
             <Input
               disabled
               size={"sm"}

@@ -28,6 +28,7 @@ import { resumeRouter } from "./routes/resumeRouter";
 import { titleRouter } from "./routes/titleRouter";
 import { incomeRouter } from "./routes/incomeRouter";
 import { TEJRouter } from "./routes/TEJRouter";
+import { outcomeRouter } from "./routes/outcomeRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -55,6 +56,7 @@ const appRouter = router({
   resume: resumeRouter,
   titlePage: titleRouter,
   income: incomeRouter,
+  outcome: outcomeRouter,
   TEJ: TEJRouter,
   "": publicProcedure.query(() => "some text"),
 });

@@ -31,6 +31,7 @@ import AgreeCartsTable from "../modules/AgreeCartsTable";
 import { Link } from "react-router-dom";
 import { EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { TEHMAP_ROUTER } from "../utils/consts";
+import CreateOutcome from "../modules/CreateOutcome/";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -77,6 +78,8 @@ const MapJornal = observer(function () {
   );
   //@ts-ignore
   myComplex.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const [outcomeOpen, setOutcomeOpen] = useState(false);
+
   return (
     <Container maxW="container.lg">
       <Box>
@@ -266,6 +269,37 @@ const MapJornal = observer(function () {
             ЗАГАЛЬНО ВИРОБНИЧІ ВИТРАТИ
           </Text>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            ПОСТІЙНІ ВИТРАТИ
+          </Text>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            Адміністування
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th rowSpan={2}>Назва</Th>
+                  <Th colSpan={3} textAlign={"center"}>
+                    Сума
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th textAlign={"center"}>Місяць</Th>
+                  <Th textAlign={"center"}>Квартал</Th>
+                  <Th textAlign={"center"}>Рік</Th>
+                </Tr>
+              </Thead>
+            </Table>
+          </TableContainer>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            БУДІВНИЦТВО БУДІВЕЛЬ І СПОРУД
+          </Text>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             Спеціалізовані та будівельні роботи
           </Text>
           <TableContainer
@@ -311,11 +345,54 @@ const MapJornal = observer(function () {
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            ПОСТІЙНІ ВИТРАТИ
+            КУПІВЛЯ ТЕХНІКИ ТА ОБЛАДНАННЯ
           </Text>
-          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            Адміністування
+          <TableContainer>
+            <Table>
+              <Thead>
+                <Th>Назва</Th>
+                <Th>Марка</Th>
+                <Th>Кількість</Th>
+                <Th>Ціна</Th>
+                <Th>Сума</Th>
+              </Thead>
+            </Table>
+          </TableContainer>
+          <Button>Добавити техніку або обладнання</Button>
+
+          <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
+            Розрахунок грошового потоку (витрати)
           </Text>
+          <TableContainer>
+            <Table size={"sm"}>
+              <Thead>
+                <Th>Назва</Th>
+                <Th>Тип витрат</Th>
+                <Th>Група витрат</Th>
+                <Th>Сума</Th>
+              </Thead>
+              <Tbody>
+                {map.outcome?.map((el) => (
+                  <Tr>
+                    <Td>{el.name}</Td>
+                    <Td>{el.type}</Td>
+                    <Td>{el.group}</Td>
+                    <Td>
+                      {(() => {
+                        const cart = map.maps.find(
+                          (e) => e.id == el.techCartId
+                        );
+                        return cart?.area! * cart?.costHectare!;
+                      })()}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Button onClick={() => setOutcomeOpen(true)}>
+            Добавити витрату в розрахунок
+          </Button>
         </Box>
       )}
       {open && (
@@ -354,6 +431,7 @@ const MapJornal = observer(function () {
         data={publicationOpen}
         setData={setPublicationOpen as any}
       />
+      <CreateOutcome open={outcomeOpen} setOpen={setOutcomeOpen} />
       {/* <Input
         type={"file"}
         accept={"image/jpg, image/png"}

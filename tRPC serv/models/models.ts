@@ -9,6 +9,7 @@ import {
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 import { resTechCartsWithOpers } from "../controllers/TechCartService";
+import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 
 export interface Iuser {
   id?: number;
@@ -770,6 +771,59 @@ technologicalEconomicJustification.init(
   },
   { sequelize }
 );
+export interface Iincome {
+  id?: number;
+  name: string;
+  date: string;
+  UserId: string;
+  TypeId: number;
+  SubTypeId: number;
+}
+export class income extends Model<Iincome> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare UserId: string;
+  declare TypeId: number;
+  declare SubTypeId: number;
+}
+income.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    date: { type: DataTypes.DATE },
+    UserId: { type: DataTypes.STRING, allowNull: false },
+    TypeId: { type: DataTypes.INTEGER },
+    SubTypeId: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
+
+export interface Ioutcome {
+  id?: number;
+  name: string;
+  group: IoutcomeGroup;
+  type: IoutcomeType;
+  userId: string;
+  techCartId?: number;
+}
+export class outcome extends Model<Ioutcome> {
+  declare id?: number;
+  declare name: string;
+  declare group: IoutcomeGroup;
+  declare type: IoutcomeType;
+  declare userId: string;
+}
+outcome.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    group: { type: DataTypes.STRING },
+    type: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -830,3 +884,6 @@ technologicalEconomicJustification.belongsTo(cultivationTechnologies);
 
 section.hasMany(tech_cart);
 tech_cart.belongsTo(section);
+
+tech_cart.hasOne(outcome);
+outcome.belongsTo(tech_cart);

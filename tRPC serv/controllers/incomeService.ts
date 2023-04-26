@@ -2,12 +2,15 @@ import { Principal } from "..";
 import {
   culture,
   Iculture,
+  Iincome,
+  income,
   IyieldCalculation,
   IyieldPlant,
   yieldCalculation,
   yieldPlant,
 } from "../models/models";
 import {
+  CreateIncome,
   createYieldCalcType,
   updateYieldPlantType,
 } from "../routes/incomeRouter";
@@ -22,7 +25,7 @@ class incomeService {
     return cultures;
   }
 
-  async get(user: Principal | undefined) {
+  async getYieldPlant(user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore
     const res: resYieldPlant[] | undefined = await yieldPlant.findAll({
@@ -32,7 +35,7 @@ class incomeService {
 
     return res;
   }
-  async getOne(plantId: number) {
+  async getOneYieldPlant(plantId: number) {
     //@ts-ignore
     const res: resYieldPlant = await yieldPlant.findOne({
       where: { cultureId: plantId },
@@ -40,7 +43,7 @@ class incomeService {
     });
     return res;
   }
-  async create(
+  async createYieldPlant(
     data: { cultureId: number; comment: string },
     user: Principal | undefined
   ) {
@@ -125,7 +128,10 @@ class incomeService {
     });
     return res;
   }
-  async delete(data: { yieldPlantId: number }, user: Principal | undefined) {
+  async deleteYieldPlant(
+    data: { yieldPlantId: number },
+    user: Principal | undefined
+  ) {
     if (!user) return;
     await yieldCalculation.destroy({
       where: { yieldPlantId: data.yieldPlantId },
@@ -133,7 +139,10 @@ class incomeService {
     await yieldPlant.destroy({ where: { id: data.yieldPlantId } });
     return data.yieldPlantId;
   }
-  async update(data: updateYieldPlantType, user: Principal | undefined) {
+  async updateYieldPlant(
+    data: updateYieldPlantType,
+    user: Principal | undefined
+  ) {
     if (!user) return;
 
     const plants = await yieldPlant.update(
@@ -147,6 +156,17 @@ class incomeService {
     const res: resYieldPlant | null = await yieldPlant.findOne({
       where: { id: data.yieldPlantId },
       include: plantInclude,
+    });
+    return res;
+  }
+  async create(user: Principal | undefined, data: CreateIncome) {
+    if (!user) return;
+    const res: Iincome | undefined = await income.create({
+      date: data.date,
+      name: data.name,
+      TypeId: data.TypeId,
+      SubTypeId: data.SubTypeId,
+      UserId: user.sub,
     });
     return res;
   }

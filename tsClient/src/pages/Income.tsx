@@ -12,7 +12,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import Dialog from "../components/Dialog";
-import CreateIncome from "../modules/CreateIncome";
+import CreateYield from "../modules/CreateYield";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import { Link } from "react-router-dom";
@@ -21,8 +21,9 @@ import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
 import { deleteYieldPlant } from "../http/requests";
-import { incProp } from "../modules/CreateIncome/CreateIncome";
+import { incProp } from "../modules/CreateYield/CreateYield";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
+import CreateIncome from "../modules/CreateIncome/CreateIncome";
 
 function Income() {
   const { income, user } = useContext(Context);
@@ -43,6 +44,7 @@ function Income() {
   });
   console.log(1);
   const [plantId, setPlantId] = useState(0);
+  const [incomeOpen, setIncomeOpen] = useState(false);
   return (
     <Container maxW="container.lg">
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -127,7 +129,7 @@ function Income() {
       <Button mt={"15px"} onClick={() => setOpen(true)}>
         Добавити культуру
       </Button>
-      <CreateIncome
+      <CreateYield
         open={open}
         setOpen={setOpen}
         res={res}
@@ -173,6 +175,21 @@ function Income() {
         </Table>
       </TableContainer>
       <Button>Додати розрахунок</Button>
+      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Планування графіку доходу
+      </Heading>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Th></Th>
+            <Th>Назва</Th>
+            <Th>Тип доходу</Th>
+            <Th>Сума доходу</Th>
+          </Thead>
+        </Table>
+      </TableContainer>
+      <Button onClick={() => setIncomeOpen(true)}>Додати дохід</Button>
+      <CreateIncome open={incomeOpen} setOpen={setIncomeOpen} />
     </Container>
   );
 }

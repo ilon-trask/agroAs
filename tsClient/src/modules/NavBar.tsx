@@ -3,6 +3,7 @@ import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
 import {
   BUSINESS_ROUTER,
+  CASH_FLOW,
   INCOME_ROUTER,
   LOGIN_ROUTE,
   MAP_ROUTE,
@@ -49,6 +50,12 @@ const NavBar = observer(() => {
               to={TEJ_JORNAL_ROUTER}
             >
               Техніко-економічне обгрунтування
+            </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={CASH_FLOW}
+            >
+              Грошовий потік
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}

@@ -19,6 +19,7 @@ import {
   getAgreeTEJ,
   getTechnologiesTEJ,
   getSection,
+  getOutcome,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -41,6 +42,7 @@ function App() {
       getCultureTEJMap(map);
       getCultivationTechnologiesMap(map);
       getSection(map);
+      getOutcome(map);
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);

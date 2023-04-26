@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Routes,
   Route,
@@ -6,7 +6,6 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { Context } from "./main";
 import BusinessCatalog from "./pages/BusinessCatalog";
 import BusinessPlanPage from "./pages/BusinessPlanPage";
 import HowThisWork from "./pages/HowThisWork";
@@ -34,10 +33,11 @@ import {
   BUSINESSpLAN_ROUTER,
   BUSINESScATALOG_ROUTER,
   BUSINESS_ROUTER,
+  CASH_FLOW,
 } from "./utils/consts";
+import CashFlow from "./pages/CashFlow";
 
 export default function AppRouter() {
-  const { user } = useContext(Context);
   const location = useLocation();
 
   useEffect(() => {
@@ -71,6 +71,7 @@ export default function AppRouter() {
       <Route path={YIELD_CALC_ROUTER + "/:id"} element={<YieldСalculation />} />
       <Route path={TEJ_JORNAL_ROUTER} element={<TEJJornal />} />
       <Route path={TEJ_ROUTER + "/:id"} element={<TEJustification />} />
+      <Route path={CASH_FLOW} element={<CashFlow />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
