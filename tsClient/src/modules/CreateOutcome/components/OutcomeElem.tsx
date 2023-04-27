@@ -7,7 +7,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createOutcome } from "../../../http/requests";
+import { createOutcome, patchOutcome } from "../../../http/requests";
 import { Context } from "../../../main";
 import { outcomeProps } from "../CreateOutcome";
 type props = {
@@ -15,8 +15,17 @@ type props = {
   res: outcomeProps;
   setRes: Dispatch<SetStateAction<outcomeProps>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function OutcomeElem({ setScreen, res, setRes, setOpen }: props) {
+function OutcomeElem({
+  setScreen,
+  res,
+  setRes,
+  setOpen,
+  update,
+  setUpdate,
+}: props) {
   const { map } = useContext(Context);
   return (
     <Box>
@@ -45,11 +54,21 @@ function OutcomeElem({ setScreen, res, setRes, setOpen }: props) {
           isDisabled={!res.id}
           onClick={() => {
             if (res.group && res.type) {
-              createOutcome(map, {
-                cartId: res.id,
-                group: res.group,
-                type: res.type,
-              });
+              if (update) {
+                patchOutcome(map, {
+                  type: res.type,
+                  cartId: res.id,
+                  group: res.group,
+                  outcomeId: res.outId!,
+                });
+                setUpdate(false);
+              } else {
+                createOutcome(map, {
+                  cartId: res.id,
+                  group: res.group,
+                  type: res.type,
+                });
+              }
               setOpen(false);
             }
           }}

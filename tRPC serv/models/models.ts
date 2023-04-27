@@ -805,6 +805,7 @@ export interface Ioutcome {
   group: IoutcomeGroup;
   type: IoutcomeType;
   userId: string;
+  isUsing?: boolean;
   techCartId?: number;
 }
 export class outcome extends Model<Ioutcome> {
@@ -812,6 +813,7 @@ export class outcome extends Model<Ioutcome> {
   declare name: string;
   declare group: IoutcomeGroup;
   declare type: IoutcomeType;
+  declare isUsing: boolean;
   declare userId: string;
 }
 outcome.init(
@@ -820,6 +822,7 @@ outcome.init(
     name: { type: DataTypes.STRING },
     group: { type: DataTypes.STRING },
     type: { type: DataTypes.STRING },
+    isUsing: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     userId: { type: DataTypes.STRING },
   },
   { sequelize }

@@ -16,7 +16,9 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
+import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Context } from "../../main";
 import useIncomeTypes from "../../pages/hook/useIncomeTypes";
 import useOutcomeTypes from "../../pages/hook/useOutcomeTypes";
@@ -50,6 +52,19 @@ const incomeTypes = useIncomeTypes;
 const outcomeTypes = useOutcomeTypes;
 function CashFlowTable() {
   const { map } = useContext(Context);
+  console.log(map.outcome);
+
+  const outcomes = map.outcome.filter((el) => el.isUsing! == true);
+  const carts: resTechCartsWithOpers[] = [];
+  for (let i = 0; i < map.maps.length; i++) {
+    const el = map.maps[i];
+    for (let j = 0; j < outcomes.length; j++) {
+      const e = outcomes[j];
+      if (el.id == e.techCartId) {
+        carts.push(el);
+      }
+    }
+  }
   return (
     <Table size={"sm"}>
       <Thead>
@@ -137,6 +152,17 @@ function CashFlowTable() {
         <Tr>
           <Td>Оборот за рік</Td>
         </Tr>
+        {carts.map((el) => (
+          <Tr>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td>{el.area * el.costHectare!}</Td>
+            <Td>{outcomes.find((e) => e.techCartId == el.id)?.type}</Td>
+            <Td>{el.nameCart}</Td>
+          </Tr>
+        ))}
         <Tr>
           <Th></Th>
           <Th></Th>
@@ -149,4 +175,4 @@ function CashFlowTable() {
   );
 }
 
-export default CashFlowTable;
+export default observer(CashFlowTable);

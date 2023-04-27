@@ -36,7 +36,7 @@ function MainPage() {
           gridTemplateColumns={["1fr", "1fr", "1fr 3fr"]}
           gridColumnGap={"15px"}
           gridGap={"15px"}
-          maxW={"1200px"}
+          maxW={"1300px"}
           mx={"auto"}
           mt={"15px"}
         >
@@ -188,7 +188,7 @@ function MainPage() {
             </TabList>
           </Box>
           <TabPanels>
-            <TabPanel>
+            <TabPanel p={0}>
               <Box
                 display={"grid"}
                 gridTemplateColumns={[

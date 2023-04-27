@@ -182,7 +182,7 @@ function TEJJornal() {
       {!!deleteOpen && (
         <DeleteAlert
           open={deleteOpen}
-          setOpen={setDeleteOpen}
+          setOpen={setDeleteOpen as any}
           text={"бізнес-план"}
           func={func.func}
         />

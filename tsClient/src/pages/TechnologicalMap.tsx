@@ -303,7 +303,7 @@ const TechnologicalMap = observer(() => {
           setUpdate={setUpdate}
           res={res as cartProps}
           setRes={setRes}
-          complex={true}
+          complex={myMap?.isComplex}
           setComplex={() => {}}
         />
       </Box>

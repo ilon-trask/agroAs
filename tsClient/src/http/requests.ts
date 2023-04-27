@@ -36,7 +36,10 @@ import {
 } from "../../../tRPC serv/routes/TEJRouter";
 import { cartProps } from "../modules/CreateCart";
 import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
-import { createOutcomeType } from "../../../tRPC serv/routes/outcomeRouter";
+import {
+  createOutcomeType,
+  patchOutcomeType,
+} from "../../../tRPC serv/routes/outcomeRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -910,5 +913,27 @@ export function createOutcome(map: MapStore, data: createOutcomeType) {
 export function getOutcome(map: MapStore) {
   client.outcome.get.query().then((res) => {
     map.outcome = res;
+  });
+}
+export function setIsUsingOutcome(
+  map: MapStore,
+  data: { outcomeId: number; value: boolean }
+) {
+  client.outcome.setIsUsing.query(data).then((res) => {
+    map.outcome = map.outcome.filter((el) => el.id != res?.id);
+    map.newOutcome = res!;
+  });
+}
+export function deleteOutcome(map: MapStore, outcomeId: number) {
+  client.outcome.delete.query({ outcomeId }).then((res) => {
+    if (!res) return;
+    map.outcome = map.outcome.filter((el) => el.id != outcomeId);
+  });
+}
+export function patchOutcome(map: MapStore, data: patchOutcomeType) {
+  client.outcome.patch.query(data).then((res) => {
+    if (!res) return;
+    map.outcome = map.outcome.filter((el) => el.id != res.id);
+    map.newOutcome = res;
   });
 }
