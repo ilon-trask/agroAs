@@ -40,6 +40,8 @@ import {
   createOutcomeType,
   patchOutcomeType,
 } from "../../../tRPC serv/routes/outcomeRouter";
+import { createProductionType } from "../../../tRPC serv/routes/productionRouter";
+import { createSaleType } from "../../../tRPC serv/routes/saleRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -774,6 +776,11 @@ export function getCultureTEJMap(map: MapStore) {
     map.culture = res;
   });
 }
+export function getProductTEJMap(map: MapStore) {
+  client.income.getProduct.query().then((res) => {
+    map.product = res;
+  });
+}
 export function getCultivationTechnologiesMap(map: MapStore) {
   client.TEJ.getCultivationTechnologies.query().then((res) => {
     map.cultivationTechnologies = res;
@@ -936,4 +943,29 @@ export function patchOutcome(map: MapStore, data: patchOutcomeType) {
     map.outcome = map.outcome.filter((el) => el.id != res.id);
     map.newOutcome = res;
   });
+}
+
+export function createProduction(
+  income: IncomeStore,
+  data: createProductionType
+) {
+  client.production.create.query(data).then((res) => {
+    console.log(res);
+
+    income.newProduction = res;
+  });
+}
+
+export function getProduction(income: IncomeStore) {
+  client.production.get.query().then((res) => {
+    income.production = res;
+  });
+}
+
+export function createSale(income: IncomeStore, data: createSaleType) {
+  client.sale.create.query(data).then((res) => (income.newSale = res));
+}
+
+export function getSale(income: IncomeStore) {
+  client.sale.get.query().then((res) => (income.sale = res));
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Container,
@@ -7,6 +7,7 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -20,13 +21,17 @@ import { YIELD_CALC_ROUTER } from "../utils/consts";
 import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert from "../components/DeleteAlert";
-import { deleteYieldPlant } from "../http/requests";
+import { deleteYieldPlant, getSale } from "../http/requests";
 import { incProp } from "../modules/CreateYield/CreateYield";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import CreateIncome from "../modules/CreateIncome/CreateIncome";
+import PlanIncomeProductionTable from "../modules/PlanIncomeProductionTable/PlanIncomeProductionTable";
+import CreateProductService from "../modules/CreateProductService";
+import { productionProp } from "../modules/CreateProductService/CreateProduction";
+import CreateSale, { SaleProp } from "../modules/CreateSale/CreateSale";
 
 function Income() {
-  const { income, user } = useContext(Context);
+  const { income, user, map } = useContext(Context);
   const yieldPlants: resYieldPlant[] = JSON.parse(
     JSON.stringify(income.yieldPlant)
   );
@@ -42,11 +47,33 @@ function Income() {
     operId: null,
     cartId: null,
   });
-  console.log(1);
+  useEffect(() => {
+    getSale(income);
+  }, []);
   const [plantId, setPlantId] = useState(0);
   const [incomeOpen, setIncomeOpen] = useState(false);
+  const [prodOpen, setProdOpen] = useState(false);
+  const [prodRes, setProdRes] = useState<productionProp>({
+    productId: "",
+    techCartId: "",
+  });
+  const [saleOpen, setSaleOpen] = useState(false);
+  const [saleRes, setSaleRes] = useState<SaleProp>({
+    amount: "",
+    date: "",
+    price: "",
+    productionId: "",
+  });
   return (
     <Container maxW="container.lg">
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Виручка від основного виробництва
+      </Text>
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Планування урожайності
       </Heading>
@@ -147,9 +174,9 @@ function Income() {
         />
       )}
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування виробництва
+        Планування основного виробництва
       </Heading>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      {/* <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
             <Th>Назва культури</Th>
@@ -157,24 +184,94 @@ function Income() {
             <Th>Урожайність т/га</Th>
             <Th>Валовий збір</Th>
           </Thead>
-        </Table>
-      </TableContainer>
-      <Button>Додати розрахунок</Button>
+          </Table>
+        </TableContainer> */}
+      <PlanIncomeProductionTable />
+      <Button onClick={() => setProdOpen(true)}>
+        Додати продукт або послугу
+      </Button>
+      <CreateProductService
+        open={prodOpen}
+        setOpen={setProdOpen}
+        res={prodRes}
+        setRes={setProdRes}
+      />
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування збуту
+        Планування збуту основного виробництва
       </Heading>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
             <Th>Назва культури</Th>
             <Th>Продукт</Th>
+            <Th>Дата</Th>
             <Th>Кількість т</Th>
             <Th>Ціна грн/т</Th>
             <Th>Сума грн</Th>
           </Thead>
+          <Tbody>
+            {income.sale.map((el) => {
+              const production = income.production.find(
+                (e) => e.id == el.productionId
+              );
+              const product = map.product.find(
+                (e) => e.id == production?.productId
+              );
+              return (
+                <Tr>
+                  <Td>
+                    {map.culture.find((e) => e.id == product?.cultureId)?.name}
+                  </Td>
+                  <Td>{product?.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.amount}</Td>
+                  <Td>{el.price}</Td>
+                  <Td>{el.price * el.amount}</Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
         </Table>
       </TableContainer>
-      <Button>Додати розрахунок</Button>
+      <CreateSale
+        open={saleOpen}
+        setOpen={setSaleOpen}
+        res={saleRes}
+        setRes={setSaleRes}
+      />
+      <Button onClick={() => setSaleOpen(true)}>Додати розрахунок</Button>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Кредит оботній
+      </Text>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Інвестиції власні
+      </Text>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Державна підтримка субсидія
+      </Text>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Грант
+      </Text>
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Планування графіку доходу
       </Heading>
@@ -190,6 +287,22 @@ function Income() {
       </TableContainer>
       <Button onClick={() => setIncomeOpen(true)}>Додати дохід</Button>
       <CreateIncome open={incomeOpen} setOpen={setIncomeOpen} />
+      <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
+        Розрахунок грошового потоку (доходи)
+      </Text>
+      <TableContainer>
+        <Table size={"sm"}>
+          <Thead>
+            <Th></Th>
+            <Th>Назва</Th>
+            <Th>Тип витрат</Th>
+            <Th>Група витрат</Th>
+            <Th>Сума</Th>
+            <Th></Th>
+            <Th></Th>
+          </Thead>
+        </Table>
+      </TableContainer>
     </Container>
   );
 }

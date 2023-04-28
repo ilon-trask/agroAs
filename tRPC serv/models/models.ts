@@ -827,6 +827,83 @@ outcome.init(
   },
   { sequelize }
 );
+export interface Iproduct {
+  id?: number;
+  name: string;
+  price: number;
+  cost: number;
+  unitMeasure: string;
+  userId: string;
+  cultureId?: number;
+}
+export class product extends Model<Iproduct> {
+  declare id?: number;
+  declare name: string;
+  declare price: number;
+  declare cost: number;
+  declare unitMeasure: string;
+  declare userId: string;
+  declare cultureId?: number;
+}
+product.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    price: { type: DataTypes.FLOAT },
+    cost: { type: DataTypes.FLOAT },
+    unitMeasure: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Iproduction {
+  id?: number;
+  isPrimary: boolean;
+  productId?: number;
+  techCartId?: number;
+  userId: string;
+}
+export class production extends Model<Iproduction> {
+  declare id?: number;
+  declare isPrimary: boolean;
+  declare productId?: number;
+  declare techCartId?: number;
+  declare userId: string;
+}
+production.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    isPrimary: { type: DataTypes.BOOLEAN, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Isale {
+  id?: number;
+  date: string;
+  amount: number;
+  price: number;
+  productionId?: number;
+  userId: string;
+}
+export class sale extends Model<Isale> {
+  declare id?: number;
+  declare date: string;
+  declare amount: number;
+  declare price: number;
+  declare productionId?: number;
+  declare userId: string;
+}
+sale.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.DATEONLY },
+    amount: { type: DataTypes.FLOAT(2) },
+    price: { type: DataTypes.FLOAT(2) },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -890,3 +967,14 @@ tech_cart.belongsTo(section);
 
 tech_cart.hasOne(outcome);
 outcome.belongsTo(tech_cart);
+
+culture.hasMany(product);
+product.belongsTo(culture);
+
+product.hasMany(production);
+production.belongsTo(product);
+tech_cart.hasMany(production);
+production.belongsTo(tech_cart);
+
+production.hasMany(sale);
+sale.belongsTo(production);

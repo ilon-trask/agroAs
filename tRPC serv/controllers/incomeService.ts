@@ -4,8 +4,10 @@ import {
   Iculture,
   Iincome,
   income,
+  Iproduct,
   IyieldCalculation,
   IyieldPlant,
+  product,
   yieldCalculation,
   yieldPlant,
 } from "../models/models";
@@ -167,6 +169,13 @@ class incomeService {
       TypeId: data.TypeId,
       SubTypeId: data.SubTypeId,
       UserId: user.sub,
+    });
+    return res;
+  }
+  async getProduct(user: Principal | undefined) {
+    if (!user) return;
+    const res: Iproduct[] | null = await product.findAll({
+      where: { userId: user.sub },
     });
     return res;
   }

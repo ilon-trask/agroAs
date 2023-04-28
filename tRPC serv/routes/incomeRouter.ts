@@ -92,4 +92,8 @@ export const incomeRouter = router({
     const res = await incomeService.create(ctx.user, input);
     return res;
   }),
+  getProduct: publicProcedure.query(async ({ ctx }) => {
+    const res = incomeService.getProduct(ctx.user);
+    return res;
+  }),
 });
