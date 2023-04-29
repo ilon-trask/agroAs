@@ -1,14 +1,24 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Dialog from "../../components/Dialog";
-import Income from "./components/Income";
-import Manufacture from "./components/manufacture";
+import IncomeChooseType from "./components/IncomeChooseType";
+import IncomeChooseGroupe from "./components/IncomeChooseGroup";
+import { IncomeType } from "../../pages/hook/useIncomeTypes";
+import { IncomeGroup } from "../../pages/hook/useIncomeGroup";
+import IncomeChoseElem from "./components/IncomeChoseElem";
 
-type props = { open: boolean; setOpen: Dispatch<SetStateAction<boolean>> };
-function CreateIncome({ open, setOpen }: props) {
+export type IncomeProp = {
+  type: IncomeType;
+  group: IncomeGroup;
+  propId: number;
+};
+type props = {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  res: IncomeProp;
+  setRes: Dispatch<SetStateAction<IncomeProp>>;
+};
+function CreateIncome({ open, setOpen, res, setRes }: props) {
   const [screen, setScreen] = useState(0);
-  function changeString(screenNum: number) {
-    setScreen(screenNum);
-  }
   return (
     <Dialog
       isErr={false}
@@ -22,9 +32,16 @@ function CreateIncome({ open, setOpen }: props) {
       update={false}
     >
       {screen == 0 ? (
-        <Income changeString={changeString} />
+        <IncomeChooseType setScreen={setScreen} res={res} setRes={setRes} />
       ) : screen == 1 ? (
-        <Manufacture />
+        <IncomeChooseGroupe setScreen={setScreen} res={res} setRes={setRes} />
+      ) : screen == 2 ? (
+        <IncomeChoseElem
+          setScreen={setScreen}
+          res={res}
+          setRes={setRes}
+          setOpen={setOpen}
+        />
       ) : null}
     </Dialog>
   );

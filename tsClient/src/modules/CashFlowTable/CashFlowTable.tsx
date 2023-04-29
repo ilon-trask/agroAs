@@ -51,8 +51,7 @@ function PopOver({
 const incomeTypes = useIncomeTypes;
 const outcomeTypes = useOutcomeTypes;
 function CashFlowTable() {
-  const { map } = useContext(Context);
-  console.log(map.outcome);
+  const { map, income } = useContext(Context);
 
   const outcomes = map.outcome.filter((el) => el.isUsing! == true);
   const carts: resTechCartsWithOpers[] = [];
@@ -65,6 +64,8 @@ function CashFlowTable() {
       }
     }
   }
+
+  const incomes = income.income.filter((el) => el.isUsing! == true);
   return (
     <Table size={"sm"}>
       <Thead>
@@ -153,7 +154,7 @@ function CashFlowTable() {
           <Td>Оборот за рік</Td>
         </Tr>
         {carts.map((el) => (
-          <Tr>
+          <Tr key={el.id}>
             <Td></Td>
             <Td></Td>
             <Td></Td>
@@ -163,6 +164,26 @@ function CashFlowTable() {
             <Td>{el.nameCart}</Td>
           </Tr>
         ))}
+        {incomes.map((el) => {
+          const sale = income.sale.find((e) => e.id == el.saleId);
+          const product = map.product.find(
+            (e) =>
+              e.id ==
+              income.production.find((e) => e.id == sale?.productionId)
+                ?.productId
+          );
+          return (
+            <Tr key={el.id}>
+              <Td></Td>
+              <Td>{product?.name}</Td>
+              <Td>{sale?.amount! * sale?.price!}</Td>
+              <Td>{el.type}</Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+            </Tr>
+          );
+        })}
         <Tr>
           <Th></Th>
           <Th></Th>

@@ -5,7 +5,8 @@ import {
   InferCreationAttributes,
   Model,
 } from "sequelize";
-
+import { IncomeType } from "../../tsClient/src/pages/hook/useIncomeTypes";
+import { IncomeGroup } from "../../tsClient/src/pages/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 import { resTechCartsWithOpers } from "../controllers/TechCartService";
@@ -773,28 +774,27 @@ technologicalEconomicJustification.init(
 );
 export interface Iincome {
   id?: number;
-  name: string;
-  date: string;
+  type: IncomeType;
+  group: IncomeGroup;
+  isUsing: boolean;
   UserId: string;
-  TypeId: number;
-  SubTypeId: number;
+  saleId?: number;
 }
 export class income extends Model<Iincome> {
   declare id?: number;
-  declare name: string;
-  declare date: string;
+  declare type: IncomeType;
+  declare group: IncomeGroup;
   declare UserId: string;
-  declare TypeId: number;
-  declare SubTypeId: number;
+  declare isUsing: boolean;
+  declare saleId?: number;
 }
 income.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING, allowNull: false },
-    date: { type: DataTypes.DATE },
+    type: { type: DataTypes.STRING, allowNull: false },
+    group: { type: DataTypes.STRING },
+    isUsing: { type: DataTypes.BOOLEAN },
     UserId: { type: DataTypes.STRING, allowNull: false },
-    TypeId: { type: DataTypes.INTEGER },
-    SubTypeId: { type: DataTypes.INTEGER },
   },
   { sequelize }
 );
@@ -978,3 +978,6 @@ production.belongsTo(tech_cart);
 
 production.hasMany(sale);
 sale.belongsTo(production);
+
+sale.hasOne(income);
+income.belongsTo(sale);

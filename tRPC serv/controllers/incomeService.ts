@@ -14,6 +14,7 @@ import {
 import {
   CreateIncome,
   createYieldCalcType,
+  setIsUsingIncomeType,
   updateYieldPlantType,
 } from "../routes/incomeRouter";
 export interface resYieldPlant extends IyieldPlant {
@@ -164,11 +165,29 @@ class incomeService {
   async create(user: Principal | undefined, data: CreateIncome) {
     if (!user) return;
     const res: Iincome | undefined = await income.create({
-      date: data.date,
-      name: data.name,
-      TypeId: data.TypeId,
-      SubTypeId: data.SubTypeId,
+      group: data.group,
+      isUsing: data.isUsing,
+      type: data.type,
+      saleId: data.saleId,
       UserId: user.sub,
+    });
+    return res;
+  }
+  async get(user: Principal | undefined) {
+    if (!user) return;
+    const res: Iincome[] | undefined = await income.findAll({
+      where: { UserId: user.sub },
+    });
+    return res;
+  }
+  async setIsUsing(user: Principal | undefined, data: setIsUsingIncomeType) {
+    if (!user) return;
+    await income.update(
+      { isUsing: data.value },
+      { where: { id: data.incomeId } }
+    );
+    const res: Iincome | null = await income.findOne({
+      where: { id: data.incomeId },
     });
     return res;
   }

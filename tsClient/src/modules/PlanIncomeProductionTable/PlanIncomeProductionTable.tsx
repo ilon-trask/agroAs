@@ -45,10 +45,6 @@ function PlanIncomeProductionTable() {
                 (e) => e.cultureId! == myProduct?.cultureId!
               );
               const myCart = map.maps.find((e) => {
-                console.log(e.id);
-                console.log(el.techCartId);
-                console.log(e.id == el.techCartId);
-
                 return e.id! == el.techCartId!;
               });
               const planYield =

@@ -39,7 +39,7 @@ function OutcomeElem({
           value={res.id}
         >
           <option hidden defaultChecked value="">
-            Виберіть групу
+            Виберіть
           </option>
           {map.maps.map((el) => (
             <option key={el.id} value={el.id}>

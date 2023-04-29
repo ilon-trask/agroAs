@@ -1,12 +1,7 @@
 import { publicProcedure, router } from "../trpc";
 import z from "zod";
 import incomeService, { resYieldPlant } from "../controllers/incomeService";
-import {
-  Iculture,
-  IyieldCalculation,
-  IyieldPlant,
-  yieldCalculation,
-} from "../models/models";
+import { Iculture } from "../models/models";
 const createYieldCalc = z.object({
   numberFruit: z.number(),
   fruitWeight: z.number(),
@@ -23,12 +18,38 @@ const updateYieldPlant = z.object({
 });
 export type updateYieldPlantType = z.infer<typeof updateYieldPlant>;
 const createIncome = z.object({
-  name: z.string(),
-  date: z.string(),
-  TypeId: z.number(),
-  SubTypeId: z.number(),
+  type: z.enum([
+    "Основне виробництво",
+    "Допоміжне виробництво",
+    "Кредит",
+    "Інвестиції",
+    "Державна підтримка",
+    "Грант",
+    "Не визначино",
+  ]),
+  group: z.enum([
+    "Виручка від основного виробництва",
+    "Виручка від допоміжного виробництва",
+    "Кредит оботній",
+    "Кредит інвестиційний",
+    "Інвестиції власні",
+    "Інвестиції інвесторські",
+    "Інвестиції залучені від інвесторів",
+    "Субсидії",
+    "Дотації",
+    "Поворотня фінансова допомога",
+    "Грантові кошти",
+    "Не визначино",
+  ]),
+  isUsing: z.boolean(),
+  saleId: z.number(),
 });
 export type CreateIncome = z.infer<typeof createIncome>;
+const setIsUsingIncome = z.object({
+  incomeId: z.number(),
+  value: z.boolean(),
+});
+export type setIsUsingIncomeType = z.infer<typeof setIsUsingIncome>;
 export const incomeRouter = router({
   getCultural: publicProcedure.query(async () => {
     const cultures: Iculture[] | undefined = await incomeService.getCultural();
@@ -92,6 +113,16 @@ export const incomeRouter = router({
     const res = await incomeService.create(ctx.user, input);
     return res;
   }),
+  get: publicProcedure.query(async ({ ctx }) => {
+    const res = await incomeService.get(ctx.user);
+    return res;
+  }),
+  setIsUsing: publicProcedure
+    .input(setIsUsingIncome)
+    .query(({ ctx, input }) => {
+      const res = incomeService.setIsUsing(ctx.user, input);
+      return res;
+    }),
   getProduct: publicProcedure.query(async ({ ctx }) => {
     const res = incomeService.getProduct(ctx.user);
     return res;

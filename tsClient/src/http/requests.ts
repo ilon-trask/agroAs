@@ -28,6 +28,7 @@ import IncomeStore from "../store/IncomeStore";
 import {
   CreateIncome,
   createYieldCalcType,
+  setIsUsingIncomeType,
 } from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
 import {
@@ -910,7 +911,20 @@ export function createIncome(Income: IncomeStore, data: CreateIncome) {
     Income.newIncome = res;
   });
 }
-
+export function getIncome(Income: IncomeStore) {
+  client.income.get.query().then((res) => {
+    Income.income = res;
+  });
+}
+export function setIsUsingIncome(
+  Income: IncomeStore,
+  data: setIsUsingIncomeType
+) {
+  client.income.setIsUsing.query(data).then((res) => {
+    Income.income = Income.income.filter((el) => el.id != res?.id);
+    Income.newIncome = res!;
+  });
+}
 export function createOutcome(map: MapStore, data: createOutcomeType) {
   client.outcome.create.query(data).then((res) => {
     map.newOutcome = res;
