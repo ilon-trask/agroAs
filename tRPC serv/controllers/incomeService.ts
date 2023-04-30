@@ -14,6 +14,7 @@ import {
 import {
   CreateIncome,
   createYieldCalcType,
+  PatchIncome,
   setIsUsingIncomeType,
   updateYieldPlantType,
 } from "../routes/incomeRouter";
@@ -196,6 +197,26 @@ class incomeService {
     const res: Iproduct[] | null = await product.findAll({
       where: { userId: user.sub },
     });
+    return res;
+  }
+  async patch(user: Principal | undefined, data: PatchIncome) {
+    if (!user) return;
+    await income.update(
+      {
+        group: data.group,
+        saleId: data.saleId,
+        type: data.type,
+      },
+      { where: { id: data.incomeId } }
+    );
+    const res: Iincome | null = await income.findOne({
+      where: { id: data.incomeId },
+    });
+    return res;
+  }
+  async delete(user: Principal | undefined, data: { incomeId: number }) {
+    if (!user) return;
+    const res = await income.destroy({ where: { id: data.incomeId } });
     return res;
   }
 }

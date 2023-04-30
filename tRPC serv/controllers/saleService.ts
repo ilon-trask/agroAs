@@ -1,7 +1,7 @@
 import { Principal } from "..";
-import { Iproduction, Isale, production, sale } from "../models/models";
+import { income, Iproduction, Isale, production, sale } from "../models/models";
 import { createProductionType } from "../routes/productionRouter";
-import { createSaleType } from "../routes/saleRouter";
+import { createSaleType, PatchSaleType } from "../routes/saleRouter";
 class SaleService {
   async get(user: Principal | undefined) {
     if (!user) return;
@@ -19,6 +19,29 @@ class SaleService {
       userId: user.sub,
       productionId: data.productionId,
     });
+    return res;
+  }
+  async patch(user: Principal | undefined, data: PatchSaleType) {
+    if (!user) return;
+    await sale.update(
+      {
+        amount: data.amount,
+        date: data.date,
+
+        price: data.price,
+        productionId: data.productionId,
+      },
+      { where: { id: data.saleId } }
+    );
+    const res: Isale | null = await sale.findOne({
+      where: { id: data.saleId },
+    });
+    return res;
+  }
+  async delete(user: Principal | undefined, data: { saleId: number }) {
+    if (!user) return;
+    const res = await sale.destroy({ where: { id: data.saleId } });
+    await income.destroy({ where: { saleId: data.saleId } });
     return res;
   }
 }

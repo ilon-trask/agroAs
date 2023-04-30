@@ -9,11 +9,18 @@ import {
   AlertDialogFooter,
   Button,
 } from "@chakra-ui/react";
-export type deleteHeading = "карту" | "операцію" | "бізнес-план" | "Витрату";
+export type IdeleteHeading =
+  | "карту"
+  | "операцію"
+  | "бізнес-план"
+  | "Витрату"
+  | "планування"
+  | "продаж"
+  | "прибуток";
 type props = {
   open: boolean;
   setOpen: ({ isOpen }: { isOpen: false }) => void;
-  text: deleteHeading;
+  text: IdeleteHeading;
   func: any;
 };
 

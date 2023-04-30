@@ -52,18 +52,10 @@ function TEJJornal() {
   const [isErr, setIsErr] = useState(false);
   const [update, setUpdate] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [agreeOpen, setAgreeOpen] = useState(false);
-  const [agreeData, setAgreeData] = useState<{
-    BusinessId: number;
-    isPublic: boolean;
-    isAgree?: boolean;
-  }>({
-    BusinessId: 0,
-    isPublic: false,
-  });
+
   const [func, setFunc] = useState<any>();
   useTEJ(TEJ);
-  useBusiness(business, map);
+
   function deleteFunc(TEJId: number) {
     setDeleteOpen(true);
     setFunc({
@@ -113,11 +105,10 @@ function TEJJornal() {
     }
   }
   const [showAlert, setShowAlert] = useState(false);
-  const [openBusiness, setOpenBusiness] = useState(false);
   return (
     <Box>
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Приклади типових техніко-економічних обгрунтувань
+        Техніко-економічні показники
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <TEJTable
@@ -142,32 +133,9 @@ function TEJJornal() {
               TEJPubOpenFunc={TEJPubOpenFunc}
             />
           </TableContainer>
+        </Box>
+      )}
 
-          <Button
-            onClick={() => {
-              navigate(BUSINESScATALOG_ROUTER);
-            }}
-          >
-            Переглянути
-          </Button>
-        </Box>
-      )}
-      {!!(user.role == "service_role" || user.role == "ADMIN") && (
-        <Box maxW="1000px" mx="auto">
-          <TableContainer
-            maxW="1000px"
-            mx="auto"
-            mt={"20px"}
-            overflowX={"scroll"}
-          >
-            <BusinessTable />
-          </TableContainer>
-          <Button onClick={() => setOpenBusiness(true)}>
-            Створити бізнес-план
-          </Button>
-          <Button>Добавити ТЕО</Button>
-        </Box>
-      )}
       <CreateTEJ
         open={createOpen}
         setOpen={setCreateOpen}
@@ -197,7 +165,6 @@ function TEJJornal() {
           setOpen={setTEJPubOpen}
         />
       )}
-      <CreateBusiness open={openBusiness} setOpen={setOpenBusiness} />
     </Box>
   );
 }

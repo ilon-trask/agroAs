@@ -8,15 +8,17 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createSale } from "../../../http/requests";
+import { createSale, patchSale } from "../../../http/requests";
 import { Context } from "../../../main";
 import { SaleProp } from "../CreateSale";
 type prop = {
   res: SaleProp;
   setRes: Dispatch<SetStateAction<SaleProp>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function Sale({ res, setRes, setOpen }: prop) {
+function Sale({ res, setRes, setOpen, update, setUpdate }: prop) {
   const { income, map } = useContext(Context);
   return (
     <Box>
@@ -88,8 +90,21 @@ function Sale({ res, setRes, setOpen }: prop) {
         <Button
           onClick={() => {
             if (res.amount && res.date && res.price && res.productionId) {
-              createSale(income, res);
+              if (update) {
+                patchSale(income, {
+                  amount: res.amount,
+                  date: res.date,
+                  price: res.price,
+                  productionId: res.productionId!,
+                  saleId: res.id!,
+                });
+              } else {
+                //@ts-ignore
+                createSale(income, res);
+              }
+              setRes({ amount: "", date: "", price: "", productionId: "" });
               setOpen(false);
+              setUpdate(false);
             }
           }}
         >

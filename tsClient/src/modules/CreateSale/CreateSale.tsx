@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
 import Sale from "./component/Sale";
 export type SaleProp = {
+  id?: number;
   date: string;
   price: number | "";
   amount: number | "";
@@ -12,8 +13,10 @@ type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   res: SaleProp;
   setRes: Dispatch<SetStateAction<SaleProp>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function CreateSale({ open, setOpen, res, setRes }: props) {
+function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
   return (
     <Dialog
       open={open}
@@ -22,11 +25,17 @@ function CreateSale({ open, setOpen, res, setRes }: props) {
       setIsErr={() => {}}
       props={{}}
       res={{}}
-      setRes={() => {}}
+      setRes={setRes}
       update={false}
       setUpdate={() => {}}
     >
-      <Sale res={res} setRes={setRes} setOpen={setOpen} />
+      <Sale
+        res={res}
+        setRes={setRes}
+        setOpen={setOpen}
+        update={update}
+        setUpdate={setUpdate}
+      />
     </Dialog>
   );
 }

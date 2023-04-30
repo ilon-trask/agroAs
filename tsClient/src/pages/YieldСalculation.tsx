@@ -14,7 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import CreateYieldCalc from "../modules/CreateYIeldCalculation";
-import { INCOME_ROUTER } from "../utils/consts";
+import { GOODS_ROUTER, INCOME_ROUTER } from "../utils/consts";
 import { IyieldCalculation } from "../../../tRPC serv/models/models";
 
 export const plantsHeads: Record<string, string[]> = {
@@ -70,7 +70,7 @@ function YieldСalculation() {
     1000;
   return (
     <Container maxW="container.lg" mt={"30px"}>
-      <Link to={INCOME_ROUTER}>
+      <Link to={GOODS_ROUTER}>
         <Button>Повернутиця до культур</Button>
       </Link>
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>

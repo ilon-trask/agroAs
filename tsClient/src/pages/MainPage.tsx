@@ -147,7 +147,7 @@ function MainPage() {
         </Box>
       </Tabs>
       <Heading textAlign={"center"} mt={"20px"}>
-        Техніко-економічні обгрунтування
+        Бізнес-плани
       </Heading>
       <Tabs
         orientation={windW < 770 ? "horizontal" : "vertical"}
@@ -176,7 +176,7 @@ function MainPage() {
               >
                 ТЕХНОЛОГІЇ
               </Tab>
-              {TEJ.technologies.map((el) => (
+              {/* {TEJ.technologies.map((el) => (
                 <Tab
                   display={"block"}
                   textAlign={"left"}
@@ -184,11 +184,11 @@ function MainPage() {
                 >
                   {el.name}
                 </Tab>
-              ))}
+              ))} */}
             </TabList>
           </Box>
           <TabPanels>
-            <TabPanel p={0}>
+            {/* <TabPanel p={0}>
               <Box
                 display={"grid"}
                 gridTemplateColumns={[
@@ -208,8 +208,8 @@ function MainPage() {
                       return <MainTableItemJustification e={e} key={e.id} />;
                     }) || <Text>Немає жодної карти</Text>}
               </Box>
-            </TabPanel>
-            {TEJ.technologies.map((el) => (
+            </TabPanel> */}
+            {/* {TEJ.technologies.map((el) => (
               <TabPanel>
                 <Box
                   display={"grid"}
@@ -232,7 +232,7 @@ function MainPage() {
                       }) || <Text>Немає жодної карти</Text>}
                 </Box>
               </TabPanel>
-            ))}
+            ))} */}
           </TabPanels>
         </Box>
       </Tabs>

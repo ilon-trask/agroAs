@@ -51,7 +51,8 @@ import {
   BUSINESScATALOG_ROUTER,
   BUSINESSpLAN_ROUTER,
   BUSINESS_ROUTER,
-  TEJ_JORNAL_ROUTER,
+  MAP_ROUTE,
+  // TEJ_JORNAL_ROUTER,
   TEJ_ROUTER,
 } from "../utils/consts";
 import useTEJ from "./hook/useTEJ";
@@ -133,10 +134,10 @@ function TEJjustification() {
         {user.role != "" && (
           <Button
             onClick={() => {
-              navigate(TEJ_JORNAL_ROUTER);
+              navigate(MAP_ROUTE);
             }}
           >
-            Назвад
+            Назад
           </Button>
         )}
         <Box display={"flex"}>

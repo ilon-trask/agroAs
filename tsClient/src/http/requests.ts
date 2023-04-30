@@ -28,6 +28,7 @@ import IncomeStore from "../store/IncomeStore";
 import {
   CreateIncome,
   createYieldCalcType,
+  PatchIncome,
   setIsUsingIncomeType,
 } from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
@@ -42,7 +43,10 @@ import {
   patchOutcomeType,
 } from "../../../tRPC serv/routes/outcomeRouter";
 import { createProductionType } from "../../../tRPC serv/routes/productionRouter";
-import { createSaleType } from "../../../tRPC serv/routes/saleRouter";
+import {
+  createSaleType,
+  PatchSaleType,
+} from "../../../tRPC serv/routes/saleRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -52,7 +56,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -970,16 +974,48 @@ export function createProduction(
   });
 }
 
-export function getProduction(income: IncomeStore) {
+export function getProduction(incomeStore: IncomeStore) {
   client.production.get.query().then((res) => {
-    income.production = res;
+    incomeStore.production = res;
   });
 }
 
-export function createSale(income: IncomeStore, data: createSaleType) {
-  client.sale.create.query(data).then((res) => (income.newSale = res));
+export function createSale(incomeStore: IncomeStore, data: createSaleType) {
+  client.sale.create.query(data).then((res) => (incomeStore.newSale = res));
 }
 
-export function getSale(income: IncomeStore) {
-  client.sale.get.query().then((res) => (income.sale = res));
+export function getSale(incomeStore: IncomeStore) {
+  client.sale.get.query().then((res) => (incomeStore.sale = res));
+}
+
+export function patchSale(incomeStore: IncomeStore, data: PatchSaleType) {
+  client.sale.patch.query(data).then((res) => {
+    incomeStore.sale = incomeStore.sale.filter((el) => el.id != data.saleId);
+    incomeStore.newSale = res!;
+  });
+}
+
+export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
+  client.sale.delete.query(data).then((res) => {
+    incomeStore.sale = incomeStore.sale.filter((el) => el.id != data.saleId);
+  });
+}
+
+export function patchIncome(incomeStore: IncomeStore, data: PatchIncome) {
+  client.income.patch.query(data).then((res) => {
+    incomeStore.income = incomeStore.income.filter((el) => el.id != res?.id);
+    incomeStore.newIncome = res!;
+  });
+}
+
+export function deleteIncome(
+  incomeStore: IncomeStore,
+  data: { incomeId: number }
+) {
+  client.income.delete.query(data).then((res) => {
+    if (res)
+      incomeStore.income = incomeStore.income.filter(
+        (el) => el.id != data.incomeId
+      );
+  });
 }

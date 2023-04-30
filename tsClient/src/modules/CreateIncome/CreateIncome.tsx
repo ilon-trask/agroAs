@@ -7,6 +7,7 @@ import { IncomeGroup } from "../../pages/hook/useIncomeGroup";
 import IncomeChoseElem from "./components/IncomeChoseElem";
 
 export type IncomeProp = {
+  id?: number;
   type: IncomeType;
   group: IncomeGroup;
   propId: number;
@@ -16,8 +17,17 @@ type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   res: IncomeProp;
   setRes: Dispatch<SetStateAction<IncomeProp>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function CreateIncome({ open, setOpen, res, setRes }: props) {
+function CreateIncome({
+  open,
+  setOpen,
+  res,
+  setRes,
+  setUpdate,
+  update,
+}: props) {
   const [screen, setScreen] = useState(0);
   return (
     <Dialog
@@ -41,6 +51,8 @@ function CreateIncome({ open, setOpen, res, setRes }: props) {
           res={res}
           setRes={setRes}
           setOpen={setOpen}
+          update={update}
+          setUpdate={setUpdate}
         />
       ) : null}
     </Dialog>

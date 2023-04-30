@@ -39,7 +39,7 @@ import {
   setIsUsingOutcome,
   supabase,
 } from "../http/requests";
-import DeleteAlert, { deleteHeading } from "../components/DeleteAlert";
+import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import CopyCartPupUp from "../modules/CopyCartPopUp";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import CreateWork, { workProps } from "../modules/CreateWork";
@@ -51,6 +51,7 @@ import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { TEHMAP_ROUTER } from "../utils/consts";
 import CreateOutcome from "../modules/CreateOutcome/";
 import { outcomeProps } from "../modules/CreateOutcome/CreateOutcome";
+import TEJJornal from "./TEJJornal";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -77,7 +78,7 @@ const MapJornal = observer(function () {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [deleteOpen, setDeleteOpen] = useState<{
     isOpen: boolean;
-    text: deleteHeading | null;
+    text: IdeleteHeading | null;
     func: any;
     operId?: number | null;
     cartId?: number | null;
@@ -341,6 +342,7 @@ const MapJornal = observer(function () {
           </TableContainer>
         )}
       </Box>
+      {user.role == "service_role" && <TEJJornal />}
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>

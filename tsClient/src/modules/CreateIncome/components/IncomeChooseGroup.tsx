@@ -21,6 +21,7 @@ function IncomeChooseGroup({ setScreen, res, setRes }: props) {
   const { map } = useContext(Context);
   const type = useIncomeTypes.find((el) => el.name == res.type);
   let group = useIncomeGroup.filter((el) => el.typeId == type?.id);
+  const thisGroup = useIncomeGroup.find((el) => el.name == res.group);
   return (
     <ModalBody>
       <Heading size="md" textAlign={"center"}>
@@ -43,7 +44,10 @@ function IncomeChooseGroup({ setScreen, res, setRes }: props) {
       </Select>
       <ModalFooter justifyContent={"space-around"}>
         <Button onClick={() => setScreen(0)}>Назад</Button>
-        <Button onClick={() => setScreen(2)} isDisabled={!res.group}>
+        <Button
+          onClick={() => setScreen(2)}
+          isDisabled={!res.group || thisGroup?.typeId != type?.id}
+        >
           Далі
         </Button>
       </ModalFooter>

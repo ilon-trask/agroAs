@@ -7,7 +7,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createIncome } from "../../../http/requests";
+import { createIncome, patchIncome } from "../../../http/requests";
 import { Context } from "../../../main";
 import { IncomeProp } from "../CreateIncome";
 type props = {
@@ -15,8 +15,17 @@ type props = {
   res: IncomeProp;
   setRes: Dispatch<SetStateAction<IncomeProp>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function IncomeChoseElem({ setScreen, res, setRes, setOpen }: props) {
+function IncomeChoseElem({
+  setScreen,
+  res,
+  setRes,
+  setOpen,
+  setUpdate,
+  update,
+}: props) {
   const { income, map } = useContext(Context);
   return (
     <ModalBody>
@@ -49,13 +58,24 @@ function IncomeChoseElem({ setScreen, res, setRes, setOpen }: props) {
         <Button onClick={() => setScreen(1)}>Назад</Button>
         <Button
           onClick={() => {
-            createIncome(income, {
-              type: res.type,
-              group: res.group,
-              isUsing: true,
-              saleId: +res.propId,
-            });
+            if (update) {
+              patchIncome(income, {
+                group: res.group,
+                incomeId: res.id!,
+                isUsing: false,
+                saleId: res.propId,
+                type: res.type,
+              });
+            } else {
+              createIncome(income, {
+                type: res.type,
+                group: res.group,
+                isUsing: true,
+                saleId: +res.propId,
+              });
+            }
             setOpen(false);
+            setUpdate(false);
           }}
           isDisabled={!res.propId}
         >

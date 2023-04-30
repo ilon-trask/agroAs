@@ -40,11 +40,14 @@ import { Link } from "react-router-dom";
 import { YIELD_CALC_ROUTER } from "../utils/consts";
 import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
-import DeleteAlert from "../components/DeleteAlert";
+import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import {
+  deleteIncome,
+  deleteSale,
   deleteYieldPlant,
   getIncome,
   getSale,
+  patchSale,
   setIsUsingIncome,
 } from "../http/requests";
 import { incProp } from "../modules/CreateYield/CreateYield";
@@ -61,39 +64,58 @@ function Sale({
   map,
   income,
   year,
-  saleOpen,
-  setSaleOpen,
-  saleRes,
-  setSaleRes,
+  month,
+  setDeleteOpen,
 }: {
   map: MapStore;
   income: IncomeStore;
   year: number;
-  saleOpen: boolean;
-  setSaleOpen: Dispatch<SetStateAction<boolean>>;
-  saleRes: SaleProp;
-  setSaleRes: Dispatch<SetStateAction<SaleProp>>;
+  month: string;
+  setDeleteOpen: Dispatch<
+    SetStateAction<{
+      isOpen: boolean;
+      text: IdeleteHeading;
+      func: any;
+      id: number;
+    }>
+  >;
 }) {
+  const [saleOpen, setSaleOpen] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [saleRes, setSaleRes] = useState<SaleProp>({
+    amount: "",
+    date: "",
+    price: "",
+    productionId: "",
+  });
   return (
     <>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування збуту основного виробництва
-      </Heading>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Виручка
+      </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>
           <Thead>
             <Tr>
+              <Th></Th>
               <Th>Назва культури</Th>
               <Th>Продукт</Th>
               <Th>Дата</Th>
               <Th>Кількість т</Th>
               <Th>Ціна грн/т</Th>
               <Th>Сума грн</Th>
+              <Th></Th>
             </Tr>
           </Thead>
           <Tbody>
             {income.sale.map((el) => {
-              if (+el.date.split("-")[0] == year) {
+              let time = el.date.split("-");
+              if (+time[0] == year && (time[1] == month || month == "")) {
                 const production = income.production.find(
                   (e) => e.id == el.productionId
                 );
@@ -103,6 +125,26 @@ function Sale({
 
                 return (
                   <Tr>
+                    <Td
+                      onClick={() => {
+                        setSaleOpen(true);
+                        setUpdate(true);
+                        setSaleRes({
+                          id: el.id!,
+                          amount: el.amount,
+                          date: el.date,
+                          price: el.price,
+                          productionId: el.productionId!,
+                        });
+                      }}
+                    >
+                      <EditIcon
+                        color={"blue.400"}
+                        w={"20px"}
+                        h={"auto"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
                     <Td>
                       {
                         map.culture.find((e) => e.id == product?.cultureId)
@@ -114,6 +156,30 @@ function Sale({
                     <Td>{el.amount}</Td>
                     <Td>{el.price}</Td>
                     <Td>{el.price * el.amount}</Td>
+                    <Td
+                      onClick={() =>
+                        setDeleteOpen((prev) => ({
+                          ...prev,
+                          id: el.id!,
+                          func: () => {
+                            deleteSale(income, { saleId: el.id! });
+                            setDeleteOpen((prev) => ({
+                              ...prev,
+                              isOpen: false,
+                            }));
+                          },
+                          isOpen: true,
+                          text: "продаж",
+                        }))
+                      }
+                    >
+                      <DeleteIcon
+                        w={"20px"}
+                        h={"auto"}
+                        color={"red"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
                   </Tr>
                 );
               }
@@ -126,6 +192,8 @@ function Sale({
         setOpen={setSaleOpen}
         res={saleRes}
         setRes={setSaleRes}
+        update={update}
+        setUpdate={setUpdate}
       />
       <Button onClick={() => setSaleOpen(true)}>Додати розрахунок</Button>
     </>
@@ -256,27 +324,26 @@ function Grant() {
 
 function Income() {
   const { income, user, map } = useContext(Context);
-  const yieldPlants: resYieldPlant[] = JSON.parse(
-    JSON.stringify(income.yieldPlant)
-  );
-  yieldPlants.sort((a, b) => a.id! - b.id!);
-  const [open, setOpen] = useState(false);
-  const [update, setUpdate] = useState(false);
-  const [res, setRes] = useState<incProp>({ cultureId: "", comment: "" });
+
   const [showAlert, setShowAlert] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState<any>({
-    idOpen: false,
+  const [deleteOpen, setDeleteOpen] = useState<{
+    isOpen: boolean;
+    text: IdeleteHeading;
+    func: any;
+    id: number;
+  }>({
+    isOpen: false,
     text: "планування",
     func: () => {},
-    operId: null,
-    cartId: null,
+    id: 0,
   });
   useEffect(() => {
     getSale(income);
     getIncome(income);
   }, []);
-  const [plantId, setPlantId] = useState(0);
+
   const [incomeOpen, setIncomeOpen] = useState(false);
+  const [incomeUpdate, setIncomeUpdate] = useState(false);
   const [incomeRes, setIncomeRes] = useState<IncomeProp>({
     //@ts-ignore
     group: "",
@@ -285,26 +352,18 @@ function Income() {
     //@ts-ignore
     propId: "",
   });
-  const [prodOpen, setProdOpen] = useState(false);
-  const [prodRes, setProdRes] = useState<productionProp>({
-    productId: "",
-    techCartId: "",
+
+  const [time, setTime] = useState({
+    year: new Date().getFullYear(),
+    month: "",
   });
-  const [saleOpen, setSaleOpen] = useState(false);
-  const [saleRes, setSaleRes] = useState<SaleProp>({
-    amount: "",
-    date: "",
-    price: "",
-    productionId: "",
-  });
-  const [year, setYear] = useState(new Date().getFullYear());
   return (
     <Container maxW="container.lg">
       <Tabs>
         <TabList>
           <NumberInput
-            defaultValue={year}
-            onChange={(e) => setYear(+e)}
+            defaultValue={time.year}
+            onChange={(e) => setTime((prev) => ({ ...prev, year: +e }))}
             width={"100px"}
           >
             <NumberInputField />
@@ -313,23 +372,29 @@ function Income() {
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
-          <Select width={"fit-content"}>
-            <option value="">Січель</option>
-            <option value="">Лютий</option>
-            <option value="">Березень</option>
-            <option value="">I квартал</option>
-            <option value="">Квітень</option>
-            <option value="">Травень</option>
-            <option value="">Червень</option>
-            <option value="">II квартал</option>
-            <option value="">Липень</option>
-            <option value="">Серпень</option>
-            <option value="">Вересень</option>
-            <option value="">III квартал</option>
-            <option value="">Жовтень</option>
-            <option value="">Листопад</option>
-            <option value="">Грудень</option>
-            <option value="">IV квартал</option>
+          <Select
+            width={"fit-content"}
+            value={time.month}
+            onChange={(e) =>
+              setTime((prev) => ({ ...prev, month: e.target.value }))
+            }
+          >
+            <option value="01">Січель</option>
+            <option value="02">Лютий</option>
+            <option value="03">Березень</option>
+            <option value="a">I квартал</option>
+            <option value="04">Квітень</option>
+            <option value="05">Травень</option>
+            <option value="06">Червень</option>
+            <option value="b">II квартал</option>
+            <option value="07">Липень</option>
+            <option value="08">Серпень</option>
+            <option value="09">Вересень</option>
+            <option value="c">III квартал</option>
+            <option value="10">Жовтень</option>
+            <option value="11">Листопад</option>
+            <option value="12">Грудень</option>
+            <option value="d  ">IV квартал</option>
             <option value="">Рік</option>
           </Select>
           <Tab ml={"15px"}>Всі доходу</Tab>
@@ -339,154 +404,23 @@ function Income() {
           <Tab>Державна підтримка</Tab>
           <Tab>Грант</Tab>
         </TabList>
-        <Text
-          textAlign={"center"}
-          fontSize={"25px"}
-          mt={"15px"}
-          textTransform={"uppercase"}
-        >
-          Виручка від основного виробництва
-        </Text>
-        <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-          Планування урожайності
-        </Heading>
-        <TableContainer
-          maxW="1000px"
-          mx="auto"
-          mt={"20px"}
-          overflowX={"scroll"}
-        >
-          <Table size={"sm"}>
-            <Thead>
-              <Tr>
-                <Th></Th>
-                <Th>Культура</Th>
-                <Th>Коментар</Th>
-                <Th>Густота насаджень</Th>
-                <Th>Урожайність з гектару</Th>
-                <Th>Урожайність з рослини</Th>
-                <Th></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {yieldPlants.map((el) => {
-                return (
-                  <Tr key={el.id!}>
-                    <Td
-                      textAlign={"center"}
-                      onClick={() => {
-                        setPlantId(el.id!);
-                        setUpdate(true);
-                        setOpen(true);
-                        setRes({
-                          comment: el.comment,
-                          cultureId: el.cultureId!,
-                        });
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>
-                      <Link to={YIELD_CALC_ROUTER + "/" + el.id}>
-                        <ViewIcon boxSize={5} /> {el?.culture?.name}
-                      </Link>
-                    </Td>
-                    <Td>{el.comment}</Td>
-                    <Td>{el.plantingDensity}</Td>
-                    <Td>{el.yieldPerHectare}</Td>
-                    <Td>{el.yieldPerRoll}</Td>
-                    <Td
-                      textAlign={"center"}
-                      cursor={"pointer"}
-                      color={"red"}
-                      onClick={
-                        user.role == ""
-                          ? () => setShowAlert(true)
-                          : () => {
-                              setDeleteOpen(() => ({
-                                ...deleteOpen,
-                                isOpen: true,
-                                cartId: el.id!,
-                                text: "карту",
-                                func: () => {
-                                  deleteYieldPlant(income, {
-                                    yieldPlantId: el.id!,
-                                  });
-                                  setDeleteOpen({
-                                    ...deleteOpen,
-                                    isOpen: false,
-                                  });
-                                },
-                              }));
-                            }
-                      }
-                    >
-                      <DeleteIcon w={"20px"} h={"auto"} />
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
-        <Button mt={"15px"} onClick={() => setOpen(true)}>
-          Добавити культуру
-        </Button>
-        <CreateYield
-          open={open}
-          setOpen={setOpen}
-          res={res}
-          setRes={setRes}
-          update={update}
-          plantId={plantId}
-        />
         <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
         {!!deleteOpen.isOpen && (
           <DeleteAlert
             open={deleteOpen.isOpen}
-            setOpen={setDeleteOpen}
+            setOpen={setDeleteOpen as any}
             text={deleteOpen.text}
             func={deleteOpen.func}
           />
         )}
-        <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-          Планування основного виробництва
-        </Heading>
-        {/* <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Th>Назва культури</Th>
-            <Th>Площа га</Th>
-            <Th>Урожайність т/га</Th>
-            <Th>Валовий збір</Th>
-          </Thead>
-          </Table>
-        </TableContainer> */}
-        <PlanIncomeProductionTable />
-        <Button onClick={() => setProdOpen(true)}>
-          Додати продукт або послугу
-        </Button>
-        <CreateProductService
-          open={prodOpen}
-          setOpen={setProdOpen}
-          res={prodRes}
-          setRes={setProdRes}
-        />
         <TabPanels>
           <TabPanel>
             <Sale
               map={map}
               income={income}
-              year={year}
-              saleOpen={saleOpen}
-              saleRes={saleRes}
-              setSaleOpen={setSaleOpen}
-              setSaleRes={setSaleRes}
+              year={time.year}
+              month={time.month}
+              setDeleteOpen={setDeleteOpen}
             />
             <Credit />
             <Invest />
@@ -497,11 +431,9 @@ function Income() {
             <Sale
               map={map}
               income={income}
-              year={year}
-              saleOpen={saleOpen}
-              saleRes={saleRes}
-              setSaleOpen={setSaleOpen}
-              setSaleRes={setSaleRes}
+              year={time.year}
+              month={time.month}
+              setDeleteOpen={setDeleteOpen}
             />
           </TabPanel>
           <TabPanel>
@@ -545,12 +477,49 @@ function Income() {
               );
               return (
                 <Tr key={el.id}>
-                  <Td></Td>
+                  <Td
+                    onClick={() => {
+                      setIncomeUpdate(true);
+                      setIncomeRes({
+                        group: el.group,
+                        propId: el.saleId!,
+                        type: el.type,
+                        id: el.id,
+                      });
+                      setIncomeOpen(true);
+                    }}
+                  >
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
                   <Td>{product?.name}</Td>
                   <Td>{el.type}</Td>
                   <Td>{el.group}</Td>
                   <Td>{sale?.amount! * sale?.price!}</Td>
-                  <Td></Td>
+                  <Td
+                    onClick={() => {
+                      setDeleteOpen({
+                        isOpen: true,
+                        func: () => {
+                          deleteIncome(income, { incomeId: el.id! });
+                          setDeleteOpen((prev) => ({ ...prev, isOpen: false }));
+                        },
+                        text: "прибуток",
+                        id: el.id!,
+                      });
+                    }}
+                  >
+                    <DeleteIcon
+                      w={"20px"}
+                      h={"auto"}
+                      color={"red"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
                   <Td
                     onClick={() =>
                       setIsUsingIncome(income, {
@@ -579,6 +548,8 @@ function Income() {
         setOpen={setIncomeOpen}
         res={incomeRes}
         setRes={setIncomeRes}
+        update={incomeUpdate}
+        setUpdate={setIncomeUpdate}
       />
     </Container>
   );

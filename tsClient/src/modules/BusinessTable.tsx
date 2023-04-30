@@ -1,4 +1,5 @@
 import { Table, Tbody, Td, Thead, Tr } from "@chakra-ui/react";
+import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../main";
@@ -35,4 +36,4 @@ function BusinessTable() {
   );
 }
 
-export default BusinessTable;
+export default observer(BusinessTable);

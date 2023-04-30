@@ -45,6 +45,8 @@ const createIncome = z.object({
   saleId: z.number(),
 });
 export type CreateIncome = z.infer<typeof createIncome>;
+const patchIncome = createIncome.extend({ incomeId: z.number() });
+export type PatchIncome = z.infer<typeof patchIncome>;
 const setIsUsingIncome = z.object({
   incomeId: z.number(),
   value: z.boolean(),
@@ -127,4 +129,14 @@ export const incomeRouter = router({
     const res = incomeService.getProduct(ctx.user);
     return res;
   }),
+  patch: publicProcedure.input(patchIncome).query(async ({ ctx, input }) => {
+    const res = await incomeService.patch(ctx.user, input);
+    return res;
+  }),
+  delete: publicProcedure
+    .input(z.object({ incomeId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const res = await incomeService.delete(ctx.user, input);
+      return res;
+    }),
 });
