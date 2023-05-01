@@ -114,53 +114,55 @@ const MapJornal = observer(function () {
   const [year, setYear] = useState(new Date().getFullYear());
   return (
     <Container maxW="container.lg">
-      <Tabs>
-        <TabList>
-          <Box display={"flex"} h={"fit-content"}>
-            <NumberInput
-              defaultValue={year}
-              onChange={(e) => setYear(+e)}
-              width={"200px"}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Select width={"fit-content"}>
-              <option value="">Січель</option>
-              <option value="">Лютий</option>
-              <option value="">Березень</option>
-              <option value="">I квартал</option>
-              <option value="">Квітень</option>
-              <option value="">Травень</option>
-              <option value="">Червень</option>
-              <option value="">II квартал</option>
-              <option value="">Липень</option>
-              <option value="">Серпень</option>
-              <option value="">Вересень</option>
-              <option value="">III квартал</option>
-              <option value="">Жовтень</option>
-              <option value="">Листопад</option>
-              <option value="">Грудень</option>
-              <option value="">IV квартал</option>
-              <option value="">Рік</option>
-            </Select>
-          </Box>
-          <Tab ml={"15px"}>Всі витрат</Tab>
-          {/* <Tab>Прямі</Tab>
+      {user.role == "service_role" && (
+        <Tabs>
+          <TabList>
+            <Box display={"flex"} h={"fit-content"}>
+              <NumberInput
+                defaultValue={year}
+                onChange={(e) => setYear(+e)}
+                width={"200px"}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Select width={"fit-content"}>
+                <option value="">Січель</option>
+                <option value="">Лютий</option>
+                <option value="">Березень</option>
+                <option value="">I квартал</option>
+                <option value="">Квітень</option>
+                <option value="">Травень</option>
+                <option value="">Червень</option>
+                <option value="">II квартал</option>
+                <option value="">Липень</option>
+                <option value="">Серпень</option>
+                <option value="">Вересень</option>
+                <option value="">III квартал</option>
+                <option value="">Жовтень</option>
+                <option value="">Листопад</option>
+                <option value="">Грудень</option>
+                <option value="">IV квартал</option>
+                <option value="">Рік</option>
+              </Select>
+            </Box>
+            <Tab ml={"15px"}>Всі витрат</Tab>
+            {/* <Tab>Прямі</Tab>
           <Tab>Загально виробничі</Tab>
           <Tab>Постійні</Tab>
           <Tab>Будівництво будівель і споруд</Tab>
           <Tab>Купівля техніки та обладнання</Tab> */}
-          <Tab>Інвестиційні</Tab>
-          <Tab>Операційні</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel></TabPanel>
-        </TabPanels>
-      </Tabs>
+            <Tab>Інвестиційні</Tab>
+            <Tab>Операційні</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel></TabPanel>
+          </TabPanels>
+        </Tabs>
+      )}
       <Box>
         {user.role == "service_role" && (
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>

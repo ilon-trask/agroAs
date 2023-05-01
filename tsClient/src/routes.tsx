@@ -16,7 +16,6 @@ import {
   HOW_ROUTER,
   INCOME_ROUTER,
   YIELD_CALC_ROUTER,
-  TEJ_JORNAL_ROUTER,
   TEJ_ROUTER,
 } from "./utils/consts";
 import TEJJornal from "./pages/TEJJornal";
@@ -34,10 +33,6 @@ export const publicRoutes = [
   {
     patch: YIELD_CALC_ROUTER,
     Component: <YieldСalculation />,
-  },
-  {
-    patch: TEJ_JORNAL_ROUTER,
-    Component: <TEJJornal />,
   },
   {
     patch: TEJ_ROUTER,

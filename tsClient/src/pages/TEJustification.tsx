@@ -632,65 +632,74 @@ function TEJjustification() {
           </Tbody>
         </Table>
       </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"80px"}>
-        Планування доходів
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Продукт або послуга</Th>
-              <Th>
-                Планова <br />
-                урожайність (т/га)
-              </Th>
-              <Th>
-                Планове <br />
-                виробництво
-              </Th>
-              <Th>
-                Плонові
-                <br /> продажі
-              </Th>
-              <Th>
-                Ціна <br />
-                грн/кг
-              </Th>
-              <Th>Сума грн</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>
-                <EditIcon
-                  color={"blue.400"}
-                  w={"20px"}
-                  h={"auto"}
-                  cursor={"pointer"}
-                />
-              </Td>
-              <Td>{myJustification?.culture?.product}</Td>
-              <Td>
-                {Math.round(
-                  myJustification?.area! * myIncome?.yieldPerHectare! * 1000
-                ) / 1000}
-              </Td>
-              <Td></Td>
-              <Td></Td>
-              <Td>{myJustification?.culture?.priceBerry}</Td>
-              <Td>
-                {Math.round(
-                  myJustification?.area! *
-                    myIncome?.yieldPerHectare! *
-                    myJustification?.culture?.priceBerry! *
-                    1000
-                )}
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
+      {user.role == "service_role" && (
+        <>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"80px"}>
+            Планування доходів
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th></Th>
+                  <Th>Продукт або послуга</Th>
+                  <Th>
+                    Планова <br />
+                    урожайність (т/га)
+                  </Th>
+                  <Th>
+                    Планове <br />
+                    виробництво
+                  </Th>
+                  <Th>
+                    Плонові
+                    <br /> продажі
+                  </Th>
+                  <Th>
+                    Ціна <br />
+                    грн/кг
+                  </Th>
+                  <Th>Сума грн</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                  <Td>{myJustification?.culture?.product}</Td>
+                  <Td>
+                    {Math.round(
+                      myJustification?.area! * myIncome?.yieldPerHectare! * 1000
+                    ) / 1000}
+                  </Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{myJustification?.culture?.priceBerry}</Td>
+                  <Td>
+                    {Math.round(
+                      myJustification?.area! *
+                        myIncome?.yieldPerHectare! *
+                        myJustification?.culture?.priceBerry! *
+                        1000
+                    )}
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
       <Box h={10}></Box>
       {/* <Box
         maxW={"1000px"}
