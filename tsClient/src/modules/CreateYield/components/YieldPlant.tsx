@@ -11,7 +11,7 @@ import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createYieldPlant, updateYieldPlant } from "../../../http/requests";
 import { Context } from "../../../main";
-import { incProp } from "../CreateIncome";
+import { incProp } from "../CreateYield";
 type props = {
   res: incProp;
   setRes: Dispatch<SetStateAction<incProp>>;
@@ -19,7 +19,7 @@ type props = {
   update: boolean;
   plantId: number;
 };
-function Income({ res, setRes, setOpen, update, plantId }: props) {
+function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
   const { income } = useContext(Context);
   //   const [focus, setFocus] = useState(false);
   return (
@@ -95,4 +95,4 @@ function Income({ res, setRes, setOpen, update, plantId }: props) {
   );
 }
 
-export default observer(Income);
+export default observer(YieldPlant);

@@ -2,13 +2,20 @@ import { Principal } from "..";
 import {
   culture,
   Iculture,
+  Iincome,
+  income,
+  Iproduct,
   IyieldCalculation,
   IyieldPlant,
+  product,
   yieldCalculation,
   yieldPlant,
 } from "../models/models";
 import {
+  CreateIncome,
   createYieldCalcType,
+  PatchIncome,
+  setIsUsingIncomeType,
   updateYieldPlantType,
 } from "../routes/incomeRouter";
 export interface resYieldPlant extends IyieldPlant {
@@ -22,7 +29,7 @@ class incomeService {
     return cultures;
   }
 
-  async get(user: Principal | undefined) {
+  async getYieldPlant(user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore
     const res: resYieldPlant[] | undefined = await yieldPlant.findAll({
@@ -32,7 +39,7 @@ class incomeService {
 
     return res;
   }
-  async getOne(plantId: number) {
+  async getOneYieldPlant(plantId: number) {
     //@ts-ignore
     const res: resYieldPlant = await yieldPlant.findOne({
       where: { cultureId: plantId },
@@ -40,7 +47,7 @@ class incomeService {
     });
     return res;
   }
-  async create(
+  async createYieldPlant(
     data: { cultureId: number; comment: string },
     user: Principal | undefined
   ) {
@@ -125,7 +132,10 @@ class incomeService {
     });
     return res;
   }
-  async delete(data: { yieldPlantId: number }, user: Principal | undefined) {
+  async deleteYieldPlant(
+    data: { yieldPlantId: number },
+    user: Principal | undefined
+  ) {
     if (!user) return;
     await yieldCalculation.destroy({
       where: { yieldPlantId: data.yieldPlantId },
@@ -133,7 +143,10 @@ class incomeService {
     await yieldPlant.destroy({ where: { id: data.yieldPlantId } });
     return data.yieldPlantId;
   }
-  async update(data: updateYieldPlantType, user: Principal | undefined) {
+  async updateYieldPlant(
+    data: updateYieldPlantType,
+    user: Principal | undefined
+  ) {
     if (!user) return;
 
     const plants = await yieldPlant.update(
@@ -148,6 +161,62 @@ class incomeService {
       where: { id: data.yieldPlantId },
       include: plantInclude,
     });
+    return res;
+  }
+  async create(user: Principal | undefined, data: CreateIncome) {
+    if (!user) return;
+    const res: Iincome | undefined = await income.create({
+      group: data.group,
+      isUsing: data.isUsing,
+      type: data.type,
+      saleId: data.saleId,
+      UserId: user.sub,
+    });
+    return res;
+  }
+  async get(user: Principal | undefined) {
+    if (!user) return;
+    const res: Iincome[] | undefined = await income.findAll({
+      where: { UserId: user.sub },
+    });
+    return res;
+  }
+  async setIsUsing(user: Principal | undefined, data: setIsUsingIncomeType) {
+    if (!user) return;
+    await income.update(
+      { isUsing: data.value },
+      { where: { id: data.incomeId } }
+    );
+    const res: Iincome | null = await income.findOne({
+      where: { id: data.incomeId },
+    });
+    return res;
+  }
+  async getProduct(user: Principal | undefined) {
+    if (!user) return;
+    const res: Iproduct[] | null = await product.findAll({
+      where: { userId: user.sub },
+    });
+    return res;
+  }
+  async patch(user: Principal | undefined, data: PatchIncome) {
+    if (!user) return;
+    await income.update(
+      {
+        group: data.group,
+        saleId: data.saleId,
+        type: data.type,
+      },
+      { where: { id: data.incomeId } }
+    );
+    const res: Iincome | null = await income.findOne({
+      where: { id: data.incomeId },
+    });
+    return res;
+  }
+  async delete(user: Principal | undefined, data: { incomeId: number }) {
+    if (!user) return;
+    const res = await income.destroy({ where: { id: data.incomeId } });
     return res;
   }
 }

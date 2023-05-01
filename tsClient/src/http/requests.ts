@@ -25,7 +25,12 @@ import { createClient } from "@supabase/supabase-js";
 import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import { createYieldCalcType } from "../../../tRPC serv/routes/incomeRouter";
+import {
+  CreateIncome,
+  createYieldCalcType,
+  PatchIncome,
+  setIsUsingIncomeType,
+} from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
 import {
   createTEJType,
@@ -33,6 +38,15 @@ import {
 } from "../../../tRPC serv/routes/TEJRouter";
 import { cartProps } from "../modules/CreateCart";
 import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
+import {
+  createOutcomeType,
+  patchOutcomeType,
+} from "../../../tRPC serv/routes/outcomeRouter";
+import { createProductionType } from "../../../tRPC serv/routes/productionRouter";
+import {
+  createSaleType,
+  PatchSaleType,
+} from "../../../tRPC serv/routes/saleRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -42,7 +56,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -87,6 +101,8 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
       } else if (oper.cost_material) {
         map.newCostMaterials = oper.cost_material;
       } else if (oper.cost_hand_work) {
+        console.log(oper.cost_hand_work);
+
         map.newCostHandWork = oper.cost_hand_work;
       }
     }
@@ -507,6 +523,8 @@ export function agreeCarts(map: MapStore) {
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.get.query().then((res) => {
+    console.log(res);
+
     Bus.businessPlan = res;
     map.isLoading = false;
   });
@@ -650,7 +668,6 @@ export function getOnlyCart(map: MapStore) {
   client.cart.getOnlyCart.query().then((res) => {
     map.maps = [];
 
-    console.log(res);
     res.forEach((el) => {
       let myMap = map.maps.find((e) => {
         return e.id == el.id;
@@ -679,7 +696,7 @@ export function createYieldPlant(
   income: IncomeStore,
   data: { cultureId: number; comment: string }
 ) {
-  client.income.create.query(data).then((res) => {
+  client.income.createYieldPlant.query(data).then((res) => {
     income.newYieldPlant = res;
   });
 }
@@ -689,7 +706,7 @@ export function getCulturalInc(income: IncomeStore) {
   });
 }
 export function getYieldPlants(income: IncomeStore) {
-  client.income.get.query().then((res) => {
+  client.income.getYieldPlant.query().then((res) => {
     income.yieldPlant = res;
     res?.forEach((el) => {
       income.newYieldCalc = el.yieldCalculation;
@@ -697,7 +714,7 @@ export function getYieldPlants(income: IncomeStore) {
   });
 }
 export function getYieldPlant(income: IncomeStore, plantId: number) {
-  client.income.getOne.query({ plantId }).then((res) => {
+  client.income.getOneYieldPlant.query({ plantId }).then((res) => {
     income.newYieldPlant = res;
   });
 }
@@ -731,7 +748,7 @@ export function deleteYieldPlant(
   income: IncomeStore,
   data: { yieldPlantId: number }
 ) {
-  client.income.delete.query(data).then((res) => {
+  client.income.deleteYieldPlant.query(data).then((res) => {
     if (!res) return;
     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
   });
@@ -741,7 +758,7 @@ export function updateYieldPlant(
   income: IncomeStore,
   data: { yieldPlantId: number; cultureId: number; comment: string }
 ) {
-  client.income.update.query(data).then((res) => {
+  client.income.updateYieldPlant.query(data).then((res) => {
     if (res) {
       income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
       income.newYieldPlant = res;
@@ -762,6 +779,11 @@ export function getPurposesMaterial(map: MapStore) {
 export function getCultureTEJMap(map: MapStore) {
   client.income.getCultural.query().then((res) => {
     map.culture = res;
+  });
+}
+export function getProductTEJMap(map: MapStore) {
+  client.income.getProduct.query().then((res) => {
+    map.product = res;
   });
 }
 export function getCultivationTechnologiesMap(map: MapStore) {
@@ -885,5 +907,115 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
       );
     });
     operationsFilter([res], map);
+  });
+}
+
+export function createIncome(Income: IncomeStore, data: CreateIncome) {
+  client.income.create.query(data).then((res) => {
+    Income.newIncome = res;
+  });
+}
+export function getIncome(Income: IncomeStore) {
+  client.income.get.query().then((res) => {
+    Income.income = res;
+  });
+}
+export function setIsUsingIncome(
+  Income: IncomeStore,
+  data: setIsUsingIncomeType
+) {
+  client.income.setIsUsing.query(data).then((res) => {
+    Income.income = Income.income.filter((el) => el.id != res?.id);
+    Income.newIncome = res!;
+  });
+}
+export function createOutcome(map: MapStore, data: createOutcomeType) {
+  client.outcome.create.query(data).then((res) => {
+    map.newOutcome = res;
+  });
+}
+
+export function getOutcome(map: MapStore) {
+  client.outcome.get.query().then((res) => {
+    map.outcome = res;
+  });
+}
+export function setIsUsingOutcome(
+  map: MapStore,
+  data: { outcomeId: number; value: boolean }
+) {
+  client.outcome.setIsUsing.query(data).then((res) => {
+    map.outcome = map.outcome.filter((el) => el.id != res?.id);
+    map.newOutcome = res!;
+  });
+}
+export function deleteOutcome(map: MapStore, outcomeId: number) {
+  client.outcome.delete.query({ outcomeId }).then((res) => {
+    if (!res) return;
+    map.outcome = map.outcome.filter((el) => el.id != outcomeId);
+  });
+}
+export function patchOutcome(map: MapStore, data: patchOutcomeType) {
+  client.outcome.patch.query(data).then((res) => {
+    if (!res) return;
+    map.outcome = map.outcome.filter((el) => el.id != res.id);
+    map.newOutcome = res;
+  });
+}
+
+export function createProduction(
+  income: IncomeStore,
+  data: createProductionType
+) {
+  client.production.create.query(data).then((res) => {
+    console.log(res);
+
+    income.newProduction = res;
+  });
+}
+
+export function getProduction(incomeStore: IncomeStore) {
+  client.production.get.query().then((res) => {
+    incomeStore.production = res;
+  });
+}
+
+export function createSale(incomeStore: IncomeStore, data: createSaleType) {
+  client.sale.create.query(data).then((res) => (incomeStore.newSale = res));
+}
+
+export function getSale(incomeStore: IncomeStore) {
+  client.sale.get.query().then((res) => (incomeStore.sale = res));
+}
+
+export function patchSale(incomeStore: IncomeStore, data: PatchSaleType) {
+  client.sale.patch.query(data).then((res) => {
+    incomeStore.sale = incomeStore.sale.filter((el) => el.id != data.saleId);
+    incomeStore.newSale = res!;
+  });
+}
+
+export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
+  client.sale.delete.query(data).then((res) => {
+    incomeStore.sale = incomeStore.sale.filter((el) => el.id != data.saleId);
+  });
+}
+
+export function patchIncome(incomeStore: IncomeStore, data: PatchIncome) {
+  client.income.patch.query(data).then((res) => {
+    incomeStore.income = incomeStore.income.filter((el) => el.id != res?.id);
+    incomeStore.newIncome = res!;
+  });
+}
+
+export function deleteIncome(
+  incomeStore: IncomeStore,
+  data: { incomeId: number }
+) {
+  client.income.delete.query(data).then((res) => {
+    if (res)
+      incomeStore.income = incomeStore.income.filter(
+        (el) => el.id != data.incomeId
+      );
   });
 }

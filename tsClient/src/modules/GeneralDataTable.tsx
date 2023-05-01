@@ -26,8 +26,15 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
           {user.role != "" && <Th></Th>}
           <Th>Назва культури</Th>
           <Th>Площа, га</Th>
-          <Th>Розрахункова ЗП грн/міс</Th>
-          <Th>Вартість ДП грн/&nbsp;л</Th>
+          <Th>
+            Розрахункова
+            <br /> оплата оплата
+            <br /> грн/міс
+          </Th>
+          <Th>
+            Вартість <br /> дизельного палива
+            <br /> грн/літ
+          </Th>
         </Tr>
       </Thead>
       <Tbody>

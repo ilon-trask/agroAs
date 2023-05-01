@@ -6,7 +6,7 @@ import BusinessService, {
 import { IbusinessPlan } from "../models/models";
 const createType = z.object({
   name: z.string(),
-  businessCategoryId: z.number(),
+  // businessCategoryId: z.number(),
 });
 export type CreateBusinessPlan = z.infer<typeof createType>;
 const patchType = z.object({

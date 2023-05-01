@@ -18,10 +18,28 @@ import {
   Th,
   Tbody,
   Td,
+  Checkbox,
+  TabList,
+  Tab,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Select,
+  Tabs,
+  TabPanels,
+  TabPanel,
 } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
-import { deleteCart, getCopyCarts, supabase } from "../http/requests";
-import DeleteAlert from "../components/DeleteAlert";
+import {
+  deleteCart,
+  deleteOutcome,
+  getCopyCarts,
+  setIsUsingOutcome,
+  supabase,
+} from "../http/requests";
+import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import CopyCartPupUp from "../modules/CopyCartPopUp";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 import CreateWork, { workProps } from "../modules/CreateWork";
@@ -29,8 +47,11 @@ import WorkTable from "../modules/WorkTable";
 import PublicationPopUp from "../modules/CartPublicationPopUp";
 import AgreeCartsTable from "../modules/AgreeCartsTable";
 import { Link } from "react-router-dom";
-import { EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { TEHMAP_ROUTER } from "../utils/consts";
+import CreateOutcome from "../modules/CreateOutcome/";
+import { outcomeProps } from "../modules/CreateOutcome/CreateOutcome";
+import TEJJornal from "./TEJJornal";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -55,8 +76,14 @@ const MapJornal = observer(function () {
     priceDiesel: "",
   });
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [deleteOpen, setDeleteOpen] = useState<any>({
-    idOpen: false,
+  const [deleteOpen, setDeleteOpen] = useState<{
+    isOpen: boolean;
+    text: IdeleteHeading | null;
+    func: any;
+    operId?: number | null;
+    cartId?: number | null;
+  }>({
+    isOpen: false,
     text: null,
     func: () => {},
     operId: null,
@@ -77,8 +104,65 @@ const MapJornal = observer(function () {
   );
   //@ts-ignore
   myComplex.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const [outcomeOpen, setOutcomeOpen] = useState(false);
+  const [outcomeRes, setOutcomeRes] = useState<outcomeProps>({
+    group: "",
+    id: 0,
+    type: "",
+  });
+  const [outcomeUpd, setOutcomeUpd] = useState(false);
+  const [year, setYear] = useState(new Date().getFullYear());
   return (
     <Container maxW="container.lg">
+      {user.role == "service_role" && (
+        <Tabs>
+          <TabList>
+            <Box display={"flex"} h={"fit-content"}>
+              <NumberInput
+                defaultValue={year}
+                onChange={(e) => setYear(+e)}
+                width={"200px"}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Select width={"fit-content"}>
+                <option value="">Січель</option>
+                <option value="">Лютий</option>
+                <option value="">Березень</option>
+                <option value="">I квартал</option>
+                <option value="">Квітень</option>
+                <option value="">Травень</option>
+                <option value="">Червень</option>
+                <option value="">II квартал</option>
+                <option value="">Липень</option>
+                <option value="">Серпень</option>
+                <option value="">Вересень</option>
+                <option value="">III квартал</option>
+                <option value="">Жовтень</option>
+                <option value="">Листопад</option>
+                <option value="">Грудень</option>
+                <option value="">IV квартал</option>
+                <option value="">Рік</option>
+              </Select>
+            </Box>
+            <Tab ml={"15px"}>Всі витрат</Tab>
+            {/* <Tab>Прямі</Tab>
+          <Tab>Загально виробничі</Tab>
+          <Tab>Постійні</Tab>
+          <Tab>Будівництво будівель і споруд</Tab>
+          <Tab>Купівля техніки та обладнання</Tab> */}
+            <Tab>Інвестиційні</Tab>
+            <Tab>Операційні</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel></TabPanel>
+          </TabPanels>
+        </Tabs>
+      )}
       <Box>
         {user.role == "service_role" && (
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -193,7 +277,7 @@ const MapJornal = observer(function () {
                 </Thead>
                 <Tbody>
                   {myComplex.map((el) => (
-                    <Tr>
+                    <Tr key={el.id}>
                       <Td
                         onClick={() => {
                           setOpen(true);
@@ -260,10 +344,66 @@ const MapJornal = observer(function () {
           </TableContainer>
         )}
       </Box>
+      {user.role == "service_role" && <TEJJornal />}
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             ЗАГАЛЬНО ВИРОБНИЧІ ВИТРАТИ
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th rowSpan={2}>Назва</Th>
+                  <Th colSpan={3} textAlign={"center"}>
+                    Сума
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th textAlign={"center"}>Місяць</Th>
+                  <Th textAlign={"center"}>Квартал</Th>
+                  <Th textAlign={"center"}>Рік</Th>
+                </Tr>
+              </Thead>
+            </Table>
+          </TableContainer>
+          <Button>Добавити витрати</Button>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            ПОСТІЙНІ ВИТРАТИ
+          </Text>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            Адміністування
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th rowSpan={2}>Назва</Th>
+                  <Th colSpan={3} textAlign={"center"}>
+                    Сума
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th textAlign={"center"}>Місяць</Th>
+                  <Th textAlign={"center"}>Квартал</Th>
+                  <Th textAlign={"center"}>Рік</Th>
+                </Tr>
+              </Thead>
+            </Table>
+          </TableContainer>
+          <Button>Добавити витрати</Button>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            БУДІВНИЦТВО БУДІВЕЛЬ І СПОРУД
           </Text>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             Спеціалізовані та будівельні роботи
@@ -311,11 +451,121 @@ const MapJornal = observer(function () {
       {user.role == "service_role" && (
         <Box>
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            ПОСТІЙНІ ВИТРАТИ
+            КУПІВЛЯ ТЕХНІКИ ТА ОБЛАДНАННЯ
           </Text>
-          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-            Адміністування
+          <TableContainer>
+            <Table>
+              <Thead>
+                <Th>Назва</Th>
+                <Th>Марка</Th>
+                <Th>Кількість</Th>
+                <Th>Ціна</Th>
+                <Th>Сума</Th>
+              </Thead>
+            </Table>
+          </TableContainer>
+          <Button>Добавити техніку або обладнання</Button>
+
+          <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
+            Розрахунок грошового потоку (витрати)
           </Text>
+          <TableContainer>
+            <Table size={"sm"}>
+              <Thead>
+                <Th></Th>
+                <Th>Назва</Th>
+                <Th>Тип витрат</Th>
+                <Th>Група витрат</Th>
+                <Th>Сума</Th>
+                <Th></Th>
+                <Th></Th>
+              </Thead>
+              <Tbody>
+                {map.outcome?.map((el) => (
+                  <Tr key={el.id}>
+                    <Td
+                      onClick={() => {
+                        setOutcomeRes({
+                          outId: el.id,
+                          group: el.group,
+                          id: el.techCartId!,
+                          type: el.type,
+                        });
+                        setOutcomeOpen(true);
+                        setOutcomeUpd(true);
+                      }}
+                    >
+                      <EditIcon
+                        color={"blue.400"}
+                        w={"20px"}
+                        h={"auto"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
+                    <Td>
+                      <Link to={TEHMAP_ROUTER + `/${el.techCartId}`}>
+                        <ViewIcon boxSize={5} color={"blue.400"} /> {el.name}
+                      </Link>
+                    </Td>
+                    <Td>{el.type}</Td>
+                    <Td>{el.group}</Td>
+                    <Td>
+                      {(() => {
+                        const cart = map.maps.find(
+                          (e) => e.id == el.techCartId
+                        );
+                        return cart?.area! * cart?.costHectare!;
+                      })()}
+                    </Td>
+                    <Td
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setDeleteOpen({
+                          isOpen: true,
+                          text: "Витрату",
+                          func: () => {
+                            deleteOutcome(map, el.id!);
+                            //@ts-ignore
+                            setDeleteOpen({ isOpen: false });
+                          },
+                        });
+                      }}
+                    >
+                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                    </Td>
+                    <Td
+                      onClick={() => {
+                        setIsUsingOutcome(map, {
+                          outcomeId: el.id!,
+                          value: !el.isUsing!,
+                        });
+                      }}
+                    >
+                      <Checkbox
+                        size="md"
+                        colorScheme="green"
+                        isChecked={el.isUsing}
+                      >
+                        Додати в розрахунок
+                      </Checkbox>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Button
+            onClick={
+              //@ts-ignore
+              user.role == ""
+                ? () => {
+                    setShowAlert(true);
+                  }
+                : () => setOutcomeOpen(true)
+            }
+          >
+            Добавити витрату в розрахунок
+          </Button>
         </Box>
       )}
       {open && (
@@ -344,8 +594,8 @@ const MapJornal = observer(function () {
       {!!deleteOpen.isOpen && (
         <DeleteAlert
           open={deleteOpen.isOpen}
-          setOpen={setDeleteOpen}
-          text={deleteOpen.text}
+          setOpen={setDeleteOpen as any}
+          text={deleteOpen.text!}
           func={deleteOpen.func}
         />
       )}
@@ -353,6 +603,14 @@ const MapJornal = observer(function () {
       <PublicationPopUp
         data={publicationOpen}
         setData={setPublicationOpen as any}
+      />
+      <CreateOutcome
+        open={outcomeOpen}
+        setOpen={setOutcomeOpen}
+        res={outcomeRes}
+        setRes={setOutcomeRes}
+        update={outcomeUpd}
+        setUpdate={setOutcomeUpd}
       />
       {/* <Input
         type={"file"}

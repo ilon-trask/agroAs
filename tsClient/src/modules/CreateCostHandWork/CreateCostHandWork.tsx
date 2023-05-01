@@ -52,7 +52,6 @@ function CreateCostHandWork({
       props={costHandWorkProps}
       isErr={isErr}
       setIsErr={setIsErr}
-
     >
       <HandWork
         res={res as CostHandWorkProps}

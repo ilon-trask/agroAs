@@ -3,10 +3,11 @@ import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
 import {
   BUSINESS_ROUTER,
+  CASH_FLOW,
+  GOODS_ROUTER,
   INCOME_ROUTER,
   LOGIN_ROUTE,
   MAP_ROUTE,
-  TEJ_JORNAL_ROUTER,
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { getCarts, supabase } from "../http/requests";
@@ -46,15 +47,21 @@ const NavBar = observer(() => {
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
-              to={TEJ_JORNAL_ROUTER}
+              to={GOODS_ROUTER}
             >
-              Техніко-економічне обгрунтування
+              Товари
+            </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={CASH_FLOW}
+            >
+              Грошовий потік
             </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
               to={BUSINESS_ROUTER}
             >
-              Культури
+              Бізнес-плани
             </Link>
           </Box>
         )}

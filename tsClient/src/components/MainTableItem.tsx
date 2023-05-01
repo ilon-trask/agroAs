@@ -15,24 +15,45 @@ import {
 } from "@chakra-ui/react";
 import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router-dom";
-import { TEHMAP_ROUTER } from "../utils/consts";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import TechnologicalMapPdf from "../pages/pdf/TechnologicalMapPdf";
-import { downloaded, getCarts } from "../http/requests";
+import { downloaded, getCarts, getTEJ } from "../http/requests";
 import getSectionsOpers from "../store/GetSectionsOpers";
 import { Context } from "../main";
 const IMGuRL =
   "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/unUsed";
 type props = { e: Itech_cart | undefined };
 
+function ButtonTEJ({
+  id,
+  navigate,
+}: {
+  id: number;
+  navigate: NavigateFunction;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      colorScheme="blue"
+      onClick={() => navigate(TEJ_ROUTER + "/" + id)}
+    >
+      Показники ТЕО
+    </Button>
+  );
+}
+
 function MainTable({ e }: props) {
   const navigate = useNavigate();
-  const { map } = useContext(Context);
+  const { map, TEJ } = useContext(Context);
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, e?.id!);
     return a;
   }, [map.opers]);
+  // getTEJ(TEJ);
+
+  const myTEJ = TEJ.agreeJustification.find((el) => el.techCartId == e?.id);
   return (
     <Card maxW="sm" mx={"auto"}>
       <CardBody
@@ -82,23 +103,23 @@ function MainTable({ e }: props) {
       </CardBody>
       <CardFooter pt={0}>
         <ButtonGroup spacing="2">
-          <Button
-            onClick={() => {
-              navigate(TEHMAP_ROUTER + "/" + e?.id);
-            }}
-          >
+          <Button onClick={() => navigate(TEHMAP_ROUTER + "/" + e?.id)}>
             До карти
           </Button>
-          <Tooltip
-            label="Рекомендації в розробці"
-            bgColor={"grey.100"}
-            color={"black"}
-            fontSize={17}
-          >
-            <Button variant="ghost" colorScheme="blue">
-              Рекомендації
-            </Button>
-          </Tooltip>
+          {!!myTEJ ? (
+            <ButtonTEJ id={myTEJ.id!} navigate={navigate} />
+          ) : (
+            <Tooltip
+              label="Рекомендації в розробці"
+              bgColor={"grey.100"}
+              color={"black"}
+              fontSize={17}
+            >
+              <Button variant="ghost" colorScheme="blue">
+                Показники ТЕО
+              </Button>
+            </Tooltip>
+          )}
         </ButtonGroup>
       </CardFooter>
     </Card>

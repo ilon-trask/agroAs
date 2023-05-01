@@ -87,6 +87,8 @@ function UpdateAreaCart({
                     comment: res.comment!,
                     TEJId: res.id!,
                     area: +res.area,
+                    cultivationTechnologyId: +res.cultivationTechnologyId!,
+                    cultureId: +res.cultureId!,
                   },
                   TEJ
                 );

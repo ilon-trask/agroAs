@@ -76,8 +76,6 @@ const CartsTableItem = observer(
 
         <Td
           textAlign={"center"}
-          cursor={"pointer"}
-          color={"red"}
           onClick={
             user.role == ""
               ? () => setShowAlert(true)
@@ -97,7 +95,7 @@ const CartsTableItem = observer(
                 }
           }
         >
-          <DeleteIcon w={"20px"} h={"auto"} />
+          <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
         </Td>
 
         <Td>

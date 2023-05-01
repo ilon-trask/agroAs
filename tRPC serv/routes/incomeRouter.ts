@@ -1,12 +1,7 @@
 import { publicProcedure, router } from "../trpc";
 import z from "zod";
 import incomeService, { resYieldPlant } from "../controllers/incomeService";
-import {
-  Iculture,
-  IyieldCalculation,
-  IyieldPlant,
-  yieldCalculation,
-} from "../models/models";
+import { Iculture } from "../models/models";
 const createYieldCalc = z.object({
   numberFruit: z.number(),
   fruitWeight: z.number(),
@@ -22,23 +17,62 @@ const updateYieldPlant = z.object({
   comment: z.string(),
 });
 export type updateYieldPlantType = z.infer<typeof updateYieldPlant>;
+const createIncome = z.object({
+  type: z.enum([
+    "Основне виробництво",
+    "Допоміжне виробництво",
+    "Кредит",
+    "Інвестиції",
+    "Державна підтримка",
+    "Грант",
+    "Не визначино",
+  ]),
+  group: z.enum([
+    "Виручка від основного виробництва",
+    "Виручка від допоміжного виробництва",
+    "Кредит оботній",
+    "Кредит інвестиційний",
+    "Інвестиції власні",
+    "Інвестиції інвесторські",
+    "Інвестиції залучені від інвесторів",
+    "Субсидії",
+    "Дотації",
+    "Поворотня фінансова допомога",
+    "Грантові кошти",
+    "Не визначино",
+  ]),
+  isUsing: z.boolean(),
+  saleId: z.number(),
+});
+export type CreateIncome = z.infer<typeof createIncome>;
+const patchIncome = createIncome.extend({ incomeId: z.number() });
+export type PatchIncome = z.infer<typeof patchIncome>;
+const setIsUsingIncome = z.object({
+  incomeId: z.number(),
+  value: z.boolean(),
+});
+export type setIsUsingIncomeType = z.infer<typeof setIsUsingIncome>;
 export const incomeRouter = router({
   getCultural: publicProcedure.query(async () => {
     const cultures: Iculture[] | undefined = await incomeService.getCultural();
     return cultures;
   }),
 
-  get: publicProcedure.query(async ({ ctx }) => {
-    const res: resYieldPlant[] | undefined = await incomeService.get(ctx.user);
+  getYieldPlant: publicProcedure.query(async ({ ctx }) => {
+    const res: resYieldPlant[] | undefined = await incomeService.getYieldPlant(
+      ctx.user
+    );
     return res;
   }),
-  getOne: publicProcedure
+  getOneYieldPlant: publicProcedure
     .input(z.object({ plantId: z.number() }))
     .query(async ({ input }) => {
-      const res: resYieldPlant = await incomeService.getOne(input.plantId);
+      const res: resYieldPlant = await incomeService.getOneYieldPlant(
+        input.plantId
+      );
       return res;
     }),
-  create: publicProcedure
+  createYieldPlant: publicProcedure
     .input(
       z.object({
         cultureId: z.number(),
@@ -46,10 +80,8 @@ export const incomeRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const yieldPlant: resYieldPlant | undefined = await incomeService.create(
-        input,
-        ctx.user
-      );
+      const yieldPlant: resYieldPlant | undefined =
+        await incomeService.createYieldPlant(input, ctx.user);
       return yieldPlant;
     }),
   createCalc: publicProcedure
@@ -66,19 +98,45 @@ export const incomeRouter = router({
         await incomeService.updateCalc(input, ctx.user);
       return res;
     }),
-  delete: publicProcedure
+  deleteYieldPlant: publicProcedure
     .input(z.object({ yieldPlantId: z.number() }))
     .query(async ({ input, ctx }) => {
-      const res = await incomeService.delete(input, ctx.user);
+      const res = await incomeService.deleteYieldPlant(input, ctx.user);
       return res;
     }),
-  update: publicProcedure
+  updateYieldPlant: publicProcedure
     .input(updateYieldPlant)
     .query(async ({ input, ctx }) => {
-      const res: resYieldPlant | null | undefined = await incomeService.update(
-        input,
-        ctx.user
-      );
+      const res: resYieldPlant | null | undefined =
+        await incomeService.updateYieldPlant(input, ctx.user);
+      return res;
+    }),
+  create: publicProcedure.input(createIncome).query(async ({ input, ctx }) => {
+    const res = await incomeService.create(ctx.user, input);
+    return res;
+  }),
+  get: publicProcedure.query(async ({ ctx }) => {
+    const res = await incomeService.get(ctx.user);
+    return res;
+  }),
+  setIsUsing: publicProcedure
+    .input(setIsUsingIncome)
+    .query(({ ctx, input }) => {
+      const res = incomeService.setIsUsing(ctx.user, input);
+      return res;
+    }),
+  getProduct: publicProcedure.query(async ({ ctx }) => {
+    const res = incomeService.getProduct(ctx.user);
+    return res;
+  }),
+  patch: publicProcedure.input(patchIncome).query(async ({ ctx, input }) => {
+    const res = await incomeService.patch(ctx.user, input);
+    return res;
+  }),
+  delete: publicProcedure
+    .input(z.object({ incomeId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const res = await incomeService.delete(ctx.user, input);
       return res;
     }),
 });

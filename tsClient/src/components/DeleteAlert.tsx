@@ -9,11 +9,18 @@ import {
   AlertDialogFooter,
   Button,
 } from "@chakra-ui/react";
-
+export type IdeleteHeading =
+  | "карту"
+  | "операцію"
+  | "бізнес-план"
+  | "Витрату"
+  | "планування"
+  | "продаж"
+  | "прибуток";
 type props = {
   open: boolean;
-  setOpen: (open: boolean) => void;
-  text: "карту" | "операцію" | "бізнес-план";
+  setOpen: ({ isOpen }: { isOpen: false }) => void;
+  text: IdeleteHeading;
   func: any;
 };
 
@@ -28,7 +35,7 @@ export default function DeleteAlert({ open, setOpen, text, func }: props) {
         <AlertDialogCloseButton />
         <AlertDialogBody>Ви дійсно хочете видалити {text}</AlertDialogBody>
         <AlertDialogFooter>
-          <Button onClick={() => setOpen(false)}>Ні</Button>
+          <Button onClick={() => setOpen({ isOpen: false })}>Ні</Button>
           <Button colorScheme="red" ml={3} onClick={func}>
             Так
           </Button>

@@ -7,6 +7,9 @@ import {
   Table,
   Thead,
   Th,
+  Tr,
+  Td,
+  Tbody,
 } from "@chakra-ui/react";
 
 import TEJTable from "../modules/TEJTable";
@@ -25,37 +28,34 @@ import {
 } from "../http/requests";
 import { Context } from "../main";
 import BusinessPublicationPopUp from "../modules/BusinessPublicationPopUp";
-import { BUSINESScATALOG_ROUTER } from "../utils/consts";
-import { useNavigate } from "react-router-dom";
+import { BUSINESScATALOG_ROUTER, BUSINESSpLAN_ROUTER } from "../utils/consts";
+import { Link, useNavigate } from "react-router-dom";
 import useBusiness from "./hook/useBusiness";
 import useTEJ from "./hook/useTEJ";
 import { TEJProps } from "../modules/CreateTEJ/CreateTEJ";
 import TEJPublicationPopUp from "../modules/TEJPublicationPopUp";
+import CreateBusiness from "../modules/CreateBusiness";
+import { observer } from "mobx-react-lite";
+import BusinessTable from "../modules/BusinessTable";
 
 function TEJJornal() {
-  const { map, user, TEJ } = useContext(Context);
-  // useBusiness(business, map);
+  const { map, user, TEJ, business } = useContext(Context);
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [res, setRes] = useState<TEJProps>({
     cartId: "",
     comment: "",
     area: 0,
+    cultivationTechnologyId: "",
+    cultureId: "",
   });
   const [isErr, setIsErr] = useState(false);
   const [update, setUpdate] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [agreeOpen, setAgreeOpen] = useState(false);
-  const [agreeData, setAgreeData] = useState<{
-    BusinessId: number;
-    isPublic: boolean;
-    isAgree?: boolean;
-  }>({
-    BusinessId: 0,
-    isPublic: false,
-  });
+
   const [func, setFunc] = useState<any>();
   useTEJ(TEJ);
+
   function deleteFunc(TEJId: number) {
     setDeleteOpen(true);
     setFunc({
@@ -108,7 +108,7 @@ function TEJJornal() {
   return (
     <Box>
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Приклади типових техніко-економічних обгрунтувань
+        Техніко-економічні показники
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <TEJTable
@@ -133,16 +133,9 @@ function TEJJornal() {
               TEJPubOpenFunc={TEJPubOpenFunc}
             />
           </TableContainer>
-
-          <Button
-            onClick={() => {
-              navigate(BUSINESScATALOG_ROUTER);
-            }}
-          >
-            Переглянути
-          </Button>
         </Box>
       )}
+
       <CreateTEJ
         open={createOpen}
         setOpen={setCreateOpen}
@@ -157,7 +150,7 @@ function TEJJornal() {
       {!!deleteOpen && (
         <DeleteAlert
           open={deleteOpen}
-          setOpen={setDeleteOpen}
+          setOpen={setDeleteOpen as any}
           text={"бізнес-план"}
           func={func.func}
         />
@@ -176,4 +169,4 @@ function TEJJornal() {
   );
 }
 
-export default TEJJornal;
+export default observer(TEJJornal);

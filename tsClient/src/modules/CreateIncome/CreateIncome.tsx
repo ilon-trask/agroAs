@@ -1,41 +1,60 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Dialog from "../../components/Dialog";
-import Income from "./components/Income";
+import IncomeChooseType from "./components/IncomeChooseType";
+import IncomeChooseGroupe from "./components/IncomeChooseGroup";
+import { IncomeType } from "../../pages/hook/useIncomeTypes";
+import { IncomeGroup } from "../../pages/hook/useIncomeGroup";
+import IncomeChoseElem from "./components/IncomeChoseElem";
 
+export type IncomeProp = {
+  id?: number;
+  type: IncomeType;
+  group: IncomeGroup;
+  propId: number;
+};
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  res: IncomeProp;
+  setRes: Dispatch<SetStateAction<IncomeProp>>;
   update: boolean;
-  res: incProp;
-  setRes: Dispatch<SetStateAction<incProp>>;
-  plantId: number;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-export type incProp = {
-  cultureId: string | number;
-  comment: string;
-};
-const prop: incProp = { cultureId: "", comment: "" };
-function CreateIncome({ open, setOpen, update, res, setRes, plantId }: props) {
-  //   console.log(123);
+function CreateIncome({
+  open,
+  setOpen,
+  res,
+  setRes,
+  setUpdate,
+  update,
+}: props) {
+  const [screen, setScreen] = useState(0);
   return (
     <Dialog
+      isErr={false}
       open={open}
       setOpen={setOpen}
-      isErr={false}
-      update={false}
-      setUpdate={() => {}}
+      setRes={setScreen}
+      props={0}
+      res={0}
       setIsErr={() => {}}
-      props={prop}
-      res={res}
-      setRes={setRes}
+      setUpdate={() => {}}
+      update={false}
     >
-      <Income
-        res={res}
-        setRes={setRes}
-        setOpen={setOpen}
-        update={update}
-        plantId={plantId}
-      />
+      {screen == 0 ? (
+        <IncomeChooseType setScreen={setScreen} res={res} setRes={setRes} />
+      ) : screen == 1 ? (
+        <IncomeChooseGroupe setScreen={setScreen} res={res} setRes={setRes} />
+      ) : screen == 2 ? (
+        <IncomeChoseElem
+          setScreen={setScreen}
+          res={res}
+          setRes={setRes}
+          setOpen={setOpen}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      ) : null}
     </Dialog>
   );
 }

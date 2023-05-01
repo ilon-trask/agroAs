@@ -17,6 +17,7 @@ import {
   Tbody,
   Tr,
   Td,
+  Stack,
 } from "@chakra-ui/react";
 import { EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import CreateResume from "../modules/CreateResume";
@@ -47,8 +48,11 @@ import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
 import {
+  BUSINESScATALOG_ROUTER,
   BUSINESSpLAN_ROUTER,
-  TEJ_JORNAL_ROUTER,
+  BUSINESS_ROUTER,
+  MAP_ROUTE,
+  // TEJ_JORNAL_ROUTER,
   TEJ_ROUTER,
 } from "../utils/consts";
 import useTEJ from "./hook/useTEJ";
@@ -130,10 +134,10 @@ function TEJjustification() {
         {user.role != "" && (
           <Button
             onClick={() => {
-              navigate(TEJ_JORNAL_ROUTER);
+              navigate(MAP_ROUTE);
             }}
           >
-            Назвад
+            Назад
           </Button>
         )}
         <Box display={"flex"}>
@@ -141,14 +145,16 @@ function TEJjustification() {
             <Button>Конструктор</Button>
             <Button>Отримати ПДФ</Button>
           </Box>
-          <Button
-            ml={4}
-            onClick={() => {
-              navigate(BUSINESSpLAN_ROUTER + "/" + id);
-            }}
-          >
-            Бізенс-план
-          </Button>
+          {user.role != "" && (
+            <Button
+              ml={4}
+              onClick={() => {
+                navigate(BUSINESScATALOG_ROUTER);
+              }}
+            >
+              Бізенс-план
+            </Button>
+          )}
         </Box>
       </Box>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
@@ -626,67 +632,74 @@ function TEJjustification() {
           </Tbody>
         </Table>
       </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"80px"}>
-        Планування доходів
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Продукт або послуга</Th>
-              <Th>Кількість</Th>
-              <Th>Ціна грн/га</Th>
-              <Th>Сума грн</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>
-                <EditIcon
-                  color={"blue.400"}
-                  w={"20px"}
-                  h={"auto"}
-                  cursor={"pointer"}
-                />
-              </Td>
-              <Td>{myJustification?.culture?.product}</Td>
-              <Td>
-                {Math.round(
-                  myJustification?.area! * myIncome?.yieldPerHectare! * 1000
-                ) / 1000}
-              </Td>
-              <Td>{myJustification?.culture?.priceBerry}</Td>
-              <Td>
-                {Math.round(
-                  myJustification?.area! *
-                    myIncome?.yieldPerHectare! *
-                    myJustification?.culture?.priceBerry! *
-                    1000
-                )}
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування грошового потоку
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th>Залишок на початок періоду</Th>
-              <Th>Прихід</Th>
-              <Th>Розхід</Th>
-              <Th>Залишов на кінець періоду</Th>
-            </Tr>
-          </Thead>
-        </Table>
-      </TableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування графіку доходів та витрат
-      </Text>
+      {user.role == "service_role" && (
+        <>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"80px"}>
+            Планування доходів
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th></Th>
+                  <Th>Продукт або послуга</Th>
+                  <Th>
+                    Планова <br />
+                    урожайність (т/га)
+                  </Th>
+                  <Th>
+                    Планове <br />
+                    виробництво
+                  </Th>
+                  <Th>
+                    Плонові
+                    <br /> продажі
+                  </Th>
+                  <Th>
+                    Ціна <br />
+                    грн/кг
+                  </Th>
+                  <Th>Сума грн</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                  <Td>{myJustification?.culture?.product}</Td>
+                  <Td>
+                    {Math.round(
+                      myJustification?.area! * myIncome?.yieldPerHectare! * 1000
+                    ) / 1000}
+                  </Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{myJustification?.culture?.priceBerry}</Td>
+                  <Td>
+                    {Math.round(
+                      myJustification?.area! *
+                        myIncome?.yieldPerHectare! *
+                        myJustification?.culture?.priceBerry! *
+                        1000
+                    )}
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
       <Box h={10}></Box>
       {/* <Box
         maxW={"1000px"}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Routes,
   Route,
@@ -6,7 +6,6 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { Context } from "./main";
 import BusinessCatalog from "./pages/BusinessCatalog";
 import BusinessPlanPage from "./pages/BusinessPlanPage";
 import HowThisWork from "./pages/HowThisWork";
@@ -24,7 +23,6 @@ import {
   HOW_ROUTER,
   INCOME_ROUTER,
   TEJ_ROUTER,
-  TEJ_JORNAL_ROUTER,
   YIELD_CALC_ROUTER,
   MAP_ROUTE,
   LOGIN_ROUTE,
@@ -34,10 +32,14 @@ import {
   BUSINESSpLAN_ROUTER,
   BUSINESScATALOG_ROUTER,
   BUSINESS_ROUTER,
+  CASH_FLOW,
+  GOODS_ROUTER,
 } from "./utils/consts";
+import CashFlow from "./pages/CashFlow";
+import Goods from "./pages/Goods";
+import BusinessJurnal from "./pages/BusinessJurnal";
 
 export default function AppRouter() {
-  const { user } = useContext(Context);
   const location = useLocation();
 
   useEffect(() => {
@@ -65,12 +67,14 @@ export default function AppRouter() {
         element={<BusinessPlanPage />}
       />
       <Route path={BUSINESScATALOG_ROUTER} element={<BusinessCatalog />} />
-      <Route path={BUSINESS_ROUTER} element={<TEJJornal />} />
+      <Route path={BUSINESS_ROUTER} element={<BusinessJurnal />} />
       <Route path={HOW_ROUTER} element={<HowThisWork />} />
       <Route path={INCOME_ROUTER} element={<Income />} />
       <Route path={YIELD_CALC_ROUTER + "/:id"} element={<YieldСalculation />} />
-      <Route path={TEJ_JORNAL_ROUTER} element={<TEJJornal />} />
+      {/* <Route path={TEJ_JORNAL_ROUTER} element={<TEJJornal />} /> */}
       <Route path={TEJ_ROUTER + "/:id"} element={<TEJustification />} />
+      <Route path={CASH_FLOW} element={<CashFlow />} />
+      <Route path={GOODS_ROUTER} element={<Goods />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

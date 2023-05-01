@@ -95,6 +95,9 @@ const HandWork = observer(
   }: InputProps<CostHandWorkProps>) => {
     const { map } = useContext(Context);
     const { id } = useParams();
+    console.log(res);
+    console.log(res.productionRateAmount);
+
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>

@@ -5,10 +5,12 @@ import {
   InferCreationAttributes,
   Model,
 } from "sequelize";
-
+import { IncomeType } from "../../tsClient/src/pages/hook/useIncomeTypes";
+import { IncomeGroup } from "../../tsClient/src/pages/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 import { resTechCartsWithOpers } from "../controllers/TechCartService";
+import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 
 export interface Iuser {
   id?: number;
@@ -770,6 +772,138 @@ technologicalEconomicJustification.init(
   },
   { sequelize }
 );
+export interface Iincome {
+  id?: number;
+  type: IncomeType;
+  group: IncomeGroup;
+  isUsing: boolean;
+  UserId: string;
+  saleId?: number;
+}
+export class income extends Model<Iincome> {
+  declare id?: number;
+  declare type: IncomeType;
+  declare group: IncomeGroup;
+  declare UserId: string;
+  declare isUsing: boolean;
+  declare saleId?: number;
+}
+income.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    type: { type: DataTypes.STRING, allowNull: false },
+    group: { type: DataTypes.STRING },
+    isUsing: { type: DataTypes.BOOLEAN },
+    UserId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
+export interface Ioutcome {
+  id?: number;
+  name: string;
+  group: IoutcomeGroup;
+  type: IoutcomeType;
+  userId: string;
+  isUsing?: boolean;
+  techCartId?: number;
+}
+export class outcome extends Model<Ioutcome> {
+  declare id?: number;
+  declare name: string;
+  declare group: IoutcomeGroup;
+  declare type: IoutcomeType;
+  declare isUsing: boolean;
+  declare userId: string;
+}
+outcome.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    group: { type: DataTypes.STRING },
+    type: { type: DataTypes.STRING },
+    isUsing: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    userId: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
+export interface Iproduct {
+  id?: number;
+  name: string;
+  price: number;
+  cost: number;
+  unitMeasure: string;
+  userId: string;
+  cultureId?: number;
+}
+export class product extends Model<Iproduct> {
+  declare id?: number;
+  declare name: string;
+  declare price: number;
+  declare cost: number;
+  declare unitMeasure: string;
+  declare userId: string;
+  declare cultureId?: number;
+}
+product.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    price: { type: DataTypes.FLOAT },
+    cost: { type: DataTypes.FLOAT },
+    unitMeasure: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Iproduction {
+  id?: number;
+  isPrimary: boolean;
+  productId?: number;
+  techCartId?: number;
+  userId: string;
+}
+export class production extends Model<Iproduction> {
+  declare id?: number;
+  declare isPrimary: boolean;
+  declare productId?: number;
+  declare techCartId?: number;
+  declare userId: string;
+}
+production.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    isPrimary: { type: DataTypes.BOOLEAN, allowNull: false },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Isale {
+  id?: number;
+  date: string;
+  amount: number;
+  price: number;
+  productionId?: number;
+  userId: string;
+}
+export class sale extends Model<Isale> {
+  declare id?: number;
+  declare date: string;
+  declare amount: number;
+  declare price: number;
+  declare productionId?: number;
+  declare userId: string;
+}
+sale.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.DATEONLY },
+    amount: { type: DataTypes.FLOAT(2) },
+    price: { type: DataTypes.FLOAT(2) },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -830,3 +964,20 @@ technologicalEconomicJustification.belongsTo(cultivationTechnologies);
 
 section.hasMany(tech_cart);
 tech_cart.belongsTo(section);
+
+tech_cart.hasOne(outcome);
+outcome.belongsTo(tech_cart);
+
+culture.hasMany(product);
+product.belongsTo(culture);
+
+product.hasMany(production);
+production.belongsTo(product);
+tech_cart.hasMany(production);
+production.belongsTo(tech_cart);
+
+production.hasMany(sale);
+sale.belongsTo(production);
+
+sale.hasOne(income);
+income.belongsTo(sale);

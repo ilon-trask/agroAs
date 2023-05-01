@@ -13,6 +13,8 @@ export type cartProps = {
   priceDiesel: number | string;
   totalCost?: number;
   sectionId?: number | "";
+  cultivationTechnologyId?: number;
+  cultureId?: number;
 };
 export const CartProps: cartProps = {
   nameCart: "",
