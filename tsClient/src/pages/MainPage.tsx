@@ -146,7 +146,7 @@ function MainPage() {
           </TabPanels>
         </Box>
       </Tabs>
-      <Heading textAlign={"center"} mt={"20px"}>
+      {/* <Heading textAlign={"center"} mt={"20px"}>
         Бізнес-плани
       </Heading>
       <Tabs
@@ -184,7 +184,7 @@ function MainPage() {
                 >
                   {el.name}
                 </Tab>
-              ))} */}
+              ))} 
             </TabList>
           </Box>
           <TabPanels>
@@ -209,7 +209,7 @@ function MainPage() {
                     }) || <Text>Немає жодної карти</Text>}
               </Box>
             </TabPanel> */}
-            {/* {TEJ.technologies.map((el) => (
+      {/* {TEJ.technologies.map((el) => (
               <TabPanel>
                 <Box
                   display={"grid"}
@@ -232,10 +232,10 @@ function MainPage() {
                       }) || <Text>Немає жодної карти</Text>}
                 </Box>
               </TabPanel>
-            ))} */}
+            ))} 
           </TabPanels>
         </Box>
-      </Tabs>
+      </Tabs> */}
     </Box>
   );
 }
