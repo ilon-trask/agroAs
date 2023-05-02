@@ -47,6 +47,14 @@ import {
   createSaleType,
   PatchSaleType,
 } from "../../../tRPC serv/routes/saleRouter";
+import {
+  CreateCreditType,
+  PatchCreditType,
+} from "../../../tRPC serv/routes/creditRouter";
+import {
+  CreateInvestmentType,
+  PatchInvestmentType,
+} from "../../../tRPC serv/routes/investmentRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -56,7 +64,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1017,5 +1025,66 @@ export function deleteIncome(
       incomeStore.income = incomeStore.income.filter(
         (el) => el.id != data.incomeId
       );
+  });
+}
+
+export function createCredit(IncomeStore: IncomeStore, data: CreateCreditType) {
+  client.credit.create.query(data).then((res) => {
+    if (res) IncomeStore.newCredit = res;
+  });
+}
+export function getCredit(IncomeStore: IncomeStore) {
+  client.credit.get.query().then((res) => {
+    IncomeStore.credit = res;
+  });
+}
+
+export function patchCredit(incomeStore: IncomeStore, data: PatchCreditType) {
+  client.credit.patch.query(data).then((res) => {
+    if (!res) return;
+    incomeStore.credit = incomeStore.credit.filter((el) => el.id != res?.id);
+    incomeStore.newCredit = res;
+  });
+}
+export function deleteCredit(incomeStore: IncomeStore, creditId: number) {
+  client.credit.delete.query({ creditId }).then((el) => {
+    incomeStore.credit = incomeStore.credit.filter((el) => el.id != creditId);
+  });
+}
+export function createInvestment(
+  incomeStore: IncomeStore,
+  data: CreateInvestmentType
+) {
+  client.investment.create.query(data).then((res) => {
+    incomeStore.newInvestment = res;
+  });
+}
+export function getInvestment(incomeStore: IncomeStore) {
+  client.investment.get.query().then((res) => {
+    incomeStore.investment = res;
+  });
+}
+
+export function patchInvestment(
+  incomeStore: IncomeStore,
+  data: PatchInvestmentType
+) {
+  client.investment.patch.query(data).then((res) => {
+    if (!res) return;
+    incomeStore.investment = incomeStore.investment.filter(
+      (el) => el.id != res?.id!
+    );
+    incomeStore.newInvestment = res;
+  });
+}
+
+export function deleteInvestment(
+  incomeStore: IncomeStore,
+  investmentId: number
+) {
+  client.investment.delete.query({ investmentId }).then((res) => {
+    incomeStore.investment = incomeStore.investment.filter(
+      (el) => el.id != investmentId
+    );
   });
 }

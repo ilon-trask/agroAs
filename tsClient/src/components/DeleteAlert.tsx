@@ -16,7 +16,8 @@ export type IdeleteHeading =
   | "Витрату"
   | "планування"
   | "продаж"
-  | "прибуток";
+  | "прибуток"
+  | "кредит";
 type props = {
   open: boolean;
   setOpen: ({ isOpen }: { isOpen: false }) => void;

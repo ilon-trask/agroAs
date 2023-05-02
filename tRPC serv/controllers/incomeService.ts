@@ -165,11 +165,23 @@ class incomeService {
   }
   async create(user: Principal | undefined, data: CreateIncome) {
     if (!user) return;
+    let saleId;
+    let creditId;
+    let investmentId;
+    if (data.type == "Основне виробництво") {
+      saleId = data.propId;
+    } else if (data.type == "Кредит") {
+      creditId = data.propId;
+    } else if (data.type == "Інвестиції") {
+      investmentId = data.propId;
+    }
     const res: Iincome | undefined = await income.create({
       group: data.group,
       isUsing: data.isUsing,
       type: data.type,
-      saleId: data.saleId,
+      saleId: saleId,
+      creditId: creditId,
+      investmentId: investmentId,
       UserId: user.sub,
     });
     return res;
@@ -201,10 +213,22 @@ class incomeService {
   }
   async patch(user: Principal | undefined, data: PatchIncome) {
     if (!user) return;
+    let saleId;
+    let creditId;
+    let investmentId;
+    if (data.type == "Основне виробництво") {
+      saleId = data.propId;
+    } else if (data.type == "Кредит") {
+      creditId = data.propId;
+    } else if (data.type == "Інвестиції") {
+      investmentId = data.propId;
+    }
     await income.update(
       {
         group: data.group,
-        saleId: data.saleId,
+        saleId: saleId,
+        creditId: creditId,
+        investmentId: investmentId,
         type: data.type,
       },
       { where: { id: data.incomeId } }

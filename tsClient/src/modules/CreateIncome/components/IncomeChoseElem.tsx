@@ -27,6 +27,14 @@ function IncomeChoseElem({
   update,
 }: props) {
   const { income, map } = useContext(Context);
+  const prop =
+    res.type == "Основне виробництво"
+      ? income.sale
+      : res.type == "Кредит"
+      ? income.credit
+      : res.type == "Інвестиції"
+      ? income.investment
+      : [];
   return (
     <ModalBody>
       <Heading as={"h4"} size="md" textAlign={"center"}>
@@ -41,18 +49,33 @@ function IncomeChoseElem({
         <option hidden defaultChecked value="">
           Виберіть
         </option>
-        {income.sale.map((el) => {
-          const product = map.product.find(
-            (e) =>
-              e.id ==
-              income.production.find((e) => e.id == el.productionId)?.productId
-          );
-          return (
-            <option value={el.id} key={el.id}>
-              {product?.name}
-            </option>
-          );
-        })}
+        {res.type == "Основне виробництво"
+          ? income.sale.map((el) => {
+              const product = map.product.find(
+                (e) =>
+                  e.id ==
+                  income.production.find((e) => e.id == el.productionId)
+                    ?.productId
+              );
+              return (
+                <option value={el.id} key={el.id}>
+                  {product?.name}
+                </option>
+              );
+            })
+          : res.type == "Кредит"
+          ? income.credit.map((el) => (
+              <option key={el.id} value={el.id}>
+                {el.name}
+              </option>
+            ))
+          : res.type == "Інвестиції"
+          ? income.investment.map((el) => (
+              <option key={el.id} value={el.id}>
+                {el.name}
+              </option>
+            ))
+          : null}
       </Select>
       <ModalFooter justifyContent={"space-around"}>
         <Button onClick={() => setScreen(1)}>Назад</Button>
@@ -63,7 +86,7 @@ function IncomeChoseElem({
                 group: res.group,
                 incomeId: res.id!,
                 isUsing: false,
-                saleId: res.propId,
+                propId: res.propId,
                 type: res.type,
               });
             } else {
@@ -71,7 +94,7 @@ function IncomeChoseElem({
                 type: res.type,
                 group: res.group,
                 isUsing: true,
-                saleId: +res.propId,
+                propId: +res.propId,
               });
             }
             setOpen(false);

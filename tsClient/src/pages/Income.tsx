@@ -42,10 +42,13 @@ import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import {
+  deleteCredit,
   deleteIncome,
   deleteSale,
   deleteYieldPlant,
+  getCredit,
   getIncome,
+  getInvestment,
   getSale,
   patchSale,
   setIsUsingIncome,
@@ -59,6 +62,13 @@ import { productionProp } from "../modules/CreateProductService/CreateProduction
 import CreateSale, { SaleProp } from "../modules/CreateSale/CreateSale";
 import MapStore from "../store/MapStore";
 import IncomeStore from "../store/IncomeStore";
+import CreateCredit from "../modules/CreateCredit";
+import { type CreditProps } from "../modules/CreateCredit/CreateCredit";
+import { observe } from "mobx";
+import { Icredit, Iinvestment } from "../../../tRPC serv/models/models";
+import CreateInvestment, {
+  CreateInvestmentProps,
+} from "../modules/CreateInvestment/CreateInvestment";
 
 function Sale({
   map,
@@ -124,7 +134,7 @@ function Sale({
                 );
 
                 return (
-                  <Tr>
+                  <Tr key={el.id}>
                     <Td
                       onClick={() => {
                         setSaleOpen(true);
@@ -187,50 +197,152 @@ function Sale({
           </Tbody>
         </Table>
       </TableContainer>
-      <CreateSale
-        open={saleOpen}
-        setOpen={setSaleOpen}
-        res={saleRes}
-        setRes={setSaleRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
+      {saleOpen && (
+        <CreateSale
+          open={saleOpen}
+          setOpen={setSaleOpen}
+          res={saleRes}
+          setRes={setSaleRes}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      )}
       <Button onClick={() => setSaleOpen(true)}>Додати розрахунок</Button>
     </>
   );
 }
 
-function Credit() {
-  return (
-    <>
-      <Text
-        textAlign={"center"}
-        fontSize={"25px"}
-        mt={"15px"}
-        textTransform={"uppercase"}
-      >
-        Кредит
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Назва</Th>
-              <Th>Дата</Th>
-              <Th>Сума</Th>
-              <Th>Призначення</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody></Tbody>
-        </Table>
-      </TableContainer>
-      <Button>Додати кредит</Button>
-    </>
+const Credit = observer(
+  ({
+    income,
+    deleteOpen,
+    setDeleteOpen,
+  }: {
+    income: IncomeStore;
+    deleteOpen: deletePropsType;
+    setDeleteOpen: Dispatch<SetStateAction<deletePropsType>>;
+  }) => {
+    const [open, setOpen] = useState<boolean>(false);
+    const [update, setUpdate] = useState<boolean>(false);
+    const [res, setRes] = useState<CreditProps>({
+      cost: "",
+      date: "",
+      name: "",
+      purpose: "",
+    });
+    const credits: Icredit[] = JSON.parse(JSON.stringify(income.credit));
+    //@ts-ignore
+    credits.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    return (
+      <>
+        <Text
+          textAlign={"center"}
+          fontSize={"25px"}
+          mt={"15px"}
+          textTransform={"uppercase"}
+        >
+          Кредит
+        </Text>
+        <TableContainer
+          maxW="1000px"
+          mx="auto"
+          mt={"20px"}
+          overflowX={"scroll"}
+        >
+          <Table size={"sm"}>
+            <Thead>
+              <Tr>
+                <Th></Th>
+                <Th>Назва</Th>
+                <Th>Дата</Th>
+                <Th>Сума</Th>
+                <Th>Призначення</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {credits?.map((el) => (
+                <Tr>
+                  <Td
+                    onClick={() => {
+                      setRes({
+                        creditId: el.id!,
+                        cost: el.cost,
+                        date: el.date,
+                        name: el.name,
+                        purpose: el.purpose,
+                      });
+                      setUpdate(true);
+                      setOpen(true);
+                    }}
+                  >
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.cost}</Td>
+                  <Td>{el.purpose}</Td>
+                  <Td
+                    onClick={() => {
+                      setDeleteOpen({
+                        text: "кредит",
+                        isOpen: true,
+                        func: () => {
+                          deleteCredit(income, el.id!);
+                          //@ts-ignore
+                          setDeleteOpen({ isOpen: false });
+                        },
+                        id: el.id!,
+                      });
+                    }}
+                  >
+                    <DeleteIcon
+                      w={"20px"}
+                      h={"auto"}
+                      color={"red"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+        <Button onClick={() => setOpen(true)}>Додати кредит</Button>
+        <CreateCredit
+          open={open}
+          setOpen={setOpen}
+          res={res}
+          setRes={setRes}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      </>
+    );
+  }
+);
+const Invest = observer(() => {
+  const [open, setOpen] = useState(false);
+  const [res, setRes] = useState<CreateInvestmentProps>({
+    cost: "",
+    date: "",
+    name: "",
+    origin: "",
+  });
+  const [update, setUpdate] = useState(false);
+  const { income } = useContext(Context);
+  const investments: Iinvestment[] = JSON.parse(
+    JSON.stringify(income.investment)
   );
-}
-function Invest() {
+  // investments.sort()
+  useEffect(() => {
+    getInvestment(income);
+  }, []);
   return (
     <>
       <Text
@@ -253,13 +365,32 @@ function Invest() {
               <Th></Th>
             </Tr>
           </Thead>
-          <Tbody></Tbody>
+          <Tbody>
+            {investments.map((el) => (
+              <Tr>
+                <Td></Td>
+                <Td>{el.name}</Td>
+                <Td>{el.date}</Td>
+                <Td>{el.cost}</Td>
+                <Td>{el.origin}</Td>
+                <Td>{el.origin}</Td>
+              </Tr>
+            ))}
+          </Tbody>
         </Table>
       </TableContainer>
-      <Button>Додати інвестицію</Button>
+      <Button onClick={() => setOpen(true)}>Додати інвестицію</Button>
+      <CreateInvestment
+        open={open}
+        setOpen={setOpen}
+        res={res}
+        setRes={setRes}
+        update={update}
+        setUpdate={setUpdate}
+      />
     </>
   );
-}
+});
 function DerjSup() {
   return (
     <>
@@ -322,16 +453,16 @@ function Grant() {
   );
 }
 
+type deletePropsType = {
+  isOpen: boolean;
+  text: IdeleteHeading;
+  func: any;
+  id: number;
+};
 function Income() {
   const { income, user, map } = useContext(Context);
-
   const [showAlert, setShowAlert] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState<{
-    isOpen: boolean;
-    text: IdeleteHeading;
-    func: any;
-    id: number;
-  }>({
+  const [deleteOpen, setDeleteOpen] = useState<deletePropsType>({
     isOpen: false,
     text: "планування",
     func: () => {},
@@ -352,7 +483,11 @@ function Income() {
     //@ts-ignore
     propId: "",
   });
+  useEffect(() => {
+    console.log(income.credit);
 
+    if (!income.credit[0]) getCredit(income);
+  }, []);
   const [time, setTime] = useState({
     year: new Date().getFullYear(),
     month: "",
@@ -422,7 +557,11 @@ function Income() {
               month={time.month}
               setDeleteOpen={setDeleteOpen}
             />
-            <Credit />
+            <Credit
+              income={income}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
+            />
             <Invest />
             <DerjSup />
             <Grant />
@@ -437,7 +576,11 @@ function Income() {
             />
           </TabPanel>
           <TabPanel>
-            <Credit />
+            <Credit
+              income={income}
+              deleteOpen={deleteOpen}
+              setDeleteOpen={setDeleteOpen}
+            />
           </TabPanel>
           <TabPanel>
             <Invest />
@@ -469,6 +612,7 @@ function Income() {
           <Tbody>
             {income.income.map((el) => {
               const sale = income.sale.find((e) => e.id == el.saleId);
+              const credit = income.credit.find((e) => e.id == el.creditId);
               const product = map.product.find(
                 (e) =>
                   e.id ==
@@ -496,10 +640,10 @@ function Income() {
                       cursor={"pointer"}
                     />
                   </Td>
-                  <Td>{product?.name}</Td>
+                  <Td>{product?.name || credit?.name}</Td>
                   <Td>{el.type}</Td>
                   <Td>{el.group}</Td>
-                  <Td>{sale?.amount! * sale?.price!}</Td>
+                  <Td>{sale?.amount! * sale?.price! || credit?.cost}</Td>
                   <Td
                     onClick={() => {
                       setDeleteOpen({

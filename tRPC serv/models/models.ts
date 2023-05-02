@@ -11,7 +11,8 @@ import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 import { resTechCartsWithOpers } from "../controllers/TechCartService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
-
+import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
+import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
 export interface Iuser {
   id?: number;
   email: string;
@@ -779,6 +780,8 @@ export interface Iincome {
   isUsing: boolean;
   UserId: string;
   saleId?: number;
+  creditId?: number;
+  investmentId?: number;
 }
 export class income extends Model<Iincome> {
   declare id?: number;
@@ -787,6 +790,8 @@ export class income extends Model<Iincome> {
   declare UserId: string;
   declare isUsing: boolean;
   declare saleId?: number;
+  declare creditId?: number;
+  declare investmentId?: number;
 }
 income.init(
   {
@@ -904,6 +909,63 @@ sale.init(
   },
   { sequelize }
 );
+export interface Icredit {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  purpose: CreditPurposeType;
+  userId?: string;
+  createdAt?: string;
+}
+export class credit extends Model<Icredit> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare purpose: CreditPurposeType;
+  declare userId?: string;
+}
+credit.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    name: { type: DataTypes.STRING },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+
+  { sequelize }
+);
+export interface Iinvestment {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  origin: InvestmentOriginType;
+  userId?: string;
+  createdAt?: string;
+}
+export class investment extends Model<Iinvestment> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare origin: InvestmentOriginType;
+  declare userId?: string;
+}
+investment.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    origin: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -981,3 +1043,9 @@ sale.belongsTo(production);
 
 sale.hasOne(income);
 income.belongsTo(sale);
+
+credit.hasOne(income);
+income.belongsTo(credit);
+
+investment.hasOne(income);
+income.belongsTo(investment);

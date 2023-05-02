@@ -54,18 +54,40 @@ function CashFlowTable() {
   const { map, income } = useContext(Context);
 
   const outcomes = map.outcome.filter((el) => el.isUsing! == true);
-  const carts: resTechCartsWithOpers[] = [];
-  for (let i = 0; i < map.maps.length; i++) {
-    const el = map.maps[i];
-    for (let j = 0; j < outcomes.length; j++) {
-      const e = outcomes[j];
-      if (el.id == e.techCartId) {
-        carts.push(el);
-      }
-    }
-  }
-
   const incomes = income.income.filter((el) => el.isUsing! == true);
+  const first = { income: 0 };
+  const second = { income: 0 };
+  const third = { income: 0 };
+  const fourth = { income: 0 };
+  const fifth = { income: 0, outcome: 0 };
+  const sixth = { income: 0 };
+  const seventh = { income: 0 };
+  const eight = { income: 0 };
+  const ninth = { income: 0 };
+  const tenth = { income: 0 };
+  const eleventh = { income: 0 };
+  const twelfth = { income: 0 };
+  const obj = {
+    1: first,
+    2: second,
+    3: third,
+    4: fourth,
+    5: fifth,
+    6: sixth,
+    7: seventh,
+    8: eight,
+    9: ninth,
+    10: tenth,
+    11: eleventh,
+    12: twelfth,
+  };
+  incomes.forEach((el) => {
+    const sale = income.credit.find((e) => e.id == el.saleId);
+    const credit = income.credit.find((e) => e.id == el.creditId);
+    const date = +credit?.date?.split("-")[1];
+    console.log(date);
+    if (date) obj[date].income += credit?.cost;
+  });
   return (
     <Table size={"sm"}>
       <Thead>
@@ -116,6 +138,8 @@ function CashFlowTable() {
         </Tr>
         <Tr>
           <Td>5</Td>
+          <Td></Td>
+          <Td>{fifth.income}</Td>
         </Tr>
         <Tr>
           <Td>6</Td>
@@ -153,19 +177,23 @@ function CashFlowTable() {
         <Tr>
           <Td>Оборот за рік</Td>
         </Tr>
-        {carts.map((el) => (
-          <Tr key={el.id}>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td>{el.area * el.costHectare!}</Td>
-            <Td>{outcomes.find((e) => e.techCartId == el.id)?.type}</Td>
-            <Td>{el.nameCart}</Td>
-          </Tr>
-        ))}
+        {outcomes.map((el) => {
+          const cart = map.maps.find((e) => e.id == el.techCartId);
+          return (
+            <Tr key={el.id}>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td></Td>
+              <Td>{cart?.area * cart?.costHectare!}</Td>
+              <Td>{el.type}</Td>
+              <Td>{cart?.nameCart}</Td>
+            </Tr>
+          );
+        })}
         {incomes.map((el) => {
           const sale = income.sale.find((e) => e.id == el.saleId);
+          const credit = income.credit.find((e) => e.id == el.creditId);
           const product = map.product.find(
             (e) =>
               e.id ==
@@ -175,8 +203,8 @@ function CashFlowTable() {
           return (
             <Tr key={el.id}>
               <Td></Td>
-              <Td>{product?.name}</Td>
-              <Td>{sale?.amount! * sale?.price!}</Td>
+              <Td>{product?.name || credit?.name}</Td>
+              <Td>{sale?.amount! * sale?.price! || credit?.cost}</Td>
               <Td>{el.type}</Td>
               <Td></Td>
               <Td></Td>
