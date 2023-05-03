@@ -30,6 +30,7 @@ type props = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
 };
 const purpose = useCreditPurpose;
+const obj = {};
 function CreateCredit({
   open,
   setOpen,
@@ -43,10 +44,10 @@ function CreateCredit({
     <Dialog
       open={open}
       setOpen={setOpen}
-      setRes={() => {}}
-      props={{}}
+      setRes={setRes}
+      props={obj}
       isErr={false}
-      res={{}}
+      res={obj}
       setUpdate={setUpdate}
       update={update}
       setIsErr={() => {}}

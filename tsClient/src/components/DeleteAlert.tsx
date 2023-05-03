@@ -17,7 +17,10 @@ export type IdeleteHeading =
   | "планування"
   | "продаж"
   | "прибуток"
-  | "кредит";
+  | "кредит"
+  | "інвестицію"
+  | "державну допомогу"
+  | "грант";
 type props = {
   open: boolean;
   setOpen: ({ isOpen }: { isOpen: false }) => void;

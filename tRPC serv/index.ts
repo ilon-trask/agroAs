@@ -33,6 +33,8 @@ import { productionRouter } from "./routes/productionRouter";
 import { saleRouter } from "./routes/saleRouter";
 import { creditRouter } from "./routes/creditRouter";
 import { investmentRouter } from "./routes/investmentRouter";
+import { derjSupportRouter } from "./routes/derjSupportRouter";
+import { grantRouter } from "./routes/grantRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -66,6 +68,8 @@ const appRouter = router({
   sale: saleRouter,
   credit: creditRouter,
   investment: investmentRouter,
+  derj_support: derjSupportRouter,
+  grant: grantRouter,
   "": publicProcedure.query(() => "some text"),
 });
 

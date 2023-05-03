@@ -55,18 +55,18 @@ function CashFlowTable() {
 
   const outcomes = map.outcome.filter((el) => el.isUsing! == true);
   const incomes = income.income.filter((el) => el.isUsing! == true);
-  const first = { income: 0 };
-  const second = { income: 0 };
-  const third = { income: 0 };
-  const fourth = { income: 0 };
-  const fifth = { income: 0, outcome: 0 };
-  const sixth = { income: 0 };
-  const seventh = { income: 0 };
-  const eight = { income: 0 };
-  const ninth = { income: 0 };
-  const tenth = { income: 0 };
-  const eleventh = { income: 0 };
-  const twelfth = { income: 0 };
+  const first = { income: 0, type: "" };
+  const second = { income: 0, type: "" };
+  const third = { income: 0, type: "" };
+  const fourth = { income: 0, type: "" };
+  const fifth = { income: 0, outcome: 0, type: "" };
+  const sixth = { income: 0, type: "" };
+  const seventh = { income: 0, type: "" };
+  const eight = { income: 0, type: "" };
+  const ninth = { income: 0, type: "" };
+  const tenth = { income: 0, type: "" };
+  const eleventh = { income: 0, type: "" };
+  const twelfth = { income: 0, type: "" };
   const obj = {
     1: first,
     2: second,
@@ -82,11 +82,18 @@ function CashFlowTable() {
     12: twelfth,
   };
   incomes.forEach((el) => {
-    const sale = income.credit.find((e) => e.id == el.saleId);
+    const sale = income.sale.find((e) => e.id == el.saleId);
     const credit = income.credit.find((e) => e.id == el.creditId);
-    const date = +credit?.date?.split("-")[1];
-    console.log(date);
-    if (date) obj[date].income += credit?.cost;
+    const derj = income.derj.find((e) => e.id == el.derjSupportId);
+    const investment = income.investment.find((e) => e.id == el.investmentId);
+    const grant = income.grant.find((e) => e.id == el.grantId);
+    const prop = credit || derj || investment || grant;
+    //@ts-ignore
+    const date = +prop?.date?.split("-")[1] || +sale?.date?.split("-")[1];
+    if (date) {
+      //@ts-ignore
+      obj[date].income += prop?.cost || sale?.price * sale?.amount;
+    }
   });
   return (
     <Table size={"sm"}>
@@ -123,50 +130,84 @@ function CashFlowTable() {
       <Tbody>
         <Tr>
           <Td>1</Td>
+          <Td></Td>
+          <Td>{first.income}</Td>
+          <Td>{first.type}</Td>
         </Tr>
         <Tr>
           <Td>2</Td>
+          <Td></Td>
+          <Td>{second.income}</Td>
+          <Td>{second.type}</Td>
         </Tr>
         <Tr>
           <Td>3</Td>
+          <Td></Td>
+          <Td>{third.income}</Td>
+          <Td>{third.type}</Td>
         </Tr>
         <Tr>
           <Td>I квартал</Td>
         </Tr>
         <Tr>
           <Td>4</Td>
+          <Td></Td>
+          <Td>{fourth.income}</Td>
+          <Td>{fourth.type}</Td>
         </Tr>
         <Tr>
           <Td>5</Td>
           <Td></Td>
           <Td>{fifth.income}</Td>
+          <Td>{fifth.type}</Td>
         </Tr>
         <Tr>
           <Td>6</Td>
+          <Td></Td>
+          <Td>{sixth.income}</Td>
+          <Td>{sixth.type}</Td>
         </Tr>
         <Tr>
           <Td>II квартал</Td>
         </Tr>
         <Tr>
           <Td>7</Td>
+          <Td></Td>
+          <Td>{seventh.income}</Td>
+          <Td>{seventh.type}</Td>
         </Tr>
         <Tr>
           <Td>8</Td>
+          <Td></Td>
+          <Td>{eight.income}</Td>
+          <Td>{eight.type}</Td>
         </Tr>
         <Tr>
           <Td>9</Td>
+          <Td></Td>
+          <Td>{ninth.income}</Td>
+          <Td>{ninth.type}</Td>
         </Tr>
         <Tr>
           <Td>III квартал</Td>
         </Tr>
         <Tr>
           <Td>10</Td>
+          <Td></Td>
+          <Td>{tenth.income}</Td>
+          <Td>{tenth.type}</Td>
         </Tr>
         <Tr>
           <Td>11</Td>
+          <Td></Td>
+          <Td>{eleventh.income}</Td>
+          <Td>{eleventh.type}</Td>
         </Tr>
         <Tr>
           <Td>12</Td>
+          <Td></Td>
+          <Td>{twelfth.income}</Td>
+          <Td>{twelfth.type}</Td>
         </Tr>
         <Tr>
           <Td>IV квартал</Td>
@@ -185,7 +226,7 @@ function CashFlowTable() {
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td>{cart?.area * cart?.costHectare!}</Td>
+              <Td>{cart?.area! * cart?.costHectare!}</Td>
               <Td>{el.type}</Td>
               <Td>{cart?.nameCart}</Td>
             </Tr>
@@ -200,11 +241,30 @@ function CashFlowTable() {
               income.production.find((e) => e.id == sale?.productionId)
                 ?.productId
           );
+          const derj = income.derj.find((e) => e.id == el.derjSupportId);
+          const investment = income.investment.find(
+            (e) => e.id == el.investmentId
+          );
+          const grant = income.grant.find((e) => e.id == el.grantId);
+          console.log(sale);
+
           return (
             <Tr key={el.id}>
               <Td></Td>
-              <Td>{product?.name || credit?.name}</Td>
-              <Td>{sale?.amount! * sale?.price! || credit?.cost}</Td>
+              <Td>
+                {product?.name ||
+                  credit?.name ||
+                  derj?.name ||
+                  investment?.name ||
+                  grant?.name}
+              </Td>
+              <Td>
+                {sale?.amount! * sale?.price! ||
+                  credit?.cost ||
+                  derj?.cost ||
+                  investment?.cost ||
+                  grant?.cost}
+              </Td>
               <Td>{el.type}</Td>
               <Td></Td>
               <Td></Td>

@@ -3,6 +3,8 @@ import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import {
   Icredit,
   Iculture,
+  Iderj_support,
+  Igrant,
   Iincome,
   Iinvestment,
   Iproduction,
@@ -21,6 +23,8 @@ export default class IncomeStore {
   private _sale: Isale[] = [];
   private _credit: Icredit[] = [];
   private _investment: Iinvestment[] = [];
+  private _derj: Iderj_support[] = [];
+  private _grant: Igrant[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -77,6 +81,18 @@ export default class IncomeStore {
   public set newInvestment(investment: Iinvestment) {
     this._investment.push(investment);
   }
+  public set derj(derj: Iderj_support[]) {
+    this._derj = derj;
+  }
+  public set newDerj(derj: Iderj_support) {
+    this._derj.push(derj);
+  }
+  public set grant(grant: Igrant[]) {
+    this._grant = grant;
+  }
+  public set newGrant(grant: Igrant) {
+    this._grant.push(grant);
+  }
   public get yieldPlant() {
     return this._yieldPlant;
   }
@@ -100,5 +116,11 @@ export default class IncomeStore {
   }
   public get investment() {
     return this._investment;
+  }
+  public get derj() {
+    return this._derj;
+  }
+  public get grant() {
+    return this._grant;
   }
 }

@@ -13,6 +13,9 @@ import { resTechCartsWithOpers } from "../controllers/TechCartService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
 import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
+import { DerjPurposeType } from "../../tsClient/src/pages/hook/useDerjPurpose";
+import { GrantPurposeType } from "../../tsClient/src/pages/hook/useGrantPurpose";
+
 export interface Iuser {
   id?: number;
   email: string;
@@ -779,9 +782,11 @@ export interface Iincome {
   group: IncomeGroup;
   isUsing: boolean;
   UserId: string;
-  saleId?: number;
-  creditId?: number;
-  investmentId?: number;
+  saleId?: number | null;
+  creditId?: number | null;
+  investmentId?: number | null;
+  derjSupportId?: number | null;
+  grantId?: number | null;
 }
 export class income extends Model<Iincome> {
   declare id?: number;
@@ -792,6 +797,8 @@ export class income extends Model<Iincome> {
   declare saleId?: number;
   declare creditId?: number;
   declare investmentId?: number;
+  declare derjSupportId?: number;
+  declare grantId?: number;
 }
 income.init(
   {
@@ -966,6 +973,60 @@ investment.init(
   },
   { sequelize }
 );
+export interface Iderj_support {
+  id?: number;
+  date: string;
+  name: string;
+  cost: number;
+  purpose: DerjPurposeType;
+  userId: string;
+}
+export class derj_support extends Model<Iderj_support> {
+  declare id?: number;
+  declare date: string;
+  declare name: string;
+  declare cost: number;
+  declare purpose: DerjPurposeType;
+  declare userId: string;
+}
+derj_support.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.DATEONLY },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export type Igrant = {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  purpose: GrantPurposeType;
+  userId: string;
+};
+export class grant extends Model<Igrant> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare purpose: GrantPurposeType;
+  declare userId: string;
+}
+grant.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1049,3 +1110,9 @@ income.belongsTo(credit);
 
 investment.hasOne(income);
 income.belongsTo(investment);
+
+derj_support.hasOne(income);
+income.belongsTo(derj_support);
+
+grant.hasOne(income);
+income.belongsTo(grant);

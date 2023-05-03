@@ -1,5 +1,5 @@
 import { Principal } from "..";
-import { credit, Icredit } from "../models/models";
+import { credit, Icredit, income } from "../models/models";
 import { CreateCreditType, PatchCreditType } from "../routes/creditRouter";
 
 class CreditService {
@@ -38,6 +38,8 @@ class CreditService {
     return res;
   }
   async delete(user: Principal | undefined, data: { creditId: number }) {
+    if (!user) return;
+    await income.destroy({ where: { creditId: data.creditId } });
     const res = await credit.destroy({ where: { id: data.creditId } });
     return res;
   }

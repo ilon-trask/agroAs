@@ -34,6 +34,10 @@ function IncomeChoseElem({
       ? income.credit
       : res.type == "Інвестиції"
       ? income.investment
+      : res.type == "Державна підтримка"
+      ? income.derj
+      : res.type == "Грант"
+      ? income.grant
       : [];
   return (
     <ModalBody>
@@ -63,19 +67,11 @@ function IncomeChoseElem({
                 </option>
               );
             })
-          : res.type == "Кредит"
-          ? income.credit.map((el) => (
+          : prop.map((el) => (
               <option key={el.id} value={el.id}>
                 {el.name}
               </option>
-            ))
-          : res.type == "Інвестиції"
-          ? income.investment.map((el) => (
-              <option key={el.id} value={el.id}>
-                {el.name}
-              </option>
-            ))
-          : null}
+            ))}
       </Select>
       <ModalFooter justifyContent={"space-around"}>
         <Button onClick={() => setScreen(1)}>Назад</Button>
@@ -86,7 +82,7 @@ function IncomeChoseElem({
                 group: res.group,
                 incomeId: res.id!,
                 isUsing: false,
-                propId: res.propId,
+                propId: +res.propId,
                 type: res.type,
               });
             } else {
@@ -99,6 +95,8 @@ function IncomeChoseElem({
             }
             setOpen(false);
             setUpdate(false);
+            setScreen(0); //@ts-ignore
+            setRes({});
           }}
           isDisabled={!res.propId}
         >

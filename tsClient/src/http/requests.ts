@@ -55,6 +55,14 @@ import {
   CreateInvestmentType,
   PatchInvestmentType,
 } from "../../../tRPC serv/routes/investmentRouter";
+import {
+  CreateDerjType,
+  PatchDerjType,
+} from "../../../tRPC serv/routes/derjSupportRouter";
+import {
+  CreateGrantType,
+  PatchGrantType,
+} from "../../../tRPC serv/routes/grantRouter";
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -1006,6 +1014,9 @@ export function patchSale(incomeStore: IncomeStore, data: PatchSaleType) {
 export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
   client.sale.delete.query(data).then((res) => {
     incomeStore.sale = incomeStore.sale.filter((el) => el.id != data.saleId);
+    incomeStore.income = incomeStore.income.filter(
+      (el) => el.saleId != data.saleId
+    );
   });
 }
 
@@ -1049,6 +1060,9 @@ export function patchCredit(incomeStore: IncomeStore, data: PatchCreditType) {
 export function deleteCredit(incomeStore: IncomeStore, creditId: number) {
   client.credit.delete.query({ creditId }).then((el) => {
     incomeStore.credit = incomeStore.credit.filter((el) => el.id != creditId);
+    incomeStore.income = incomeStore.income.filter(
+      (el) => el.creditId != creditId
+    );
   });
 }
 export function createInvestment(
@@ -1085,6 +1099,63 @@ export function deleteInvestment(
   client.investment.delete.query({ investmentId }).then((res) => {
     incomeStore.investment = incomeStore.investment.filter(
       (el) => el.id != investmentId
+    );
+    incomeStore.income = incomeStore.income.filter(
+      (el) => el.investmentId != investmentId
+    );
+  });
+}
+
+export function getDerj(incomeStore: IncomeStore) {
+  client.derj_support.get.query().then((res) => (incomeStore.derj = res));
+}
+
+export function createDerj(incomeStore: IncomeStore, data: CreateDerjType) {
+  client.derj_support.create.query(data).then((res) => {
+    incomeStore.newDerj = res;
+  });
+}
+
+export function patchDerj(incomeStore: IncomeStore, data: PatchDerjType) {
+  client.derj_support.patch.query(data).then((res) => {
+    if (!res) return;
+    incomeStore.derj = incomeStore.derj.filter((el) => el.id != res?.id);
+    incomeStore.newDerj = res;
+  });
+}
+
+export function deleteDerj(incomeStore: IncomeStore, derjId: number) {
+  client.derj_support.delete.query({ derjId }).then((res) => {
+    incomeStore.derj = incomeStore.derj.filter((el) => el.id != derjId);
+    incomeStore.income = incomeStore.income.filter(
+      (el) => el.derjSupportId != derjId
+    );
+  });
+}
+
+export function getGrant(incomeStore: IncomeStore) {
+  client.grant.get.query().then((res) => {
+    incomeStore.grant = res;
+  });
+}
+
+export function createGrant(incomeStore: IncomeStore, data: CreateGrantType) {
+  client.grant.create.query(data).then((res) => {
+    incomeStore.newGrant = res;
+  });
+}
+export function patchGrant(incomeStore: IncomeStore, data: PatchGrantType) {
+  client.grant.patch.query(data).then((res) => {
+    if (!res) return;
+    incomeStore.grant = incomeStore.grant.filter((el) => el.id != res.id);
+    incomeStore.newGrant = res;
+  });
+}
+export function deleteGrant(incomeStore: IncomeStore, grantId: number) {
+  client.grant.delete.query({ grantId }).then((res) => {
+    incomeStore.grant = incomeStore.grant.filter((el) => el.id != grantId);
+    incomeStore.income = incomeStore.income.filter(
+      (el) => el.grantId != grantId
     );
   });
 }

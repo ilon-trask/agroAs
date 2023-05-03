@@ -9,14 +9,15 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
-import { InvestmentOriginType } from "../../pages/hook/useInvestmentOrigin";
-import useInvestmentOrigin from "../../pages/hook/useInvestmentOrigin";
-import { createInvestment, patchInvestment } from "../../http/requests";
+import useDerjPurpose, {
+  DerjPurposeType,
+} from "../../pages/hook/useDerjPurpose";
+import { createDerj, patchDerj } from "../../http/requests";
 import { Context } from "../../main";
-export type CreateInvestmentProps = {
-  investmentId?: number;
+export type CreateDerjProps = {
+  derjId?: number;
   name: string;
-  origin: InvestmentOriginType | "";
+  purpose: DerjPurposeType | "";
   cost: number | "";
   date: string;
 };
@@ -25,11 +26,11 @@ type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  res: CreateInvestmentProps;
-  setRes: Dispatch<SetStateAction<CreateInvestmentProps>>;
+  res: CreateDerjProps;
+  setRes: Dispatch<SetStateAction<CreateDerjProps>>;
 };
 const obj = {};
-function CreateInvestment({
+function CreateDerjSupport({
   open,
   setOpen,
   setUpdate,
@@ -37,8 +38,9 @@ function CreateInvestment({
   res,
   setRes,
 }: props) {
-  const investments = useInvestmentOrigin;
+  const purpose = useDerjPurpose;
   const { income } = useContext(Context);
+
   return (
     <Dialog
       open={open}
@@ -53,7 +55,7 @@ function CreateInvestment({
     >
       <Box>
         <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
-          Впишіть дані для розрахунку інвестицій
+          Впишіть дані для розрахунку державної підтримки
         </Heading>
         <Box display={"flex"} justifyContent={"space-around"} mt={3}>
           <Box maxW={"190px"}>
@@ -100,22 +102,22 @@ function CreateInvestment({
           </Box>
           <Box width={"190px"}>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
-              Виберіть походження
+              Виберіть напрямок
             </Heading>
             <Select
               size={"sm"}
-              value={res.origin}
+              value={res.purpose}
               onChange={(e) => {
                 setRes((prev) => ({
                   ...prev,
-                  origin: e.target.value as InvestmentOriginType,
+                  purpose: e.target.value as DerjPurposeType,
                 }));
               }}
             >
               <option value="" hidden defaultChecked>
                 Виберіть опцію
               </option>
-              {investments.map((el) => (
+              {purpose.map((el) => (
                 <option key={el.id} value={el.name}>
                   {el.name}
                 </option>
@@ -126,20 +128,19 @@ function CreateInvestment({
       </Box>
       <ModalFooter>
         <Button
-          isDisabled={!res.cost && !res.date && !res.name && !res.origin}
+          isDisabled={!res.cost && !res.date && !res.name && !res.purpose}
           onClick={() => {
-            if (res.cost && res.date && res.name && res.origin) {
+            if (res.cost && res.date && res.name && res.purpose) {
               if (update) {
                 //@ts-ignore
-                patchInvestment(income, res);
+                patchDerj(income, res);
               } else {
                 res.cost = +res.cost;
                 //@ts-ignore
-                createInvestment(income, res);
+                createDerj(income, res);
               }
               setOpen(false);
-              setUpdate(false);
-              //@ts-ignore
+              setUpdate(false); //@ts-ignore
               setRes({});
             }
           }}
@@ -151,4 +152,4 @@ function CreateInvestment({
   );
 }
 
-export default CreateInvestment;
+export default CreateDerjSupport;

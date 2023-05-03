@@ -9,14 +9,15 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
-import { InvestmentOriginType } from "../../pages/hook/useInvestmentOrigin";
-import useInvestmentOrigin from "../../pages/hook/useInvestmentOrigin";
-import { createInvestment, patchInvestment } from "../../http/requests";
+import { createGrant, patchGrant } from "../../http/requests";
 import { Context } from "../../main";
-export type CreateInvestmentProps = {
-  investmentId?: number;
+import useGrantPurpose, {
+  GrantPurposeType,
+} from "../../pages/hook/useGrantPurpose";
+export type CreateGrantProps = {
+  grantId?: number;
   name: string;
-  origin: InvestmentOriginType | "";
+  purpose: GrantPurposeType | "";
   cost: number | "";
   date: string;
 };
@@ -25,19 +26,12 @@ type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  res: CreateInvestmentProps;
-  setRes: Dispatch<SetStateAction<CreateInvestmentProps>>;
+  res: CreateGrantProps;
+  setRes: Dispatch<SetStateAction<CreateGrantProps>>;
 };
 const obj = {};
-function CreateInvestment({
-  open,
-  setOpen,
-  setUpdate,
-  update,
-  res,
-  setRes,
-}: props) {
-  const investments = useInvestmentOrigin;
+function CreateGrant({ open, setOpen, setUpdate, update, res, setRes }: props) {
+  const purpose = useGrantPurpose;
   const { income } = useContext(Context);
   return (
     <Dialog
@@ -45,7 +39,7 @@ function CreateInvestment({
       setOpen={setOpen}
       update={update}
       setUpdate={setUpdate}
-      setRes={setRes}
+      setRes={() => {}}
       setIsErr={() => {}}
       isErr={false}
       props={obj}
@@ -53,7 +47,7 @@ function CreateInvestment({
     >
       <Box>
         <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
-          Впишіть дані для розрахунку інвестицій
+          Впишіть дані для розрахунку гранту
         </Heading>
         <Box display={"flex"} justifyContent={"space-around"} mt={3}>
           <Box maxW={"190px"}>
@@ -100,22 +94,22 @@ function CreateInvestment({
           </Box>
           <Box width={"190px"}>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
-              Виберіть походження
+              Виберіть напрямок
             </Heading>
             <Select
               size={"sm"}
-              value={res.origin}
+              value={res.purpose}
               onChange={(e) => {
                 setRes((prev) => ({
                   ...prev,
-                  origin: e.target.value as InvestmentOriginType,
+                  purpose: e.target.value as GrantPurposeType,
                 }));
               }}
             >
               <option value="" hidden defaultChecked>
                 Виберіть опцію
               </option>
-              {investments.map((el) => (
+              {purpose.map((el) => (
                 <option key={el.id} value={el.name}>
                   {el.name}
                 </option>
@@ -126,21 +120,30 @@ function CreateInvestment({
       </Box>
       <ModalFooter>
         <Button
-          isDisabled={!res.cost && !res.date && !res.name && !res.origin}
+          isDisabled={!res.cost && !res.date && !res.name && !res.purpose}
           onClick={() => {
-            if (res.cost && res.date && res.name && res.origin) {
+            console.log(res.cost);
+            console.log(res.date);
+            console.log(res.name);
+            console.log(res.purpose);
+
+            if (res.cost && res.date && res.name && res.purpose) {
               if (update) {
                 //@ts-ignore
-                patchInvestment(income, res);
+                patchGrant(income, res);
               } else {
                 res.cost = +res.cost;
                 //@ts-ignore
-                createInvestment(income, res);
+                createGrant(income, res);
               }
               setOpen(false);
               setUpdate(false);
-              //@ts-ignore
-              setRes({});
+              setRes({
+                cost: "",
+                date: "",
+                name: "",
+                purpose: "",
+              });
             }
           }}
         >
@@ -151,4 +154,4 @@ function CreateInvestment({
   );
 }
 
-export default CreateInvestment;
+export default CreateGrant;
