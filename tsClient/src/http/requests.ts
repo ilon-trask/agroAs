@@ -63,6 +63,12 @@ import {
   CreateGrantType,
   PatchGrantType,
 } from "../../../tRPC serv/routes/grantRouter";
+
+import {
+  CreateBuyingMachine,
+  PatchBuyingMachine,
+} from "../../../tRPC serv/routes/buyingMachineRouter";
+
 let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
@@ -1157,5 +1163,28 @@ export function deleteGrant(incomeStore: IncomeStore, grantId: number) {
     incomeStore.income = incomeStore.income.filter(
       (el) => el.grantId != grantId
     );
+  });
+}
+
+export function getBuyingMachine(map: MapStore) {
+  client.buyingMachine.get.query().then((res) => (map.buyingMachine = res));
+}
+export function createBuyingMachine(map: MapStore, data: CreateBuyingMachine) {
+  client.buyingMachine.create.query(data).then((res) => {
+    map.newBuyingMachine = res;
+  });
+}
+
+export function patchBuyingMachine(map: MapStore, data: PatchBuyingMachine) {
+  client.buyingMachine.patch.query(data).then((res) => {
+    if (!res) return;
+    map.buyingMachine = map.buyingMachine.filter((el) => el.id != res.id);
+    map.newBuyingMachine = res;
+  });
+}
+export function deleteBuyingMachine(map: MapStore, buyingId: number) {
+  client.buyingMachine.delete.query({ buyingId }).then((res) => {
+    map.buyingMachine = map.buyingMachine.filter((el) => el.id != buyingId);
+    map.outcome = map.outcome.filter((el) => el.buyingMachineId != buyingId);
   });
 }

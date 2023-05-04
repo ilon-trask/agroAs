@@ -33,8 +33,10 @@ import {
 } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import {
+  deleteBuyingMachine,
   deleteCart,
   deleteOutcome,
+  getBuyingMachine,
   getCopyCarts,
   setIsUsingOutcome,
   supabase,
@@ -52,6 +54,9 @@ import { TEHMAP_ROUTER } from "../utils/consts";
 import CreateOutcome from "../modules/CreateOutcome/";
 import { outcomeProps } from "../modules/CreateOutcome/CreateOutcome";
 import TEJJornal from "./TEJJornal";
+import CreateBuyingMachine, {
+  CreateBuyingMachineProps,
+} from "../modules/CreateBuyingMachine";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -112,6 +117,22 @@ const MapJornal = observer(function () {
   });
   const [outcomeUpd, setOutcomeUpd] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [buyingMachineRes, setBuyingMachineRes] =
+    useState<CreateBuyingMachineProps>({
+      name: "",
+      brand: "",
+      date: "",
+      amount: "",
+      cost: "",
+      purpose: "",
+    });
+  const [buyingMachineUpdate, setBuyingMachineUpdate] = useState(false);
+  const [buyingMachineOpen, setBuyingMachineOpen] = useState(false);
+  useEffect(() => {
+    if (!map.buyingMachine[0]) {
+      getBuyingMachine(map);
+    }
+  }, []);
   return (
     <Container maxW="container.lg">
       {user.role == "service_role" && (
@@ -454,18 +475,81 @@ const MapJornal = observer(function () {
             КУПІВЛЯ ТЕХНІКИ ТА ОБЛАДНАННЯ
           </Text>
           <TableContainer>
-            <Table>
+            <Table size={"sm"}>
               <Thead>
-                <Th>Назва</Th>
-                <Th>Марка</Th>
-                <Th>Кількість</Th>
-                <Th>Ціна</Th>
-                <Th>Сума</Th>
+                <Tr>
+                  <Th></Th>
+                  <Th>Дата</Th>
+                  <Th>Назва</Th>
+                  <Th>Марка</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                  <Th></Th>
+                </Tr>
               </Thead>
+              <Tbody>
+                {map.buyingMachine.map((el) => (
+                  <Tr>
+                    <Td
+                      onClick={() => {
+                        setBuyingMachineOpen(true);
+                        setBuyingMachineUpdate(true);
+                        setBuyingMachineRes({
+                          buyingId: el.id,
+                          amount: el.amount,
+                          brand: el.brand,
+                          cost: el.cost,
+                          date: el.date,
+                          name: el.name,
+                          purpose: el.purpose,
+                        });
+                      }}
+                    >
+                      <EditIcon
+                        color={"blue.400"}
+                        w={"20px"}
+                        h={"auto"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
+                    <Td>{el.date}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.brand}</Td>
+                    <Td>{el.amount}</Td>
+                    <Td>{el.cost}</Td>
+                    <Td>{el.cost * el.amount}</Td>
+                    <Td
+                      onClick={() =>
+                        setDeleteOpen({
+                          isOpen: true,
+                          func: () => {
+                            deleteBuyingMachine(map, el.id!);
+                            //@ts-ignore
+                            setDeleteOpen({ isOpen: false });
+                          },
+                          text: "покупку техніки",
+                        })
+                      }
+                    >
+                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
             </Table>
           </TableContainer>
-          <Button>Добавити техніку або обладнання</Button>
-
+          <Button onClick={() => setBuyingMachineOpen(true)}>
+            Добавити техніку або обладнання
+          </Button>
+          <CreateBuyingMachine
+            open={buyingMachineOpen}
+            setOpen={setBuyingMachineOpen}
+            res={buyingMachineRes}
+            setRes={setBuyingMachineRes}
+            update={buyingMachineUpdate}
+            setUpdate={setBuyingMachineUpdate}
+          />
           <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
             Розрахунок грошового потоку (витрати)
           </Text>
@@ -473,6 +557,7 @@ const MapJornal = observer(function () {
             <Table size={"sm"}>
               <Thead>
                 <Th></Th>
+
                 <Th>Назва</Th>
                 <Th>Тип витрат</Th>
                 <Th>Група витрат</Th>

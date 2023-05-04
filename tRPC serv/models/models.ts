@@ -15,7 +15,7 @@ import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpos
 import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
 import { DerjPurposeType } from "../../tsClient/src/pages/hook/useDerjPurpose";
 import { GrantPurposeType } from "../../tsClient/src/pages/hook/useGrantPurpose";
-
+import { BuyingMachinePurposeType } from "../../tsClient/src/pages/hook/useBuyingMachinePurpose";
 export interface Iuser {
   id?: number;
   email: string;
@@ -819,6 +819,7 @@ export interface Ioutcome {
   userId: string;
   isUsing?: boolean;
   techCartId?: number;
+  buyingMachineId?: number;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
@@ -1027,6 +1028,39 @@ grant.init(
   },
   { sequelize }
 );
+export interface Ibuying_machine {
+  id?: number;
+  name: string;
+  brand: string;
+  date: string;
+  cost: number;
+  amount: number;
+  purpose: BuyingMachinePurposeType;
+  userId: string;
+}
+export class buying_machine extends Model<Ibuying_machine> {
+  declare id?: number;
+  declare name: string;
+  declare brand: string;
+  declare date: string;
+  declare cost: number;
+  declare amount: number;
+  declare purpose: BuyingMachinePurposeType;
+  declare userId: string;
+}
+buying_machine.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    brand: { type: DataTypes.STRING },
+    date: { type: DataTypes.DATEONLY },
+    amount: { type: DataTypes.INTEGER },
+    cost: { type: DataTypes.INTEGER },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1116,3 +1150,6 @@ income.belongsTo(derj_support);
 
 grant.hasOne(income);
 income.belongsTo(grant);
+
+buying_machine.hasOne(outcome);
+outcome.belongsTo(buying_machine);

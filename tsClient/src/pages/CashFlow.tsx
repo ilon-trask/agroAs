@@ -30,6 +30,8 @@ function CashFlow() {
   function setYear(year: number) {
     setTime({ from: year + "-" + "01", to: year + "-" + 12 });
   }
+  //@ts-ignore
+  const manyTimes = +time.to.split("-")[0] - +time.from.split("-")[0];
   return (
     <Container maxW="1000px">
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -82,7 +84,17 @@ function CashFlow() {
         })()}
       </Box>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <CashFlowTable />
+        {(() => {
+          console.log(manyTimes);
+          const res: JSX.Element[] = [];
+          const from = time.from.split("-")[0];
+          const to = time.to.split("-")[0];
+          for (let i = 0; i <= manyTimes; i++) {
+            console.log(i);
+            res.push(<CashFlowTable year={+from + +i} />);
+          }
+          return res;
+        })()}
       </TableContainer>
       <Box display={"flex"} justifyContent={"space-evenly"} mt={"15px"}>
         <Button onClick={() => navigate(INCOME_ROUTER)}>

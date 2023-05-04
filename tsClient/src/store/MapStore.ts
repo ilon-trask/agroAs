@@ -23,6 +23,7 @@ import {
   IcultivationTechnologies,
   Ioutcome,
   Iproduct,
+  Ibuying_machine,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -51,6 +52,7 @@ export default class MapStore {
   private _complex: resTechCartsWithOpers[] = [];
   private _outcome: Ioutcome[] = [];
   private _product: Iproduct[] = [];
+  private _buyingMachine: Ibuying_machine[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -174,6 +176,12 @@ export default class MapStore {
   public set newProduct(prod: Iproduct) {
     this._product.push(prod);
   }
+  public set buyingMachine(buyingMachine: Ibuying_machine[]) {
+    this._buyingMachine = buyingMachine;
+  }
+  public set newBuyingMachine(buyingMachine: Ibuying_machine) {
+    this._buyingMachine.push(buyingMachine);
+  }
   public get maps() {
     return this._maps;
   }
@@ -245,5 +253,8 @@ export default class MapStore {
   }
   public get product() {
     return this._product;
+  }
+  public get buyingMachine() {
+    return this._buyingMachine;
   }
 }

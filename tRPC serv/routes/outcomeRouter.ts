@@ -11,7 +11,7 @@ const createOutcome = z.object({
     "Будівництво будівель і споруд",
     "Не визначино",
   ]),
-  cartId: z.number(),
+  propId: z.number(),
 });
 export type createOutcomeType = z.infer<typeof createOutcome>;
 const patchOutcome = createOutcome.extend({ outcomeId: z.number() });
