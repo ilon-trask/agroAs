@@ -206,6 +206,7 @@ function CreateBuyingMachine({
               res.cost = +res.cost;
               res.amount = +res.amount;
               if (update) {
+                //@ts-ignore
                 patchBuyingMachine(map, res);
               } else {
                 //@ts-ignore

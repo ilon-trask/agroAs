@@ -69,7 +69,10 @@ function IncomeChoseElem({
             })
           : prop.map((el) => (
               <option key={el.id} value={el.id}>
-                {el.name}
+                {
+                  //@ts-ignore
+                  el.name
+                }
               </option>
             ))}
       </Select>
