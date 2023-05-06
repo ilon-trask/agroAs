@@ -42,7 +42,7 @@ const createIncome = z.object({
     "Не визначино",
   ]),
   isUsing: z.boolean(),
-  saleId: z.number(),
+  propId: z.number(),
 });
 export type CreateIncome = z.infer<typeof createIncome>;
 const patchIncome = createIncome.extend({ incomeId: z.number() });

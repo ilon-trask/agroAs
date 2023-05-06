@@ -1,6 +1,6 @@
-import { Box, Button, TableContainer } from "@chakra-ui/react";
+import { Box, Button, TableContainer, Text } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
-import CreateBusiness from "../modules/CreateBusiness";
+import CreateBusiness, { CreateBusinessProp } from "../modules/CreateBusiness";
 import BusinessTable from "../modules/BusinessTable";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
@@ -20,12 +20,29 @@ function BusinessJurnal() {
     isPublic: false,
   });
   const [openBusiness, setOpenBusiness] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [res, setRes] = useState<CreateBusinessProp>({
+    name: "",
+    dateStart: "",
+    enterpriseId: "",
+    initialAmount: "",
+    realizationTime: "",
+    cultureIds: [],
+  });
   useBusiness(business, map);
   const navigate = useNavigate();
   return (
     <Box maxW="1000px" mx="auto">
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Бізнес-плани
+      </Text>
+
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <BusinessTable />
+        <BusinessTable
+          setOpen={setOpenBusiness}
+          setRes={setRes}
+          setUpdate={setUpdate}
+        />
       </TableContainer>
       <Button onClick={() => setOpenBusiness(true)}>
         Створити бізнес-план
@@ -38,7 +55,14 @@ function BusinessJurnal() {
       >
         Переглянути
       </Button>
-      <CreateBusiness open={openBusiness} setOpen={setOpenBusiness} />
+      <CreateBusiness
+        open={openBusiness}
+        setOpen={setOpenBusiness}
+        res={res}
+        setRes={setRes}
+        update={update}
+        setUpdate={setUpdate}
+      />
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import UserStore from "./store/UserStore";
 import BusinessStore from "./store/BusinessStore";
 import IncomeStore from "./store/IncomeStore";
 import TEJStore from "./store/TEJStore";
+import EnterpriseStore from "./store/EnterpriseStore";
 
 export const Context = createContext({
   user: new UserStore(),
@@ -15,6 +16,7 @@ export const Context = createContext({
   business: new BusinessStore(),
   income: new IncomeStore(),
   TEJ: new TEJStore(),
+  enterpriseStore: new EnterpriseStore(),
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -25,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       business: new BusinessStore(),
       income: new IncomeStore(),
       TEJ: new TEJStore(),
+      enterpriseStore: new EnterpriseStore(),
     }}
   >
     <App />

@@ -165,11 +165,31 @@ class incomeService {
   }
   async create(user: Principal | undefined, data: CreateIncome) {
     if (!user) return;
+    let saleId = null;
+    let creditId = null;
+    let investmentId = null;
+    let derjId = null;
+    let grantId = null;
+    if (data.type == "Основне виробництво") {
+      saleId = data.propId;
+    } else if (data.type == "Кредит") {
+      creditId = data.propId;
+    } else if (data.type == "Інвестиції") {
+      investmentId = data.propId;
+    } else if (data.type == "Державна підтримка") {
+      derjId = data.propId;
+    } else if (data.type == "Грант") {
+      grantId = data.propId;
+    }
     const res: Iincome | undefined = await income.create({
       group: data.group,
       isUsing: data.isUsing,
       type: data.type,
-      saleId: data.saleId,
+      saleId: saleId,
+      creditId: creditId,
+      investmentId: investmentId,
+      derjSupportId: derjId,
+      grantId: grantId,
       UserId: user.sub,
     });
     return res;
@@ -201,10 +221,30 @@ class incomeService {
   }
   async patch(user: Principal | undefined, data: PatchIncome) {
     if (!user) return;
+    let saleId = null;
+    let creditId = null;
+    let investmentId = null;
+    let derjId = null;
+    let grantId = null;
+    if (data.type == "Основне виробництво") {
+      saleId = data.propId;
+    } else if (data.type == "Кредит") {
+      creditId = data.propId;
+    } else if (data.type == "Інвестиції") {
+      investmentId = data.propId;
+    } else if (data.type == "Державна підтримка") {
+      derjId = data.propId;
+    } else if (data.type == "Грант") {
+      grantId = data.propId;
+    }
     await income.update(
       {
         group: data.group,
-        saleId: data.saleId,
+        saleId: saleId,
+        creditId: creditId,
+        investmentId: investmentId,
+        derjSupportId: derjId,
+        grantId: grantId,
         type: data.type,
       },
       { where: { id: data.incomeId } }

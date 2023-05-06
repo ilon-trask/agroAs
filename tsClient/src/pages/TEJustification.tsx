@@ -131,20 +131,18 @@ function TEJjustification() {
         maxW={"1000px"}
         mx={"auto"}
       >
-        {user.role != "" && (
-          <Button
-            onClick={() => {
-              navigate(MAP_ROUTE);
-            }}
-          >
-            Назад
-          </Button>
-        )}
+        <Button
+          onClick={() => {
+            navigate(MAP_ROUTE);
+          }}
+        >
+          Назад
+        </Button>
         <Box display={"flex"}>
-          <Box display={"flex"}>
+          {/* <Box display={"flex"}>
             <Button>Конструктор</Button>
             <Button>Отримати ПДФ</Button>
-          </Box>
+          </Box> */}
           {user.role != "" && (
             <Button
               ml={4}

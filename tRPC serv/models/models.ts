@@ -11,7 +11,14 @@ import { Icell } from "../controllers/OperService";
 import { string } from "zod";
 import { resTechCartsWithOpers } from "../controllers/TechCartService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
-
+import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
+import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
+import { DerjPurposeType } from "../../tsClient/src/pages/hook/useDerjPurpose";
+import { GrantPurposeType } from "../../tsClient/src/pages/hook/useGrantPurpose";
+import { BuyingMachinePurposeType } from "../../tsClient/src/pages/hook/useBuyingMachinePurpose";
+import { AdministrationPurposeType } from "../../tsClient/src/pages/hook/useAdministrationPurpose";
+import { AdministrationPeriodCalcType } from "../../tsClient/src/pages/hook/useAdministrationPeriodCalc";
+import { EnterpriseFormType } from "../../tsClient/src/pages/hook/useEnterpriseForm";
 export interface Iuser {
   id?: number;
   email: string;
@@ -529,10 +536,14 @@ cultures_types.init(
 export interface IbusinessPlan {
   id?: number;
   name: string;
-  businessCategoryId?: number;
+  initialAmount: number;
+  dateStart: string;
+  realizationTime: number;
+  cultures?: Iculture[];
   isPublic?: boolean;
   isAgree?: boolean;
   description?: string;
+  enterpriseId?: number;
   userId: string;
   createdAt?: string;
   updatedAt?: string;
@@ -540,6 +551,9 @@ export interface IbusinessPlan {
 export class businessPlan extends Model<IbusinessPlan> {
   declare id?: number;
   declare name: string;
+  declare initialAmount: number;
+  declare dateStart: string;
+  declare realizationTime: number;
   declare isPublic?: boolean;
   declare isAgree?: boolean;
   declare description?: string;
@@ -549,6 +563,9 @@ businessPlan.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
+    initialAmount: { type: DataTypes.INTEGER },
+    dateStart: { type: DataTypes.DATEONLY },
+    realizationTime: { type: DataTypes.INTEGER },
     userId: { type: DataTypes.STRING, allowNull: false },
     isPublic: {
       type: DataTypes.BOOLEAN,
@@ -565,6 +582,7 @@ businessPlan.init(
   { sequelize }
 );
 
+export const busCul = sequelize.define("busCul", {}, { timestamps: false });
 export interface IcultivationTechnologies {
   id?: number;
   name: string;
@@ -778,7 +796,11 @@ export interface Iincome {
   group: IncomeGroup;
   isUsing: boolean;
   UserId: string;
-  saleId?: number;
+  saleId?: number | null;
+  creditId?: number | null;
+  investmentId?: number | null;
+  derjSupportId?: number | null;
+  grantId?: number | null;
 }
 export class income extends Model<Iincome> {
   declare id?: number;
@@ -787,6 +809,10 @@ export class income extends Model<Iincome> {
   declare UserId: string;
   declare isUsing: boolean;
   declare saleId?: number;
+  declare creditId?: number;
+  declare investmentId?: number;
+  declare derjSupportId?: number;
+  declare grantId?: number;
 }
 income.init(
   {
@@ -807,6 +833,8 @@ export interface Ioutcome {
   userId: string;
   isUsing?: boolean;
   techCartId?: number;
+  buyingMachineId?: number;
+  administrationId?: number;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
@@ -904,6 +932,206 @@ sale.init(
   },
   { sequelize }
 );
+export interface Icredit {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  purpose: CreditPurposeType;
+  userId?: string;
+  createdAt?: string;
+}
+export class credit extends Model<Icredit> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare purpose: CreditPurposeType;
+  declare userId?: string;
+}
+credit.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    name: { type: DataTypes.STRING },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+
+  { sequelize }
+);
+export interface Iinvestment {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  origin: InvestmentOriginType;
+  userId?: string;
+  createdAt?: string;
+}
+export class investment extends Model<Iinvestment> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare origin: InvestmentOriginType;
+  declare userId?: string;
+}
+investment.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    origin: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Iderj_support {
+  id?: number;
+  date: string;
+  name: string;
+  cost: number;
+  purpose: DerjPurposeType;
+  userId: string;
+}
+export class derj_support extends Model<Iderj_support> {
+  declare id?: number;
+  declare date: string;
+  declare name: string;
+  declare cost: number;
+  declare purpose: DerjPurposeType;
+  declare userId: string;
+}
+derj_support.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.DATEONLY },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export type Igrant = {
+  id?: number;
+  name: string;
+  date: string;
+  cost: number;
+  purpose: GrantPurposeType;
+  userId: string;
+};
+export class grant extends Model<Igrant> {
+  declare id?: number;
+  declare name: string;
+  declare date: string;
+  declare cost: number;
+  declare purpose: GrantPurposeType;
+  declare userId: string;
+}
+grant.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    cost: { type: DataTypes.INTEGER },
+    date: { type: DataTypes.DATEONLY },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Ibuying_machine {
+  id?: number;
+  name: string;
+  brand: string;
+  date: string;
+  cost: number;
+  amount: number;
+  purpose: BuyingMachinePurposeType;
+  userId: string;
+}
+export class buying_machine extends Model<Ibuying_machine> {
+  declare id?: number;
+  declare name: string;
+  declare brand: string;
+  declare date: string;
+  declare cost: number;
+  declare amount: number;
+  declare purpose: BuyingMachinePurposeType;
+  declare userId: string;
+}
+buying_machine.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    brand: { type: DataTypes.STRING },
+    date: { type: DataTypes.DATEONLY },
+    amount: { type: DataTypes.INTEGER },
+    cost: { type: DataTypes.INTEGER },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Iadministration {
+  id?: number;
+  name: string;
+  dateFrom: string;
+  dateTo: string;
+  price: number;
+  cost?: number;
+  purpose: AdministrationPurposeType;
+  periodCalc: AdministrationPeriodCalcType;
+  userId: string;
+}
+export class administration extends Model<Iadministration> {
+  declare id?: number;
+  declare name: string;
+  declare price: number;
+  declare dateFrom: string;
+  declare dateTo: string;
+  declare purpose: AdministrationPurposeType;
+  declare periodCalc: AdministrationPeriodCalcType;
+  declare userId: string;
+}
+administration.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    price: { type: DataTypes.INTEGER },
+    dateFrom: { type: DataTypes.DATEONLY },
+    dateTo: { type: DataTypes.DATEONLY },
+    periodCalc: { type: DataTypes.STRING },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
+export interface Ienterprise {
+  id?: number;
+  name: string;
+  form: EnterpriseFormType;
+  userId: string;
+}
+export class enterprise extends Model<Ienterprise> {
+  declare id?: number;
+  declare name: string;
+  declare form: EnterpriseFormType;
+  declare userId: string;
+}
+enterprise.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    form: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -944,6 +1172,9 @@ businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
 
+businessPlan.belongsToMany(culture, { through: busCul });
+culture.belongsToMany(businessPlan, { through: busCul });
+
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
 
@@ -981,3 +1212,29 @@ sale.belongsTo(production);
 
 sale.hasOne(income);
 income.belongsTo(sale);
+
+credit.hasOne(income);
+income.belongsTo(credit);
+
+investment.hasOne(income);
+income.belongsTo(investment);
+
+derj_support.hasOne(income);
+income.belongsTo(derj_support);
+
+grant.hasOne(income);
+income.belongsTo(grant);
+
+buying_machine.hasOne(outcome);
+outcome.belongsTo(buying_machine);
+
+administration.hasOne(outcome);
+outcome.belongsTo(administration);
+// (async () => {
+//   let a = await culture.findOne({ where: { id: 3 } });
+//   let b = await businessPlan.findOne({ where: { id: 5 } });
+//   await b.addCulture(a);
+// })();
+
+enterprise.hasMany(businessPlan);
+businessPlan.belongsTo(enterprise);

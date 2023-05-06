@@ -34,10 +34,14 @@ import {
   BUSINESS_ROUTER,
   CASH_FLOW,
   GOODS_ROUTER,
+  ENTERPRISE_JOURNAL_ROUTER,
+  ENTERPRISE_ROUTER,
 } from "./utils/consts";
 import CashFlow from "./pages/CashFlow";
 import Goods from "./pages/Goods";
 import BusinessJurnal from "./pages/BusinessJurnal";
+import EnterpriseJournal from "./pages/EnterpriseJournal";
+import Enterprise from "./pages/Enterprise";
 
 export default function AppRouter() {
   const location = useLocation();
@@ -75,6 +79,8 @@ export default function AppRouter() {
       <Route path={TEJ_ROUTER + "/:id"} element={<TEJustification />} />
       <Route path={CASH_FLOW} element={<CashFlow />} />
       <Route path={GOODS_ROUTER} element={<Goods />} />
+      <Route path={ENTERPRISE_JOURNAL_ROUTER} element={<EnterpriseJournal />} />
+      <Route path={ENTERPRISE_ROUTER + "/:id"} element={<Enterprise />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

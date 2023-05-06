@@ -73,6 +73,7 @@ function BiznesPlanPage() {
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         {myBusiness?.name}
       </Heading>
+      <Text textAlign={"center"}>Загальні данні</Text>
       <Box
         maxW={"1000px"}
         mx="auto"
