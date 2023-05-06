@@ -1,5 +1,11 @@
 import { Principal } from "..";
-import { buying_machine, Ioutcome, outcome, tech_cart } from "../models/models";
+import {
+  administration,
+  buying_machine,
+  Ioutcome,
+  outcome,
+  tech_cart,
+} from "../models/models";
 import { createOutcomeType, patchOutcomeType } from "../routes/outcomeRouter";
 
 export type IoutcomeType = "Інвестиційні" | "Операційні" | "Не визначено";
@@ -18,20 +24,30 @@ class outcomeService {
     const buying = await buying_machine.findOne({
       where: { id: data.propId },
     });
+    const adm = await administration.findOne({ where: { id: data.propId } });
+
     let buyingId;
     let cartId;
+    let admId;
+    let propName = "";
     if (data?.group == "Купівля техніки і обладнання") {
       buyingId = data.propId;
+      propName = buying?.name as string;
     } else if (data.group == "Прямі") {
       cartId = data.propId;
+      propName = cart?.nameCart as string;
+    } else if (data.group == "Постійні") {
+      admId = data.propId;
+      propName = adm?.name as string;
     }
     const res: Ioutcome | undefined = await outcome.create({
-      name: cart?.nameCart! || buying?.name!,
+      name: propName,
       group: data.group,
       type: data.type,
       userId: user.sub,
       techCartId: cartId,
       buyingMachineId: buyingId,
+      administrationId: admId,
     });
     return res;
   }
@@ -41,19 +57,29 @@ class outcomeService {
     const buying = await buying_machine.findOne({
       where: { id: data.propId },
     });
+    const adm = await administration.findOne({ where: { id: data.propId } });
+
     let buyingId;
     let cartId;
+    let admId;
+    let propName = undefined;
     if (data?.group == "Купівля техніки і обладнання") {
       buyingId = data.propId;
+      propName = buying?.name;
     } else if (data.group == "Прямі") {
       cartId = data.propId;
+      propName = cart?.nameCart;
+    } else if (data.group == "Постійні") {
+      admId = data.propId;
+      propName = adm?.name;
     }
     await outcome.update(
       {
         group: data.group,
         techCartId: cartId,
         buyingMachineId: buyingId,
-        name: cart?.nameCart! || buying?.name!,
+        administrationId: admId,
+        name: propName,
         type: data.type,
       },
       { where: { id: data.outcomeId } }

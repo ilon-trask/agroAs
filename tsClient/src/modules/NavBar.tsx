@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   BUSINESS_ROUTER,
   CASH_FLOW,
+  ENTERPRISE_JOURNAL_ROUTER,
   GOODS_ROUTER,
   INCOME_ROUTER,
   LOGIN_ROUTE,
@@ -33,6 +34,12 @@ const NavBar = observer(() => {
         </Link>
         {user.role == "service_role" && (
           <Box as={"nav"} gap={4} display={"flex"}>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={ENTERPRISE_JOURNAL_ROUTER}
+            >
+              Підприємство
+            </Link>
             <Link
               style={{ color: "#20401e", textDecoration: "none" }}
               to={MAP_ROUTE}

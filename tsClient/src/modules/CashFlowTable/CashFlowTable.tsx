@@ -23,7 +23,12 @@ import { Context } from "../../main";
 import useIncomeTypes from "../../pages/hook/useIncomeTypes";
 import useOutcomeTypes from "../../pages/hook/useOutcomeTypes";
 import Button from "../../ui/Button/Button";
-
+let akk: number[] = [];
+function setAkk(value: number) {
+  if (!akk.includes(value)) {
+    akk.push(value);
+  }
+}
 function PopOver({
   children,
   arr,
@@ -52,7 +57,6 @@ const incomeTypes = useIncomeTypes;
 const outcomeTypes = useOutcomeTypes;
 function CashFlowTable({ year }: { year: number }) {
   const { map, income } = useContext(Context);
-  console.log(year);
 
   const outcomes = map.outcome.filter((el) => el.isUsing! == true);
   const incomes = income.income.filter((el) => el.isUsing! == true);
@@ -131,23 +135,59 @@ function CashFlowTable({ year }: { year: number }) {
     const buying = map.buyingMachine.find(
       (e) => e.id == el.buyingMachineId && +e.date.split("-")[0] == year
     );
-    const prop = buying;
+    const adm = map.administration.find((e) => e.id == el.administrationId);
+    akk = [];
+    if (adm?.periodCalc == "Поквартально") {
+      for (
+        let i = +adm.dateFrom.split("-")[1];
+        i <= +adm.dateTo.split("-")[1];
+        i++
+      ) {
+        if (i >= 1 && i <= 3) {
+          setAkk(1);
+        } else if (i > 3 && i <= 6) {
+          setAkk(2);
+        } else if (i >= 7 && i <= 9) {
+          setAkk(3);
+        } else if (i >= 10 && i <= 12) {
+          setAkk(4);
+        }
+      }
+      console.log(akk);
+
+      akk.forEach((e) => {
+        if (e == 1) {
+          fkOutcome += adm.price;
+        } else if (e == 2) {
+          skOutcome += adm.price;
+          console.log(skOutcome);
+        } else if (e == 3) {
+          tkOutcome += adm.price;
+        } else if (e == 4) {
+          fourthkOutcome += adm.price;
+        }
+      });
+    }
+    let a = adm?.periodCalc == "Помісячно" ? adm : null;
+    const prop = buying || a;
     const month = +prop?.date?.split("-")[1];
     if (month) {
       //@ts-ignore
       obj[month].outcome += prop?.cost * prop?.amount;
-      yearOutcome += prop?.cost! * prop?.amount!;
+      yearOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       if (month >= 1 && month <= 3) {
-        fkOutcome += prop?.cost! * prop?.amount!;
+        fkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 3 && month <= 5) {
-        skOutcome += prop?.cost! * prop?.amount!;
+        skOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 6 && month < 9) {
-        tkOutcome += prop?.cost! * prop?.amount!;
+        tkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 9 && month < 12) {
-        fourthkOutcome += prop?.cost! * prop?.amount!;
+        fourthkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       }
     }
+    console.log(tkOutcome);
   });
+
   return (
     <Table size={"sm"}>
       <Thead>
@@ -308,6 +348,9 @@ function CashFlowTable({ year }: { year: number }) {
           const buying = map.buyingMachine.find(
             (e) => e.id == el.buyingMachineId
           );
+          const adm = map.administration.find(
+            (e) => e.id == el.administrationId
+          );
           return (
             <Tr key={el.id}>
               <Td></Td>
@@ -316,10 +359,11 @@ function CashFlowTable({ year }: { year: number }) {
               <Td></Td>
               <Td>
                 {cart?.area! * cart?.costHectare! ||
-                  buying?.amount! * buying?.cost!}
+                  buying?.amount! * buying?.cost! ||
+                  adm?.cost}
               </Td>
               <Td>{el.type}</Td>
-              <Td>{cart?.nameCart || buying?.name}</Td>
+              <Td>{cart?.nameCart || buying?.name || adm?.name}</Td>
             </Tr>
           );
         })}
@@ -337,6 +381,7 @@ function CashFlowTable({ year }: { year: number }) {
             (e) => e.id == el.investmentId
           );
           const grant = income.grant.find((e) => e.id == el.grantId);
+
           const conditionTime =
             +sale?.date?.split("-")[0] == year ||
             +credit?.date?.split("-")[0] == year ||

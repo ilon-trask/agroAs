@@ -24,6 +24,7 @@ import {
   Ioutcome,
   Iproduct,
   Ibuying_machine,
+  Iadministration,
 } from "../../../tRPC serv/models/models";
 
 export default class MapStore {
@@ -53,6 +54,7 @@ export default class MapStore {
   private _outcome: Ioutcome[] = [];
   private _product: Iproduct[] = [];
   private _buyingMachine: Ibuying_machine[] = [];
+  private _administration: Iadministration[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -182,6 +184,12 @@ export default class MapStore {
   public set newBuyingMachine(buyingMachine: Ibuying_machine) {
     this._buyingMachine.push(buyingMachine);
   }
+  public set administration(administration: Iadministration[]) {
+    this._administration = administration;
+  }
+  public set newAdministration(administration: Iadministration) {
+    this._administration.push(administration);
+  }
   public get maps() {
     return this._maps;
   }
@@ -256,5 +264,8 @@ export default class MapStore {
   }
   public get buyingMachine() {
     return this._buyingMachine;
+  }
+  public get administration() {
+    return this._administration;
   }
 }

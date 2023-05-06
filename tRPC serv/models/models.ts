@@ -16,6 +16,9 @@ import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmen
 import { DerjPurposeType } from "../../tsClient/src/pages/hook/useDerjPurpose";
 import { GrantPurposeType } from "../../tsClient/src/pages/hook/useGrantPurpose";
 import { BuyingMachinePurposeType } from "../../tsClient/src/pages/hook/useBuyingMachinePurpose";
+import { AdministrationPurposeType } from "../../tsClient/src/pages/hook/useAdministrationPurpose";
+import { AdministrationPeriodCalcType } from "../../tsClient/src/pages/hook/useAdministrationPeriodCalc";
+import { EnterpriseFormType } from "../../tsClient/src/pages/hook/useEnterpriseForm";
 export interface Iuser {
   id?: number;
   email: string;
@@ -533,10 +536,14 @@ cultures_types.init(
 export interface IbusinessPlan {
   id?: number;
   name: string;
-  businessCategoryId?: number;
+  initialAmount: number;
+  dateStart: string;
+  realizationTime: number;
+  cultures?: Iculture[];
   isPublic?: boolean;
   isAgree?: boolean;
   description?: string;
+  enterpriseId?: number;
   userId: string;
   createdAt?: string;
   updatedAt?: string;
@@ -544,6 +551,9 @@ export interface IbusinessPlan {
 export class businessPlan extends Model<IbusinessPlan> {
   declare id?: number;
   declare name: string;
+  declare initialAmount: number;
+  declare dateStart: string;
+  declare realizationTime: number;
   declare isPublic?: boolean;
   declare isAgree?: boolean;
   declare description?: string;
@@ -553,6 +563,9 @@ businessPlan.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
+    initialAmount: { type: DataTypes.INTEGER },
+    dateStart: { type: DataTypes.DATEONLY },
+    realizationTime: { type: DataTypes.INTEGER },
     userId: { type: DataTypes.STRING, allowNull: false },
     isPublic: {
       type: DataTypes.BOOLEAN,
@@ -569,6 +582,7 @@ businessPlan.init(
   { sequelize }
 );
 
+export const busCul = sequelize.define("busCul", {}, { timestamps: false });
 export interface IcultivationTechnologies {
   id?: number;
   name: string;
@@ -820,6 +834,7 @@ export interface Ioutcome {
   isUsing?: boolean;
   techCartId?: number;
   buyingMachineId?: number;
+  administrationId?: number;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
@@ -1061,6 +1076,62 @@ buying_machine.init(
   },
   { sequelize }
 );
+export interface Iadministration {
+  id?: number;
+  name: string;
+  dateFrom: string;
+  dateTo: string;
+  price: number;
+  cost?: number;
+  purpose: AdministrationPurposeType;
+  periodCalc: AdministrationPeriodCalcType;
+  userId: string;
+}
+export class administration extends Model<Iadministration> {
+  declare id?: number;
+  declare name: string;
+  declare price: number;
+  declare dateFrom: string;
+  declare dateTo: string;
+  declare purpose: AdministrationPurposeType;
+  declare periodCalc: AdministrationPeriodCalcType;
+  declare userId: string;
+}
+administration.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    price: { type: DataTypes.INTEGER },
+    dateFrom: { type: DataTypes.DATEONLY },
+    dateTo: { type: DataTypes.DATEONLY },
+    periodCalc: { type: DataTypes.STRING },
+    purpose: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+
+export interface Ienterprise {
+  id?: number;
+  name: string;
+  form: EnterpriseFormType;
+  userId: string;
+}
+export class enterprise extends Model<Ienterprise> {
+  declare id?: number;
+  declare name: string;
+  declare form: EnterpriseFormType;
+  declare userId: string;
+}
+enterprise.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    form: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1100,6 +1171,9 @@ cultures_types.hasMany(tech_cart);
 businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
+
+businessPlan.belongsToMany(culture, { through: busCul });
+culture.belongsToMany(businessPlan, { through: busCul });
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
@@ -1153,3 +1227,14 @@ income.belongsTo(grant);
 
 buying_machine.hasOne(outcome);
 outcome.belongsTo(buying_machine);
+
+administration.hasOne(outcome);
+outcome.belongsTo(administration);
+// (async () => {
+//   let a = await culture.findOne({ where: { id: 3 } });
+//   let b = await businessPlan.findOne({ where: { id: 5 } });
+//   await b.addCulture(a);
+// })();
+
+enterprise.hasMany(businessPlan);
+businessPlan.belongsTo(enterprise);

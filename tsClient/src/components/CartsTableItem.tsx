@@ -73,6 +73,7 @@ const CartsTableItem = observer(
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
         <Td>{e.costHectare || "0"}</Td>
+        <Td>{"кульрута"}</Td>
 
         <Td
           textAlign={"center"}

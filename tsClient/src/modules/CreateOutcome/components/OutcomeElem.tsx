@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import {
+  Iadministration,
   Ibuying_machine,
   Itech_cart,
 } from "../../../../../tRPC serv/models/models";
@@ -31,11 +32,13 @@ function OutcomeElem({
   setUpdate,
 }: props) {
   const { map } = useContext(Context);
-  let prop: Itech_cart[] | Ibuying_machine[] = [];
+  let prop: Itech_cart[] | Ibuying_machine[] | Iadministration[] = [];
   if (res.group == "Купівля техніки і обладнання") {
     prop = map.buyingMachine;
   } else if (res.group == "Прямі") {
     prop = map.maps;
+  } else if (res.group == "Постійні") {
+    prop = map.administration;
   }
 
   return (

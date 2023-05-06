@@ -3,30 +3,31 @@ import z from "zod";
 import BusinessService, {
   resBusinessPlan,
 } from "../controllers/BusinessService";
-import { IbusinessPlan } from "../models/models";
 const createType = z.object({
   name: z.string(),
-  // businessCategoryId: z.number(),
+  initialAmount: z.number(),
+  enterpriseId: z.number(),
+  cultureIds: z.array(z.number()),
+  dateStart: z.string(),
+  realizationTime: z.number(),
 });
 export type CreateBusinessPlan = z.infer<typeof createType>;
-const patchType = z.object({
+const patchType = createType.extend({
   planId: z.number(),
-  name: z.string(),
-  businessCategoryId: z.number(),
 });
 export type PatchBusinessPlan = z.infer<typeof patchType>;
 const deleteType = z.object({
-  BusinessId: z.number(),
+  planId: z.number(),
 });
 export type DeleteBusinessPlan = z.infer<typeof deleteType>;
 const setIsPublic = z.object({
-  BusinessId: z.number(),
+  planId: z.number(),
   isPublic: z.boolean(),
   description: z.string().optional(),
 });
 export type SetIsPublicBusinessPlan = z.infer<typeof setIsPublic>;
 const setIsAgree = z.object({
-  BusinessId: z.number(),
+  planId: z.number(),
   isAgree: z.boolean(),
   description: z.string().optional(),
 });
@@ -43,7 +44,8 @@ const businessRouter = router({
     return res;
   }),
   create: publicProcedure.input(createType).query(async ({ input, ctx }) => {
-    const res: resBusinessPlan = await BusinessService.create(ctx.user, input);
+    const res: resBusinessPlan | undefined | null =
+      await BusinessService.create(ctx.user, input);
     return res;
   }),
   patch: publicProcedure.input(patchType).query(async ({ input, ctx }) => {
@@ -54,7 +56,10 @@ const businessRouter = router({
     return res;
   }),
   delete: publicProcedure.input(deleteType).query(async ({ input, ctx }) => {
-    const res: number = await BusinessService.delete(ctx.user, input);
+    const res: number | undefined = await BusinessService.delete(
+      ctx.user,
+      input
+    );
     return res;
   }),
   setIsPublic: publicProcedure

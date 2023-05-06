@@ -15,3 +15,5 @@ export const YIELD_CALC_ROUTER = "/yieldCalc";
 export const TEJ_ROUTER = "/TEJ";
 export const CASH_FLOW = "/CashFlow";
 export const GOODS_ROUTER = "/Goods";
+export const ENTERPRISE_JOURNAL_ROUTER = "/EnterpriseJournal";
+export const ENTERPRISE_ROUTER = "/Enterprise";

@@ -33,6 +33,7 @@ import {
 } from "@chakra-ui/react";
 import NoAuthAlert from "../components/NoAuthAlert";
 import {
+  deleteAdministration,
   deleteBuyingMachine,
   deleteCart,
   deleteOutcome,
@@ -57,6 +58,8 @@ import TEJJornal from "./TEJJornal";
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "../modules/CreateBuyingMachine";
+import CreateAdministration from "../modules/CreateAdministration";
+import { CreateAdministrationProp } from "../modules/CreateAdministration/CreateAdministration";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -128,6 +131,18 @@ const MapJornal = observer(function () {
     });
   const [buyingMachineUpdate, setBuyingMachineUpdate] = useState(false);
   const [buyingMachineOpen, setBuyingMachineOpen] = useState(false);
+  const [administrationOpen, setAdministrationOpen] = useState(false);
+  const [administrationUpdate, setAdministrationUpdate] = useState(false);
+  const [administrationRes, setAdministrationRes] =
+    useState<CreateAdministrationProp>({
+      name: "",
+      price: "",
+      periodCalc: "",
+      purpose: "",
+      dateFrom: "",
+      dateTo: "",
+    });
+
   useEffect(() => {
     if (!map.buyingMachine[0]) {
       getBuyingMachine(map);
@@ -409,20 +424,81 @@ const MapJornal = observer(function () {
             <Table size={"sm"}>
               <Thead>
                 <Tr>
+                  <Th rowSpan={2}></Th>
                   <Th rowSpan={2}>Назва</Th>
-                  <Th colSpan={3} textAlign={"center"}>
-                    Сума
+                  <Th colSpan={2} textAlign={"center"}>
+                    Період
                   </Th>
+                  <Th rowSpan={2}>Вартість</Th>
+                  <Th rowSpan={2}>Сума</Th>
+                  <Th rowSpan={2}>Розрахунок</Th>
+                  <Th rowSpan={2}></Th>
                 </Tr>
                 <Tr>
-                  <Th textAlign={"center"}>Місяць</Th>
-                  <Th textAlign={"center"}>Квартал</Th>
-                  <Th textAlign={"center"}>Рік</Th>
+                  <Th textAlign={"center"}>з</Th>
+                  <Th textAlign={"center"}>по</Th>
                 </Tr>
               </Thead>
+              <Tbody>
+                {map?.administration?.map((el) => (
+                  <Tr>
+                    <Td
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setAdministrationOpen(true);
+                        setAdministrationUpdate(true);
+                        //@ts-ignore
+                        setAdministrationRes({
+                          ...el,
+                          admId: el.id,
+                        });
+                      }}
+                    >
+                      <EditIcon
+                        color={"blue.400"}
+                        w={"20px"}
+                        h={"auto"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.dateFrom}</Td>
+                    <Td>{el.dateTo}</Td>
+                    <Td>{el.price}</Td>
+                    <Td>{el.cost}</Td>
+                    <Td>{el.periodCalc}</Td>
+                    <Td
+                      cursor={"pointer"}
+                      onClick={() =>
+                        setDeleteOpen({
+                          isOpen: true,
+                          func: () => {
+                            deleteAdministration(map, el.id!);
+                            //@ts-ignore
+                            setDeleteOpen({ isOpen: false });
+                          },
+                          text: "адміністрування",
+                        })
+                      }
+                    >
+                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
             </Table>
           </TableContainer>
-          <Button>Добавити витрати</Button>
+          <Button onClick={() => setAdministrationOpen(true)}>
+            Добавити витрати
+          </Button>
+          <CreateAdministration
+            open={administrationOpen}
+            setOpen={setAdministrationOpen}
+            update={administrationUpdate}
+            setUpdate={setAdministrationUpdate}
+            res={administrationRes}
+            setRes={setAdministrationRes}
+          />
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             БУДІВНИЦТВО БУДІВЕЛЬ І СПОРУД
           </Text>
@@ -596,10 +672,22 @@ const MapJornal = observer(function () {
                     <Td>{el.group}</Td>
                     <Td>
                       {(() => {
-                        const cart = map.maps.find(
-                          (e) => e.id == el.techCartId
-                        );
-                        return cart?.area! * cart?.costHectare!;
+                        if (el.group == "Прямі") {
+                          const cart = map.maps.find(
+                            (e) => e.id == el.techCartId
+                          );
+                          return cart?.area! * cart?.costHectare!;
+                        } else if (el.group == "Постійні") {
+                          const adm = map.administration.find(
+                            (e) => e.id == el.administrationId
+                          );
+                          return adm?.cost;
+                        } else if (el.group == "Купівля техніки і обладнання") {
+                          const buying = map.buyingMachine.find(
+                            (e) => e.id == el.buyingMachineId
+                          );
+                          return buying?.amount! * buying?.cost!;
+                        }
                       })()}
                     </Td>
                     <Td

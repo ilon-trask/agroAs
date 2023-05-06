@@ -1,6 +1,7 @@
 import { Principal } from "..";
 import {
   businessPlan,
+  culture,
   IbusinessPlan,
   Iresume,
   ItitlePage,
@@ -18,7 +19,7 @@ export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
   titlePage: ItitlePage;
 }
-const includes = [{ model: resume }, { model: titlePage }];
+const includes = [{ model: resume }, { model: titlePage }, { model: culture }];
 class BusinessService {
   // async getCategory() {
   //   const category = await businessCategory.findAll();
@@ -31,7 +32,6 @@ class BusinessService {
         where: { userId: user.sub },
         include: includes,
       });
-
       return plans;
     } else {
       //@ts-ignore
@@ -43,20 +43,40 @@ class BusinessService {
     }
   }
   async create(user: Principal | undefined, data: CreateBusinessPlan) {
-    if (!user) throw new Error("юсер не увійшов");
+    if (!user) return;
     //@ts-ignore
-    const plan: resBusinessPlan = await businessPlan.create({
-      name: data.name,
-      // businessCategoryId: data.businessCategoryId,
-      userId: user.sub,
+    const plan: resBusinessPlan = await businessPlan.create(
+      {
+        name: data.name,
+        initialAmount: data.initialAmount,
+        dateStart: data.dateStart,
+        enterpriseId: data.enterpriseId,
+        realizationTime: data.realizationTime,
+        userId: user.sub,
+      },
+      { include: includes }
+    );
+    data.cultureIds.forEach((el) => {
+      //@ts-ignore
+      plan.addCulture(el);
     });
-    return plan;
+    //@ts-ignore
+    const res: resBusinessPlan | null = await businessPlan.findOne({
+      where: { id: plan.id },
+      include: includes,
+    });
+    return res;
   }
   async patch(user: Principal | undefined, data: PatchBusinessPlan) {
     if (!user) return;
+
     const ind = await businessPlan.update(
       {
-        businessCategoryId: data.businessCategoryId,
+        dateStart: data.dateStart,
+        initialAmount: data.initialAmount,
+        enterpriseId: data.enterpriseId,
+        realizationTime: data.realizationTime,
+
         name: data.name,
       },
       { where: { id: data.planId } }
@@ -68,13 +88,25 @@ class BusinessService {
         where: { id: data.planId },
         include: includes,
       });
+      //@ts-ignore
+      await res.setCultures([]);
+      for (let i = 0; i < data.cultureIds.length; i++) {
+        const el = data.cultureIds[i];
+        //@ts-ignore
+        await res.addCulture(el);
+      }
+      //@ts-ignore
+      res = await businessPlan.findOne({
+        where: { id: data.planId },
+        include: includes,
+      });
     }
     return res;
   }
   async delete(user: Principal | undefined, data: DeleteBusinessPlan) {
-    if (!user) throw new Error("");
+    if (!user) return;
     const plans = await businessPlan.destroy({
-      where: { userId: user.sub, id: data.BusinessId },
+      where: { userId: user.sub, id: data.planId },
     });
     return plans;
   }
@@ -82,20 +114,20 @@ class BusinessService {
     user: Principal | undefined,
     data: SetIsPublicBusinessPlan
   ) {
-    if (!user) throw new Error("");
+    if (!user) return;
     const ind = await businessPlan.update(
       {
         isPublic: data.isPublic,
         isAgree: false,
         description: data.description,
       },
-      { where: { id: data.BusinessId } }
+      { where: { id: data.planId } }
     );
     let res: resBusinessPlan | null | undefined = undefined;
     if (ind[0] == 1) {
       //@ts-ignore
       res = await businessPlan.findOne({
-        where: { id: data.BusinessId },
+        where: { id: data.planId },
         include: includes,
       });
     }
@@ -110,12 +142,12 @@ class BusinessService {
     return res;
   }
   async setIsAgree(user: Principal | undefined, data: SetIsAgreeBusinessPlan) {
-    if (!user) throw new Error("");
+    if (!user) return;
 
     if (user.role == "ADMIN" || user.role == "service_role") {
       const ind = await businessPlan.update(
         { isAgree: data.isAgree, description: data.description },
-        { where: { id: data.BusinessId } }
+        { where: { id: data.planId } }
       );
 
       return ind;

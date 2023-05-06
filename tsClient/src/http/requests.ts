@@ -22,7 +22,10 @@ import {
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
 // import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
-import { CreateBusinessPlan } from "../../../tRPC serv/routes/businessRouter";
+import {
+  CreateBusinessPlan,
+  PatchBusinessPlan,
+} from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
 import {
@@ -68,6 +71,17 @@ import {
   CreateBuyingMachine,
   PatchBuyingMachine,
 } from "../../../tRPC serv/routes/buyingMachineRouter";
+
+import {
+  CreateAdministration,
+  PatchAdministration,
+} from "../../../tRPC serv/routes/administrationRouter";
+import { makeObservable } from "mobx";
+import EnterpriseStore from "../store/EnterpriseStore";
+import {
+  CreateEnterpriseType,
+  PatchEnterpriseType,
+} from "../../../tRPC serv/routes/enterpriseRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -559,6 +573,8 @@ export function createBusinessPlan(
 ) {
   map.isLoading = true;
   client.business.create.query(data).then((res) => {
+    console.log(res);
+    if (!res) return;
     Bus.newBusinessPlan = res;
     map.isLoading = false;
   });
@@ -566,47 +582,39 @@ export function createBusinessPlan(
 export function deleteBusinessPlan(
   map: MapStore,
   Bus: BusinessStore,
-  BusinessId: number
+  planId: number
 ) {
   map.isLoading = true;
-  client.business.delete.query({ BusinessId }).then((res) => {
+  client.business.delete.query({ planId }).then((res) => {
     if (res == 1) {
-      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != BusinessId);
+      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != planId);
     }
     map.isLoading = false;
   });
 }
-// export function patchBusinessPlan(
-//   map: MapStore,
-//   Bus: BusinessStore,
-//   data: BusinessProps
-// ) {
-//   map.isLoading = true;
-//   client.business.patch
-//     .query({
-//       businessCategoryId: +data.businessCategoryId!,
-//       name: data.name,
-//       planId: data.id!,
-//     })
-//     .then((res) => {
-//       if (res) {
-//         Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.id);
-//         Bus.newBusinessPlan = res;
-//       }
-//       map.isLoading = false;
-//     });
-// }
+export function patchBusinessPlan(
+  map: MapStore,
+  Bus: BusinessStore,
+  data: PatchBusinessPlan
+) {
+  map.isLoading = true;
+  client.business.patch.query(data).then((res) => {
+    if (res) {
+      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != res.id);
+      Bus.newBusinessPlan = res;
+    }
+    map.isLoading = false;
+  });
+}
 export function setIsPublicBusiness(
   map: MapStore,
   Bus: BusinessStore,
-  data: { BusinessId: number; isPublic: boolean; description?: string }
+  data: { planId: number; isPublic: boolean; description?: string }
 ) {
   map.isLoading = true;
   client.business.setIsPublic.query(data).then((res) => {
     if (res) {
-      Bus.businessPlan = Bus.businessPlan.filter(
-        (el) => el.id != data.BusinessId
-      );
+      Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.planId);
       Bus.newBusinessPlan = res;
       getNoAgreeBusiness(map, Bus);
     }
@@ -626,14 +634,14 @@ export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
 export function setIsAgreeBusiness(
   map: MapStore,
   Bus: BusinessStore,
-  data: { BusinessId: number; isAgree: boolean; description?: string }
+  data: { planId: number; isAgree: boolean; description?: string }
 ) {
   map.isLoading = true;
   client.business.setIsAgree.query(data).then((res) => {
     if (res)
       if (res[0]) {
         Bus.noAgreeBusinessPlan = Bus.noAgreeBusinessPlan.filter(
-          (el) => el.id != data.BusinessId
+          (el) => el.id != data.planId
         );
       }
     map.isLoading = false;
@@ -1186,5 +1194,67 @@ export function deleteBuyingMachine(map: MapStore, buyingId: number) {
   client.buyingMachine.delete.query({ buyingId }).then((res) => {
     map.buyingMachine = map.buyingMachine.filter((el) => el.id != buyingId);
     map.outcome = map.outcome.filter((el) => el.buyingMachineId != buyingId);
+  });
+}
+
+export function createAdministration(
+  map: MapStore,
+  data: CreateAdministration
+) {
+  client.administration.create.query(data).then((res) => {
+    map.newAdministration = res;
+  });
+}
+export function getAdministration(map: MapStore) {
+  client.administration.get.query().then((res) => {
+    map.administration = res;
+  });
+}
+export function patchAdministration(map: MapStore, data: PatchAdministration) {
+  client.administration.patch.query(data).then((res) => {
+    if (!res) return;
+    map.administration = map.administration.filter((el) => el.id != res.id);
+    map.newAdministration = res;
+  });
+}
+export function deleteAdministration(map: MapStore, admId: number) {
+  client.administration.delete.query({ admId }).then((res) => {
+    map.administration = map.administration.filter((el) => el.id != admId);
+  });
+}
+
+export function getEnterprise(EnterpriseStore: EnterpriseStore) {
+  client.enterprise.get.query().then((res) => {
+    EnterpriseStore.enterprise = res;
+  });
+}
+export function createEnterprise(
+  EnterpriseStore: EnterpriseStore,
+  data: CreateEnterpriseType
+) {
+  client.enterprise.create.query(data).then((res) => {
+    EnterpriseStore.newEnterprise = res;
+  });
+}
+export function patchEnterprise(
+  EnterpriseStore: EnterpriseStore,
+  data: PatchEnterpriseType
+) {
+  client.enterprise.patch.query(data).then((res) => {
+    if (!res) return;
+    EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
+      (el) => el.id != res.id
+    );
+    EnterpriseStore.newEnterprise = res;
+  });
+}
+export function deleteEnterprise(
+  EnterpriseStore: EnterpriseStore,
+  entId: number
+) {
+  client.enterprise.delete.query({ entId }).then((res) => {
+    EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
+      (el) => el.id != entId
+    );
   });
 }
