@@ -57,7 +57,10 @@ function OutcomeElem({
           </option>
           {prop?.map((el) => (
             <option key={el.id} value={el.id}>
-              {el.nameCart || el.name}
+              {
+                //@ts-ignore
+                el.nameCart || el.name
+              }
             </option>
           ))}
         </Select>

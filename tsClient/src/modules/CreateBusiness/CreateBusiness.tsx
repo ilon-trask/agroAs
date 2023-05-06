@@ -176,13 +176,14 @@ function CreateBusiness({
             res.initialAmount = +res.initialAmount;
             res.realizationTime = +res.realizationTime;
             if (update) {
+              //@ts-ignore
               patchBusinessPlan(map, business, res);
             } else {
+              //@ts-ignore
               createBusinessPlan(map, business, res);
             }
             setOpen(false);
             setUpdate(false);
-
             //@ts-ignore
             setRes({});
           }

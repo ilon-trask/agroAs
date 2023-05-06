@@ -170,18 +170,24 @@ function CashFlowTable({ year }: { year: number }) {
     }
     let a = adm?.periodCalc == "Помісячно" ? adm : null;
     const prop = buying || a;
+    //@ts-ignore
     const month = +prop?.date?.split("-")[1];
     if (month) {
       //@ts-ignore
       obj[month].outcome += prop?.cost * prop?.amount;
+      //@ts-ignore
       yearOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       if (month >= 1 && month <= 3) {
+        //@ts-ignore
         fkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 3 && month <= 5) {
+        //@ts-ignore
         skOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 6 && month < 9) {
+        //@ts-ignore
         tkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       } else if (month >= 9 && month < 12) {
+        //@ts-ignore
         fourthkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       }
     }
@@ -378,15 +384,21 @@ function CashFlowTable({ year }: { year: number }) {
           );
           const derj = income.derj.find((e) => e.id == el.derjSupportId);
           const investment = income.investment.find(
+            //@ts-ignore
             (e) => e.id == el.investmentId
           );
           const grant = income.grant.find((e) => e.id == el.grantId);
 
           const conditionTime =
+            //@ts-ignore
             +sale?.date?.split("-")[0] == year ||
+            //@ts-ignore
             +credit?.date?.split("-")[0] == year ||
+            //@ts-ignore
             +derj?.date?.split("-")[0] == year ||
+            //@ts-ignore
             +investment?.date?.split("-")[0] == year ||
+            //@ts-ignore
             +grant?.date?.split("-")[0] == year;
           if (conditionTime)
             return (
