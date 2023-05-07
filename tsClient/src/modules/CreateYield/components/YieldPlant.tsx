@@ -20,12 +20,13 @@ type props = {
   plantId: number;
 };
 function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
-  const { income } = useContext(Context);
+  const { income, map } = useContext(Context);
   //   const [focus, setFocus] = useState(false);
+
   return (
     <Box>
       <Heading as={"h4"} size="md" textAlign={"center"} mt={3}>
-        Створення культури
+        Створення урожайності культури
       </Heading>
       <Box
         mt={3}
@@ -56,17 +57,29 @@ function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
         </Box>
         <Box>
           <Heading as={"h4"} size="sm">
-            Введіть коментар
+            Веберіть технологію
           </Heading>
-          <Input
+          <Select
             size={"sm"}
             mt={2}
-            value={res?.comment}
-            maxLength={15}
+            value={res?.cultivationTechnologyId}
+            // maxLength={15}
             onChange={(e) => {
-              setRes({ ...res, comment: e.target.value });
+              setRes({
+                ...res,
+                cultivationTechnologyId: e.target.value as any,
+              });
             }}
-          />
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            {map.cultivationTechnologies.map((el) => (
+              <option key={el.id} value={el.id}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
         </Box>
       </Box>
       <ModalFooter p={"15px 67px"}>
@@ -76,12 +89,12 @@ function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
             if (!update) {
               createYieldPlant(income, {
                 cultureId: +res.cultureId,
-                comment: res.comment,
+                cultivationTechnologyId: +res.cultivationTechnologyId,
               });
             } else {
               updateYieldPlant(income, {
                 cultureId: +res.cultureId,
-                comment: res.comment,
+                cultivationTechnologyId: +res.cultivationTechnologyId,
                 yieldPlantId: plantId,
               });
             }

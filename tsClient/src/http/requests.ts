@@ -30,9 +30,12 @@ import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
 import {
   CreateIncome,
+  CreateProductType,
   createYieldCalcType,
+  CreateYieldPlantType,
   PatchIncome,
   setIsUsingIncomeType,
+  UpdateYieldPlantType,
 } from "../../../tRPC serv/routes/incomeRouter";
 import TEJStore from "../store/TEJStore";
 import {
@@ -724,7 +727,7 @@ export function downloaded(map: MapStore, cartId: number, value: number) {
 }
 export function createYieldPlant(
   income: IncomeStore,
-  data: { cultureId: number; comment: string }
+  data: CreateYieldPlantType
 ) {
   client.income.createYieldPlant.query(data).then((res) => {
     income.newYieldPlant = res;
@@ -786,7 +789,7 @@ export function deleteYieldPlant(
 
 export function updateYieldPlant(
   income: IncomeStore,
-  data: { yieldPlantId: number; cultureId: number; comment: string }
+  data: UpdateYieldPlantType
 ) {
   client.income.updateYieldPlant.query(data).then((res) => {
     if (res) {
@@ -814,6 +817,13 @@ export function getCultureTEJMap(map: MapStore) {
 export function getProductTEJMap(map: MapStore) {
   client.income.getProduct.query().then((res) => {
     map.product = res;
+  });
+}
+export function createProduct(map: MapStore, data: CreateProductType) {
+  client.income.createProduct.query(data).then((res) => {
+    console.log(res);
+
+    map.newProduct = res;
   });
 }
 export function getCultivationTechnologiesMap(map: MapStore) {

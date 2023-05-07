@@ -13,10 +13,11 @@ import {
 } from "../models/models";
 import {
   CreateIncome,
+  CreateProductType,
   createYieldCalcType,
   PatchIncome,
   setIsUsingIncomeType,
-  updateYieldPlantType,
+  UpdateYieldPlantType,
 } from "../routes/incomeRouter";
 export interface resYieldPlant extends IyieldPlant {
   culture: Iculture;
@@ -48,13 +49,13 @@ class incomeService {
     return res;
   }
   async createYieldPlant(
-    data: { cultureId: number; comment: string },
+    data: { cultureId: number; cultivationTechnologyId: number },
     user: Principal | undefined
   ) {
     if (!user) return;
     const YieldPlant = await yieldPlant.create({
       userId: user.sub,
-      comment: data.comment,
+      cultivationTechnologyId: data.cultivationTechnologyId,
       plantingDensity: 0,
       yieldPerHectare: 0,
       yieldPerRoll: 0,
@@ -144,14 +145,14 @@ class incomeService {
     return data.yieldPlantId;
   }
   async updateYieldPlant(
-    data: updateYieldPlantType,
+    data: UpdateYieldPlantType,
     user: Principal | undefined
   ) {
     if (!user) return;
 
     const plants = await yieldPlant.update(
       {
-        comment: data.comment,
+        cultivationTechnologyId: data.cultivationTechnologyId,
         cultureId: data.cultureId,
       },
       { where: { id: data.yieldPlantId } }
@@ -257,6 +258,21 @@ class incomeService {
   async delete(user: Principal | undefined, data: { incomeId: number }) {
     if (!user) return;
     const res = await income.destroy({ where: { id: data.incomeId } });
+    return res;
+  }
+  async createProduct(user: Principal | undefined, data: CreateProductType) {
+    if (!user) return;
+    const res: Iproduct = await product.create({
+      name: data.name,
+      cultureId: data.cultureId,
+      userId: user.sub,
+      //@ts-ignore
+      cost: null,
+      //@ts-ignore
+      price: null,
+      //@ts-ignore
+      unitMeasure: null,
+    });
     return res;
   }
 }

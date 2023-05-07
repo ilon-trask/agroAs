@@ -13,6 +13,7 @@ const createCartProps = z.object({
   priceDiesel: z.number(),
   isComplex: z.boolean().optional(),
   sectionId: z.number().optional(),
+  cultureId: z.number().optional(),
 });
 export type CreateCartType = z.infer<typeof createCartProps>;
 export const cartRouter = router({
@@ -56,7 +57,8 @@ export const cartRouter = router({
         priceDiesel: z.number(),
         userId: z.string().optional().nullish(),
         isComplex: z.boolean().optional(),
-        sectionId: z.number().optional(),
+        sectionId: z.number().optional().nullable(),
+        cultureId: z.number().optional(),
         tech_operations: z
           .array(
             z.object({

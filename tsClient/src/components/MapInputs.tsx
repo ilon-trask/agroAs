@@ -48,6 +48,7 @@ const createCartFunc: func<cartProps> = (
     setRes(CartProps);
     if (setComplex) setComplex(false);
     if (update) {
+      res.cultureId = +res.cultureId!;
       updateMap(map, res as resTechCartsWithOpers);
     } else {
       createCart(map, {
@@ -58,6 +59,7 @@ const createCartFunc: func<cartProps> = (
         isPublic: res.isPublic,
         isComplex: complex ? complex : undefined,
         sectionId: res.sectionId ? res.sectionId : undefined,
+        cultureId: +res.cultureId!,
       });
     }
   }
@@ -118,13 +120,29 @@ export default function MapInputs({
         alignItems={"center"}
         mt={"15px"}
       >
-        {complex ? (
-          <Box>
-            <Name res={res} setRes={setRes} />
-          </Box>
-        ) : (
+        <Box>
           <Name res={res} setRes={setRes} />
-        )}
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Виберіть культуру
+          </Heading>
+          <Select
+            value={res?.cultureId}
+            onChange={(e) =>
+              setRes({ ...res, cultureId: e.target.value as any })
+            }
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            {map.culture.map((el) => (
+              <option key={el.id} value={el.id}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
         {!!complex && (
           <Box>
             <Heading as={"h4"} size="sm" minW={"max-content"}>

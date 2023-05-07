@@ -95,7 +95,7 @@ function YieldСalculation() {
         <Tbody>
           <Tr>
             <Td>{myYield?.culture.name}</Td>
-            <Td>{myYield?.comment}</Td>
+            <Td></Td>
             <Td>{myCalc?.numberPlantsPerHectare || 0}</Td>
             <Td>{myYield?.yieldPerHectare || 0}</Td>
             <Td>{myYield?.yieldPerRoll || 0}</Td>

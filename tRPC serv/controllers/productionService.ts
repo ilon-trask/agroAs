@@ -15,6 +15,7 @@ class ProductionService {
       productId: data.productId,
       isPrimary: data.isPrimary,
       techCartId: data.techCartId,
+      year: data.year,
       userId: user.sub,
     });
     return res;

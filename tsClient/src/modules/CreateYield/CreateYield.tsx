@@ -12,9 +12,9 @@ type props = {
 };
 export type incProp = {
   cultureId: string | number;
-  comment: string;
+  cultivationTechnologyId: number | "";
 };
-const prop: incProp = { cultureId: "", comment: "" };
+const prop: incProp = { cultureId: "", cultivationTechnologyId: "" };
 function CreateYield({ open, setOpen, update, res, setRes, plantId }: props) {
   //   console.log(123);
   return (
