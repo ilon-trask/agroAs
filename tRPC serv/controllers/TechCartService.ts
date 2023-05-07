@@ -250,7 +250,15 @@ class TechCartService {
     return carts;
   }
   async create(data: CreateCartType, user: Principal | undefined) {
-    const { nameCart, area, salary, priceDiesel, isComplex, sectionId } = data;
+    const {
+      nameCart,
+      area,
+      salary,
+      priceDiesel,
+      isComplex,
+      sectionId,
+      cultureId,
+    } = data;
 
     if (!user) return;
     const techCart: Itech_cart = await tech_cart.create({
@@ -260,6 +268,7 @@ class TechCartService {
       priceDiesel,
       isComplex: isComplex ? true : false,
       sectionId: sectionId ? sectionId : null,
+      cultureId: cultureId,
       userId: user?.sub,
     });
 
@@ -275,6 +284,7 @@ class TechCartService {
       priceDiesel,
       isComplex,
       sectionId,
+      cultureId,
     } = data;
 
     if (user) {
@@ -287,6 +297,7 @@ class TechCartService {
           priceDiesel,
           isComplex: isComplex ? true : false,
           sectionId: sectionId ? sectionId : null,
+          cultureId: cultureId,
         },
         { where: { id: id } }
       );

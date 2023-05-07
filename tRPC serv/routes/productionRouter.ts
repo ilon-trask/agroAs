@@ -6,6 +6,7 @@ const createProduction = z.object({
   productId: z.number(),
   isPrimary: z.boolean(),
   techCartId: z.number(),
+  year: z.number(),
 });
 export type createProductionType = z.infer<typeof createProduction>;
 export const productionRouter = router({

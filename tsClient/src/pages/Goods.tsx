@@ -21,6 +21,8 @@ import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteYieldPlant } from "../http/requests";
 import { Context } from "../main";
+import CreateProduct from "../modules/CreateProduct";
+import { CreateProductProps } from "../modules/CreateProduct/CreateProduct";
 import CreateProductService from "../modules/CreateProductService";
 import { productionProp } from "../modules/CreateProductService/CreateProduction";
 import CreateYield, { incProp } from "../modules/CreateYield/CreateYield";
@@ -35,7 +37,10 @@ function Goods() {
   yieldPlants.sort((a, b) => a.id! - b.id!);
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
-  const [res, setRes] = useState<incProp>({ cultureId: "", comment: "" });
+  const [res, setRes] = useState<incProp>({
+    cultureId: "",
+    cultivationTechnologyId: "",
+  });
   const [showAlert, setShowAlert] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState<{
     isOpen: boolean;
@@ -53,6 +58,14 @@ function Goods() {
   const [prodRes, setProdRes] = useState<productionProp>({
     productId: "",
     techCartId: "",
+    isPrimary: "",
+    cultureId: "",
+    year: "",
+  });
+  const [productOpen, setProductOpen] = useState(false);
+  const [productRes, setProductRes] = useState<CreateProductProps>({
+    cultureId: "",
+    name: "",
   });
   return (
     <Container maxW={"container.lg"}>
@@ -62,7 +75,7 @@ function Goods() {
         mt={"15px"}
         textTransform={"uppercase"}
       >
-        Основне виробництво
+        Спеціалізація та урожайність
       </Text>
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Планування урожайності
@@ -73,7 +86,7 @@ function Goods() {
             <Tr>
               <Th></Th>
               <Th>Культура</Th>
-              <Th>Коментар</Th>
+              <Th>Технологія</Th>
               <Th>Густота насаджень</Th>
               <Th>Урожайність з гектару</Th>
               <Th>Урожайність з рослини</Th>
@@ -91,7 +104,7 @@ function Goods() {
                       setUpdate(true);
                       setOpen(true);
                       setRes({
-                        comment: el.comment,
+                        cultivationTechnologyId: el.cultivationTechnologyId!,
                         cultureId: el.cultureId!,
                       });
                     }}
@@ -108,7 +121,13 @@ function Goods() {
                       <ViewIcon boxSize={5} /> {el?.culture?.name}
                     </Link>
                   </Td>
-                  <Td>{el.comment}</Td>
+                  <Td>
+                    {
+                      map.cultivationTechnologies.find(
+                        (e) => e.id == el.cultivationTechnologyId
+                      )?.name
+                    }
+                  </Td>
                   <Td>{el.plantingDensity}</Td>
                   <Td>{el.yieldPerHectare}</Td>
                   <Td>{el.yieldPerRoll}</Td>
@@ -166,8 +185,16 @@ function Goods() {
           func={deleteOpen.func}
         />
       )}
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Виробництво
+      </Text>
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування основного виробництва
+        Планування виробництва
       </Heading>
       {/* <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
 <Table size={"sm"}>
@@ -188,15 +215,14 @@ function Goods() {
         setOpen={setProdOpen}
         res={prodRes}
         setRes={setProdRes}
+        setProductOpen={setProductOpen}
       />
-      <Text
-        textAlign={"center"}
-        fontSize={"25px"}
-        mt={"15px"}
-        textTransform={"uppercase"}
-      >
-        Допоміжне виробництво
-      </Text>
+      <CreateProduct
+        open={productOpen}
+        setOpen={setProductOpen}
+        res={productRes}
+        setRes={setProductRes}
+      />
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Планування собівартості продукції
       </Heading>

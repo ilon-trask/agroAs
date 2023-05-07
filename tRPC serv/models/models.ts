@@ -586,15 +586,18 @@ export const busCul = sequelize.define("busCul", {}, { timestamps: false });
 export interface IcultivationTechnologies {
   id?: number;
   name: string;
+  yieldFactor: number;
 }
 export class cultivationTechnologies extends Model<IcultivationTechnologies> {
   declare id?: number;
   declare name: string;
+  declare yieldFactor: number;
 }
 cultivationTechnologies.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
+    yieldFactor: { type: DataTypes.FLOAT, defaultValue: 1 },
   },
   { sequelize }
 );
@@ -652,27 +655,26 @@ titlePage.init(
 export interface IyieldPlant {
   id?: number;
   userId?: string;
-  comment: string;
   plantingDensity: number;
   yieldPerHectare: number;
   yieldPerRoll: number;
   timesDow: number;
   cultureId?: number;
+  cultivationTechnologyId?: number;
 }
 export class yieldPlant extends Model<IyieldPlant> {
   declare id?: number;
   declare userId?: string;
-  declare comment: string;
   declare plantingDensity: number;
   declare yieldPerHectare: number;
   declare yieldPerRoll: number;
   declare timesDow: number;
+  declare cultivationTechnologyId?: number;
 }
 yieldPlant.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     userId: { type: DataTypes.STRING, allowNull: false },
-    comment: { type: DataTypes.STRING },
     plantingDensity: { type: DataTypes.FLOAT },
     yieldPerHectare: { type: DataTypes.FLOAT },
     yieldPerRoll: { type: DataTypes.FLOAT },
@@ -887,6 +889,7 @@ product.init(
 export interface Iproduction {
   id?: number;
   isPrimary: boolean;
+  year: number;
   productId?: number;
   techCartId?: number;
   userId: string;
@@ -894,6 +897,7 @@ export interface Iproduction {
 export class production extends Model<Iproduction> {
   declare id?: number;
   declare isPrimary: boolean;
+  declare year: number;
   declare productId?: number;
   declare techCartId?: number;
   declare userId: string;
@@ -901,6 +905,7 @@ export class production extends Model<Iproduction> {
 production.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    year: { type: DataTypes.INTEGER },
     isPrimary: { type: DataTypes.BOOLEAN, allowNull: false },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
@@ -1238,3 +1243,8 @@ outcome.belongsTo(administration);
 
 enterprise.hasMany(businessPlan);
 businessPlan.belongsTo(enterprise);
+
+cultivationTechnologies.hasMany(yieldPlant);
+
+culture.hasMany(tech_cart);
+tech_cart.belongsTo(culture);

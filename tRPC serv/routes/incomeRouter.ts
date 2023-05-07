@@ -11,12 +11,15 @@ const createYieldCalc = z.object({
   yieldPlantId: z.number(),
 });
 export type createYieldCalcType = z.infer<typeof createYieldCalc>;
-const updateYieldPlant = z.object({
-  yieldPlantId: z.number(),
+const createYieldPlant = z.object({
   cultureId: z.number(),
-  comment: z.string(),
+  cultivationTechnologyId: z.number(),
 });
-export type updateYieldPlantType = z.infer<typeof updateYieldPlant>;
+export type CreateYieldPlantType = z.infer<typeof createYieldPlant>;
+const updateYieldPlant = createYieldPlant.extend({
+  yieldPlantId: z.number(),
+});
+export type UpdateYieldPlantType = z.infer<typeof updateYieldPlant>;
 const createIncome = z.object({
   type: z.enum([
     "Основне виробництво",
@@ -52,6 +55,11 @@ const setIsUsingIncome = z.object({
   value: z.boolean(),
 });
 export type setIsUsingIncomeType = z.infer<typeof setIsUsingIncome>;
+const createProduct = z.object({
+  name: z.string(),
+  cultureId: z.number(),
+});
+export type CreateProductType = z.infer<typeof createProduct>;
 export const incomeRouter = router({
   getCultural: publicProcedure.query(async () => {
     const cultures: Iculture[] | undefined = await incomeService.getCultural();
@@ -73,12 +81,7 @@ export const incomeRouter = router({
       return res;
     }),
   createYieldPlant: publicProcedure
-    .input(
-      z.object({
-        cultureId: z.number(),
-        comment: z.string(),
-      })
-    )
+    .input(createYieldPlant)
     .query(async ({ input, ctx }) => {
       const yieldPlant: resYieldPlant | undefined =
         await incomeService.createYieldPlant(input, ctx.user);
@@ -129,6 +132,12 @@ export const incomeRouter = router({
     const res = incomeService.getProduct(ctx.user);
     return res;
   }),
+  createProduct: publicProcedure
+    .input(createProduct)
+    .query(({ ctx, input }) => {
+      const res = incomeService.createProduct(ctx.user, input);
+      return res;
+    }),
   patch: publicProcedure.input(patchIncome).query(async ({ ctx, input }) => {
     const res = await incomeService.patch(ctx.user, input);
     return res;
