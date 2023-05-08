@@ -23,11 +23,11 @@ function Sale({ res, setRes, setOpen, update, setUpdate }: prop) {
   return (
     <Box>
       <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
-        Впишіть дані для розрахунку
+        Дані для розрахунку
       </Heading>
       <Box display={"flex"} justifyContent={"space-around"} mt={5}>
         <Box>
-          <Text>Виберіть виробництво</Text>
+          <Text>Виберіть товар</Text>
           <Select
             value={res.productionId}
             onChange={(e) => {

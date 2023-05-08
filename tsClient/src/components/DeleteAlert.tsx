@@ -22,15 +22,20 @@ export type IdeleteHeading =
   | "державну допомогу"
   | "грант"
   | "покупку техніки"
-  | "адміністрування";
-type props = {
+  | "адміністрування"
+  | "виробинцтво";
+export type DeleteProps = {
+  isOpen: boolean;
+  text: IdeleteHeading;
+  func: any;
+};
+type prop = {
   open: boolean;
   setOpen: ({ isOpen }: { isOpen: false }) => void;
   text: IdeleteHeading;
   func: any;
 };
-
-export default function DeleteAlert({ open, setOpen, text, func }: props) {
+export default function DeleteAlert({ open, setOpen, text, func }: prop) {
   return (
     //@ts-ignore
     <AlertDialog onClose={() => setOpen(false)} isOpen={open} isCentered>

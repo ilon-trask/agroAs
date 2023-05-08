@@ -1,4 +1,4 @@
-import { EditIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Table,
   TableContainer,
@@ -10,13 +10,28 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import { isPlainObject } from "mobx/dist/internal";
-import React, { useContext } from "react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import { Iproduction } from "../../../../tRPC serv/models/models";
+import { DeleteProps } from "../../components/DeleteAlert";
+import { deleteProduction } from "../../http/requests";
 import { Context } from "../../main";
 import useProductionTypes from "../../pages/hook/useProductionTypes";
 import IncomeStore from "../../store/IncomeStore";
+import { productionProp } from "../CreateProductService/CreateProduction";
 
-function Item({ el }: { el: Iproduction }) {
+function Item({
+  el,
+  setOpen,
+  setUpdate,
+  setDeleteOpen,
+  setRes,
+}: {
+  el: Iproduction;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  setRes: Dispatch<SetStateAction<productionProp>>;
+}) {
   const { income, map } = useContext(Context);
   const myProduct = map.product.find((e) => e.id! == el.productId!);
   const myYield = income.yieldPlant.find(
@@ -29,7 +44,19 @@ function Item({ el }: { el: Iproduction }) {
     Math.round(myYield?.yieldPerHectare! * myCart?.area! * 100) / 100;
   return (
     <Tr key={el.id}>
-      <Td>
+      <Td
+        onClick={() => {
+          setOpen(true);
+          setUpdate(true);
+          setRes({
+            prodId: el.id!,
+            isPrimary: el.isPrimary,
+            productId: el.productId!,
+            techCartId: el.techCartId!,
+            year: el.year,
+          });
+        }}
+      >
         <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
       </Td>
       <Td>{myProduct?.name}</Td>
@@ -42,6 +69,21 @@ function Item({ el }: { el: Iproduction }) {
         ) / 100}
       </Td>
       <Td>{myCart?.costHectare! * myCart?.area!}</Td>
+      <Td
+        onClick={() => {
+          setDeleteOpen({
+            isOpen: true,
+            func: () => {
+              deleteProduction(income, { prodId: el.id! });
+              //@ts-ignore
+              setDeleteOpen({ isOpen: false });
+            },
+            text: "виробинцтво",
+          });
+        }}
+      >
+        <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
+      </Td>
     </Tr>
   );
 }
@@ -49,10 +91,18 @@ function GigItem({
   arr,
   isPrimary,
   year,
+  setOpen,
+  setUpdate,
+  setDeleteOpen,
+  setRes,
 }: {
   arr: Iproduction[];
   year: number;
   isPrimary: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  setRes: Dispatch<SetStateAction<productionProp>>;
 }) {
   return (
     <>
@@ -68,22 +118,58 @@ function GigItem({
         <Td></Td>
       </Tr>
       {arr.map((e) => (
-        <Item key={e.id} el={e} />
+        <Item
+          key={e.id}
+          el={e}
+          setOpen={setOpen}
+          setUpdate={setUpdate}
+          setDeleteOpen={setDeleteOpen}
+          setRes={setRes}
+        />
       ))}
     </>
   );
 }
-function returner(isPrimary: boolean, income: IncomeStore) {
+function returner(
+  isPrimary: boolean,
+  income: IncomeStore,
+  setOpen: Dispatch<SetStateAction<boolean>>,
+  setUpdate: Dispatch<SetStateAction<boolean>>,
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>,
+  setRes: Dispatch<SetStateAction<productionProp>>
+) {
   const array = new Array(20);
   array.fill(1);
   return array.map((e, ind) => {
     const arr = income.production.filter(
       (e) => e.year == ind && e.isPrimary == isPrimary
     );
-    return arr[0] && <GigItem arr={arr} isPrimary={isPrimary} year={ind} />;
+    return (
+      arr[0] && (
+        <GigItem
+          arr={arr}
+          isPrimary={isPrimary}
+          year={ind}
+          setOpen={setOpen}
+          setUpdate={setUpdate}
+          setDeleteOpen={setDeleteOpen}
+          setRes={setRes}
+        />
+      )
+    );
   });
 }
-function PlanIncomeProductionTable() {
+function PlanIncomeProductionTable({
+  setOpen,
+  setUpdate,
+  setDeleteOpen,
+  setRes,
+}: {
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  setRes: Dispatch<SetStateAction<productionProp>>;
+}) {
   const { income, map } = useContext(Context);
 
   return (
@@ -110,8 +196,8 @@ function PlanIncomeProductionTable() {
           </Tr>
         </Thead>
         <Tbody>
-          {returner(true, income)}
-          {returner(false, income)}
+          {returner(true, income, setOpen, setUpdate, setDeleteOpen, setRes)}
+          {returner(false, income, setOpen, setUpdate, setDeleteOpen, setRes)}
         </Tbody>
       </Table>
     </TableContainer>

@@ -48,7 +48,10 @@ import {
   createOutcomeType,
   patchOutcomeType,
 } from "../../../tRPC serv/routes/outcomeRouter";
-import { createProductionType } from "../../../tRPC serv/routes/productionRouter";
+import {
+  createProductionType,
+  PatchProductionType,
+} from "../../../tRPC serv/routes/productionRouter";
 import {
   createSaleType,
   PatchSaleType,
@@ -1019,7 +1022,30 @@ export function getProduction(incomeStore: IncomeStore) {
     incomeStore.production = res;
   });
 }
-
+export function patchProduction(
+  incomeStore: IncomeStore,
+  data: PatchProductionType
+) {
+  client.production.patch.query(data).then((res) => {
+    if (!res) return;
+    incomeStore.production = incomeStore.production.filter(
+      (el) => el.id != res.id
+    );
+    incomeStore.newProduction = res;
+  });
+}
+export function deleteProduction(
+  incomeStore: IncomeStore,
+  data: { prodId: number }
+) {
+  client.production.delete.query(data).then((res) => {
+    if (res) {
+      incomeStore.production = incomeStore.production.filter(
+        (el) => el.id != data.prodId
+      );
+    }
+  });
+}
 export function createSale(incomeStore: IncomeStore, data: createSaleType) {
   client.sale.create.query(data).then((res) => (incomeStore.newSale = res));
 }

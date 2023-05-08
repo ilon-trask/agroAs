@@ -16,6 +16,7 @@ type props = {
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
 };
+const obj = {};
 function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
   return (
     <Dialog
@@ -23,8 +24,8 @@ function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
       setOpen={setOpen}
       isErr={false}
       setIsErr={() => {}}
-      props={{}}
-      res={{}}
+      props={obj}
+      res={obj}
       setRes={setRes}
       update={false}
       setUpdate={() => {}}

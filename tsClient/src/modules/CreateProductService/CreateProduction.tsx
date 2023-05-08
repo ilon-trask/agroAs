@@ -3,9 +3,9 @@ import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
 import ProductService from "./components/Production";
 export type productionProp = {
+  prodId?: number;
   productId: number | "";
   techCartId: number | "";
-  cultureId: number | "";
   year: number | "";
   isPrimary: boolean | "";
 };
@@ -15,6 +15,8 @@ type props = {
   res: productionProp;
   setRes: Dispatch<SetStateAction<productionProp>>;
   setProductOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
 function CreateProductService({
   open,
@@ -22,6 +24,8 @@ function CreateProductService({
   res,
   setRes,
   setProductOpen,
+  update,
+  setUpdate,
 }: props) {
   return (
     <Dialog
@@ -40,6 +44,8 @@ function CreateProductService({
         res={res}
         setRes={setRes}
         setProductOpen={setProductOpen}
+        setUpdate={setUpdate}
+        update={update}
       />
     </Dialog>
   );
