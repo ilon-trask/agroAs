@@ -17,7 +17,10 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
-import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
+import DeleteAlert, {
+  DeleteProps,
+  IdeleteHeading,
+} from "../components/DeleteAlert";
 import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteYieldPlant } from "../http/requests";
 import { Context } from "../main";
@@ -42,24 +45,18 @@ function Goods() {
     cultivationTechnologyId: "",
   });
   const [showAlert, setShowAlert] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState<{
-    isOpen: boolean;
-    text: IdeleteHeading;
-    func: any;
-    id: number;
-  }>({
+  const [deleteOpen, setDeleteOpen] = useState<DeleteProps>({
     isOpen: false,
     text: "планування",
     func: () => {},
-    id: 0,
   });
   const [plantId, setPlantId] = useState(0);
   const [prodOpen, setProdOpen] = useState(false);
+  const [prodUpdate, setProdUpdate] = useState(false);
   const [prodRes, setProdRes] = useState<productionProp>({
     productId: "",
     techCartId: "",
     isPrimary: "",
-    cultureId: "",
     year: "",
   });
   const [productOpen, setProductOpen] = useState(false);
@@ -67,6 +64,7 @@ function Goods() {
     cultureId: "",
     name: "",
   });
+
   return (
     <Container maxW={"container.lg"}>
       <Text
@@ -206,7 +204,12 @@ function Goods() {
   </Thead>
   </Table>
 </TableContainer> */}
-      <PlanIncomeProductionTable />
+      <PlanIncomeProductionTable
+        setOpen={setProdOpen}
+        setUpdate={setProdUpdate}
+        setRes={setProdRes}
+        setDeleteOpen={setDeleteOpen}
+      />
       <Button onClick={() => setProdOpen(true)}>
         Додати продукт або послугу
       </Button>
@@ -216,6 +219,8 @@ function Goods() {
         res={prodRes}
         setRes={setProdRes}
         setProductOpen={setProductOpen}
+        setUpdate={setProdUpdate}
+        update={prodUpdate}
       />
       <CreateProduct
         open={productOpen}

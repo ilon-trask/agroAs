@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createProduction } from "../../../http/requests";
+import { createProduction, patchProduction } from "../../../http/requests";
 import { Context } from "../../../main";
 import useProductionTypes from "../../../pages/hook/useProductionTypes";
 import { productionProp } from "../CreateProduction";
@@ -17,8 +17,17 @@ type props = {
   res: productionProp;
   setRes: Dispatch<SetStateAction<productionProp>>;
   setProductOpen: Dispatch<SetStateAction<boolean>>;
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-function ProductService({ setOpen, res, setRes, setProductOpen }: props) {
+function ProductService({
+  setOpen,
+  res,
+  setRes,
+  setProductOpen,
+  update,
+  setUpdate,
+}: props) {
   const { map, income, user } = useContext(Context);
   return (
     <Box>
@@ -94,7 +103,6 @@ function ProductService({ setOpen, res, setRes, setProductOpen }: props) {
               //   );
               // }
             })}
-            <option></option>
           </Select>
         </Box>
         <Box w={"100%"}>
@@ -142,17 +150,27 @@ function ProductService({ setOpen, res, setRes, setProductOpen }: props) {
       <AlertDialogFooter>
         <Button
           onClick={() => {
-            console.log(res);
-
-            if (res.productId && res.techCartId && res.isPrimary) {
-              createProduction(income, {
-                productId: res.productId,
-                techCartId: +res.techCartId,
-                //@ts-ignore
-                isPrimary: res.isPrimary == "true",
-                year: +res.year,
-              });
+            if (res.productId && res.techCartId && res.isPrimary && res.year) {
+              if (update) {
+                patchProduction(income, {
+                  prodId: res.prodId!,
+                  //@ts-ignore
+                  isPrimary: res.isPrimary == "true",
+                  productId: res.productId,
+                  techCartId: res.techCartId,
+                  year: +res.year,
+                });
+              } else {
+                createProduction(income, {
+                  productId: res.productId,
+                  techCartId: +res.techCartId,
+                  //@ts-ignore
+                  isPrimary: res.isPrimary == "true",
+                  year: +res.year,
+                });
+              }
               setOpen(false);
+              setUpdate(false);
               //@ts-ignore
               setRes({});
             }
