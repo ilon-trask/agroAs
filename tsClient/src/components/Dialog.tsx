@@ -65,6 +65,18 @@ interface props {
   isErr: boolean;
   setIsErr: (isErr: boolean) => void;
   setComplex?: Dispatch<SetStateAction<boolean>>;
+  size?:
+    | "2xl"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xs"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl"
+    | "full";
 }
 const Dialog: FC<props> = observer(
   ({
@@ -76,10 +88,10 @@ const Dialog: FC<props> = observer(
     setUpdate,
     children,
     props,
-
     isErr,
     setIsErr,
     setComplex,
+    size,
   }) => {
     // useEffect(() => {
     //   setRes(res);
@@ -92,7 +104,7 @@ const Dialog: FC<props> = observer(
     }, [props]);
     return (
       <Modal
-        size={"2xl"}
+        size={size || "2xl"}
         isOpen={open}
         onClose={() => {
           setOpen(false);

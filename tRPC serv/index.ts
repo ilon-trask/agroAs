@@ -38,6 +38,8 @@ import { grantRouter } from "./routes/grantRouter";
 import { buyingMachineRouter } from "./routes/buyingMachineRouter";
 import { administrationRouter } from "./routes/administrationRouter";
 import { enterpriseRouter } from "./routes/enterpriseRouter";
+import { jobRouter } from "./routes/jobRouter";
+import { workerRouter } from "./routes/workerRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -76,6 +78,8 @@ const appRouter = router({
   buyingMachine: buyingMachineRouter,
   administration: administrationRouter,
   enterprise: enterpriseRouter,
+  worker: workerRouter,
+  job: jobRouter,
   "": publicProcedure.query(() => "some text"),
 });
 

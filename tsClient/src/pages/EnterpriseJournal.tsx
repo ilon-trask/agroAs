@@ -26,6 +26,7 @@ function Enterprise() {
   const [res, setRes] = useState<CreateEnterpriseProps>({
     name: "",
     form: "",
+    taxGroup: "",
   });
   const { enterpriseStore } = useContext(Context);
   useEffect(() => {
@@ -43,6 +44,7 @@ function Enterprise() {
               <Td></Td>
               <Td>Назва підприємства</Td>
               <Td>Організаційно правова форма</Td>
+              <Td>Група оподаткування</Td>
               <Td></Td>
             </Tr>
           </Thead>
@@ -51,7 +53,12 @@ function Enterprise() {
               <Tr key={el.id}>
                 <Td
                   onClick={() => {
-                    setRes({ entId: el.id, form: el.form, name: el.name });
+                    setRes({
+                      entId: el.id,
+                      form: el.form,
+                      name: el.name,
+                      taxGroup: el.taxGroup,
+                    });
                     setUpdate(true);
                     setOpen(true);
                   }}
@@ -69,6 +76,7 @@ function Enterprise() {
                   </Link>
                 </Td>
                 <Td>{el.form}</Td>
+                <Td>{el.taxGroup}</Td>
                 <Td>
                   <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
                 </Td>

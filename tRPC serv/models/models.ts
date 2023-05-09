@@ -19,6 +19,8 @@ import { BuyingMachinePurposeType } from "../../tsClient/src/pages/hook/useBuyin
 import { AdministrationPurposeType } from "../../tsClient/src/pages/hook/useAdministrationPurpose";
 import { AdministrationPeriodCalcType } from "../../tsClient/src/pages/hook/useAdministrationPeriodCalc";
 import { EnterpriseFormType } from "../../tsClient/src/pages/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../tsClient/src/pages/hook/useEnterpriseTaxGroup";
+import { WorkerClassesType } from "../../tsClient/src/pages/hook/useWorkersClasses";
 export interface Iuser {
   id?: number;
   email: string;
@@ -1120,12 +1122,14 @@ export interface Ienterprise {
   id?: number;
   name: string;
   form: EnterpriseFormType;
+  taxGroup: EnterpriseTaxGroupType;
   userId: string;
 }
 export class enterprise extends Model<Ienterprise> {
   declare id?: number;
   declare name: string;
   declare form: EnterpriseFormType;
+  declare taxGroup: EnterpriseTaxGroupType;
   declare userId: string;
 }
 enterprise.init(
@@ -1133,7 +1137,71 @@ enterprise.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING },
     form: { type: DataTypes.STRING },
+    taxGroup: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize }
+);
+export interface Ijob {
+  id?: number;
+  name: string;
+  isFOPWith: boolean;
+  isFOP: boolean;
+  isQO: boolean;
+  userId: string | null;
+}
+export class job extends Model<Ijob> {
+  declare id?: number;
+  declare name: string;
+  declare isFOPWith: boolean;
+  declare isFOP: boolean;
+  declare isQO: boolean;
+  declare userId: string | null;
+}
+job.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING },
+    isFOPWith: { type: DataTypes.BOOLEAN },
+    isFOP: { type: DataTypes.BOOLEAN },
+    isQO: { type: DataTypes.BOOLEAN },
+    userId: { type: DataTypes.STRING },
+  },
+  { sequelize }
+);
+export interface Iworker {
+  id?: number;
+  isConst: boolean;
+  salary: number;
+  amount: number;
+  dateFrom: string;
+  dateTo: string;
+  class: WorkerClassesType;
+  userId: string;
+  enterpriseId?: number;
+  jobId?: number;
+}
+
+export class worker extends Model<Iworker> {
+  declare id?: number;
+  declare isConst: boolean;
+  declare salary: number;
+  declare amount: number;
+  declare dateFrom: string;
+  declare dateTo: string;
+  declare class: WorkerClassesType;
+  declare userId: string;
+}
+worker.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    amount: { type: DataTypes.INTEGER },
+    salary: { type: DataTypes.INTEGER },
+    isConst: { type: DataTypes.BOOLEAN },
+    dateFrom: { type: DataTypes.DATEONLY },
+    dateTo: { type: DataTypes.DATEONLY },
+    class: { type: DataTypes.STRING },
+    userId: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -1248,3 +1316,9 @@ cultivationTechnologies.hasMany(yieldPlant);
 
 culture.hasMany(tech_cart);
 tech_cart.belongsTo(culture);
+
+enterprise.hasOne(worker);
+worker.belongsTo(enterprise);
+
+job.hasOne(worker);
+worker.belongsTo(job);
