@@ -12,6 +12,13 @@ const createEnterprise = z.object({
     "Юридична особа ФГ",
     "Не визначено",
   ]),
+  taxGroup: z.enum([
+    "II група",
+    "III група з пдв",
+    "III група без пдв",
+    "IV група",
+    "Загальна",
+  ]),
 });
 export type CreateEnterpriseType = z.infer<typeof createEnterprise>;
 const patchEnterprise = createEnterprise.extend({ entId: z.number() });

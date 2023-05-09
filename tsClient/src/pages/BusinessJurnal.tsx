@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite";
 import useBusiness from "./hook/useBusiness";
 import { useNavigate } from "react-router-dom";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
+import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
 
 function BusinessJurnal() {
   const { business, map } = useContext(Context);
@@ -21,6 +22,10 @@ function BusinessJurnal() {
   });
   const [openBusiness, setOpenBusiness] = useState(false);
   const [update, setUpdate] = useState(false);
+  const [openQuiz, setOpenQuiz] = useState(false);
+  const [updateQuiz, setUpdateQuiz] = useState(false);
+
+  const [quizRes, setQuizRes] = useState({});
   const [res, setRes] = useState<CreateBusinessProp>({
     name: "",
     dateStart: "",
@@ -55,6 +60,13 @@ function BusinessJurnal() {
       >
         Переглянути
       </Button>
+      <Button
+        onClick={() => {
+          setOpenQuiz(true);
+        }}
+      >
+        Конструктор
+      </Button>
       <CreateBusiness
         open={openBusiness}
         setOpen={setOpenBusiness}
@@ -62,6 +74,14 @@ function BusinessJurnal() {
         setRes={setRes}
         update={update}
         setUpdate={setUpdate}
+      />
+      <QuizBusinessPopUp
+        open={openQuiz}
+        setOpen={setOpenQuiz}
+        update={updateQuiz}
+        setUpdate={setUpdateQuiz}
+        res={quizRes}
+        setRes={setQuizRes}
       />
     </Box>
   );

@@ -14,6 +14,8 @@ import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
 } from "../../pages/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../pages/hook/useEnterpriseTaxGroup";
+import EnterpriseInputs from "./components/EnterpriseInputs";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -26,9 +28,10 @@ export type CreateEnterpriseProps = {
   entId?: number;
   name: string;
   form: EnterpriseFormType | "";
+  taxGroup: EnterpriseTaxGroupType | "";
 };
 const obj = {};
-const forms = useEnterpriseForm;
+
 function CreateEnterprise({
   open,
   setOpen,
@@ -50,42 +53,7 @@ function CreateEnterprise({
       setUpdate={setUpdate}
       props={obj}
     >
-      <Heading size="md" textAlign={"center"}>
-        Вкажіть данні для підприємства
-      </Heading>
-      <Box>
-        <Box>
-          <Text>Введіть назву </Text>
-          <Input
-            value={res.name}
-            placeholder="Введіть назву"
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, name: e.target.value }))
-            }
-          />
-        </Box>
-        <Box>
-          <Text>Введіть організаційно правову форму</Text>
-          <Select
-            value={res.form}
-            onChange={(e) =>
-              setRes((prev) => ({
-                ...prev,
-                form: e.target.value as EnterpriseFormType,
-              }))
-            }
-          >
-            <option value="" hidden defaultChecked>
-              Виберіть опцію
-            </option>
-            {forms.map((el) => (
-              <option key={el.id} value={el.name}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
-      </Box>
+      <EnterpriseInputs res={res} setRes={setRes} />
       <ModalFooter>
         <Button
           isDisabled={!res.name && !res.form}

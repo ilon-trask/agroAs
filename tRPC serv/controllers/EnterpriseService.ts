@@ -5,7 +5,7 @@ import {
   PatchEnterpriseType,
 } from "../routes/enterpriseRouter";
 
-class CreditService {
+class EnterpriseService {
   async get(user: Principal | undefined) {
     if (!user) return;
     const res: Ienterprise[] | null = await enterprise.findAll({
@@ -18,6 +18,7 @@ class CreditService {
     const res: Ienterprise = await enterprise.create({
       name: data.name,
       form: data.form,
+      taxGroup: data.taxGroup,
       userId: user.sub,
     });
     return res;
@@ -28,6 +29,7 @@ class CreditService {
       {
         name: data.name,
         form: data.form,
+        taxGroup: data.taxGroup,
       },
       { where: { id: data.entId } }
     );
@@ -42,4 +44,4 @@ class CreditService {
     return res;
   }
 }
-export default new CreditService();
+export default new EnterpriseService();

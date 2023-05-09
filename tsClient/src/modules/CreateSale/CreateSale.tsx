@@ -1,6 +1,9 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
-import Sale from "./component/Sale";
+import SaleInputs from "./component/SaleInputs";
+import { Button, ModalFooter } from "@chakra-ui/react";
+import { patchSale } from "../../http/requests";
+import { Context } from "../../main";
 export type SaleProp = {
   id?: number;
   date: string;
@@ -18,6 +21,7 @@ type props = {
 };
 const obj = {};
 function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
+  const { income } = useContext(Context);
   return (
     <Dialog
       open={open}
@@ -30,13 +34,32 @@ function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
       update={false}
       setUpdate={() => {}}
     >
-      <Sale
-        res={res}
-        setRes={setRes}
-        setOpen={setOpen}
-        update={update}
-        setUpdate={setUpdate}
-      />
+      <SaleInputs res={res} setRes={setRes} isAmount={true} />
+      <ModalFooter>
+        <Button
+          onClick={() => {
+            if (res.amount && res.date && res.price && res.productionId) {
+              if (update) {
+                patchSale(income, {
+                  amount: res.amount,
+                  date: res.date,
+                  price: res.price,
+                  productionId: res.productionId!,
+                  saleId: res.id!,
+                });
+              } else {
+                //@ts-ignore
+                createSale(income, res);
+              }
+              setRes({ amount: "", date: "", price: "", productionId: "" });
+              setOpen(false);
+              setUpdate(false);
+            }
+          }}
+        >
+          Зберегти
+        </Button>
+      </ModalFooter>
     </Dialog>
   );
 }

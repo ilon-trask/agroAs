@@ -88,6 +88,14 @@ import {
   CreateEnterpriseType,
   PatchEnterpriseType,
 } from "../../../tRPC serv/routes/enterpriseRouter";
+import {
+  CreateJobType,
+  PatchJobType,
+} from "../../../tRPC serv/routes/jobRouter";
+import {
+  CreateWorkerType,
+  PatchWorkerType,
+} from "../../../tRPC serv/routes/workerRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -1291,6 +1299,65 @@ export function deleteEnterprise(
   client.enterprise.delete.query({ entId }).then((res) => {
     EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
       (el) => el.id != entId
+    );
+  });
+}
+export function getJob(enterprise: EnterpriseStore) {
+  client.job.get.query().then((res) => {
+    enterprise.job = res;
+  });
+}
+export function createJob(enterprise: EnterpriseStore, data: CreateJobType) {
+  client.job.create.query(data).then((res) => {
+    enterprise.newJob = res;
+  });
+}
+export function patchJob(enterprise: EnterpriseStore, data: PatchJobType) {
+  client.job.patch.query(data).then((res) => {
+    if (!res) return;
+    enterprise.job = enterprise.job.filter((el) => el.id != res.id);
+    enterprise.newJob = res;
+  });
+}
+export function deleteJob(
+  enterprise: EnterpriseStore,
+  data: { jobId: number }
+) {
+  client.job.delete.query(data).then((res) => {
+    enterprise.job = enterprise.job.filter((el) => el.id != data.jobId);
+  });
+}
+
+export function getWorker(enterprise: EnterpriseStore) {
+  client.worker.get.query().then((res) => {
+    enterprise.worker = res;
+  });
+}
+export function createWorker(
+  enterprise: EnterpriseStore,
+  data: CreateWorkerType
+) {
+  client.worker.create.query(data).then((res) => {
+    enterprise.newWorker = res;
+  });
+}
+export function patchWorker(
+  enterprise: EnterpriseStore,
+  data: PatchWorkerType
+) {
+  client.worker.patch.query(data).then((res) => {
+    if (!res) return;
+    enterprise.worker = enterprise.worker.filter((el) => el.id != res.id);
+    enterprise.newWorker = res;
+  });
+}
+export function deleteWorker(
+  enterprise: EnterpriseStore,
+  data: { workerId: number }
+) {
+  client.worker.delete.query(data).then((res) => {
+    enterprise.worker = enterprise.worker.filter(
+      (el) => el.id != data.workerId
     );
   });
 }
