@@ -20,9 +20,6 @@ function SaleInputs({ res, setRes, isAmount }: prop) {
   const { income, map } = useContext(Context);
   return (
     <Box>
-      <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
-        Дані для розрахунку
-      </Heading>
       <Box display={"flex"} justifyContent={"space-around"} mt={5}>
         <Box>
           <Text>Виберіть товар</Text>

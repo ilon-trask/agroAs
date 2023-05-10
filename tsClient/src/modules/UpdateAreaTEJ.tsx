@@ -23,6 +23,7 @@ export const CartProps: cartProps = {
   priceDiesel: "",
   cultivationTechnologyId: 6,
   cultureId: 4,
+  year: "",
 };
 
 interface props {

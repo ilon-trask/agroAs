@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Heading,
   ModalFooter,
   Table,
   Tag,
@@ -52,7 +53,9 @@ function Years({
   return (
     <Box>
       {arr.map((el) => (
-        <Tag size={"lg"}>{el}</Tag>
+        <Tag size={"lg"} key={el}>
+          {el}
+        </Tag>
       ))}
     </Box>
   );
@@ -141,6 +144,13 @@ function QuizBusinessPopUp({
         </Box>
       ) : screen == 4 ? (
         <Box>
+          <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
+            Дані для розрахунку
+          </Heading>
+          <Years
+            dateStart={res.dateStart}
+            realizationTime={res.realizationTime}
+          />
           <SaleInputs res={res} setRes={setRes} />
           <Footer />
         </Box>
@@ -149,6 +159,10 @@ function QuizBusinessPopUp({
           <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
             Внесіть дані про фінансовий план
           </Text>
+          <Years
+            dateStart={res.dateStart}
+            realizationTime={res.realizationTime}
+          />
           <Box display={"flex"} mx={"auto"} maxW={"fit-content"}>
             <Box width="50%">
               <Text textAlign={"center"}>Доходи (залучені кошити)</Text>
@@ -212,6 +226,10 @@ function QuizBusinessPopUp({
               <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
                 Показники
               </Text>
+              <Years
+                dateStart={res.dateStart}
+                realizationTime={res.realizationTime}
+              />
               <Table size={"sm"}>
                 <Tbody>
                   <Tr>

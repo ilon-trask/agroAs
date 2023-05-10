@@ -28,6 +28,7 @@ export type func<T> = (
   seCell?: (cell: Icell | "") => void,
   section?: number | "" | undefined,
   setSection?: (section: number | "") => void,
+  setUpdate?: Dispatch<SetStateAction<boolean>>,
   complex?: boolean,
   setComplex?: Dispatch<SetStateAction<boolean>>
 ) => void;

@@ -72,6 +72,7 @@ export interface Itech_cart {
   cultivationTechnologyId?: number;
   isComplex?: boolean;
   sectionId?: number | null;
+  year: number;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -95,6 +96,8 @@ export class tech_cart extends Model<Itech_cart> {
   declare timesDow?: number;
   declare isComplex?: boolean;
   declare sectionId?: number;
+  declare cultivationTechnologyId?: number;
+  declare year: number;
 }
 
 tech_cart.init(
@@ -123,6 +126,7 @@ tech_cart.init(
       defaultValue: false,
       allowNull: false,
     },
+    year: { type: DataTypes.INTEGER },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -1322,3 +1326,6 @@ worker.belongsTo(enterprise);
 
 job.hasOne(worker);
 worker.belongsTo(job);
+
+cultivationTechnologies.hasMany(tech_cart);
+tech_cart.belongsTo(cultivationTechnologies);

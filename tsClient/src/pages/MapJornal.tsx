@@ -76,6 +76,7 @@ const MapJornal = observer(function () {
     area: "",
     salary: "",
     priceDiesel: "",
+    year: "",
   });
   const [workRes, setWorkRes] = useState<workProps>({
     nameWork: "",

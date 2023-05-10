@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
 import SaleInputs from "./component/SaleInputs";
-import { Button, ModalFooter } from "@chakra-ui/react";
+import { Button, Heading, ModalFooter } from "@chakra-ui/react";
 import { patchSale } from "../../http/requests";
 import { Context } from "../../main";
 export type SaleProp = {
@@ -34,6 +34,9 @@ function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
       update={false}
       setUpdate={() => {}}
     >
+      <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
+        Дані для розрахунку
+      </Heading>
       <SaleInputs res={res} setRes={setRes} isAmount={true} />
       <ModalFooter>
         <Button

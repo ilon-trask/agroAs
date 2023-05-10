@@ -8,7 +8,7 @@ import { cartProps } from "./CreateCart";
 
 import Loader from "../components/Loader";
 
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tfoot, Tr, Th, Box, Td } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 
 interface props {
@@ -26,6 +26,7 @@ interface props {
     isOpen: boolean;
     data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
+  isCul?: boolean;
 }
 
 const CartsTable = observer(
@@ -38,6 +39,7 @@ const CartsTable = observer(
     deleteOpen,
     setDeleteOpen,
     setPublicationOpen,
+    isCul,
   }: props) => {
     const { map, user } = useContext(Context);
 
@@ -46,11 +48,16 @@ const CartsTable = observer(
         <Thead>
           <Tr>
             <Th></Th>
-            <Th>Назва культури</Th>
+            {isCul && (
+              <>
+                <Th>Технологія</Th>
+                <Th>Рік</Th>
+              </>
+            )}
+            <Th>Назва карти</Th>
             <Th>Площа (га)</Th>
             <Th>Загальна вартість (грн)</Th>
             <Th>Витрати на 1 га (грн)</Th>
-            <Th>Культура</Th>
             <Th></Th>
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
@@ -65,19 +72,58 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {maps.map((e) => (
-            <CartsTableItem
-              key={e.id}
-              e={e}
-              setOpen={setOpen}
-              setRes={setRes}
-              setUpdate={setUpdate}
-              setShowAlert={setShowAlert}
-              deleteOpen={deleteOpen}
-              setDeleteOpen={setDeleteOpen}
-              setPublicationOpen={setPublicationOpen}
-            />
-          ))}
+          {isCul
+            ? map.culture.map((el) => (
+                <>
+                  <Tr>
+                    <Td></Td>
+                    <Td>{el.name}</Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                  </Tr>
+
+                  {map.cultivationTechnologies.map((elx) =>
+                    maps.map((e) => {
+                      if (
+                        e.cultureId == el.id &&
+                        elx.id == e.cultivationTechnologyId
+                      )
+                        return (
+                          <CartsTableItem
+                            key={e.id}
+                            e={e}
+                            setOpen={setOpen}
+                            setRes={setRes}
+                            setUpdate={setUpdate}
+                            setShowAlert={setShowAlert}
+                            deleteOpen={deleteOpen}
+                            setDeleteOpen={setDeleteOpen}
+                            setPublicationOpen={setPublicationOpen}
+                            isCul={isCul}
+                          />
+                        );
+                    })
+                  )}
+                </>
+              ))
+            : maps.map((e) => (
+                <CartsTableItem
+                  key={e.id}
+                  e={e}
+                  setOpen={setOpen}
+                  setRes={setRes}
+                  setUpdate={setUpdate}
+                  setShowAlert={setShowAlert}
+                  deleteOpen={deleteOpen}
+                  setDeleteOpen={setDeleteOpen}
+                  setPublicationOpen={setPublicationOpen}
+                />
+              ))}
         </Tbody>
       </Table>
     );
