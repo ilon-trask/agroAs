@@ -48,6 +48,9 @@ const createCartFunc: func<cartProps> = (
     res.priceDiesel = +res.priceDiesel;
     res.year = +res.year;
     res.cultureId = res.cultureId ? +res.cultureId : undefined;
+    res.cultivationTechnologyId = res.cultivationTechnologyId
+      ? +res.cultivationTechnologyId
+      : undefined;
     if (setUpdate) setUpdate(false);
     setRes(CartProps);
     if (setComplex) setComplex(false);
