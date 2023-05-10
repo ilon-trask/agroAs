@@ -28,6 +28,7 @@ const createCartFunc: func<cartProps> = (
   b,
   c,
   d,
+  setUpdate,
   complex,
   setComplex
 ) => {
@@ -45,10 +46,12 @@ const createCartFunc: func<cartProps> = (
     res.area = +res.area;
     res.salary = +res.salary;
     res.priceDiesel = +res.priceDiesel;
+    res.year = +res.year;
+    res.cultureId = res.cultureId ? +res.cultureId : undefined;
+    if (setUpdate) setUpdate(false);
     setRes(CartProps);
     if (setComplex) setComplex(false);
     if (update) {
-      res.cultureId = +res.cultureId!;
       updateMap(map, res as resTechCartsWithOpers);
     } else {
       createCart(map, {
@@ -59,7 +62,9 @@ const createCartFunc: func<cartProps> = (
         isPublic: res.isPublic,
         isComplex: complex ? complex : undefined,
         sectionId: res.sectionId ? res.sectionId : undefined,
-        cultureId: +res.cultureId!,
+        cultureId: res.cultureId,
+        cultivationTechnologyId: res.cultivationTechnologyId,
+        year: res.year,
       });
     }
   }
@@ -71,9 +76,11 @@ type props = {
   setIsErr: (isErr: boolean) => void;
   setOpen: (open: boolean) => void;
   update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
   noBtn?: boolean;
   complex?: boolean;
   setComplex?: Dispatch<SetStateAction<boolean>>;
+  isCul?: boolean;
 };
 const Name = ({
   res,
@@ -102,9 +109,11 @@ export default function MapInputs({
   setIsErr,
   setOpen,
   update,
+  setUpdate,
   noBtn,
   complex,
   setComplex,
+  isCul,
 }: props) {
   const { map } = useContext(Context);
   const { id } = useParams();
@@ -123,27 +132,8 @@ export default function MapInputs({
         <Box>
           <Name res={res} setRes={setRes} />
         </Box>
-        <Box>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Виберіть культуру
-          </Heading>
-          <Select
-            value={res?.cultureId}
-            onChange={(e) =>
-              setRes({ ...res, cultureId: e.target.value as any })
-            }
-          >
-            <option value="" hidden defaultChecked>
-              Виберіть опцію
-            </option>
-            {map.culture.map((el) => (
-              <option key={el.id} value={el.id}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
-        {!!complex && (
+
+        {!!complex ? (
           <Box>
             <Heading as={"h4"} size="sm" minW={"max-content"}>
               Виберіть розділ
@@ -160,6 +150,49 @@ export default function MapInputs({
               ))}
             </Select>
           </Box>
+        ) : (
+          !!isCul && (
+            <>
+              <Box>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Виберіть культуру
+                </Heading>
+                <Select
+                  value={res?.cultureId}
+                  onChange={(e) =>
+                    setRes({ ...res, cultureId: e.target.value as any })
+                  }
+                >
+                  <option value="" hidden defaultChecked>
+                    Виберіть опцію
+                  </option>
+                  {map.culture.map((el) => (
+                    <option key={el.id} value={el.id}>
+                      {el.name}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+              <Box>
+                <Heading as={"h4"} size="sm" minW={"max-content"}>
+                  Виберіть технології
+                </Heading>
+                <Select
+                  value={res.cultivationTechnologyId}
+                  onChange={(e) =>
+                    setRes({ ...res, cultivationTechnologyId: +e.target.value })
+                  }
+                >
+                  <option hidden defaultChecked value="">
+                    Виберіть технології
+                  </option>
+                  {map.cultivationTechnologies.map((el) => (
+                    <option value={el.id}>{el.name}</option>
+                  ))}
+                </Select>
+              </Box>
+            </>
+          )
         )}
       </Box>
       <Box display={"flex"} mt={"15px"} gap={3}>
@@ -206,6 +239,21 @@ export default function MapInputs({
           />
         </div>
       </Box>
+      {isCul && (
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            рік
+          </Heading>
+          <Input
+            type={"number"}
+            inputMode="numeric"
+            value={res.year}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, year: e.target.value as any }))
+            }
+          ></Input>
+        </Box>
+      )}
       <ModalFooter p={"15px 5px"}>
         {!noBtn && (
           <Button
@@ -222,6 +270,7 @@ export default function MapInputs({
                 undefined,
                 undefined,
                 undefined,
+                setUpdate,
                 complex,
                 setComplex
               )

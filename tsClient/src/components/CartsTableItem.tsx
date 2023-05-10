@@ -31,6 +31,7 @@ interface props {
     isOpen: boolean;
     data: { id: number; isPublic: boolean; agree: boolean };
   }) => void;
+  isCul?: boolean;
 }
 
 const CartsTableItem = observer(
@@ -43,8 +44,11 @@ const CartsTableItem = observer(
     deleteOpen,
     setDeleteOpen,
     setPublicationOpen,
+    isCul,
   }: props) => {
     const { map, user } = useContext(Context);
+    console.log(e);
+
     return (
       <Tr key={e.id!}>
         <Td
@@ -65,6 +69,18 @@ const CartsTableItem = observer(
             cursor={"pointer"}
           />
         </Td>
+        {isCul && (
+          <>
+            <Td>
+              {
+                map.cultivationTechnologies.find(
+                  (el) => el?.id == e?.cultivationTechnologyId
+                )?.name
+              }
+            </Td>
+            <Td>{e.year}</Td>
+          </>
+        )}
         <Td>
           <Link to={TEHMAP_ROUTER + `/${e.id}`}>
             <ViewIcon boxSize={5} color={"blue.400"} /> {e.nameCart}
@@ -73,8 +89,6 @@ const CartsTableItem = observer(
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
         <Td>{e.costHectare || "0"}</Td>
-        <Td>{"кульрута"}</Td>
-
         <Td
           textAlign={"center"}
           onClick={

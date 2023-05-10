@@ -1,7 +1,16 @@
-import React, { Dispatch, SetStateAction, useContext } from "react";
-import { Box, Input, Heading, Select, Text, Checkbox } from "@chakra-ui/react";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import {
+  Box,
+  Input,
+  Heading,
+  Select,
+  Text,
+  Checkbox,
+  Button,
+} from "@chakra-ui/react";
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
+import SecondOpen from "./SecondOpen";
 type props = {
   res: CreateBusinessProp;
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
@@ -9,6 +18,8 @@ type props = {
 };
 function BusinessInputs({ res, setRes, isEnterprise }: props) {
   const { map, enterpriseStore } = useContext(Context);
+  const [secondOpen, setSecondOpen] = useState(false);
+  const [secondRes, setSecondRes] = useState({});
   function setCulture(id: number) {
     if (res.cultureIds.includes(id)) {
       let akk = res.cultureIds.filter((el) => el != id);
@@ -67,28 +78,18 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
         <Box>
           {map.culture.map((el) => (
             <Box key={el.id} as="span" ml={2} display={"inline-flex"} gap={1}>
-              <Checkbox
-                onChange={() => setCulture(el.id!)}
-                isChecked={isCheckedCulture(el.id!)}
-              />
-              <Box
-                as="span"
-                cursor="pointer"
-                onClick={() => setCulture(el.id!)}
+              <Button
+                onClick={() => {
+                  setSecondOpen(true);
+                  setSecondRes({ cultureId: el.id! });
+                }}
+                variant={isCheckedCulture(el.id!) ? "solid" : "outline"}
               >
                 {el.name}
-              </Box>
+              </Button>
             </Box>
           ))}
         </Box>
-      </Box>
-      <Box>
-        <Text>Виберіть технологію</Text>
-        <Select>
-          {map.cultivationTechnologies.map((el) => (
-            <option key={el.id}>{el.name}</option>
-          ))}
-        </Select>
       </Box>
       <Box>
         <Text>Вкажіть дату початку</Text>
@@ -131,6 +132,12 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           inputMode={"numeric"}
         />
       </Box>
+      <SecondOpen
+        open={secondOpen}
+        setOpen={setSecondOpen}
+        res={secondRes}
+        setRes={setSecondRes}
+      />
     </Box>
   );
 }

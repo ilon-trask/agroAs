@@ -258,6 +258,8 @@ class TechCartService {
       isComplex,
       sectionId,
       cultureId,
+      cultivationTechnologyId,
+      year,
     } = data;
 
     if (!user) return;
@@ -269,6 +271,8 @@ class TechCartService {
       isComplex: isComplex ? true : false,
       sectionId: sectionId ? sectionId : null,
       cultureId: cultureId,
+      cultivationTechnologyId: cultivationTechnologyId,
+      year: year!,
       userId: user?.sub,
     });
 
@@ -285,6 +289,8 @@ class TechCartService {
       isComplex,
       sectionId,
       cultureId,
+      cultivationTechnologyId,
+      year,
     } = data;
 
     if (user) {
@@ -298,6 +304,8 @@ class TechCartService {
           isComplex: isComplex ? true : false,
           sectionId: sectionId ? sectionId : null,
           cultureId: cultureId,
+          year: year!,
+          cultivationTechnologyId: cultivationTechnologyId,
         },
         { where: { id: id } }
       );

@@ -13,8 +13,9 @@ export type cartProps = {
   priceDiesel: number | string;
   totalCost?: number;
   sectionId?: number | "";
-  cultivationTechnologyId?: number;
-  cultureId?: number;
+  cultivationTechnologyId?: number | "";
+  cultureId?: number | "";
+  year: number | "";
 };
 export const CartProps: cartProps = {
   nameCart: "",
@@ -23,17 +24,19 @@ export const CartProps: cartProps = {
   isPublic: false,
   priceDiesel: "",
   sectionId: "",
+  year: "",
 };
 
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
   update: boolean;
-  setUpdate: (update: boolean) => void;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
   res: cartProps;
-  setRes: (res: cartProps | ((res: cartProps) => cartProps) | {}) => void;
+  setRes: Dispatch<SetStateAction<cartProps>>;
   complex?: boolean;
   setComplex?: Dispatch<SetStateAction<boolean>>;
+  isCul?: boolean;
 }
 export default function CreateCart({
   open,
@@ -44,8 +47,12 @@ export default function CreateCart({
   setRes,
   complex,
   setComplex,
+  isCul,
 }: props) {
   const [isErr, setIsErr] = useState<boolean>(false);
+  console.log(update);
+  console.log(res);
+
   return (
     <Dialog
       open={open}
@@ -65,8 +72,10 @@ export default function CreateCart({
         setIsErr={setIsErr}
         setOpen={setOpen}
         update={update}
+        setUpdate={setUpdate}
         complex={complex}
         setComplex={setComplex}
+        isCul={isCul}
       />
     </Dialog>
   );
