@@ -1,8 +1,12 @@
 import { Principal } from "..";
 import {
+  busCul,
   businessPlan,
+  cultivationTechnologies,
   culture,
   IbusinessPlan,
+  IcultivationTechnologies,
+  Iculture,
   Iresume,
   ItitlePage,
   resume,
@@ -16,10 +20,30 @@ import {
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
 export interface resBusinessPlan extends IbusinessPlan {
+  area: number;
+
   resume: Iresume;
   titlePage: ItitlePage;
+  busCuls: {
+    businessPlanId: number;
+    cultivationTechnologyId: number;
+    cultureId: number;
+    id: number;
+    cultivationTechnology: IcultivationTechnologies;
+    culture: Iculture;
+    area: number;
+  }[];
 }
-const includes = [{ model: resume }, { model: titlePage }, { model: culture }];
+const includes = [
+  { model: resume },
+  { model: titlePage },
+  // { model: culture },
+  {
+    model: busCul,
+    include: [{ model: culture }, { model: cultivationTechnologies }],
+  },
+  // { model: cultivationTechnologies },
+];
 class BusinessService {
   // async getCategory() {
   //   const category = await businessCategory.findAll();
@@ -44,6 +68,8 @@ class BusinessService {
   }
   async create(user: Principal | undefined, data: CreateBusinessPlan) {
     if (!user) return;
+    console.log(data);
+
     //@ts-ignore
     const plan: resBusinessPlan = await businessPlan.create(
       {
@@ -56,10 +82,24 @@ class BusinessService {
       },
       { include: includes }
     );
-    data.cultureIds.forEach((el) => {
+    for (let i = 0; i < data.cultureIds.length; i++) {
+      const el = data.cultureIds[i];
       //@ts-ignore
-      plan.addCulture(el);
-    });
+      for (let j = 0; j < el.tech.length; j++) {
+        const e = el.tech[j];
+        const last = await busCul.findOne({
+          order: [["id", "DESC"]],
+        });
+
+        await busCul.create({
+          id: last?.id! + 1,
+          businessPlanId: plan?.id,
+          cultureId: el.id,
+          cultivationTechnologyId: e.techId,
+          area: e.area,
+        });
+      }
+    }
     //@ts-ignore
     const res: resBusinessPlan | null = await businessPlan.findOne({
       where: { id: plan.id },
@@ -89,11 +129,23 @@ class BusinessService {
         include: includes,
       });
       //@ts-ignore
-      await res.setCultures([]);
+      await busCul.destroy({ where: { businessPlanId: res.id } });
       for (let i = 0; i < data.cultureIds.length; i++) {
         const el = data.cultureIds[i];
         //@ts-ignore
-        await res.addCulture(el);
+        for (let j = 0; j < el.tech.length; j++) {
+          const e = el.tech[j];
+          const last = await busCul.findOne({
+            order: [["id", "DESC"]],
+          });
+          await busCul.create({
+            id: last?.id! + 1,
+            businessPlanId: res?.id,
+            cultureId: el.id,
+            cultivationTechnologyId: e.techId,
+            area: e.area,
+          });
+        }
       }
       //@ts-ignore
       res = await businessPlan.findOne({
@@ -118,7 +170,7 @@ class BusinessService {
     const ind = await businessPlan.update(
       {
         isPublic: data.isPublic,
-        isAgree: false,
+        isAgree: data.isPublic,
         description: data.description,
       },
       { where: { id: data.planId } }

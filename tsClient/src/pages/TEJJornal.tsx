@@ -122,6 +122,9 @@ function TEJJornal() {
       </TableContainer>
       {!!(user.role == "service_role" || user.role == "ADMIN") && (
         <Box maxW="1000px" mx="auto">
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            Публікування ТЕП
+          </Text>
           <TableContainer
             maxW="1000px"
             mx="auto"

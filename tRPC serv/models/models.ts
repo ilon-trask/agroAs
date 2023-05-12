@@ -588,7 +588,28 @@ businessPlan.init(
   { sequelize }
 );
 
-export const busCul = sequelize.define("busCul", {}, { timestamps: false });
+export interface IbusCul {
+  id?: number;
+  businessPlanId?: number;
+  cultureId?: number;
+  cultivationTechnologyId?: number;
+  area: number;
+}
+export class busCul extends Model<IbusCul> {
+  declare id?: number;
+  declare businessPlanId?: number;
+  declare cultureId?: number;
+  declare cultivationTechnologyId?: number;
+  declare area: number;
+}
+busCul.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    area: { type: DataTypes.INTEGER },
+  },
+  { sequelize, timestamps: false }
+);
+
 export interface IcultivationTechnologies {
   id?: number;
   name: string;
@@ -1209,6 +1230,7 @@ worker.init(
   },
   { sequelize }
 );
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1249,8 +1271,18 @@ businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
 
+cultivationTechnologies.hasMany(busCul);
+
 businessPlan.belongsToMany(culture, { through: busCul });
 culture.belongsToMany(businessPlan, { through: busCul });
+cultivationTechnologies.belongsToMany(culture, { through: busCul });
+businessPlan.belongsToMany(cultivationTechnologies, { through: busCul });
+businessPlan.hasMany(busCul);
+busCul.belongsTo(businessPlan);
+culture.hasMany(busCul);
+busCul.belongsTo(culture);
+cultivationTechnologies.hasMany(busCul);
+busCul.belongsTo(cultivationTechnologies);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);

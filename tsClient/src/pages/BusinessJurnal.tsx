@@ -8,6 +8,7 @@ import useBusiness from "./hook/useBusiness";
 import { useNavigate } from "react-router-dom";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
+import DeleteAlert, { DeleteProps } from "../components/DeleteAlert";
 
 function BusinessJurnal() {
   const { business, map } = useContext(Context);
@@ -22,10 +23,7 @@ function BusinessJurnal() {
   });
   const [openBusiness, setOpenBusiness] = useState(false);
   const [update, setUpdate] = useState(false);
-  const [openQuiz, setOpenQuiz] = useState(false);
-  const [updateQuiz, setUpdateQuiz] = useState(false);
 
-  const [quizRes, setQuizRes] = useState({});
   const [res, setRes] = useState<CreateBusinessProp>({
     name: "",
     dateStart: "",
@@ -36,6 +34,11 @@ function BusinessJurnal() {
   });
   useBusiness(business, map);
   const navigate = useNavigate();
+  const [deleteRes, setDeleteRes] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "бізнес-план",
+  });
   return (
     <Box maxW="1000px" mx="auto">
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -47,6 +50,7 @@ function BusinessJurnal() {
           setOpen={setOpenBusiness}
           setRes={setRes}
           setUpdate={setUpdate}
+          setDeleteOpen={setDeleteRes}
         />
       </TableContainer>
       <Button onClick={() => setOpenBusiness(true)}>
@@ -60,13 +64,7 @@ function BusinessJurnal() {
       >
         Переглянути
       </Button>
-      <Button
-        onClick={() => {
-          setOpenQuiz(true);
-        }}
-      >
-        Конструктор
-      </Button>
+
       <CreateBusiness
         open={openBusiness}
         setOpen={setOpenBusiness}
@@ -75,13 +73,12 @@ function BusinessJurnal() {
         update={update}
         setUpdate={setUpdate}
       />
-      <QuizBusinessPopUp
-        open={openQuiz}
-        setOpen={setOpenQuiz}
-        update={updateQuiz}
-        setUpdate={setUpdateQuiz}
-        res={quizRes}
-        setRes={setQuizRes}
+
+      <DeleteAlert
+        func={deleteRes.func}
+        open={deleteRes.isOpen}
+        setOpen={setDeleteRes as any}
+        text={deleteRes.text}
       />
     </Box>
   );

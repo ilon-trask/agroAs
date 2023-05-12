@@ -18,10 +18,10 @@ import {
   Tr,
   Td,
 } from "@chakra-ui/react";
-import { EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { EditIcon, PlusSquareIcon, ViewIcon } from "@chakra-ui/icons";
 import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
 import { IbusinessPlan } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
@@ -33,6 +33,10 @@ import { patchResume, patchTitlePage } from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
+import CreateBusiness, { CreateBusinessProp } from "../modules/CreateBusiness";
+import { setPatchBusinessPlan } from "../modules/BusinessTable";
+import { ENTERPRISE_ROUTER } from "../utils/consts";
+import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -47,7 +51,10 @@ function BiznesPlanPage() {
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
   const [infCartId, setInfCartId] = useState<number>(0);
-  const { map, user, business } = useContext(Context);
+  const [businessOpen, setBusinessOpen] = useState(false);
+  //@ts-ignore
+  const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
+  const { map, user, enterpriseStore, business } = useContext(Context);
   useBusiness(business, map);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
@@ -63,17 +70,145 @@ function BiznesPlanPage() {
     setChild(children);
     setName(name);
   }
-
+  const myEnterprise = enterpriseStore.enterprise.find(
+    (el) => el.id == myBusiness.enterpriseId
+  );
   const [isActiveInput, setIsActiveInput] = useState(false);
+  const [openQuiz, setOpenQuiz] = useState(false);
+  const [updateQuiz, setUpdateQuiz] = useState(false);
+
+  const [quizRes, setQuizRes] = useState({});
   return (
-    <Box overflowX={"scroll"}>
+    <Box overflowX={"scroll"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        Бізнес-план
+        Бізнес-план {myBusiness?.name}
       </Heading>
+      <Text textAlign={"center"} textTransform={"uppercase"} fontSize={"20px"}>
+        Загальні дані
+      </Text>{" "}
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table>
+          <Thead>
+            <Tr>
+              <Td></Td>
+              <Td>Культура</Td>
+              <Td>Технологія</Td>
+              <Td>Площа</Td>
+              <Td>Дата початку</Td>
+              <Td>Термін реалізації</Td>
+              <Td>Початкова сума</Td>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td
+                onClick={() => {
+                  setBusinessOpen(true);
+                  const cultureIds = setPatchBusinessPlan(myBusiness);
+                  setBusinessRes({
+                    cultureIds: cultureIds,
+                    dateStart: myBusiness.dateStart,
+                    enterpriseId: myBusiness.enterpriseId!,
+                    initialAmount: myBusiness.initialAmount,
+                    name: myBusiness.name,
+                    realizationTime: myBusiness.realizationTime,
+                    planId: myBusiness.id,
+                  });
+                }}
+              >
+                <EditIcon
+                  color={"blue.400"}
+                  w={"20px"}
+                  h={"auto"}
+                  cursor={"pointer"}
+                />
+              </Td>
+              <Td>
+                {myBusiness?.busCuls?.map((el) => (
+                  <Box>{el?.culture?.name}</Box>
+                ))}
+              </Td>
+              <Td>
+                {myBusiness?.busCuls?.map((el) => (
+                  <Box>{el?.cultivationTechnology?.name}</Box>
+                ))}
+              </Td>
+              <Td>
+                {myBusiness?.busCuls?.map((el) => (
+                  <Box>{el.area}</Box>
+                ))}
+              </Td>
+              <Td>{myBusiness?.dateStart}</Td>
+              <Td>{myBusiness?.realizationTime}</Td>
+              <Td>{myBusiness?.initialAmount}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <CreateBusiness
+        open={businessOpen}
+        setOpen={setBusinessOpen}
+        res={businessRes}
+        setRes={setBusinessRes}
+        update={true}
+        setUpdate={() => {}}
+      />
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        {myBusiness?.name}
+        Підприємство
       </Heading>
-      <Text textAlign={"center"}>Загальні данні</Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Td></Td>
+              <Td>Назва підприємства</Td>
+              <Td>Організаційно правова форма</Td>
+              <Td>Група оподаткування</Td>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td
+                onClick={() => {
+                  // setRes({
+                  //   entId: el.id,
+                  //   form: el.form,
+                  //   name: el.name,
+                  //   taxGroup: el.taxGroup,
+                  // });
+                  // setUpdate(true);
+                  // setOpen(true);
+                }}
+              >
+                <EditIcon
+                  color={"blue.400"}
+                  w={"20px"}
+                  h={"auto"}
+                  cursor={"pointer"}
+                />
+              </Td>
+              <Td>{myEnterprise?.name}</Td>
+              <Td>{myEnterprise?.form}</Td>
+              <Td>{myEnterprise?.taxGroup}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Button
+        onClick={() => {
+          setOpenQuiz(true);
+        }}
+      >
+        Конструктор
+      </Button>
+      <QuizBusinessPopUp
+        open={openQuiz}
+        setOpen={setOpenQuiz}
+        update={updateQuiz}
+        setUpdate={setUpdateQuiz}
+        res={quizRes}
+        setRes={setQuizRes}
+      />
       <Box
         maxW={"1000px"}
         mx="auto"
