@@ -6,14 +6,13 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { observer } from "mobx-react-lite";
 type props = {
-  id: number;
-  setMapOpen: (open: boolean) => void;
-  setUpdate: (update: boolean) => void;
-  setRes: (res: cartProps) => void;
+  id?: number;
+  setMapOpen?: (open: boolean) => void;
+  setUpdate?: (update: boolean) => void;
+  setRes?: (res: cartProps) => void;
 };
 
 function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
-  let th = { fontSize: "18px", padding: "0 10px " };
   const { map, user } = useContext(Context);
   let myMap = map.maps.find((el) => el.id == id);
   if (!myMap) {
@@ -38,26 +37,24 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
         </Tr>
       </Thead>
       <Tbody>
-        {
-          <Tr key={myMap?.id}>
-            {user.role != "" && (
-              <Td
-                onClick={() => {
-                  setMapOpen(true);
-                  setUpdate(true);
-                  //@ts-ignore
-                  setRes({ ...myMap });
-                }}
-              >
-                <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
-              </Td>
-            )}
-            <Td>{myMap?.nameCart}</Td>
-            <Td>{myMap?.area}</Td>
-            <Td>{myMap?.salary}</Td>
-            <Td>{myMap?.priceDiesel}</Td>
-          </Tr>
-        }
+        <Tr>
+          {user.role != "" && (
+            <Td
+              onClick={() => {
+                if (setMapOpen) setMapOpen(true);
+                if (setUpdate) setUpdate(true);
+                //@ts-ignore
+                if (setRes) setRes({ ...myMap });
+              }}
+            >
+              <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
+            </Td>
+          )}
+          <Td>{myMap?.nameCart}</Td>
+          <Td>{myMap?.area}</Td>
+          <Td>{myMap?.salary}</Td>
+          <Td>{myMap?.priceDiesel}</Td>
+        </Tr>
       </Tbody>
     </Table>
   );

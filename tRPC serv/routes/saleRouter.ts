@@ -30,4 +30,15 @@ export const saleRouter = router({
       const res = await saleService.delete(ctx.user, input);
       return res;
     }),
+  setIsPlan: publicProcedure
+    .input(
+      z.object({
+        saleId: z.number(),
+        isPlan: z.boolean(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const res = await saleService.setIsPlan(ctx.user, input);
+      return res;
+    }),
 });

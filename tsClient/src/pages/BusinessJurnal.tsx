@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
 import DeleteAlert, { DeleteProps } from "../components/DeleteAlert";
+import useEnterprise from "./hook/useEnterprise";
 
 function BusinessJurnal() {
   const { business, map } = useContext(Context);
@@ -23,7 +24,7 @@ function BusinessJurnal() {
   });
   const [openBusiness, setOpenBusiness] = useState(false);
   const [update, setUpdate] = useState(false);
-
+  useEnterprise();
   const [res, setRes] = useState<CreateBusinessProp>({
     name: "",
     dateStart: "",

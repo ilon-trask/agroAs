@@ -37,6 +37,14 @@ import CreateBusiness, { CreateBusinessProp } from "../modules/CreateBusiness";
 import { setPatchBusinessPlan } from "../modules/BusinessTable";
 import { ENTERPRISE_ROUTER } from "../utils/consts";
 import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
+import StaffingTable from "../modules/StaffingTable";
+import useEnterprise from "./hook/useEnterprise";
+import GeneralDataTable from "../modules/GeneralDataTable";
+import CashFlowTable from "../modules/CashFlowTable";
+import PlanIncomeProductionTable from "../modules/PlanIncomeProductionTable";
+import SaleTable from "../modules/SaleTable";
+import CostProdTable from "../modules/CostProdTable";
+import CartsTable from "../modules/CartsTable";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -54,13 +62,14 @@ function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
-  const { map, user, enterpriseStore, business } = useContext(Context);
+  const { map, user, enterpriseStore, business, income } = useContext(Context);
   useBusiness(business, map);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
     JSON.stringify(business.businessPlan)
   );
-  const [myBusiness] = Business.filter((el) => el.id == id);
+  const myBusiness = Business.find((el) => el.id == id);
+  if (!myBusiness) throw new Error("плак плак");
   //@ts-ignore
   let data = name && child ? myBusiness[name][child] : "";
   const [nData, setNData] = useState<string>();
@@ -71,13 +80,16 @@ function BiznesPlanPage() {
     setName(name);
   }
   const myEnterprise = enterpriseStore.enterprise.find(
-    (el) => el.id == myBusiness.enterpriseId
+    (el) => el.id == myBusiness?.enterpriseId
   );
   const [isActiveInput, setIsActiveInput] = useState(false);
   const [openQuiz, setOpenQuiz] = useState(false);
   const [updateQuiz, setUpdateQuiz] = useState(false);
+  useEnterprise();
 
   const [quizRes, setQuizRes] = useState({});
+  const start = +myBusiness?.dateStart?.split("-")[0]!;
+  const end = +start + +myBusiness?.realizationTime!;
   return (
     <Box overflowX={"scroll"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
@@ -85,7 +97,7 @@ function BiznesPlanPage() {
       </Heading>
       <Text textAlign={"center"} textTransform={"uppercase"} fontSize={"20px"}>
         Загальні дані
-      </Text>{" "}
+      </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table>
           <Thead>
@@ -104,15 +116,17 @@ function BiznesPlanPage() {
               <Td
                 onClick={() => {
                   setBusinessOpen(true);
-                  const cultureIds = setPatchBusinessPlan(myBusiness);
+                  const cultureIds = myBusiness
+                    ? setPatchBusinessPlan(myBusiness)
+                    : null;
                   setBusinessRes({
-                    cultureIds: cultureIds,
-                    dateStart: myBusiness.dateStart,
-                    enterpriseId: myBusiness.enterpriseId!,
-                    initialAmount: myBusiness.initialAmount,
-                    name: myBusiness.name,
-                    realizationTime: myBusiness.realizationTime,
-                    planId: myBusiness.id,
+                    cultureIds: cultureIds || [{ id: 0, tech: [] }],
+                    dateStart: myBusiness?.dateStart!,
+                    enterpriseId: myBusiness?.enterpriseId!,
+                    initialAmount: myBusiness?.initialAmount!,
+                    name: myBusiness?.name!,
+                    realizationTime: myBusiness?.realizationTime!,
+                    planId: myBusiness?.id,
                   });
                 }}
               >
@@ -194,13 +208,25 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
-      <Button
-        onClick={() => {
-          setOpenQuiz(true);
-        }}
-      >
-        Конструктор
-      </Button>
+      <Box display={"flex"} justifyContent={"space-between"}>
+        <Button>Отримати PDF</Button>
+        <Button
+          onClick={() => {
+            setOpenQuiz(true);
+            setQuizRes({
+              cultureIds: myBusiness ? setPatchBusinessPlan(myBusiness) : null,
+              dateStart: myBusiness?.dateStart,
+              enterpriseId: myBusiness?.enterpriseId!,
+              initialAmount: myBusiness?.initialAmount,
+              name: myBusiness?.name,
+              realizationTime: myBusiness?.realizationTime,
+              planId: myBusiness?.id,
+            });
+          }}
+        >
+          Конструктор
+        </Button>
+      </Box>
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -208,6 +234,7 @@ function BiznesPlanPage() {
         setUpdate={setUpdateQuiz}
         res={quizRes}
         setRes={setQuizRes}
+        cultures={myBusiness?.busCuls?.map((el) => el.culture) || []}
       />
       <Box
         maxW={"1000px"}
@@ -228,180 +255,308 @@ function BiznesPlanPage() {
           h={`${720 * 1.4}px`}
           border={"black 2px solid"}
           p={"30px"}
-          px={"60px"}
+          px={"30px"}
           overflowY={"scroll"}
         >
-          {data && (
-            <>
-              <Box display={"flex"} alignItems={"center"}>
-                <Button
-                  onClick={() => {
-                    setIsActiveInput(true);
-                  }}
-                >
-                  <EditIcon />
-                </Button>
-                <Text fontSize={"20px"} fontWeight={"500"}>
-                  {names[child!]}
-                </Text>
-                {isActiveInput && (
-                  <Button
-                    ml={"auto"}
-                    onClick={() => {
-                      setIsActiveInput(false);
-                      name == "resume"
-                        ? patchResume(business, {
-                            businessId: +id!,
-                            data: { [child!]: nData },
-                          })
-                        : name == "titlePage"
-                        ? patchTitlePage(business, {
-                            businessId: +id!,
-                            title: nData!,
-                          })
-                        : null;
-                    }}
-                  >
-                    Завершити редагування
-                  </Button>
-                )}
+          <Text fontSize={"20px"} fontWeight={"500"}>
+            {names[child!]}
+          </Text>
+          <>
+            <Box
+              mx={"auto"}
+              w={"fit-content"}
+              mt={20}
+              fontSize={"60px"}
+              lineHeight={10}
+              color={"#20401E"}
+            >
+              <Text>Ягідна </Text>
+              <Text ml={"-20px"}>плантація</Text>
+            </Box>
+            <Text
+              mt={40}
+              fontSize={"32px"}
+              fontWeight={"bold"}
+              textAlign={"center"}
+            >
+              Бізнес-план
+            </Text>
+            <Text textAlign={"center"} mt={3}>
+              Вирощування та продаж ягід:
+            </Text>
+            <Box mt={200} maxW={"80%"} mx={"auto"}>
+              <Box mt={5}>
+                <Text>Мета проекту</Text>
               </Box>
-              {isActiveInput ? (
-                <Textarea
-                  // value={data}
-                  onChange={(e) => setNData(e.target.value)}
-                >
-                  {data}
-                </Textarea>
-              ) : child == "title" ? (
-                <>
-                  <Box
-                    mx={"auto"}
-                    w={"fit-content"}
-                    mt={20}
-                    fontSize={"60px"}
-                    lineHeight={10}
-                    color={"#20401E"}
-                  >
-                    <Text>Ягідна </Text>
-                    <Text ml={"-20px"}>плантація</Text>
-                  </Box>
-                  <Text
-                    mt={40}
-                    fontSize={"32px"}
-                    fontWeight={"bold"}
-                    textAlign={"center"}
-                  >
-                    Бізнес-план
-                  </Text>
-                  <Text textAlign={"center"} mt={3}>
-                    Вирощування та продаж ягід:
-                  </Text>
-                  <Box mt={200} maxW={"80%"} mx={"auto"}>
-                    <Box mt={5}>
-                      <Text>Мета проекту</Text>
+              <Box mt={5}>
+                <Text>Розробник</Text>
+              </Box>
+              <Box mt={5}>
+                <Text>Відповідальна особа</Text>
+              </Box>
+              <Text mt={50} textAlign={"center"} fontSize={"10px"}>
+                Інформація, наведена у проекті, є конфіденційною та надається за
+                умови, що не буде передана третім особам без попереднього
+                погодження з розробником проекту
+              </Text>
+            </Box>
+            <Box mt={20} textAlign={"center"}>
+              <Text>Івано-франківськ</Text>
+              <Text>2023</Text>
+            </Box>
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Резюме
+            </Heading>
+            <Table>
+              <Tbody>
+                <Tr>
+                  <Td>Опис проекту</Td>
+                  <Td></Td>
+                  <Td>Проект створення ягідної плантації площею 12 га</Td>
+                </Tr>
+                <Tr>
+                  <Td>Місце розташування</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+                <Tr>
+                  <Td>Термін реалізації проекту</Td>
+                  <Td display={"flex"}>
+                    <Box>
+                      <Text> Проекний період</Text>
+                      <Text> Початок продажів</Text>
                     </Box>
-                    <Box mt={5}>
-                      <Text>Розробник</Text>
-                    </Box>
-                    <Box mt={5}>
-                      <Text>Відповідальна особа</Text>
-                    </Box>
-                    <Text mt={50} textAlign={"center"} fontSize={"10px"}>
-                      Інформація, наведена у проекті, є конфіденційною та
-                      надається за умови, що не буде передана третім особам без
-                      попереднього погодження з розробником проекту
-                    </Text>
+                    <Box></Box>
+                  </Td>
+                  <Td></Td>
+                </Tr>
+                <Tr>
+                  <Td>Бюджет проекту</Td>
+                  <Td>
+                    <Text>Вартість проекту</Text>
+                    <Text>В тому числі:</Text>
+                    <Text>Власні кошти</Text>
+                    <Text>Кредит</Text>
+                    <Text>Інвестиційні кошти</Text>
+                    <Text>Державна підтримка</Text>
+                    <Text>Коофіцієнт автономії</Text>
+                  </Td>
+                  <Td></Td>
+                </Tr>
+                <Tr>
+                  <Td>Прибутковість проекту</Td>
+                  <Td>
+                    <Text>Валовий дохід</Text>
+                    <Text>Чистий прибуток</Text>
+                    <Text>Рентабельність</Text>
+                    <Text>Термін окупності</Text>
+                  </Td>
+                  <Td></Td>
+                </Tr>
+                <Tr>
+                  <Td>Інвестиційна привабливість проекту</Td>
+                  <Td>
+                    <Text>Дисконтний період окупності (DPP), років</Text>
+                    <Text>Чиста поточна варість проекту (NPV)</Text>
+                    <Text>Внутрішня ставка доходу (IRR)</Text>
+                    <Text>Індекс прибутковості вкладень (PI)</Text>
+                  </Td>
+                  <Td></Td>
+                </Tr>
+              </Tbody>
+            </Table>
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Підприємство
+            </Heading>
+            <Text textAlign={"center"}>
+              Штатний розпис
+              <br />
+              {myEnterprise?.form}
+            </Text>
+            {(() => {
+              console.log(end);
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <>
+                    <Text fontWeight={"bold"}>{i}</Text>
+                    <StaffingTable thisWorkers={[]} />
+                  </>
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Виробництво
+            </Heading>
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              Технологічні карти
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(<Text fontWeight={"bold"}>{i}</Text>);
+                for (let j = 0; j < myBusiness.busCuls.length; j++) {
+                  const e = myBusiness.busCuls[j];
+                  const maps = map.maps.map((m) => ({ ...m, area: e.area }));
+                  res.push(
+                    <CartsTable
+                      maps={maps.filter(
+                        (el) =>
+                          el.cultureId == e?.cultureId &&
+                          el.cultivationTechnologyId ==
+                            e?.cultivationTechnologyId &&
+                          el.year == i - start + 1
+                      )}
+                      deleteOpen={() => {}}
+                      setDeleteOpen={() => {}}
+                      setOpen={() => {}}
+                      setPublicationOpen={() => {}}
+                      setRes={() => {}}
+                      setShowAlert={() => {}}
+                      setUpdate={() => {}}
+                      isCul={true}
+                    />
+                  );
+                }
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              Планування виробництва продукції
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <>
+                    <Text fontWeight={"bold"}>{i}</Text>
+                    <PlanIncomeProductionTable isPlan={true} />
+                  </>
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              Продаж продукції
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <>
+                    <Text fontWeight={"bold"}>{i}</Text>
+                    <SaleTable month="" year={i} isPlan={true} />
+                  </>
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Фінансування
+            </Heading>
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              Грошовий потік
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <Box mt={"50px"}>
+                    <CashFlowTable
+                      year={i}
+                      startSum={myBusiness?.initialAmount}
+                    />
                   </Box>
-                  <Box mt={20} textAlign={"center"}>
-                    <Text>Івано-франківськ</Text>
-                    <Text>2023</Text>
-                  </Box>
-                </>
-              ) : child == "aboutProject" ? (
-                <>
-                  <Table>
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              План залучення коштів
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <Table size={"sm"}>
+                    <Thead>
+                      <Tr>
+                        <Th>Назва</Th>
+                        <Th>Дата</Th>
+                        <Th>Сума</Th>
+                        <Th>Призначення</Th>
+                      </Tr>
+                    </Thead>
                     <Tbody>
-                      <Tr>
-                        <Td>Опис проект</Td>
-                        <Td></Td>
-                        <Td>фівафва</Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Місце розташування</Td>
-                        <Td></Td>
-                        <Td></Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Термін реалізації проекту</Td>
-                        <Td display={"flex"}>
-                          <Box>
-                            <Text> Проекний період</Text>
-                            <Text> Початок продажів</Text>
-                          </Box>
-                          <Box></Box>
-                        </Td>
-                        <Td></Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Бюджет проекту</Td>
-                        <Td>
-                          <Text>Вартість проекту</Text>
-                          <Text>В тому числі:</Text>
-                          <Text>Власні кошти</Text>
-                          <Text>Кредит</Text>
-                          <Text>Інвестиційні кошти</Text>
-                          <Text>Державна підтримка</Text>
-                          <Text>Коофіцієнт автономії</Text>
-                        </Td>
-                        <Td></Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Прибутковість проекту</Td>
-                        <Td>
-                          <Text>Валовий дохід</Text>
-                          <Text>Чистий прибуток</Text>
-                          <Text>Рентабельність</Text>
-                          <Text>Термін окупності</Text>
-                        </Td>
-                        <Td></Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Інвестиційна привабливість проекту</Td>
-                        <Td>
-                          <Text>Дисконтний період окупності (DPP), років</Text>
-                          <Text>Чиста поточна варість проекту (NPV)</Text>
-                          <Text>Внутрішня ставка доходу (IRR)</Text>
-                          <Text>Індекс прибутковості вкладень (PI)</Text>
-                        </Td>
-                        <Td></Td>
-                      </Tr>
+                      {(() => {
+                        const res = income.credit.map((e) => {
+                          if (e.isUseCost && +e.date.split("-")[0] == i)
+                            return (
+                              <Tr>
+                                <Td>{e.name}</Td>
+                                <Td>{e.date}</Td>
+                                <Td>{e.cost}</Td>
+                                <Td>{e.purpose}</Td>
+                              </Tr>
+                            );
+                        });
+                        if (res)
+                          return (
+                            <>
+                              <Tr>
+                                <Td fontWeight={"bold"}>Кредит</Td>
+                                <Td></Td>
+                                <Td></Td>
+                                <Td></Td>
+                              </Tr>
+                              {res}
+                            </>
+                          );
+                      })()}
                     </Tbody>
                   </Table>
-                </>
-              ) : (
-                <Text>{data}</Text>
-              )}
-              <Box>
-                {!!infCartId && child == "investment" && (
-                  <Box mt={4}>
-                    <CartsTableInBusiness cartId={infCartId} />
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Показники
+            </Heading>
+            <Heading textAlign={"center"} size={"sm"} mt={5}>
+              Розрахунок собівартості продукції
+            </Heading>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <Box mt={"50px"}>
+                    <CostProdTable />
                   </Box>
-                )}
-                {child == "investment" && (
-                  <Button
-                    onClick={() => {
-                      setShowSelectCart(true);
-                    }}
-                  >
-                    Добавити таблицю
-                  </Button>
-                )}
+                );
+              }
+              return res;
+            })()}
+            <Heading textAlign={"center"} size={"md"} mt={5}>
+              Додатки
+            </Heading>
+          </>
+          <Box>
+            {!!infCartId && child == "investment" && (
+              <Box mt={4}>
+                <CartsTableInBusiness cartId={infCartId} />
               </Box>
-            </>
-          )}
+            )}
+            <Button
+              onClick={() => {
+                setShowSelectCart(true);
+              }}
+            >
+              Добавити таблицю
+            </Button>
+          </Box>
         </Box>
-      </Box>{" "}
+      </Box>
       <SelectCart
         open={showSelectCart}
         setOpen={setShowSelectCart}

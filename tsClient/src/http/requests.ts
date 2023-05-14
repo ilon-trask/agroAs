@@ -124,10 +124,7 @@ const client = createTRPCProxyClient<AppRouter>({
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
-    console.log(map.maps);
     map.maps = map.maps.filter((el) => el.id != cart.id);
-    console.log(map.maps);
-
     map.complex = map.complex.filter((el) => el.id != cart.id);
     if (cart.isComplex) {
       map.newComplex = cart;
@@ -135,7 +132,7 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
       map.newMap = cart;
     }
 
-    const opers = carts[i].tech_operations;
+    const opers = cart.tech_operations;
     if (!opers) return;
     for (let j = 0; j < opers.length; j++) {
       const oper = opers[j];
@@ -151,8 +148,6 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
       } else if (oper.cost_material) {
         map.newCostMaterials = oper.cost_material;
       } else if (oper.cost_hand_work) {
-        console.log(oper.cost_hand_work);
-
         map.newCostHandWork = oper.cost_hand_work;
       }
     }
@@ -356,9 +351,10 @@ export async function patchOperation(
 
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   //@ts-ignore
-  let [mapOperData] = mapData.tech_operations?.filter((el) => {
-    return el?.id == arr.res.operId;
-  });
+  let mapOperData = mapData.tech_operations?.find(
+    (el) => el?.id == arr.res.operId
+  );
+
   mapData.costHectare! -= operValue(operData);
   await client.oper.patch[arr.cell]
     .query({
@@ -387,6 +383,7 @@ export async function patchOperation(
       map.costTransport = map.costTransport.filter(
         (el) => el.techOperationId != arr.res.operId
       );
+      if (!mapOperData) throw new Error("Нема");
 
       if (res.aggregate) {
         mapOperData.aggregate = res.aggregate;
@@ -573,8 +570,6 @@ export function agreeCarts(map: MapStore) {
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.get.query().then((res) => {
-    console.log(res);
-
     Bus.businessPlan = res;
     map.isLoading = false;
   });
@@ -587,7 +582,6 @@ export function createBusinessPlan(
 ) {
   map.isLoading = true;
   client.business.create.query(data).then((res) => {
-    console.log(res);
     if (!res) return;
     Bus.newBusinessPlan = res;
     map.isLoading = false;
@@ -710,7 +704,7 @@ export function patchTitlePage(
 export function getOnlyCart(map: MapStore) {
   map.isLoading = true;
   client.cart.getOnlyCart.query().then((res) => {
-    map.maps = [];
+    // map.maps = [];
 
     res.forEach((el) => {
       let myMap = map.maps.find((e) => {
@@ -832,8 +826,6 @@ export function getProductTEJMap(map: MapStore) {
 }
 export function createProduct(map: MapStore, data: CreateProductType) {
   client.income.createProduct.query(data).then((res) => {
-    console.log(res);
-
     map.newProduct = res;
   });
 }
@@ -888,8 +880,6 @@ export function patchTEJ(
 }
 
 export function setIsPublicTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
-  console.log("work");
-
   client.TEJ.setIsPublic.query(data).then((res) => {
     if (!res) return;
     TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
@@ -909,8 +899,6 @@ export function getNoAgreeJustification(TEJ: TEJStore) {
 }
 
 export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
-  console.log(data.isAgree);
-
   client.TEJ.setIsAgree.query(data).then((res) => {
     TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
     TEJ.newJustification = res;
@@ -1019,8 +1007,6 @@ export function createProduction(
   data: createProductionType
 ) {
   client.production.create.query(data).then((res) => {
-    console.log(res);
-
     income.newProduction = res;
   });
 }
@@ -1359,5 +1345,25 @@ export function deleteWorker(
     enterprise.worker = enterprise.worker.filter(
       (el) => el.id != data.workerId
     );
+  });
+}
+
+export function productSetIsPlan(
+  income: IncomeStore,
+  data: { prodId: number; isPlan: boolean }
+) {
+  client.production.setIsPlan.query(data).then((res) => {
+    income.production = income.production.filter((el) => el.id != data.prodId);
+    income.newProduction = res;
+  });
+}
+
+export function saleSetIsPlan(
+  income: IncomeStore,
+  data: { saleId: number; isPlan: boolean }
+) {
+  client.sale.setIsPlan.query(data).then((res) => {
+    income.production = income.production.filter((el) => el.id != data.saleId);
+    income.newProduction = res;
   });
 }

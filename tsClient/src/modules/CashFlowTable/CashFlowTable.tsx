@@ -55,7 +55,13 @@ function PopOver({
 }
 const incomeTypes = useIncomeTypes;
 const outcomeTypes = useOutcomeTypes;
-function CashFlowTable({ year }: { year: number }) {
+function CashFlowTable({
+  year,
+  startSum,
+}: {
+  year: number;
+  startSum?: number;
+}) {
   const { map, income } = useContext(Context);
 
   const outcomes = map.outcome.filter((el) => el.isUsing! == true);
@@ -200,8 +206,8 @@ function CashFlowTable({ year }: { year: number }) {
         <Tr>
           <Th></Th>
           <Th></Th>
-          <Th>10000</Th>
-          <Th colSpan={3}>Залишок на початок періоду 2222</Th>
+          <Th>{startSum || 10000}</Th>
+          <Th colSpan={3}>Залишок на початок періоду {year || 2222}</Th>
           <Th></Th>
         </Tr>
         <Tr>
@@ -429,7 +435,7 @@ function CashFlowTable({ year }: { year: number }) {
           <Th></Th>
           <Th></Th>
           <Th>10000</Th>
-          <Th colSpan={3}>Залишок на кінець періоду 2222</Th>
+          <Th colSpan={3}>Залишок на кінець періоду {year || 2222}</Th>
           <Th></Th>
         </Tr>
       </Tbody>

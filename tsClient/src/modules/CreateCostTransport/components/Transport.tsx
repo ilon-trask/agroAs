@@ -64,10 +64,12 @@ const Transport = observer(
     update,
   }: InputProps<TransportProps>) => {
     const { map } = useContext(Context);
+    console.log(map.maps.filter((el) => el.id == 119));
+
     const { id } = useParams();
     useEffect(() => {
       setRes({ ...res, unitsOfCost: "грн/га" });
-    }, [res]);
+    }, [res.nameOper]);
     return (
       <ModalBody>
         <Heading as={"h4"} size="md" textAlign={"center"}>

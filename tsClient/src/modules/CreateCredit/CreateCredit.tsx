@@ -5,6 +5,7 @@ import {
   Select,
   ModalFooter,
   Button,
+  Checkbox,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
@@ -20,6 +21,7 @@ export type CreditProps = {
   date: string;
   purpose: CreditPurposeType | "";
   cost: number | "";
+  isUseCost: boolean;
 };
 type props = {
   open: boolean;
@@ -123,6 +125,16 @@ function CreateCredit({
           </Select>
         </Box>
       </Box>
+      <Box width={"fit-content"} mx={"auto"}>
+        <Checkbox
+          isChecked={res.isUseCost}
+          onChange={() =>
+            setRes((prev) => ({ ...prev, isUseCost: !prev.isUseCost }))
+          }
+        >
+          Використовувати в бізнес-плані
+        </Checkbox>
+      </Box>
       <ModalFooter>
         <Button
           onClick={() => {
@@ -134,6 +146,7 @@ function CreateCredit({
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
+                  isUseCost: res.isUseCost,
                 });
               } else {
                 res.cost = +res.cost;
@@ -142,6 +155,7 @@ function CreateCredit({
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
+                  isUseCost: res.isUseCost,
                 });
               }
               setOpen(false);

@@ -52,60 +52,7 @@ const CartsTableItem = observer(
       <>
         <Tr key={e.id!}>
           <Td fontWeight={"600"}>{e.name}</Td>
-
-          <Td
-            textAlign={"center"}
-            cursor={"pointer"}
-            onClick={
-              user.role == ""
-                ? () => setShowAlert(true)
-                : () => {
-                    setOpen(true);
-                  }
-            }
-          >
-            <PlusSquareIcon w={"20px"} h={"auto"} />
-          </Td>
-
-          <Td></Td>
         </Tr>
-        {!!e.children &&
-          props?.map((el) => {
-            if (
-              el != "id" &&
-              el != "createdAt" &&
-              el != "updatedAt" &&
-              el != "id_tableInvestment" &&
-              el != "businessPlanId"
-            ) {
-              if (e.children[el]) {
-                return (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        getData(
-                          e.label,
-                          el as iChild,
-                          e.children.id_tableInvestment
-                        );
-                      }}
-                      cursor={"pointer"}
-                      _hover={{ color: "blue.400" }}
-                    >
-                      {
-                        //@ts-ignore
-                        names[el]
-                      }
-                    </Td>
-                    <Td></Td>
-                    <Td></Td>
-                  </Tr>
-                );
-              } else {
-                return null;
-              }
-            }
-          })}
       </>
     );
   }

@@ -31,8 +31,8 @@ function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
       props={obj}
       res={obj}
       setRes={setRes}
-      update={false}
-      setUpdate={() => {}}
+      update={update}
+      setUpdate={setUpdate}
     >
       <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
         Дані для розрахунку
@@ -41,8 +41,11 @@ function CreateSale({ open, setOpen, res, setRes, setUpdate, update }: props) {
       <ModalFooter>
         <Button
           onClick={() => {
+            console.log(res);
             if (res.amount && res.date && res.price && res.productionId) {
               if (update) {
+                console.log(res);
+
                 patchSale(income, {
                   amount: res.amount,
                   date: res.date,

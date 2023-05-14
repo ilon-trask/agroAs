@@ -28,6 +28,16 @@ interface props {
   }) => void;
   isCul?: boolean;
 }
+function isNotEmpty(res: (JSX.Element | undefined)[][]) {
+  for (let i = 0; i < res.length; i++) {
+    const el = res[i];
+    for (let j = 0; j < el.length; j++) {
+      const e = el[j];
+      if (e) return true;
+    }
+  }
+  return false;
+}
 
 const CartsTable = observer(
   ({
@@ -42,7 +52,6 @@ const CartsTable = observer(
     isCul,
   }: props) => {
     const { map, user } = useContext(Context);
-
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
@@ -58,10 +67,11 @@ const CartsTable = observer(
             <Th>Площа (га)</Th>
             <Th>Загальна вартість (грн)</Th>
             <Th>Витрати на 1 га (грн)</Th>
-            <Th></Th>
+            {!isCul && <Th></Th>}
             {(user.role == "ADMIN" ||
               user.role == "AUTHOR" ||
-              user.role == "service_role") && <Th></Th>}
+              user.role == "service_role") &&
+              !isCul && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -73,44 +83,47 @@ const CartsTable = observer(
             <></>
           )}
           {isCul
-            ? map.culture.map((el) => (
-                <>
-                  <Tr>
-                    <Td></Td>
-                    <Td>{el.name}</Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                  </Tr>
+            ? map.culture.map((el) => {
+                const res = map.cultivationTechnologies.map((elx) =>
+                  maps.map((e) => {
+                    if (
+                      e.cultureId == el.id &&
+                      elx.id == e.cultivationTechnologyId
+                    )
+                      return (
+                        <CartsTableItem
+                          key={e.id}
+                          e={e}
+                          setOpen={setOpen}
+                          setRes={setRes}
+                          setUpdate={setUpdate}
+                          setShowAlert={setShowAlert}
+                          deleteOpen={deleteOpen}
+                          setDeleteOpen={setDeleteOpen}
+                          setPublicationOpen={setPublicationOpen}
+                          isCul={isCul}
+                        />
+                      );
+                  })
+                );
 
-                  {map.cultivationTechnologies.map((elx) =>
-                    maps.map((e) => {
-                      if (
-                        e.cultureId == el.id &&
-                        elx.id == e.cultivationTechnologyId
-                      )
-                        return (
-                          <CartsTableItem
-                            key={e.id}
-                            e={e}
-                            setOpen={setOpen}
-                            setRes={setRes}
-                            setUpdate={setUpdate}
-                            setShowAlert={setShowAlert}
-                            deleteOpen={deleteOpen}
-                            setDeleteOpen={setDeleteOpen}
-                            setPublicationOpen={setPublicationOpen}
-                            isCul={isCul}
-                          />
-                        );
-                    })
-                  )}
-                </>
-              ))
+                if (isNotEmpty(res))
+                  return (
+                    <>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{el.name}</Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td></Td>
+                      </Tr>
+
+                      {res}
+                    </>
+                  );
+              })
             : maps.map((e) => (
                 <CartsTableItem
                   key={e.id}

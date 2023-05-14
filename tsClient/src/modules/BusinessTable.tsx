@@ -21,7 +21,7 @@ export function setPatchBusinessPlan(el: resBusinessPlan) {
     id: number;
     tech: { techId: number; area: number }[];
   }[] = [];
-  el.busCuls.forEach((el) => {
+  el?.busCuls?.forEach((el) => {
     const myCulture = cultureIds.find((e) => e.id == el.cultureId);
     if (myCulture) {
       myCulture.tech.push({

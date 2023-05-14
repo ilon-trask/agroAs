@@ -70,14 +70,14 @@ const CartsTable = observer(
       },
       {
         id: 3,
-        name: "Про підприємство",
+        name: "Підприємство",
         label: "",
         setOpen: () => {},
         children: null,
       },
       {
         id: 4,
-        name: "Про проект",
+        name: "Виробництво",
         label: "",
         setOpen: () => {},
         children: null,
@@ -89,15 +89,20 @@ const CartsTable = observer(
         setOpen: () => {},
         children: null,
       },
-      { id: 6, name: "Додатки", label: "", setOpen: () => {}, children: null },
+      {
+        id: 6,
+        name: "Показники",
+        label: "",
+        setOpen: () => {},
+        children: null,
+      },
+      { id: 7, name: "Додатки", label: "", setOpen: () => {}, children: null },
     ];
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
           <Tr>
             <Th>Зміст</Th>
-            <Th></Th>
-            <Th></Th>
           </Tr>
         </Thead>
         <Tbody>

@@ -170,10 +170,8 @@ function SecondOpen({ open, setOpen, res, setRes, cultureId }: props) {
                   const myTech = myCulture?.tech.find(
                     (ex) => ex.techId == el.id
                   );
-                  console.log(myTech);
-                  console.log(e.target.value);
-
-                  myTech?.area = e.target.value as any;
+                  //@ts-ignore
+                  myTech.area = e.target.value as any;
                   return prev;
                 });
                 setUpd((prev) => !prev);
