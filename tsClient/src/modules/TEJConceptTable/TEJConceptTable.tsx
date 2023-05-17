@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import { observer } from "mobx-react-lite";
 
 import { Context } from "../../main";
@@ -14,30 +20,14 @@ import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessServi
 import { iChild, iName } from "../../pages/BusinessPlanPage";
 
 interface props {
-  // maps: resTechCartsWithOpers[] | [];
-  // setCreate: Dispatch<SetStateAction<boolean>>;
-  // deleteFunc: (BusinessId: number) => void;
-  // setShowAlert: Dispatch<SetStateAction<boolean>>;
-  // setUpdate: Dispatch<SetStateAction<boolean>>;
-  // setRes: Dispatch<SetStateAction<BusinessProps>>;
-  // agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
   setOpenResume: Dispatch<SetStateAction<boolean>>;
   setOpenTitle: Dispatch<SetStateAction<boolean>>;
   getData: (name: iName, children: iChild, infCartId: number | null) => void;
+  indicatorRef: RefObject<HTMLParagraphElement>;
+  buttonsRef: RefObject<HTMLDivElement>;
 }
 const CartsTable = observer(
-  ({
-    setOpenResume,
-    setOpenTitle,
-    getData,
-  }: // setCreate,
-  // deleteFunc,
-  // setShowAlert,
-  // setUpdate,
-  // setRes,
-  // agreeFunc,
-
-  props) => {
+  ({ setOpenResume, setOpenTitle, indicatorRef, buttonsRef }: props) => {
     const { map, user, business } = useContext(Context);
     const { id } = useParams();
     const Business: resBusinessPlan[] = JSON.parse(
@@ -45,7 +35,6 @@ const CartsTable = observer(
     );
     const [showAlert, setShowAlert] = useState(false);
     const [myBusiness] = Business.filter((el) => el.id == id);
-    console.log(myBusiness);
 
     const data: {
       id: number;
@@ -53,6 +42,7 @@ const CartsTable = observer(
       label: iName;
       setOpen: Dispatch<SetStateAction<boolean>> | ((res: any) => void);
       children: any;
+      ref: RefObject<HTMLParagraphElement>;
     }[] = [
       {
         id: 1,
@@ -60,6 +50,7 @@ const CartsTable = observer(
         label: "titlePage",
         setOpen: setOpenTitle,
         children: myBusiness?.titlePage,
+        ref: {} as any,
       },
       {
         id: 2,
@@ -67,6 +58,7 @@ const CartsTable = observer(
         label: "resume",
         setOpen: setOpenResume,
         children: myBusiness?.resume,
+        ref: {} as any,
       },
       {
         id: 3,
@@ -74,6 +66,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
+        ref: {} as any,
       },
       {
         id: 4,
@@ -81,6 +74,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
+        ref: {} as any,
       },
       {
         id: 5,
@@ -88,6 +82,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
+        ref: {} as any,
       },
       {
         id: 6,
@@ -95,8 +90,16 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
+        ref: indicatorRef,
       },
-      { id: 7, name: "Додатки", label: "", setOpen: () => {}, children: null },
+      {
+        id: 7,
+        name: "Додатки",
+        label: "",
+        setOpen: () => {},
+        children: null,
+        ref: {} as any,
+      },
     ];
     return (
       <Table variant="simple" size={"sm"}>
@@ -113,24 +116,11 @@ const CartsTable = observer(
           ) : (
             <></>
           )}
-          {data.map((e) => (
-            <BusinessTableItem
-              key={e.id}
-              e={e}
-              setOpen={e.setOpen}
-              // deleteFunc={deleteFunc}
-              setShowAlert={setShowAlert}
-              // setUpdate={setUpdate}
-              // setRes={setRes}
-              // agreeFunc={agreeFunc}
-              getData={getData}
-              // setOpen={setOpen}
-              // setUpdate={setUpdate}
-              // deleteOpen={deleteOpen}
-              // setDeleteOpen={setDeleteOpen}
-              // setPublicationOpen={setPublicationOpen}
-            />
-          ))}
+          {data.map((e) => {
+            console.log(e.ref);
+
+            return <BusinessTableItem key={e.id} e={e} aref={buttonsRef} />;
+          })}
         </Tbody>
       </Table>
     );

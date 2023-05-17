@@ -10,6 +10,7 @@ import Loader from "../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box, Td } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { IUserRole } from "../../../tRPC serv";
 
 interface props {
   maps: resTechCartsWithOpers[] | [];
@@ -38,7 +39,35 @@ function isNotEmpty(res: (JSX.Element | undefined)[][]) {
   }
   return false;
 }
-
+export function CartsTableHeadRow({
+  isCul,
+  isPlan,
+  role,
+}: {
+  isCul?: boolean;
+  isPlan?: boolean;
+  role: IUserRole;
+}) {
+  return (
+    <Tr>
+      {!isPlan && <Th></Th>}
+      {isCul && (
+        <>
+          <Th>Технологія</Th>
+          <Th>Рік</Th>
+        </>
+      )}
+      <Th>Назва карти</Th>
+      <Th>Площа (га)</Th>
+      <Th>Загальна вартість (грн)</Th>
+      <Th>Витрати на 1 га (грн)</Th>
+      {!isCul && !isPlan && <Th></Th>}
+      {(role == "ADMIN" || role == "AUTHOR" || role == "service_role") &&
+        !isCul &&
+        !isPlan && <Th></Th>}
+    </Tr>
+  );
+}
 const CartsTable = observer(
   ({
     maps,
@@ -55,24 +84,7 @@ const CartsTable = observer(
     return (
       <Table variant="simple" size={"sm"}>
         <Thead>
-          <Tr>
-            <Th></Th>
-            {isCul && (
-              <>
-                <Th>Технологія</Th>
-                <Th>Рік</Th>
-              </>
-            )}
-            <Th>Назва карти</Th>
-            <Th>Площа (га)</Th>
-            <Th>Загальна вартість (грн)</Th>
-            <Th>Витрати на 1 га (грн)</Th>
-            {!isCul && <Th></Th>}
-            {(user.role == "ADMIN" ||
-              user.role == "AUTHOR" ||
-              user.role == "service_role") &&
-              !isCul && <Th></Th>}
-          </Tr>
+          <CartsTableHeadRow role={user.role} isCul={isCul} />
         </Thead>
         <Tbody>
           {map.isLoading ? (

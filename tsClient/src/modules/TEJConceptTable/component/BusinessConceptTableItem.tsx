@@ -1,60 +1,56 @@
 import { observer } from "mobx-react-lite";
-import React, { FC, useContext, Dispatch, SetStateAction } from "react";
-import { Link } from "react-router-dom";
-import {
-  deleteCart,
-  setIsPublic,
-  setIsPublicBusiness,
-} from "../../../http/requests";
-import { Context } from "../../../main";
-import { cartProps } from "../../CreateCart";
-import MapStore from "../../../store/MapStore";
-import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../../../utils/consts";
+import React, { Dispatch, SetStateAction, RefObject } from "react";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import {
-  EditIcon,
-  DeleteIcon,
-  QuestionOutlineIcon,
-  PlusSquareIcon,
-} from "@chakra-ui/icons";
 import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
 // import { BusinessProps } from "../../CreateTEJ/CreateTEJ";
 import { iChild, iName } from "../../../pages/BusinessPlanPage";
 
 interface props {
-  e: { id: number; name: string; label: iName; children?: any };
-  // deleteFunc: (BusinessId: number) => void;
-  setShowAlert: Dispatch<SetStateAction<boolean>>;
-  // setUpdate: Dispatch<SetStateAction<boolean>>;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  // setRes: Dispatch<SetStateAction<BusinessProps>>;
-  // agreeFunc: (BusinessId: number, isPublic: boolean, isAgree?: boolean) => void;
-  getData: (name: iName, children: iChild, infCartId: number | null) => void;
+  e: {
+    id: number;
+    name: string;
+    label: iName;
+    children?: any;
+    ref: RefObject<HTMLParagraphElement>;
+  };
+  aref: RefObject<HTMLDivElement>;
 }
 import names from "../names";
-const CartsTableItem = observer(
-  ({
-    e,
-    // deleteFunc,
-    setShowAlert,
-    // setUpdate,
-    setOpen,
-    // setRes,
-    // agreeFunc,
-    getData,
-  }: props) => {
-    const { map, business, user } = useContext(Context);
-    let props;
-    if (e.children) props = Object.keys(e.children);
-
-    return (
-      <>
-        <Tr key={e.id!}>
-          <Td fontWeight={"600"}>{e.name}</Td>
-        </Tr>
-      </>
-    );
+import res from "../../../pages/hook/useIncomeTypes";
+function CartsTableItem({ e, aref }: props) {
+  let props;
+  if (e.children) props = Object.keys(e.children);
+  function func2() {
+    aref.current?.scrollIntoView({ behavior: "smooth" });
   }
-);
-export default CartsTableItem;
+  return (
+    <>
+      <Tr
+        key={e.id!}
+        onClick={() => {
+          if (e.ref.current) {
+            // func2();
+            // setTimeout(
+            e.ref.current?.scrollIntoView({ behavior: "smooth" });
+            //   500
+            // );
+          }
+        }}
+      >
+        <Td fontWeight={"600"}>{e.name}</Td>
+      </Tr>
+    </>
+  );
+}
+export default observer(CartsTableItem);
+
+{
+  /* <div>
+  <div></div>;
+  <div style={{ display: "flex" }}>
+    <div></div>
+    <div></div>
+  </div>
+</div>; */
+}

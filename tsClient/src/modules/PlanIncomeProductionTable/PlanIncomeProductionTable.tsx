@@ -189,6 +189,33 @@ function returner(
     );
   });
 }
+export function PlanIncomeProductionTableHeadRow({
+  isPlan,
+}: {
+  isPlan?: boolean;
+}) {
+  return (
+    <Tr>
+      {!isPlan && <Th></Th>}
+      <Th>Продукт або послуга</Th>
+      <Th>
+        Планова <br />
+        урожайність (т/га)
+      </Th>
+      <Th>Площа (га)</Th>
+      <Th>
+        Планове <br />
+        виробництво (т)
+      </Th>
+      <Th>
+        Собівартість <br />
+        грн/т
+      </Th>
+      <Th>Сума грн</Th>
+      {!isPlan && <Th></Th>}
+    </Tr>
+  );
+}
 function PlanIncomeProductionTable({
   setOpen,
   setUpdate,
@@ -208,25 +235,7 @@ function PlanIncomeProductionTable({
     <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
       <Table size={"sm"}>
         <Thead>
-          <Tr>
-            <Th></Th>
-            <Th>Продукт або послуга</Th>
-            <Th>
-              Планова <br />
-              урожайність (т/га)
-            </Th>
-            <Th>Площа (га)</Th>
-            <Th>
-              Планове <br />
-              виробництво (т)
-            </Th>
-            <Th>
-              Собівартість <br />
-              грн/т
-            </Th>
-            <Th>Сума грн</Th>
-            <Th></Th>
-          </Tr>
+          <PlanIncomeProductionTableHeadRow />
         </Thead>
         <Tbody>
           {returner(
