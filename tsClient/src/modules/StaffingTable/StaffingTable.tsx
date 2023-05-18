@@ -9,8 +9,9 @@ export function StaffingTableHeadRow() {
       <Th>Кількість</Th>
       <Th>Місячний оклад</Th>
       <Th>Дата прийняття</Th>
-      <Th>Вид найму</Th>
       <Th>Сума&nbsp;за&nbsp;рік</Th>
+      <Th>Вид найму</Th>
+      <Th>Вид витрат</Th>
     </Tr>
   );
 }
@@ -23,7 +24,7 @@ export function StaffingTableBodyRows({
   return (
     <>
       <Tr>
-        <Td colSpan={6}>Адмінісаративний персонал</Td>
+        <Td colSpan={7}>Адмінісаративний персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job.find((e) => e.id == el.jobId);
@@ -34,13 +35,14 @@ export function StaffingTableBodyRows({
               <Td>{el.amount}</Td>
               <Td>{el.salary}</Td>
               <Td>{el.dateFrom}</Td>
-              <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
               <Td>{el.salary * 12}</Td>
+              <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
+              <Td>{}</Td>
             </Tr>
           );
       })}
       <Tr>
-        <Td colSpan={6}>Виробничий персонал</Td>
+        <Td colSpan={7}>Виробничий персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job.find((e) => e.id == el.jobId);
@@ -51,8 +53,9 @@ export function StaffingTableBodyRows({
               <Td>{el.amount}</Td>
               <Td>{el.salary}</Td>
               <Td>{el.dateFrom}</Td>
-              <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
               <Td>{el.salary * 12}</Td>
+              <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
+              <Td>{}</Td>
             </Tr>
           );
       })}

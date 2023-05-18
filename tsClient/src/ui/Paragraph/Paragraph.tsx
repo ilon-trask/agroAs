@@ -8,6 +8,7 @@ function Paragraph({ children }: { children: string }) {
       textAlign={"left"}
       fontWeight={"bold"}
       textTransform={"none"}
+      ml={"20px"}
     >
       {children}
     </Text>

@@ -14,6 +14,7 @@ function SectionTitle({
       textAlign={"left"}
       textTransform={"none"}
       mt={mt}
+      ml={30}
     >
       {children}
     </Heading>
