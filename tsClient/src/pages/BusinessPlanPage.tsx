@@ -863,9 +863,11 @@ function BiznesPlanPage() {
             </Table>
             <Paragraph>3.3. Земельні ділянки та структура насаджень</Paragraph>
             <Description>
-              Проект буде здійснюватися на земельній ділянці загальною площею{" "}
-              {myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)}га, з правом
-              використання на весь період реалізації.
+              {`Проект буде здійснюватися на земельній ділянці загальною площею 
+              ${
+                " " + myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)
+              }га, з правом
+              використання на весь період реалізації.`}
             </Description>
             <Table size={"sm"}>
               <Thead>
@@ -1012,12 +1014,12 @@ function BiznesPlanPage() {
             <Table size={"sm"}>
               <Thead>
                 <Tr>
-                  <Th colSpan={1 + myBusiness?.busCuls.length * 2}>
+                  <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
                     <TableName>Планова структура урожайності</TableName>
                   </Th>
                 </Tr>
                 <Tr>
-                  <Th colSpan={1 + myBusiness?.busCuls.length * 2}>
+                  <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
                     <TableNumber></TableNumber>
                   </Th>
                 </Tr>
@@ -1140,11 +1142,11 @@ function BiznesPlanPage() {
                   const res = [];
                   for (let i = start; i < end; i++) {
                     res.push(<Tr>{i}</Tr>);
-                    for (let j = 0; j < myBusiness?.busCuls.length; j++) {
+                    for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
                       const e = myBusiness?.busCuls[j];
                       let maps = map.maps.map((m) => ({
                         ...m,
-                        area: e.area,
+                        area: e?.area,
                       }));
                       maps = maps.filter(
                         (el) =>
@@ -1160,7 +1162,7 @@ function BiznesPlanPage() {
                               <Td>{el.nameCart}</Td>
                               <Td>{el.area}</Td>
                               <Td>
-                                {Math.round(el.area * el.costHectare! * 100) /
+                                {Math.round(el.area! * el.costHectare! * 100) /
                                   100}
                               </Td>
                               <Td>{el.costHectare}</Td>

@@ -1353,6 +1353,7 @@ export function productSetIsPlan(
   data: { prodId: number; isPlan: boolean }
 ) {
   client.production.setIsPlan.query(data).then((res) => {
+    if (!res) return;
     income.production = income.production.filter((el) => el.id != data.prodId);
     income.newProduction = res;
   });
@@ -1363,6 +1364,7 @@ export function saleSetIsPlan(
   data: { saleId: number; isPlan: boolean }
 ) {
   client.sale.setIsPlan.query(data).then((res) => {
+    if (!res) return;
     income.production = income.production.filter((el) => el.id != data.saleId);
     income.newProduction = res;
   });
