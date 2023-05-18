@@ -106,7 +106,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1365,7 +1365,7 @@ export function saleSetIsPlan(
 ) {
   client.sale.setIsPlan.query(data).then((res) => {
     if (!res) return;
-    income.production = income.production.filter((el) => el.id != data.saleId);
-    income.newProduction = res;
+    income.sale = income.sale.filter((el) => el.id != data.saleId);
+    income.newSale = res;
   });
 }

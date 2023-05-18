@@ -22,7 +22,6 @@ import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCar
 import { Context } from "../../main";
 import useIncomeTypes from "../../pages/hook/useIncomeTypes";
 import useOutcomeTypes from "../../pages/hook/useOutcomeTypes";
-import Button from "../../ui/Button/Button";
 let akk: number[] = [];
 function setAkk(value: number) {
   if (!akk.includes(value)) {

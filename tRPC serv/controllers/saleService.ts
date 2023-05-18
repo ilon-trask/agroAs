@@ -51,7 +51,9 @@ class SaleService {
   ) {
     if (!user) return;
     await sale.update({ isPlan: data.isPlan }, { where: { id: data.saleId } });
-    const res = await sale.findOne({ where: { id: data.saleId } });
+    const res: Isale | null = await sale.findOne({
+      where: { id: data.saleId },
+    });
     return res;
   }
 }

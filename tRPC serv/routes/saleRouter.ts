@@ -1,6 +1,7 @@
 import { publicProcedure, router } from "../trpc";
 import * as z from "zod";
 import saleService from "../controllers/saleService";
+import { Isale } from "../models/models";
 
 const createSale = z.object({
   amount: z.number(),
@@ -38,7 +39,10 @@ export const saleRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const res = await saleService.setIsPlan(ctx.user, input);
+      const res: Isale | null | undefined = await saleService.setIsPlan(
+        ctx.user,
+        input
+      );
       return res;
     }),
 });
