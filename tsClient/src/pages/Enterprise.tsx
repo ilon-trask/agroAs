@@ -17,6 +17,7 @@ import { getWorker } from "../http/requests";
 import { Context } from "../main";
 import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
+import StaffingTable from "../modules/StaffingTable";
 
 function Enterprise() {
   const { id } = useParams();
@@ -50,54 +51,7 @@ function Enterprise() {
       <Heading textAlign={"center"} size={"md"} mt={3}>
         Штатний роспис
       </Heading>
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Td>Посада</Td>
-            <Td>Кількість</Td>
-            <Td>Місячний оклад</Td>
-            <Td>Дата прийняття</Td>
-            <Td>Вид найму</Td>
-            <Td>Сума за рік</Td>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Адмінісаративний персонал</Td>
-          </Tr>
-          {thisWorkers?.map((el) => {
-            const job = enterpriseStore.job.find((e) => e.id == el.jobId);
-            if (el.class == "Адміністративний")
-              return (
-                <Tr key={el.id}>
-                  <Td>{job?.name}</Td>
-                  <Td>{el.amount}</Td>
-                  <Td>{el.salary}</Td>
-                  <Td>{el.dateFrom}</Td>
-                  <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
-                  <Td>{el.salary * 12}</Td>
-                </Tr>
-              );
-          })}
-          <Tr>
-            <Td>Виробничий персонал</Td>
-          </Tr>
-          {thisWorkers?.map((el) => {
-            const job = enterpriseStore.job.find((e) => e.id == el.jobId);
-            if (el.class == "Виробничий")
-              return (
-                <Tr key={el.id}>
-                  <Td>{job?.name}</Td>
-                  <Td>{el.amount}</Td>
-                  <Td>{el.salary}</Td>
-                  <Td>{el.dateFrom}</Td>
-                  <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
-                  <Td>{el.salary * 12}</Td>
-                </Tr>
-              );
-          })}
-        </Tbody>
-      </Table>
+      <StaffingTable thisWorkers={thisWorkers} />
       <Button onClick={() => setOpen(true)}>Додати працівника</Button>
       <CreateWorker
         open={open}

@@ -71,6 +71,7 @@ const TechnologicalMap = observer(() => {
   if (!myMap) {
     myMap = map.complex.find((el) => el.id == id);
   }
+  console.log(map.maps.filter((el) => el.id == 119));
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {

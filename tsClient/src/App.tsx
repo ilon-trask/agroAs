@@ -49,6 +49,7 @@ function App() {
       getProductTEJMap(map);
       getProduction(income);
       getAdministration(map);
+
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);

@@ -19,6 +19,7 @@ class ProductionService {
       isPrimary: data.isPrimary,
       techCartId: data.techCartId,
       year: data.year,
+      isPlan: false,
       userId: user.sub,
     });
     return res;
@@ -43,6 +44,21 @@ class ProductionService {
   async delete(user: Principal | undefined, data: { prodId: number }) {
     if (!user) return;
     return await production.destroy({ where: { id: data.prodId } });
+  }
+
+  async setIsPlan(
+    user: Principal | undefined,
+    data: { prodId: number; isPlan: boolean }
+  ) {
+    if (!user) return;
+    await production.update(
+      { isPlan: data.isPlan },
+      { where: { id: data.prodId } }
+    );
+    const res: Iproduction | null = await production.findOne({
+      where: { id: data.prodId },
+    });
+    return res;
   }
 }
 export default new ProductionService();

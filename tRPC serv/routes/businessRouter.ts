@@ -7,7 +7,12 @@ const createType = z.object({
   name: z.string(),
   initialAmount: z.number(),
   enterpriseId: z.number(),
-  cultureIds: z.array(z.number()),
+  cultureIds: z.array(
+    z.object({
+      id: z.number(),
+      tech: z.array(z.object({ techId: z.number(), area: z.number() })),
+    })
+  ),
   dateStart: z.string(),
   realizationTime: z.number(),
 });

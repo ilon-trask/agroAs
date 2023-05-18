@@ -78,6 +78,7 @@ interface props {
     | "5xl"
     | "6xl"
     | "full";
+  onClose?: () => void;
 }
 const Dialog: FC<props> = observer(
   ({
@@ -93,6 +94,7 @@ const Dialog: FC<props> = observer(
     setIsErr,
     setComplex,
     size,
+    onClose,
   }) => {
     // useEffect(() => {
     //   setRes(res);
@@ -113,7 +115,9 @@ const Dialog: FC<props> = observer(
           setUpdate(false);
           setRes(props);
           if (setComplex) setComplex(false);
+          if (onClose) onClose();
         }}
+        onCloseComplete={() => {}}
         isCentered
       >
         <ModalOverlay />

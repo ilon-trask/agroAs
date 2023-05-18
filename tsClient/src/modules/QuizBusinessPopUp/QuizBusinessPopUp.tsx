@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   Heading,
+  Input,
   ModalFooter,
   Table,
   Tag,
@@ -15,15 +16,19 @@ import {
 import React, {
   Dispatch,
   SetStateAction,
+  useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
+import { Iculture } from "../../../../tRPC serv/models/models";
 import Dialog from "../../components/Dialog";
+import { Context } from "../../main";
 import { BusinessInputs } from "../CreateBusiness";
 import EnterpriseInputs from "../CreateEnterprise/components/EnterpriseInputs";
 import ProductInputs from "../CreateProduct/components/ProductInputs";
 import SaleInputs from "../CreateSale/component/SaleInputs";
+import CreditTablePopUp from "./compponents/CreditTablePopUp";
 
 type props = {
   open: boolean;
@@ -32,20 +37,23 @@ type props = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
   res: any;
   setRes: Dispatch<SetStateAction<any>>;
+  cultures: Iculture[];
 };
 const obj = {};
 function Years({
   dateStart = "",
-  realizationTime = 0,
+  year,
+  period,
+  setPeriod,
 }: {
   dateStart: string;
-  realizationTime: number;
+  year: number;
+  period: number;
+  setPeriod: Dispatch<SetStateAction<number>>;
 }) {
-  console.log(dateStart);
-
-  const year = +dateStart.split("-")[0] + +realizationTime;
-  console.log(year);
   const arr = [];
+  console.log(period);
+
   for (let i = +dateStart.split("-")[0]; i < year; i++) {
     console.log(i);
     arr.push(i);
@@ -53,7 +61,12 @@ function Years({
   return (
     <Box>
       {arr.map((el) => (
-        <Tag size={"lg"} key={el}>
+        <Tag
+          size={"lg"}
+          key={el}
+          onClick={() => setPeriod(el)}
+          variant={period == el ? "solid" : "outline"}
+        >
           {el}
         </Tag>
       ))}
@@ -67,9 +80,17 @@ function QuizBusinessPopUp({
   setUpdate,
   res,
   setRes,
+  cultures,
 }: props) {
   const [screen, setScreen] = useState(1);
   const [isActive, setIsActive] = useState(true);
+  const [creditOpen, setCreditOpen] = useState(false);
+  const startYear = +res.dateStart?.split("-")[0];
+  const year = startYear + +res.realizationTime;
+  const [period, setPeriod] = useState(startYear);
+  useEffect(() => setPeriod(startYear), [startYear]);
+  const { income, map } = useContext(Context);
+  const sales = income.sale.filter((el) => el.isPlan);
   function Footer() {
     return (
       <ModalFooter justifyContent={"space-between"}>
@@ -110,7 +131,9 @@ function QuizBusinessPopUp({
           </Text>
           <Years
             dateStart={res.dateStart}
-            realizationTime={res.realizationTime}
+            year={year}
+            period={period}
+            setPeriod={setPeriod}
           />
           <Table size={"sm"}>
             <Tbody>
@@ -145,80 +168,133 @@ function QuizBusinessPopUp({
       ) : screen == 4 ? (
         <Box>
           <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
-            Дані для розрахунку
+            Дані для розрахунку валової виручки
           </Heading>
           <Years
             dateStart={res.dateStart}
-            realizationTime={res.realizationTime}
+            year={year}
+            period={period}
+            setPeriod={setPeriod}
           />
-          <SaleInputs res={res} setRes={setRes} />
+          <Box>
+            {sales.map((el) => {
+              const production = income.production.find(
+                (e) => e.id == el.productionId
+              );
+              const product = map.product.find(
+                (e) => e.id == production?.productId
+              );
+              const cart = map.maps.find((e) => e.id == production?.techCartId);
+              const myYield = income.yieldPlant.find(
+                (e) => e.cultureId == product?.cultureId
+              );
+              return (
+                <Box display={"flex"} gap={5}>
+                  <Input value={product?.name} isDisabled={true} />
+                  <Input
+                    value={
+                      Math.round(
+                        myYield?.yieldPerHectare! * cart?.area! * 100
+                      ) / 100
+                    }
+                    isDisabled={true}
+                  />
+                  <Input value={el?.price} autoFocus={true} />
+                  <Input value={el?.date} isDisabled={true} />
+                </Box>
+              );
+            })}
+          </Box>
           <Footer />
         </Box>
       ) : screen == 5 ? (
-        <Box>
-          <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
-            Внесіть дані про фінансовий план
-          </Text>
-          <Years
-            dateStart={res.dateStart}
-            realizationTime={res.realizationTime}
-          />
-          <Box display={"flex"} mx={"auto"} maxW={"fit-content"}>
-            <Box width="50%">
-              <Text textAlign={"center"}>Доходи (залучені кошити)</Text>
-              <Table size="sm">
-                <Tbody>
-                  <Tr>
-                    <Td>Кредит</Td>
-                    <Td>{0}</Td>
-                    <Td>
-                      <Button>Додати</Button>
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Інвестицію</Td>
-                    <Td>{0}</Td>
-                    <Td>
-                      <Button>Додати</Button>
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Грант</Td>
-                    <Td>{0}</Td>
-                    <Td>
-                      <Button>Додати</Button>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
+        (() => {
+          const allCredits = income.credit.filter((el) => el.isUseCost);
+          const credits = allCredits.filter(
+            (el) => +el.date?.split("-")[0] == period
+          );
+          let creditSum: number = credits?.reduce((a, b) => a + b.cost!, 0);
+
+          return (
+            <Box>
+              <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
+                Внесіть дані про фінансовий план
+              </Text>
+              <Years
+                dateStart={res.dateStart}
+                year={year}
+                period={period}
+                setPeriod={setPeriod}
+              />
+              <Box display={"flex"} mx={"auto"} maxW={"fit-content"}>
+                <Box width="50%">
+                  <Text textAlign={"center"}>Доходи (залучені кошити)</Text>
+                  <Table size="sm">
+                    <Tbody>
+                      <Tr>
+                        <Td>Кредит</Td>
+                        <Td>{creditSum}</Td>
+                        <Td>
+                          <Button onClick={() => setCreditOpen(true)}>
+                            Додати
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Інвестицію</Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>Додати</Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Грант</Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>Додати</Button>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </Box>
+                <Box width="50%">
+                  <Text textAlign={"center"}>Витрати (об'єкт інвестицій)</Text>
+                  <Table size="sm">
+                    <Tbody>
+                      <Tr>
+                        <Td>Купівля техніки й обладнання</Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>Додати</Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Будівництво будівель і споруд</Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>Додати</Button>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </Box>
+              </Box>
+              <ModalFooter justifyContent={"space-between"}>
+                <Button onClick={() => setScreen((prev) => prev - 1)}>
+                  Назад
+                </Button>
+                <Button onClick={() => setScreen((prev) => prev + 1)}>
+                  Далі
+                </Button>
+              </ModalFooter>
+              <CreditTablePopUp
+                open={creditOpen}
+                setOpen={setCreditOpen}
+                credits={allCredits}
+              />
             </Box>
-            <Box width="50%">
-              <Text textAlign={"center"}>Витрати (об'єкт інвестицій)</Text>
-              <Table size="sm">
-                <Tbody>
-                  <Tr>
-                    <Td>Купівля техніки й обладнання</Td>
-                    <Td>{0}</Td>
-                    <Td>
-                      <Button>Додати</Button>
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Будівництво будівель і споруд</Td>
-                    <Td>{0}</Td>
-                    <Td>
-                      <Button>Додати</Button>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Box>
-          </Box>
-          <ModalFooter justifyContent={"space-between"}>
-            <Button onClick={() => setScreen((prev) => prev - 1)}>Назад</Button>
-            <Button onClick={() => setScreen((prev) => prev + 1)}>Далі</Button>
-          </ModalFooter>
-        </Box>
+          );
+        })()
       ) : screen == 6 ? (
         (() => {
           return (
@@ -228,7 +304,9 @@ function QuizBusinessPopUp({
               </Text>
               <Years
                 dateStart={res.dateStart}
-                realizationTime={res.realizationTime}
+                year={year}
+                period={period}
+                setPeriod={setPeriod}
               />
               <Table size={"sm"}>
                 <Tbody>
@@ -271,7 +349,7 @@ function QuizBusinessPopUp({
                   onClick={() => setScreen((prev) => prev + 1)}
                   isDisabled={isActive}
                 >
-                  Сформувати бізнес-план
+                  Отримати PDF
                 </Button>
               </ModalFooter>
             </Box>

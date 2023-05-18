@@ -85,6 +85,7 @@ import CreateDerjSupport, {
 import CreateGrant, {
   CreateGrantProps,
 } from "../modules/CreateGrant/CreateGrant";
+import SaleTable from "../modules/SaleTable";
 
 function Sale({
   map,
@@ -125,93 +126,14 @@ function Sale({
         Виручка
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Культура</Th>
-              <Th>Товар</Th>
-              <Th>Дата</Th>
-              <Th>Кількість т</Th>
-              <Th>Ціна грн/т</Th>
-              <Th>Сума грн</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {income.sale.map((el) => {
-              let time = el.date.split("-");
-              if (+time[0] == year && (time[1] == month || month == "")) {
-                const production = income.production.find(
-                  (e) => e.id == el.productionId
-                );
-                const product = map.product.find(
-                  (e) => e.id == production?.productId
-                );
-
-                return (
-                  <Tr key={el.id}>
-                    <Td
-                      onClick={() => {
-                        setSaleOpen(true);
-                        setUpdate(true);
-                        setSaleRes({
-                          id: el.id!,
-                          amount: el.amount,
-                          date: el.date,
-                          price: el.price,
-                          productionId: el.productionId!,
-                        });
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>
-                      {
-                        map.culture.find((e) => e.id == product?.cultureId)
-                          ?.name
-                      }
-                    </Td>
-                    <Td>{product?.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.amount}</Td>
-                    <Td>{el.price}</Td>
-                    <Td>{el.price * el.amount}</Td>
-                    <Td
-                      onClick={() =>
-                        setDeleteOpen((prev) => ({
-                          ...prev,
-                          id: el.id!,
-                          func: () => {
-                            deleteSale(income, { saleId: el.id! });
-                            setDeleteOpen((prev) => ({
-                              ...prev,
-                              isOpen: false,
-                            }));
-                          },
-                          isOpen: true,
-                          text: "продаж",
-                        }))
-                      }
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
-              }
-            })}
-          </Tbody>
-        </Table>
+        <SaleTable
+          setDeleteOpen={setDeleteOpen as any}
+          setSaleOpen={setSaleOpen}
+          setSaleRes={setSaleRes}
+          setUpdate={setUpdate}
+          month={month}
+          year={year}
+        ></SaleTable>
       </TableContainer>
       {saleOpen && (
         <CreateSale
@@ -246,6 +168,7 @@ const Credit = observer(
       date: "",
       name: "",
       purpose: "",
+      isUseCost: false,
     });
     const credits: Icredit[] = JSON.parse(JSON.stringify(income.credit));
     //@ts-ignore
@@ -275,6 +198,7 @@ const Credit = observer(
                 <Th>Сума</Th>
                 <Th>Призначення</Th>
                 <Th></Th>
+                <Th></Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -291,6 +215,7 @@ const Credit = observer(
                             date: el.date,
                             name: el.name,
                             purpose: el.purpose,
+                            isUseCost: el.isUseCost,
                           });
                           setUpdate(true);
                           setOpen(true);
@@ -327,6 +252,11 @@ const Credit = observer(
                           color={"red"}
                           cursor={"pointer"}
                         />
+                      </Td>
+                      <Td>
+                        <Checkbox isChecked={el.isUseCost}>
+                          В бізнес-план
+                        </Checkbox>
                       </Td>
                     </Tr>
                   );
@@ -397,7 +327,7 @@ const Invest = observer(
                 <Th>Назва</Th>
                 <Th>Дата</Th>
                 <Th>Сума</Th>
-                <Th>Походження</Th>
+                <Th>Призначення</Th>
                 <Th></Th>
               </Tr>
             </Thead>

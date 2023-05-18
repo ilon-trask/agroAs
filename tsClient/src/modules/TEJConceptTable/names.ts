@@ -1,5 +1,5 @@
 let names = {
-  aboutProject: "Про проект",
+  aboutProject: "Виробництво",
   investment: "Інвестиції",
   finIndicators: "Фінансові показники",
   deduction: "Висновки",

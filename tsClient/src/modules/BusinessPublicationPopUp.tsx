@@ -73,6 +73,7 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
         setData({ BusinessId: 0, isPublic: false, isAgree: false });
         setIsErr(false);
       }}
+      size={"2xl"}
       isCentered
     >
       <ModalOverlay />
@@ -148,19 +149,11 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
                   setIsErr(false);
                   setOpen(false);
                   setData({ BusinessId: 0, isPublic: false, isAgree: false });
-                  if (data.isAgree) {
-                    setIsAgreeBusiness(map, business, {
-                      planId: data.BusinessId,
-                      isAgree: data.isAgree,
-                      description: description,
-                    });
-                  } else {
-                    setIsPublicBusiness(map, business, {
-                      planId: data.BusinessId,
-                      isPublic: data.isPublic,
-                      description: description,
-                    });
-                  }
+                  setIsPublicBusiness(map, business, {
+                    planId: data.BusinessId,
+                    isPublic: data.isPublic,
+                    description: description,
+                  });
                 }
               }}
             >

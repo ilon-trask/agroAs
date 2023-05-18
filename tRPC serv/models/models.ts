@@ -588,7 +588,28 @@ businessPlan.init(
   { sequelize }
 );
 
-export const busCul = sequelize.define("busCul", {}, { timestamps: false });
+export interface IbusCul {
+  id?: number;
+  businessPlanId?: number;
+  cultureId?: number;
+  cultivationTechnologyId?: number;
+  area: number;
+}
+export class busCul extends Model<IbusCul> {
+  declare id?: number;
+  declare businessPlanId?: number;
+  declare cultureId?: number;
+  declare cultivationTechnologyId?: number;
+  declare area: number;
+}
+busCul.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    area: { type: DataTypes.FLOAT },
+  },
+  { sequelize, timestamps: false }
+);
+
 export interface IcultivationTechnologies {
   id?: number;
   name: string;
@@ -898,6 +919,7 @@ export interface Iproduction {
   year: number;
   productId?: number;
   techCartId?: number;
+  isPlan: boolean;
   userId: string;
 }
 export class production extends Model<Iproduction> {
@@ -906,6 +928,7 @@ export class production extends Model<Iproduction> {
   declare year: number;
   declare productId?: number;
   declare techCartId?: number;
+  declare isPlan: boolean;
   declare userId: string;
 }
 production.init(
@@ -913,6 +936,7 @@ production.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     year: { type: DataTypes.INTEGER },
     isPrimary: { type: DataTypes.BOOLEAN, allowNull: false },
+    isPlan: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
@@ -923,6 +947,7 @@ export interface Isale {
   amount: number;
   price: number;
   productionId?: number;
+  isPlan: boolean;
   userId: string;
 }
 export class sale extends Model<Isale> {
@@ -931,6 +956,7 @@ export class sale extends Model<Isale> {
   declare amount: number;
   declare price: number;
   declare productionId?: number;
+  declare isPlan: boolean;
   declare userId: string;
 }
 sale.init(
@@ -939,6 +965,7 @@ sale.init(
     date: { type: DataTypes.DATEONLY },
     amount: { type: DataTypes.FLOAT(2) },
     price: { type: DataTypes.FLOAT(2) },
+    isPlan: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
@@ -949,6 +976,8 @@ export interface Icredit {
   date: string;
   cost: number;
   purpose: CreditPurposeType;
+  isUseCost: boolean;
+  businessCost?: number;
   userId?: string;
   createdAt?: string;
 }
@@ -958,6 +987,7 @@ export class credit extends Model<Icredit> {
   declare date: string;
   declare cost: number;
   declare purpose: CreditPurposeType;
+  declare isUseCost: boolean;
   declare userId?: string;
 }
 credit.init(
@@ -967,6 +997,11 @@ credit.init(
     date: { type: DataTypes.DATEONLY },
     name: { type: DataTypes.STRING },
     purpose: { type: DataTypes.STRING },
+    isUseCost: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
 
@@ -1209,6 +1244,7 @@ worker.init(
   },
   { sequelize }
 );
+
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1249,8 +1285,18 @@ businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
 
+cultivationTechnologies.hasMany(busCul);
+
 businessPlan.belongsToMany(culture, { through: busCul });
 culture.belongsToMany(businessPlan, { through: busCul });
+cultivationTechnologies.belongsToMany(culture, { through: busCul });
+businessPlan.belongsToMany(cultivationTechnologies, { through: busCul });
+businessPlan.hasMany(busCul);
+busCul.belongsTo(businessPlan);
+culture.hasMany(busCul);
+busCul.belongsTo(culture);
+cultivationTechnologies.hasMany(busCul);
+busCul.belongsTo(cultivationTechnologies);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);

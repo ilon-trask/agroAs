@@ -19,7 +19,7 @@ export type CreateBusinessProp = {
   planId?: number;
   name: string;
   initialAmount: number | "";
-  cultureIds: number[];
+  cultureIds: { id: number; tech: { techId: number; area: number }[] }[];
   enterpriseId: number | "";
   dateStart: string;
   realizationTime: number | "";
@@ -33,6 +33,14 @@ type props = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
 };
 const obj = {};
+const prop = {
+  name: "",
+  dateStart: "",
+  enterpriseId: "",
+  initialAmount: "",
+  realizationTime: "",
+  cultureIds: [],
+};
 function CreateBusiness({
   open,
   setOpen,
@@ -51,7 +59,7 @@ function CreateBusiness({
       setOpen={setOpen}
       setRes={setRes}
       isErr={false}
-      props={obj}
+      props={prop}
       res={obj}
       setIsErr={() => {}}
       setUpdate={setUpdate}
@@ -64,6 +72,12 @@ function CreateBusiness({
             if (res) {
               res.initialAmount = +res.initialAmount;
               res.realizationTime = +res.realizationTime;
+              res.cultureIds.forEach((el) => {
+                el.tech.forEach((e) => {
+                  e.techId = +e.techId;
+                  e.area = +e.area;
+                });
+              });
               if (update) {
                 //@ts-ignore
                 patchBusinessPlan(map, business, res);

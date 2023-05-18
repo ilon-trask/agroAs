@@ -1,5 +1,6 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
+  Checkbox,
   Table,
   TableContainer,
   Tbody,
@@ -13,7 +14,7 @@ import { isPlainObject } from "mobx/dist/internal";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { Iproduction } from "../../../../tRPC serv/models/models";
 import { DeleteProps } from "../../components/DeleteAlert";
-import { deleteProduction } from "../../http/requests";
+import { deleteProduction, productSetIsPlan } from "../../http/requests";
 import { Context } from "../../main";
 import useProductionTypes from "../../pages/hook/useProductionTypes";
 import IncomeStore from "../../store/IncomeStore";
@@ -25,12 +26,14 @@ function Item({
   setUpdate,
   setDeleteOpen,
   setRes,
+  isPlan,
 }: {
   el: Iproduction;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
-  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
-  setRes: Dispatch<SetStateAction<productionProp>>;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+  setUpdate?: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen?: Dispatch<SetStateAction<DeleteProps>>;
+  setRes?: Dispatch<SetStateAction<productionProp>>;
+  isPlan?: boolean;
 }) {
   const { income, map } = useContext(Context);
   const myProduct = map.product.find((e) => e.id! == el.productId!);
@@ -44,21 +47,29 @@ function Item({
     Math.round(myYield?.yieldPerHectare! * myCart?.area! * 100) / 100;
   return (
     <Tr key={el.id}>
-      <Td
-        onClick={() => {
-          setOpen(true);
-          setUpdate(true);
-          setRes({
-            prodId: el.id!,
-            isPrimary: el.isPrimary,
-            productId: el.productId!,
-            techCartId: el.techCartId!,
-            year: el.year,
-          });
-        }}
-      >
-        <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
-      </Td>
+      {!isPlan && (
+        <Td
+          onClick={() => {
+            if (setOpen) setOpen(true);
+            if (setUpdate) setUpdate(true);
+            if (setRes)
+              setRes({
+                prodId: el.id!,
+                isPrimary: el.isPrimary,
+                productId: el.productId!,
+                techCartId: el.techCartId!,
+                year: el.year,
+              });
+          }}
+        >
+          <EditIcon
+            color={"blue.400"}
+            w={"20px"}
+            h={"auto"}
+            cursor={"pointer"}
+          />
+        </Td>
+      )}
       <Td>{myProduct?.name}</Td>
       <Td>{myYield?.yieldPerHectare}</Td>
       <Td>{myCart?.area}</Td>
@@ -69,20 +80,33 @@ function Item({
         ) / 100}
       </Td>
       <Td>{myCart?.costHectare! * myCart?.area!}</Td>
-      <Td
-        onClick={() => {
-          setDeleteOpen({
-            isOpen: true,
-            func: () => {
-              deleteProduction(income, { prodId: el.id! });
-              //@ts-ignore
-              setDeleteOpen({ isOpen: false });
-            },
-            text: "виробинцтво",
-          });
-        }}
-      >
-        <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
+      {!isPlan && (
+        <Td
+          onClick={() => {
+            //@ts-ignore
+            setDeleteOpen({
+              isOpen: true,
+              func: () => {
+                deleteProduction(income, { prodId: el.id! });
+                //@ts-ignore
+                setDeleteOpen({ isOpen: false });
+              },
+              text: "виробинцтво",
+            });
+          }}
+        >
+          <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
+        </Td>
+      )}
+      <Td>
+        <Checkbox
+          isChecked={el.isPlan}
+          onChange={() =>
+            productSetIsPlan(income, { prodId: el.id!, isPlan: !el.isPlan })
+          }
+        >
+          В бізнес-план
+        </Checkbox>
       </Td>
     </Tr>
   );
@@ -95,14 +119,16 @@ function GigItem({
   setUpdate,
   setDeleteOpen,
   setRes,
+  isPlan,
 }: {
   arr: Iproduction[];
   year: number;
   isPrimary: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
-  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
-  setRes: Dispatch<SetStateAction<productionProp>>;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+  setUpdate?: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen?: Dispatch<SetStateAction<DeleteProps>>;
+  setRes?: Dispatch<SetStateAction<productionProp>>;
+  isPlan?: boolean;
 }) {
   return (
     <>
@@ -116,6 +142,7 @@ function GigItem({
         <Td></Td>
         <Td></Td>
         <Td></Td>
+        <Td></Td>
       </Tr>
       {arr.map((e) => (
         <Item
@@ -125,6 +152,7 @@ function GigItem({
           setUpdate={setUpdate}
           setDeleteOpen={setDeleteOpen}
           setRes={setRes}
+          isPlan={isPlan}
         />
       ))}
     </>
@@ -133,10 +161,11 @@ function GigItem({
 function returner(
   isPrimary: boolean,
   income: IncomeStore,
-  setOpen: Dispatch<SetStateAction<boolean>>,
-  setUpdate: Dispatch<SetStateAction<boolean>>,
-  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>,
-  setRes: Dispatch<SetStateAction<productionProp>>
+  setOpen?: Dispatch<SetStateAction<boolean>>,
+  setUpdate?: Dispatch<SetStateAction<boolean>>,
+  setDeleteOpen?: Dispatch<SetStateAction<DeleteProps>>,
+  setRes?: Dispatch<SetStateAction<productionProp>>,
+  isPlan?: boolean
 ) {
   const array = new Array(20);
   array.fill(1);
@@ -154,21 +183,51 @@ function returner(
           setUpdate={setUpdate}
           setDeleteOpen={setDeleteOpen}
           setRes={setRes}
+          isPlan={isPlan}
         />
       )
     );
   });
+}
+export function PlanIncomeProductionTableHeadRow({
+  isPlan,
+}: {
+  isPlan?: boolean;
+}) {
+  return (
+    <Tr>
+      {!isPlan && <Th></Th>}
+      <Th>Продукт або послуга</Th>
+      <Th>
+        Планова <br />
+        урожайність (т/га)
+      </Th>
+      <Th>Площа (га)</Th>
+      <Th>
+        Планове <br />
+        виробництво (т)
+      </Th>
+      <Th>
+        Собівартість <br />
+        грн/т
+      </Th>
+      <Th>Сума грн</Th>
+      {!isPlan && <Th></Th>}
+    </Tr>
+  );
 }
 function PlanIncomeProductionTable({
   setOpen,
   setUpdate,
   setDeleteOpen,
   setRes,
+  isPlan,
 }: {
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
-  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
-  setRes: Dispatch<SetStateAction<productionProp>>;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+  setUpdate?: Dispatch<SetStateAction<boolean>>;
+  setDeleteOpen?: Dispatch<SetStateAction<DeleteProps>>;
+  setRes?: Dispatch<SetStateAction<productionProp>>;
+  isPlan?: boolean;
 }) {
   const { income, map } = useContext(Context);
 
@@ -176,28 +235,27 @@ function PlanIncomeProductionTable({
     <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
       <Table size={"sm"}>
         <Thead>
-          <Tr>
-            <Th></Th>
-            <Th>Продукт або послуга</Th>
-            <Th>
-              Планова <br />
-              урожайність (т/га)
-            </Th>
-            <Th>Площа (га)</Th>
-            <Th>
-              Планове <br />
-              виробництво (т)
-            </Th>
-            <Th>
-              Собівартість <br />
-              грн/т
-            </Th>
-            <Th>Сума грн</Th>
-          </Tr>
+          <PlanIncomeProductionTableHeadRow />
         </Thead>
         <Tbody>
-          {returner(true, income, setOpen, setUpdate, setDeleteOpen, setRes)}
-          {returner(false, income, setOpen, setUpdate, setDeleteOpen, setRes)}
+          {returner(
+            true,
+            income,
+            setOpen,
+            setUpdate,
+            setDeleteOpen,
+            setRes,
+            isPlan
+          )}
+          {returner(
+            false,
+            income,
+            setOpen,
+            setUpdate,
+            setDeleteOpen,
+            setRes,
+            isPlan
+          )}
         </Tbody>
       </Table>
     </TableContainer>

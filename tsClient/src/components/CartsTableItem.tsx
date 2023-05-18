@@ -47,7 +47,7 @@ const CartsTableItem = observer(
     isCul,
   }: props) => {
     const { map, user } = useContext(Context);
-    console.log(e);
+    // console.log(e);
 
     return (
       <Tr key={e.id!}>
@@ -89,52 +89,61 @@ const CartsTableItem = observer(
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
         <Td>{e.costHectare || "0"}</Td>
-        <Td
-          textAlign={"center"}
-          onClick={
-            user.role == ""
-              ? () => setShowAlert(true)
-              : () => {
-                  console.log(e.id);
+        {!isCul && (
+          <Td
+            textAlign={"center"}
+            onClick={
+              user.role == ""
+                ? () => setShowAlert(true)
+                : () => {
+                    console.log(e.id);
 
-                  setDeleteOpen(() => ({
-                    ...deleteOpen,
-                    isOpen: true,
-                    cartId: e.id!,
-                    text: "карту",
-                    func: () => {
-                      deleteCart(map, e.id!);
-                      setDeleteOpen({ ...deleteOpen, isOpen: false });
-                    },
-                  }));
-                }
-          }
-        >
-          <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
-        </Td>
+                    setDeleteOpen(() => ({
+                      ...deleteOpen,
+                      isOpen: true,
+                      cartId: e.id!,
+                      text: "карту",
+                      func: () => {
+                        deleteCart(map, e.id!);
+                        setDeleteOpen({ ...deleteOpen, isOpen: false });
+                      },
+                    }));
+                  }
+            }
+          >
+            <DeleteIcon
+              w={"20px"}
+              h={"auto"}
+              color={"red"}
+              cursor={"pointer"}
+            />
+          </Td>
+        )}
 
-        <Td>
-          {(user.role == "ADMIN" ||
-            user.role == "AUTHOR" ||
-            user.role == "service_role") && (
-            <div
-              onClick={() => {
-                if (e.isPublic) {
-                  setIsPublic(map, { id: e.id!, isPublic: !e.isPublic });
-                } else {
-                  setPublicationOpen({
-                    isOpen: true,
-                    data: { id: e.id!, isPublic: !e.isPublic, agree: false },
-                  });
-                }
-              }}
-            >
-              <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>
-                опублікувати
-              </Checkbox>
-            </div>
-          )}
-        </Td>
+        {!isCul && (
+          <Td>
+            {(user.role == "ADMIN" ||
+              user.role == "AUTHOR" ||
+              user.role == "service_role") && (
+              <div
+                onClick={() => {
+                  if (e.isPublic) {
+                    setIsPublic(map, { id: e.id!, isPublic: !e.isPublic });
+                  } else {
+                    setPublicationOpen({
+                      isOpen: true,
+                      data: { id: e.id!, isPublic: !e.isPublic, agree: false },
+                    });
+                  }
+                }}
+              >
+                <Checkbox size="md" colorScheme="green" isChecked={e.isPublic}>
+                  опублікувати
+                </Checkbox>
+              </div>
+            )}
+          </Td>
+        )}
       </Tr>
     );
   }

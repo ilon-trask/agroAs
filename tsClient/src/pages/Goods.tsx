@@ -12,6 +12,7 @@ import {
   Tr,
   Button,
   Container,
+  Checkbox,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useContext, useState } from "react";
@@ -24,6 +25,7 @@ import DeleteAlert, {
 import NoAuthAlert from "../components/NoAuthAlert";
 import { deleteYieldPlant } from "../http/requests";
 import { Context } from "../main";
+import CostProdTable from "../modules/CostProdTable";
 import CreateProduct from "../modules/CreateProduct";
 import { CreateProductProps } from "../modules/CreateProduct/CreateProduct";
 import CreateProductService from "../modules/CreateProductService";
@@ -194,16 +196,7 @@ function Goods() {
       <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Планування виробництва
       </Heading>
-      {/* <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-<Table size={"sm"}>
-  <Thead>
-    <Th>Назва культури</Th>
-    <Th>Площа га</Th>
-    <Th>Урожайність т/га</Th>
-    <Th>Валовий збір</Th>
-  </Thead>
-  </Table>
-</TableContainer> */}
+
       <PlanIncomeProductionTable
         setOpen={setProdOpen}
         setUpdate={setProdUpdate}
@@ -232,42 +225,7 @@ function Goods() {
         Планування собівартості продукції
       </Heading>
       <TableContainer overflowX={"scroll"}>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th rowSpan={3}>
-                Назва <br /> продукції
-              </Th>
-              <Th rowSpan={3}> Обсяг</Th>
-              <Th colSpan={6} textAlign={"center"}>
-                Собіварість
-              </Th>
-              <Th rowSpan={3}>
-                Загальна <br /> собівартість
-              </Th>
-            </Tr>
-            <Tr>
-              <Th fontSize={"12px"} textTransform={"none"} colSpan={2}>
-                у прямих
-              </Th>
-              <Th fontSize={"12px"} textTransform={"none"} colSpan={2}>
-                у загально виробничих
-              </Th>
-              <Th fontSize={"12px"} textTransform={"none"} colSpan={2}>
-                у постійних
-              </Th>
-            </Tr>
-            <Tr>
-              <Th>Ціна</Th>
-              <Th>Сума</Th>
-              <Th>Ціна</Th>
-              <Th>Сума</Th>
-              <Th>Ціна</Th>
-              <Th>Сума</Th>
-            </Tr>
-          </Thead>
-          <Tbody></Tbody>
-        </Table>
+        <CostProdTable />
       </TableContainer>
       <Button>Добавити продукт або послугу</Button>
     </Container>

@@ -16,6 +16,7 @@ class SaleService {
       amount: data.amount,
       date: data.date,
       price: data.price,
+      isPlan: false,
       userId: user.sub,
       productionId: data.productionId,
     });
@@ -42,6 +43,17 @@ class SaleService {
     if (!user) return;
     const res = await sale.destroy({ where: { id: data.saleId } });
     await income.destroy({ where: { saleId: data.saleId } });
+    return res;
+  }
+  async setIsPlan(
+    user: Principal | undefined,
+    data: { saleId: number; isPlan: boolean }
+  ) {
+    if (!user) return;
+    await sale.update({ isPlan: data.isPlan }, { where: { id: data.saleId } });
+    const res: Isale | null = await sale.findOne({
+      where: { id: data.saleId },
+    });
     return res;
   }
 }

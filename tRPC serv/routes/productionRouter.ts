@@ -37,4 +37,10 @@ export const productionRouter = router({
       );
       return res;
     }),
+  setIsPlan: publicProcedure
+    .input(z.object({ prodId: z.number(), isPlan: z.boolean() }))
+    .query(async ({ ctx, input }) => {
+      const res = await productionService.setIsPlan(ctx.user, input);
+      return res;
+    }),
 });

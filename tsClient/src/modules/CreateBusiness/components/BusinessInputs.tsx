@@ -19,18 +19,27 @@ type props = {
 function BusinessInputs({ res, setRes, isEnterprise }: props) {
   const { map, enterpriseStore } = useContext(Context);
   const [secondOpen, setSecondOpen] = useState(false);
-  const [secondRes, setSecondRes] = useState({});
-  function setCulture(id: number) {
-    if (res.cultureIds.includes(id)) {
-      let akk = res.cultureIds.filter((el) => el != id);
-      setRes((prev) => ({ ...prev, cultureIds: [...akk] }));
-    } else {
-      setRes((prev) => ({ ...prev, cultureIds: [...prev.cultureIds, id] }));
-    }
-  }
+  const [culture, setCulture] = useState(0);
+  // function setCulture(id: number) {
+  //   if (res.cultureIds.includes(id)) {
+  //     let akk = res.cultureIds.filter((el) => el != id);
+  //     setRes((prev) => ({ ...prev, cultureIds: [...akk] }));
+  //   } else {
+  //     setRes((prev) => ({ ...prev, cultureIds: [...prev.cultureIds, id] }));
+  //   }
+  // }
 
   function isCheckedCulture(id: number) {
-    if (res.cultureIds?.includes(id)) {
+    console.log(res.cultureIds);
+
+    if (
+      res.cultureIds?.find((el) => {
+        console.log(el.id);
+        console.log(id);
+
+        return el.id == id;
+      })
+    ) {
       return true;
     } else {
       return false;
@@ -81,7 +90,22 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
               <Button
                 onClick={() => {
                   setSecondOpen(true);
-                  setSecondRes({ cultureId: el.id! });
+                  setRes((prev) => {
+                    console.log(prev);
+
+                    if (!prev.cultureIds?.find((e) => e.id == el.id)) {
+                      return {
+                        ...prev,
+                        cultureIds: [
+                          ...prev.cultureIds,
+                          { id: +el.id!, tech: [] },
+                        ],
+                      };
+                    } else {
+                      return prev;
+                    }
+                  });
+                  setCulture(el.id!);
                 }}
                 variant={isCheckedCulture(el.id!) ? "solid" : "outline"}
               >
@@ -133,10 +157,11 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
         />
       </Box>
       <SecondOpen
+        cultureId={culture}
         open={secondOpen}
         setOpen={setSecondOpen}
-        res={secondRes}
-        setRes={setSecondRes}
+        res={res}
+        setRes={setRes}
       />
     </Box>
   );

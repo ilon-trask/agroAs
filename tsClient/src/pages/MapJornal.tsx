@@ -367,18 +367,23 @@ const MapJornal = observer(function () {
           </>
         )}
         {(user.role == "ADMIN" || user.role == "service_role") && (
-          <TableContainer
-            maxW="1000px"
-            mx="auto"
-            mt={"20px"}
-            overflowX={"scroll"}
-          >
-            <AgreeCartsTable
-              setRes={setRes}
-              setOpen={setOpen}
-              setPublicationOpen={setPublicationOpen}
-            />
-          </TableContainer>
+          <>
+            <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+              Публікування карти
+            </Text>
+            <TableContainer
+              maxW="1000px"
+              mx="auto"
+              mt={"20px"}
+              overflowX={"scroll"}
+            >
+              <AgreeCartsTable
+                setRes={setRes}
+                setOpen={setOpen}
+                setPublicationOpen={setPublicationOpen}
+              />
+            </TableContainer>
+          </>
         )}
       </Box>
       {user.role == "service_role" && <TEJJornal />}
