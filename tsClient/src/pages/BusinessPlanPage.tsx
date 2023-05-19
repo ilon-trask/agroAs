@@ -41,9 +41,6 @@ import StaffingTable from "../modules/StaffingTable";
 import useEnterprise from "./hook/useEnterprise";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import CashFlowTable from "../modules/CashFlowTable";
-import PlanIncomeProductionTable from "../modules/PlanIncomeProductionTable";
-import SaleTable from "../modules/SaleTable";
-import CostProdTable from "../modules/CostProdTable";
 import CartsTable, { CartsTableHeadRow } from "../modules/CartsTable";
 import SectionTitle from "../ui/SectionTitle/SectionTitle";
 import Description from "../ui/Description";
@@ -105,6 +102,9 @@ function BiznesPlanPage() {
   const indicatorRef = useRef<HTMLTableElement>(null);
   const buttonsRef = useRef<HTMLParagraphElement>(null);
   const cultureSet = new Set(myBusiness?.busCuls.map((el) => el.culture.name));
+  const productSet = new Set(
+    myBusiness?.busCuls?.map((el) => el.culture.product)
+  );
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
@@ -403,11 +403,6 @@ function BiznesPlanPage() {
                   <Td>Початок продажів</Td>
                 </Tr>
                 {(() => {
-                  const productSet = new Set(
-                    myBusiness?.busCuls?.map((el) => el.culture.product)
-                  );
-                  console.log(productSet);
-
                   return [...productSet].map((el, ind) =>
                     ind == 0 ? (
                       <>
@@ -871,40 +866,46 @@ function BiznesPlanPage() {
             </Description>
             <Table size={"sm"}>
               <Thead>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableName>Земельні ділянки</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Вид оплати</Th>
+                  <Th>Кадастровий номер</Th>
+                  <Th>Площа</Th>
+                  <Th>Ставка</Th>
+                  <Th>Плата за землю</Th>
+                  <Th>Власність</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 {(() => {
                   const res = [];
-
-                  // for (let i = start; i < end; i++) {
-                  //   res.push(
-                  //     <>
-                  //       <Tr>
-                  //         <Td>{i}</Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //       </Tr>
-                  //     </>
-                  //   );
-                  // }
-                  return (
-                    <>
-                      <Tr>
-                        <Th>
-                          <TableName>Земельні ділянки</TableName>
-                        </Th>
-                      </Tr>
-                      <Tr>
-                        <Th>
-                          <TableNumber></TableNumber>
-                        </Th>
-                      </Tr>
-                      <Tr></Tr>
-                    </>
-                  );
+                  for (let i = start; i < end; i++) {
+                    res.push(
+                      <>
+                        <Tr>
+                          <Td>{i}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td>Оренда Землі</Td>
+                        </Tr>
+                        <Tr>
+                          <Td>Податок</Td>
+                        </Tr>
+                      </>
+                    );
+                  }
+                  return res;
                 })()}
-              </Thead>
+              </Tbody>
             </Table>
             <Description>
               Використання площ під культурою описано у табличному вигляді.
@@ -1175,6 +1176,181 @@ function BiznesPlanPage() {
                   return res;
                 })()}
               </Tbody>
+            </Table>
+            <Paragraph>
+              4.2.Основні засоби, ресурси та біологічні активи
+            </Paragraph>
+            <Description>
+              Основні засоби, що використовуються під час операційної діяльності
+              підприємства втрачають свою вартість через фізичний знос і
+              моральне старіння. Знос (або амортизація) є однією зі складових
+              собівартості товарів, але не є причиною відтоку реальних грошей.
+              Найбільшого поширення набув механізм лінійної амортизації, коли
+              річна норма амортизації встановлюється виходячи з терміну служби
+              обладнання. Первісна вартість основних засобів - це вартість, за
+              якою засіб було придбано чи оприбутковано на баланс підприємства.
+              Балансова вартість або залишкова вартість = Первісна вартість -
+              нарахований знос. Амортизаційні відрахування в розрахунках
+              прийняті відповідно нормативним значенням. В основу розрахунку
+              покладена вартість комплексу технічних приміщень та огорожі.В
+              якості базового методу розрахунку амортизації було обрано лінійний
+              метод. При розрахунку амортизації були використані положення
+              Податкового кодексу України.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Основні засоби</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>
+                    <Th>Назва основного засобу</Th>
+                    <Th>Первісн а вартість</Th>
+                    <Th>Термін амортизації</Th>
+                    <Th>Знос за …3 роки</Th>
+                    <Th>Залишкова вартість</Th>
+                  </Th>
+                </Tr>
+              </Thead>
+            </Table>
+            <Description>
+              В якості базового методу розрахунку амортизації біологічних
+              активів було обрано лінійний метод. При розрахунку амортизації
+              були використані положення Податкового кодексу України.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Біологічні активи</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Назва біологічного аактиву</Th>
+                  <Th>Первісна вартість</Th>
+                  <Th>Термін амортизації</Th>
+                  <Th>Знос за …3 роки</Th>
+                  <Th>Залишкова вартість</Th>
+                </Tr>
+              </Thead>
+            </Table>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th
+                    colSpan={
+                      (myBusiness?.realizationTime! <= 7
+                        ? myBusiness?.realizationTime!
+                        : 6) + 2
+                    }
+                  >
+                    <TableName>
+                      План амортизації перших{" "}
+                      {myBusiness?.realizationTime! <= 7
+                        ? myBusiness?.realizationTime!
+                        : 6}{" "}
+                      років проекту
+                    </TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th
+                    colSpan={
+                      (myBusiness?.realizationTime! <= 7
+                        ? myBusiness?.realizationTime!
+                        : 6) + 2
+                    }
+                  >
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>
+                    Засоби <br />
+                    і&nbsp;активи
+                  </Th>
+                  {(() => {
+                    const res = [];
+                    for (let i = start; i < end; i++) {
+                      if (i <= start + 6) {
+                        res.push(
+                          <>
+                            <Th>{i}</Th>
+                          </>
+                        );
+                      }
+                    }
+                    return res;
+                  })()}
+                  <Th>
+                    Сума <br />
+                    амортизації
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>Основні засоби</Td>
+                </Tr>
+                <Tr>
+                  <Td>Біоактиви</Td>
+                </Tr>
+                <Tr>
+                  <Td>Разом</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+            <Description>
+              Для планування необхідних ресурсів використано нормативний метод
+              та дані про потребу основних ресурсів записано у табличному
+              вигляді.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Основні ресурси</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Назва ресурсу</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                  <Th>Призначення</Th>
+                </Tr>
+              </Thead>
+            </Table>
+            <Paragraph>4.3. Опис продукту</Paragraph>
+            <Table size={"sm"}>
+              {[...productSet].map((el, ind) => {
+                if (ind == 0) {
+                  return (
+                    <Tr>
+                      <Th rowSpan={productSet.size}>Основний продукт</Th>
+                      <Th>{el}</Th>
+                    </Tr>
+                  );
+                } else {
+                  return (
+                    <Tr>
+                      <Th>{el}</Th>
+                    </Tr>
+                  );
+                }
+              })}
             </Table>
             <Table size="sm">
               <Tr>
