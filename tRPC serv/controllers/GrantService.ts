@@ -1,6 +1,5 @@
 import { Principal } from "..";
 import { grant, Igrant, income } from "../models/models";
-import { CreateCreditType, PatchCreditType } from "../routes/creditRouter";
 import { CreateGrantType, PatchGrantType } from "../routes/grantRouter";
 
 class GrantService {

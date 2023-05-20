@@ -11,6 +11,9 @@ import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createYieldPlant, updateYieldPlant } from "../../../http/requests";
 import { Context } from "../../../main";
+import useYieldPlantLandingPeriod, {
+  YieldPlantLandingPeriodType,
+} from "../../../pages/hook/useYieldPlantLandingPeriod";
 import { incProp } from "../CreateYield";
 type props = {
   res: incProp;
@@ -81,6 +84,31 @@ function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
             ))}
           </Select>
         </Box>
+        <Box>
+          <Heading as={"h4"} size="sm">
+            Виберіть строк посадки
+          </Heading>
+          <Select
+            size={"sm"}
+            mt={2}
+            value={res?.landingPeriod}
+            onChange={(e) => {
+              setRes({
+                ...res,
+                landingPeriod: e.target.value as any,
+              });
+            }}
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            {useYieldPlantLandingPeriod.map((el) => (
+              <option value={el.name} key={el.id}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
       </Box>
       <ModalFooter p={"15px 67px"}>
         <Button
@@ -90,12 +118,14 @@ function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
               createYieldPlant(income, {
                 cultureId: +res.cultureId,
                 cultivationTechnologyId: +res.cultivationTechnologyId,
+                landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
               });
             } else {
               updateYieldPlant(income, {
                 cultureId: +res.cultureId,
                 cultivationTechnologyId: +res.cultivationTechnologyId,
                 yieldPlantId: plantId,
+                landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
               });
             }
             setOpen(false);

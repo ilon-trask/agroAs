@@ -15,7 +15,21 @@ const createCartProps = z.object({
   sectionId: z.number().optional(),
   cultureId: z.number().optional(),
   cultivationTechnologyId: z.number().optional(),
-  year: z.number().optional(),
+  year: z
+    .enum([
+      "0рік весна",
+      "0рік осінь",
+      "1рік",
+      "2рік ",
+      "3рік",
+      "4рік",
+      "5рік",
+      "6рік",
+      "7рік",
+      "8рік",
+      "Наступні",
+    ])
+    .optional(),
 });
 export type CreateCartType = z.infer<typeof createCartProps>;
 export const cartRouter = router({
@@ -62,7 +76,21 @@ export const cartRouter = router({
         sectionId: z.number().optional().nullable(),
         cultureId: z.number().optional(),
         cultivationTechnologyId: z.number().optional(),
-        year: z.number().optional(),
+        year: z
+          .enum([
+            "0рік весна",
+            "0рік осінь",
+            "1рік",
+            "2рік ",
+            "3рік",
+            "4рік",
+            "5рік",
+            "6рік",
+            "7рік",
+            "8рік",
+            "Наступні",
+          ])
+          .optional(),
         tech_operations: z
           .array(
             z.object({

@@ -158,14 +158,12 @@ function CashFlowTable({
           setAkk(4);
         }
       }
-      console.log(akk);
 
       akk.forEach((e) => {
         if (e == 1) {
           fkOutcome += adm.price;
         } else if (e == 2) {
           skOutcome += adm.price;
-          console.log(skOutcome);
         } else if (e == 3) {
           tkOutcome += adm.price;
         } else if (e == 4) {
@@ -196,7 +194,6 @@ function CashFlowTable({
         fourthkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
       }
     }
-    console.log(tkOutcome);
   });
 
   return (

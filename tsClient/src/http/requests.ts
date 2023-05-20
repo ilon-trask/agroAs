@@ -96,6 +96,7 @@ import {
   CreateWorkerType,
   PatchWorkerType,
 } from "../../../tRPC serv/routes/workerRouter";
+import { CreateVegetationType } from "../../../tRPC serv/routes/vegetationYearRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -106,7 +107,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1367,5 +1368,19 @@ export function saleSetIsPlan(
     if (!res) return;
     income.sale = income.sale.filter((el) => el.id != data.saleId);
     income.newSale = res;
+  });
+}
+
+export function getVegetationYear(income: IncomeStore) {
+  client.vegetation.get.query().then((res) => {
+    income.vegetationYear = res;
+  });
+}
+export function createVegetationYear(
+  income: IncomeStore,
+  data: CreateVegetationType
+) {
+  client.vegetation.create.query(data).then((res) => {
+    income.vegetationYear = res;
   });
 }

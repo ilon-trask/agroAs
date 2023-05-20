@@ -45,6 +45,7 @@ function Goods() {
   const [res, setRes] = useState<incProp>({
     cultureId: "",
     cultivationTechnologyId: "",
+    landingPeriod: "",
   });
   const [showAlert, setShowAlert] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState<DeleteProps>({
@@ -87,9 +88,22 @@ function Goods() {
               <Th></Th>
               <Th>Культура</Th>
               <Th>Технологія</Th>
-              <Th>Густота насаджень</Th>
-              <Th>Урожайність з гектару</Th>
-              <Th>Урожайність з рослини</Th>
+              <Th>
+                Густота <br />
+                насаджень
+              </Th>
+              <Th>
+                Урожайність
+                <br /> з гектару
+              </Th>
+              <Th>
+                Урожайність
+                <br /> з рослини
+              </Th>
+              <Th>
+                Строк <br />
+                посадки
+              </Th>
               <Th></Th>
             </Tr>
           </Thead>
@@ -106,6 +120,7 @@ function Goods() {
                       setRes({
                         cultivationTechnologyId: el.cultivationTechnologyId!,
                         cultureId: el.cultureId!,
+                        landingPeriod: el.landingPeriod,
                       });
                     }}
                   >
@@ -131,6 +146,7 @@ function Goods() {
                   <Td>{el.plantingDensity}</Td>
                   <Td>{el.yieldPerHectare}</Td>
                   <Td>{el.yieldPerRoll}</Td>
+                  <Td>{el.landingPeriod}</Td>
                   <Td
                     textAlign={"center"}
                     cursor={"pointer"}

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Tab,
   Tabs,
@@ -29,7 +29,12 @@ import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService"
 import { names } from "../modules/TEJConceptTable/index";
 import SelectCart from "../modules/TEJConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
-import { patchResume, patchTitlePage } from "../http/requests";
+import {
+  getVegetationYear,
+  getYieldPlants,
+  patchResume,
+  patchTitlePage,
+} from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
@@ -54,6 +59,8 @@ import {
   StaffingTableHeadRow,
 } from "../modules/StaffingTable/StaffingTable";
 import Paragraph from "../ui/Paragraph";
+import useVegetationYears from "./hook/useVegetationYears";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -73,6 +80,12 @@ function BiznesPlanPage() {
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
   const { map, user, enterpriseStore, business, income } = useContext(Context);
   useBusiness(business, map);
+  useEnterprise();
+  useEffect(() => {
+    getYieldPlants(income);
+    getVegetationYear(income);
+    console.log(123);
+  }, []);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
     JSON.stringify(business.businessPlan)
@@ -94,16 +107,17 @@ function BiznesPlanPage() {
   const [isActiveInput, setIsActiveInput] = useState(false);
   const [openQuiz, setOpenQuiz] = useState(false);
   const [updateQuiz, setUpdateQuiz] = useState(false);
-  useEnterprise();
 
   const [quizRes, setQuizRes] = useState({});
   const start = +myBusiness?.dateStart?.split("-")[0]!;
   const end = +start + +myBusiness?.realizationTime!;
   const indicatorRef = useRef<HTMLTableElement>(null);
   const buttonsRef = useRef<HTMLParagraphElement>(null);
-  const cultureSet = new Set(myBusiness?.busCuls.map((el) => el.culture.name));
+  const cultureSet = new Set(
+    myBusiness?.busCuls.map((el) => el?.culture?.name)
+  );
   const productSet = new Set(
-    myBusiness?.busCuls?.map((el) => el.culture.product)
+    myBusiness?.busCuls?.map((el) => el.culture?.product)
   );
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
@@ -923,7 +937,7 @@ function BiznesPlanPage() {
                             <Td>
                               {myBusiness?.busCuls.reduce(
                                 (p, c) =>
-                                  el == c.culture.name ? p + c.area : p,
+                                  el == c.culture?.name ? p + c.area : p,
                                 0
                               )}
                             </Td>
@@ -998,10 +1012,10 @@ function BiznesPlanPage() {
                     площа
                   </Th>
                 </Tr>
-                {myBusiness?.busCuls.map((el) => (
+                {myBusiness?.busCuls?.map((el) => (
                   <Tr>
-                    <Td>{el.culture.name}</Td>
-                    <Td>{el.cultivationTechnology.name}</Td>
+                    <Td>{el?.culture?.name}</Td>
+                    <Td>{el?.cultivationTechnology?.name}</Td>
                     <Td>{el.area}</Td>
                     {/* <Td>{}</Td> */}
                   </Tr>
@@ -1028,14 +1042,14 @@ function BiznesPlanPage() {
                   <Th rowSpan={2}>Вегетація</Th>
                   {myBusiness?.busCuls.map((el) => (
                     <Th colSpan={2}>
-                      {el.culture.name}
+                      {el.culture?.name}
                       <br />
-                      {el.cultivationTechnology.name}
+                      {el.cultivationTechnology?.name}
                     </Th>
                   ))}
                 </Tr>
                 <Tr>
-                  {myBusiness?.busCuls.map((el) => (
+                  {myBusiness?.busCuls.map(() => (
                     <>
                       <Th>Коеф.</Th>
                       <Th>Урожайн.</Th>
@@ -1047,10 +1061,34 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    const yearName = useVegetationYears[i - start].name;
                     res.push(
                       <>
                         <Tr>
-                          <Td>{i}</Td>
+                          <Td>{i + " " + yearName}</Td>
+                          {myBusiness?.busCuls.map((el) => {
+                            const myYield = income.yieldPlant.find(
+                              (e) => e.cultureId == el.cultureId
+                            );
+                            const vegetation = income.vegetationYear.find(
+                              (e) =>
+                                e.yieldPlantId == myYield?.id &&
+                                e.year == yearName
+                            );
+
+                            return (
+                              <>
+                                <Th>{vegetation?.allCoeff || 0}</Th>
+                                <Th>
+                                  {Math.round(
+                                    myYield?.yieldPerHectare *
+                                      (vegetation?.allCoeff || 0) *
+                                      100
+                                  ) / 100}
+                                </Th>
+                              </>
+                            );
+                          })}
                         </Tr>
                       </>
                     );
@@ -1372,18 +1410,50 @@ function BiznesPlanPage() {
                 </Th>
               </Tr>
               <PlanIncomeProductionTableHeadRow isPlan={true} />
+              <Tbody>
+                {(() => {
+                  const res = [];
+                  for (let i = start; i < end; i++) {
+                    const yearName = useVegetationYears[i - start].name;
+
+                    let akk = myBusiness?.busCuls.map((el) => {
+                      const myYield = income.yieldPlant.find(
+                        (e) => e.cultureId == el.cultureId
+                      );
+
+                      const vegetation = income.vegetationYear.find(
+                        (e) =>
+                          e.yieldPlantId == myYield?.id && e.year == yearName
+                      );
+                      const sum =
+                        Math.round(
+                          (myYield?.yieldPerHectare! * vegetation?.allCoeff! ||
+                            0) * 100
+                        ) / 100;
+                      return (
+                        <Tr>
+                          <Td>{el.culture?.name}</Td>
+                          <Td>{sum}</Td>
+                          <Td>{el.area}</Td>
+                          <Td>{Math.round(sum * el.area * 100) / 100}</Td>
+                        </Tr>
+                      );
+                    });
+                    res.push(
+                      <>
+                        <Tr>
+                          <Td>
+                            <Text fontWeight={"bold"}>{i}</Text>
+                          </Td>
+                        </Tr>
+                        {akk}
+                      </>
+                    );
+                  }
+                  return res;
+                })()}
+              </Tbody>
             </Table>
-            {(() => {
-              const res = [];
-              for (let i = start; i < end; i++) {
-                res.push(
-                  <>
-                    <Text fontWeight={"bold"}>{i}</Text>
-                  </>
-                );
-              }
-              return res;
-            })()}
             {/* <Heading textAlign={"center"} size={"sm"} mt={5}>
               Продаж продукції
             </Heading> */}

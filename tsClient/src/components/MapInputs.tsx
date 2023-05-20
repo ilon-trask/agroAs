@@ -16,6 +16,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import useVegetationYears from "../pages/hook/useVegetationYears";
 const createCartFunc: func<cartProps> = (
   id,
   map,
@@ -46,7 +47,6 @@ const createCartFunc: func<cartProps> = (
     res.area = +res.area;
     res.salary = +res.salary;
     res.priceDiesel = +res.priceDiesel;
-    res.year = +res.year;
     res.cultureId = res.cultureId ? +res.cultureId : undefined;
     res.cultivationTechnologyId = res.cultivationTechnologyId
       ? +res.cultivationTechnologyId
@@ -67,7 +67,7 @@ const createCartFunc: func<cartProps> = (
         sectionId: res.sectionId ? res.sectionId : undefined,
         cultureId: res.cultureId,
         cultivationTechnologyId: res.cultivationTechnologyId,
-        year: res.year,
+        year: res.year ? res.year : undefined,
       });
     }
   }
@@ -247,14 +247,19 @@ export default function MapInputs({
           <Heading as={"h4"} size="sm" minW={"max-content"}>
             рік
           </Heading>
-          <Input
-            type={"number"}
-            inputMode="numeric"
+          <Select
             value={res.year}
             onChange={(e) =>
               setRes((prev) => ({ ...prev, year: e.target.value as any }))
             }
-          ></Input>
+          >
+            <option value="" hidden defaultChecked>
+              Оберіть опцію
+            </option>
+            {useVegetationYears.map((el) => (
+              <option value={el.name}>{el.name}</option>
+            ))}
+          </Select>
         </Box>
       )}
       <ModalFooter p={"15px 5px"}>

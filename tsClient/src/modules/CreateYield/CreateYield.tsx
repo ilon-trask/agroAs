@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Dialog from "../../components/Dialog";
+import { YieldPlantLandingPeriodType } from "../../pages/hook/useYieldPlantLandingPeriod";
 import YieldPlant from "./components/YieldPlant";
 
 type props = {
@@ -13,8 +14,13 @@ type props = {
 export type incProp = {
   cultureId: string | number;
   cultivationTechnologyId: number | "";
+  landingPeriod: YieldPlantLandingPeriodType | "";
 };
-const prop: incProp = { cultureId: "", cultivationTechnologyId: "" };
+const prop: incProp = {
+  cultureId: "",
+  cultivationTechnologyId: "",
+  landingPeriod: "",
+};
 function CreateYield({ open, setOpen, update, res, setRes, plantId }: props) {
   //   console.log(123);
   return (

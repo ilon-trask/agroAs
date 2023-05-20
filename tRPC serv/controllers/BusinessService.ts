@@ -29,8 +29,8 @@ export interface resBusinessPlan extends IbusinessPlan {
     cultivationTechnologyId: number;
     cultureId: number;
     id: number;
-    cultivationTechnology: IcultivationTechnologies;
-    culture: Iculture;
+    cultivationTechnology: IcultivationTechnologies | undefined;
+    culture: Iculture | undefined;
     area: number;
   }[];
 }
