@@ -20,11 +20,20 @@ export function SaleTableHeadRows({ isPlan }: { isPlan?: boolean }) {
       {!isPlan && <Th></Th>}
       <Th>Культура</Th>
       <Th>Товар</Th>
-      <Th>Дата</Th>
-      <Th>
-        Планове <br />
-        виробництво
-      </Th>
+      {!isPlan ? (
+        <>
+          <Th>Дата</Th>
+          <Th>
+            Планове <br />
+            виробництво
+          </Th>
+        </>
+      ) : (
+        <Th>
+          Період <br />
+          збору
+        </Th>
+      )}
       <Th>Кількість т</Th>
       <Th>Ціна грн/т</Th>
       <Th>Сума грн</Th>

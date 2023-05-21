@@ -23,7 +23,7 @@ import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
-import { IbusinessPlan } from "../../../tRPC serv/models/models";
+import { IbusinessPlan, Iproduct } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { names } from "../modules/TEJConceptTable/index";
@@ -1469,7 +1469,7 @@ function BiznesPlanPage() {
                 </Tr>
                 <Tr>
                   <Th colSpan={7}>
-                    <TableName>Графік реалізації продукції</TableName>
+                    <TableName>Графік збору продукції</TableName>
                   </Th>
                 </Tr>
                 <Tr>
@@ -1488,6 +1488,34 @@ function BiznesPlanPage() {
                         <Tr>
                           <Td>{i}</Td>
                         </Tr>
+                        {myBusiness?.busCuls?.map((el) => {
+                          const yearName = useVegetationYears[i - start].name;
+                          const myYield = income.yieldPlant.find(
+                            (e) => e.cultureId == el.cultureId
+                          );
+
+                          const vegetation = income.vegetationYear.find(
+                            (e) =>
+                              e.yieldPlantId == myYield?.id &&
+                              e.year == yearName
+                          );
+                          const sum =
+                            Math.round(
+                              (myYield?.yieldPerHectare! *
+                                el.area *
+                                vegetation?.allCoeff! || 0) * 100
+                            ) / 100;
+                          return (
+                            <Tr>
+                              <Td>{el.culture?.name}</Td>
+                              <Td>{el.culture?.product}</Td>
+                              <Td>{el.culture?.collectPeriod}</Td>
+                              <Td>{sum}</Td>
+                              <Td>{el.culture?.priceBerry}</Td>
+                              <Td>{sum * el.culture?.priceBerry}</Td>
+                            </Tr>
+                          );
+                        })}
                       </>
                     );
                   }
@@ -1728,7 +1756,7 @@ function BiznesPlanPage() {
               }
               return res;
             })()}
-            <Table ref={indicatorRef}>
+            <Table size={"sm"} ref={indicatorRef}>
               <Thead>
                 <Tr>
                   <Th colSpan={9}>
@@ -1798,10 +1826,42 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    let fin = 0;
+                    myBusiness?.busCuls?.forEach((el) => {
+                      const yearName = useVegetationYears[i - start].name;
+                      const myYield = income.yieldPlant.find(
+                        (e) => e.cultureId == el.cultureId
+                      );
+
+                      const vegetation = income.vegetationYear.find(
+                        (e) =>
+                          e.yieldPlantId == myYield?.id && e.year == yearName
+                      );
+                      const sum =
+                        Math.round(
+                          (myYield?.yieldPerHectare! *
+                            el.area *
+                            vegetation?.allCoeff! || 0) * 100
+                        ) / 100;
+                      fin += sum * el.culture?.priceBerry;
+                    });
                     res.push(
-                      <Tr>
-                        <Td px={1}>{i + ".12"}</Td>
-                      </Tr>
+                      <>
+                        <Tr>
+                          <Td px={1}>{i + ".12"}</Td>
+                        </Tr>
+
+                        <Tr>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td>{fin}</Td>
+                        </Tr>
+                      </>
                     );
                   }
                   return res;

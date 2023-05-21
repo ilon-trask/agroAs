@@ -749,12 +749,14 @@ export interface Iculture {
   name: string;
   product: string;
   priceBerry: number;
+  collectPeriod: string;
 }
 export class culture extends Model<Iculture> {
   declare id?: number;
   declare name: string;
   declare product: string;
   declare priceBerry: number;
+  declare collectPeriod: number;
 }
 culture.init(
   {
@@ -762,6 +764,7 @@ culture.init(
     name: { type: DataTypes.STRING },
     product: { type: DataTypes.STRING },
     priceBerry: { type: DataTypes.INTEGER },
+    collectPeriod: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -896,6 +899,7 @@ export interface Iproduct {
   price: number;
   cost: number;
   unitMeasure: string;
+  collectPeriod: string;
   userId: string;
   cultureId?: number;
 }
@@ -915,6 +919,7 @@ product.init(
     price: { type: DataTypes.FLOAT },
     cost: { type: DataTypes.FLOAT },
     unitMeasure: { type: DataTypes.STRING },
+    collectPeriod: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
