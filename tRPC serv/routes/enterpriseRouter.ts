@@ -7,10 +7,12 @@ import EnterpriseService from "../controllers/EnterpriseService";
 const createEnterprise = z.object({
   name: z.string(),
   form: z.enum([
-    "ФОП з членами",
-    "ФОП без членів",
+    "ФОП",
+    "ФОП + 1",
+    "ФОП + 2",
+    "ФОП + 3",
+    "ФОП + 4",
     "Юридична особа ФГ",
-    "Не визначено",
   ]),
   taxGroup: z.enum([
     "II група",

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Tab,
   Tabs,
@@ -23,13 +23,20 @@ import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
-import { IbusinessPlan } from "../../../tRPC serv/models/models";
+import { IbusinessPlan, Iproduct } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { names } from "../modules/TEJConceptTable/index";
 import SelectCart from "../modules/TEJConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
-import { patchResume, patchTitlePage } from "../http/requests";
+import {
+  getJob,
+  getVegetationYear,
+  getWorker,
+  getYieldPlants,
+  patchResume,
+  patchTitlePage,
+} from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
 import useBusiness from "./hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
@@ -41,9 +48,6 @@ import StaffingTable from "../modules/StaffingTable";
 import useEnterprise from "./hook/useEnterprise";
 import GeneralDataTable from "../modules/GeneralDataTable";
 import CashFlowTable from "../modules/CashFlowTable";
-import PlanIncomeProductionTable from "../modules/PlanIncomeProductionTable";
-import SaleTable from "../modules/SaleTable";
-import CostProdTable from "../modules/CostProdTable";
 import CartsTable, { CartsTableHeadRow } from "../modules/CartsTable";
 import SectionTitle from "../ui/SectionTitle/SectionTitle";
 import Description from "../ui/Description";
@@ -57,6 +61,10 @@ import {
   StaffingTableHeadRow,
 } from "../modules/StaffingTable/StaffingTable";
 import Paragraph from "../ui/Paragraph";
+import useVegetationYears from "./hook/useVegetationYears";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
+import CreateEnterprise from "../modules/CreateEnterprise";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -65,9 +73,6 @@ export type iChild =
   | "deduction"
   | "title";
 function BiznesPlanPage() {
-  const [openResume, setOpenResume] = useState<boolean>(false);
-  const [openTitle, setOpenTitle] = useState<boolean>(false);
-  const [name, setName] = useState<iName>();
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
   const [infCartId, setInfCartId] = useState<number>(0);
@@ -76,35 +81,46 @@ function BiznesPlanPage() {
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
   const { map, user, enterpriseStore, business, income } = useContext(Context);
   useBusiness(business, map);
+  useEnterprise();
+  useEffect(() => {
+    getYieldPlants(income);
+    getVegetationYear(income);
+    getWorker(enterpriseStore);
+    getJob(enterpriseStore);
+  }, []);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
     JSON.stringify(business.businessPlan)
   );
   const myBusiness = Business.find((el) => el.id == id);
   // if (!myBusiness) return;
-  //@ts-ignore
-  let data = name && child ? myBusiness[name][child] : "";
-  const [nData, setNData] = useState<string>();
-  function getData(name: iName, children: iChild, infCartId: number | null) {
-    setIsActiveInput(false);
-    setInfCartId(infCartId || 0);
-    setChild(children);
-    setName(name);
-  }
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
   );
-  const [isActiveInput, setIsActiveInput] = useState(false);
   const [openQuiz, setOpenQuiz] = useState(false);
   const [updateQuiz, setUpdateQuiz] = useState(false);
-  useEnterprise();
-
+  const [openEnterprise, setOpenEnterprise] = useState(false);
+  const [resEnterprise, setResEnterprise] = useState<CreateEnterpriseProps>({
+    form: "",
+    name: "",
+    taxGroup: "",
+    entId: 0,
+  });
   const [quizRes, setQuizRes] = useState({});
   const start = +myBusiness?.dateStart?.split("-")[0]!;
   const end = +start + +myBusiness?.realizationTime!;
   const indicatorRef = useRef<HTMLTableElement>(null);
   const buttonsRef = useRef<HTMLParagraphElement>(null);
-  const cultureSet = new Set(myBusiness?.busCuls.map((el) => el.culture.name));
+  const cultureSet = new Set(
+    myBusiness?.busCuls.map((el) => el?.culture?.name)
+  );
+  const productSet = new Set(
+    myBusiness?.busCuls?.map((el) => el.culture?.product)
+  );
+  let thisWorkers = enterpriseStore.worker.filter(
+    (e) => e.enterpriseId == myEnterprise?.id! && e.form == myEnterprise?.form
+  );
+
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
@@ -199,14 +215,13 @@ function BiznesPlanPage() {
             <Tr>
               <Td
                 onClick={() => {
-                  // setRes({
-                  //   entId: el.id,
-                  //   form: el.form,
-                  //   name: el.name,
-                  //   taxGroup: el.taxGroup,
-                  // });
-                  // setUpdate(true);
-                  // setOpen(true);
+                  setResEnterprise({
+                    entId: myEnterprise?.id,
+                    form: myEnterprise?.form!,
+                    name: myEnterprise?.name!,
+                    taxGroup: myEnterprise?.taxGroup!,
+                  });
+                  setOpenEnterprise(true);
                 }}
               >
                 <EditIcon
@@ -223,6 +238,14 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
+      <CreateEnterprise
+        open={openEnterprise}
+        setOpen={setOpenEnterprise}
+        res={resEnterprise}
+        setRes={setResEnterprise}
+        update={true}
+        setUpdate={() => {}}
+      />
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -230,7 +253,8 @@ function BiznesPlanPage() {
         setUpdate={setUpdateQuiz}
         res={quizRes}
         setRes={setQuizRes}
-        cultures={myBusiness?.busCuls?.map((el) => el.culture) || []}
+        //@ts-ignore
+        cultures={myBusiness?.busCuls?.map((el) => el.culture)}
       />
       <Box
         // display={"grid"}
@@ -276,9 +300,9 @@ function BiznesPlanPage() {
           gridColumnEnd={2}
         >
           <BusinessConceptTable
-            setOpenResume={setOpenResume}
-            setOpenTitle={setOpenTitle}
-            getData={getData}
+            setOpenResume={() => {}}
+            setOpenTitle={() => {}}
+            getData={() => {}}
             indicatorRef={indicatorRef}
             buttonsRef={buttonsRef}
           />
@@ -403,11 +427,6 @@ function BiznesPlanPage() {
                   <Td>Початок продажів</Td>
                 </Tr>
                 {(() => {
-                  const productSet = new Set(
-                    myBusiness?.busCuls?.map((el) => el.culture.product)
-                  );
-                  console.log(productSet);
-
                   return [...productSet].map((el, ind) =>
                     ind == 0 ? (
                       <>
@@ -721,7 +740,7 @@ function BiznesPlanPage() {
                 <Tr>
                   <Th colSpan={7}>
                     <TableName>
-                      {`Штатний розпис ${myEnterprise?.form}`}
+                      {`Штатний розпис ${myEnterprise?.form} на 1 га`}
                     </TableName>
                   </Th>
                 </Tr>
@@ -730,21 +749,36 @@ function BiznesPlanPage() {
                     <TableNumber></TableNumber>
                   </Th>
                 </Tr>
-                <StaffingTableHeadRow />
+                <StaffingTableHeadRow isPlan={true} />
               </Thead>
               <Tbody>
                 {(() => {
+                  let sum = 0;
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    thisWorkers.forEach((el) => {
+                      sum += el.salary * 12 * el.amount;
+                    });
                     res.push(
                       <>
                         <Tr>
                           <Td>{i}</Td>
                         </Tr>
-                        <StaffingTableBodyRows thisWorkers={[]} />
+                        <StaffingTableBodyRows
+                          thisWorkers={thisWorkers}
+                          isPlan={true}
+                        />
                       </>
                     );
                   }
+                  res.push(
+                    <Tr fontWeight={"bold"}>
+                      <Td
+                        colSpan={3}
+                      >{`Разом фонд оплати праці, років - ${myBusiness?.realizationTime}`}</Td>
+                      <Td>{sum}</Td>
+                    </Tr>
+                  );
                   return res;
                 })()}
               </Tbody>
@@ -794,7 +828,40 @@ function BiznesPlanPage() {
               <Tbody>
                 {(() => {
                   const res = [];
+                  let sum = 0;
+                  thisWorkers = thisWorkers.map((el) => {
+                    if (el.class == "Виробничий")
+                      return {
+                        ...el,
+                        amount: Math.ceil(
+                          el.amount *
+                            //@ts-ignore
+                            myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0)
+                        ),
+                      };
+                    else return el;
+                  });
                   for (let i = start; i < end; i++) {
+                    let adAmount = 0;
+                    let adSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Адміністративний") {
+                        adAmount += e.amount;
+                        adSalary += e.salary * e.amount;
+                      }
+                    });
+                    let vAmount = 0;
+                    let vSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Виробничий") {
+                        vAmount += e.amount;
+                        vSalary += e.salary * e.amount;
+                      }
+                    });
+                    sum +=
+                      Math.round(adSalary * 12 * 0.235) +
+                      adSalary * 12 +
+                      (Math.round(vSalary * 12 * 0.235) + vSalary * 12);
                     res.push(
                       <>
                         <Tr>
@@ -802,13 +869,33 @@ function BiznesPlanPage() {
                         </Tr>
                         <Tr>
                           <Td>Адмін</Td>
+                          <Td>{adAmount}</Td>
+                          <Td>{Math.round(adSalary / adAmount)}</Td>
+                          <Td>{adSalary * 12}</Td>
+                          <Td>{Math.round(adSalary * 12 * 0.235)}</Td>
+                          <Td>
+                            {Math.round(adSalary * 12 * 0.235) + adSalary * 12}
+                          </Td>
                         </Tr>
                         <Tr>
                           <Td>Вироб</Td>
+                          <Td>{vAmount}</Td>
+                          <Td>{Math.round(vSalary / vAmount)}</Td>
+                          <Td>{vSalary * 12}</Td>
+                          <Td>{Math.round(vSalary * 12 * 0.235)}</Td>
+                          <Td>
+                            {Math.round(vSalary * 12 * 0.235) + vSalary * 12}
+                          </Td>
                         </Tr>
                       </>
                     );
                   }
+                  res.push(
+                    <Tr fontWeight={"bold"}>
+                      <Td colSpan={5}>Річний оплати праці з нарахуваннями</Td>
+                      <Td>{sum}</Td>
+                    </Tr>
+                  );
                   return res;
                 })()}
               </Tbody>
@@ -844,11 +931,19 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    let vSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Виробничий") {
+                        vSalary += e.salary * e.amount;
+                      }
+                    }, 0);
                     res.push(
                       <>
                         <Tr>
                           <Td>{i}</Td>
-                          <Td></Td>
+                          <Td>
+                            {Math.round(vSalary * 12 * 0.235) + vSalary * 12}
+                          </Td>
                           <Td></Td>
                           <Td></Td>
                           <Td></Td>
@@ -871,40 +966,46 @@ function BiznesPlanPage() {
             </Description>
             <Table size={"sm"}>
               <Thead>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableName>Земельні ділянки</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Вид оплати</Th>
+                  <Th>Кадастровий номер</Th>
+                  <Th>Площа</Th>
+                  <Th>Ставка</Th>
+                  <Th>Плата за землю</Th>
+                  <Th>Власність</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 {(() => {
                   const res = [];
-
-                  // for (let i = start; i < end; i++) {
-                  //   res.push(
-                  //     <>
-                  //       <Tr>
-                  //         <Td>{i}</Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //         <Td></Td>
-                  //       </Tr>
-                  //     </>
-                  //   );
-                  // }
-                  return (
-                    <>
-                      <Tr>
-                        <Th>
-                          <TableName>Земельні ділянки</TableName>
-                        </Th>
-                      </Tr>
-                      <Tr>
-                        <Th>
-                          <TableNumber></TableNumber>
-                        </Th>
-                      </Tr>
-                      <Tr></Tr>
-                    </>
-                  );
+                  for (let i = start; i < end; i++) {
+                    res.push(
+                      <>
+                        <Tr>
+                          <Td>{i}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td>Оренда Землі</Td>
+                        </Tr>
+                        <Tr>
+                          <Td>Податок</Td>
+                        </Tr>
+                      </>
+                    );
+                  }
+                  return res;
                 })()}
-              </Thead>
+              </Tbody>
             </Table>
             <Description>
               Використання площ під культурою описано у табличному вигляді.
@@ -922,7 +1023,7 @@ function BiznesPlanPage() {
                             <Td>
                               {myBusiness?.busCuls.reduce(
                                 (p, c) =>
-                                  el == c.culture.name ? p + c.area : p,
+                                  el == c.culture?.name ? p + c.area : p,
                                 0
                               )}
                             </Td>
@@ -997,10 +1098,10 @@ function BiznesPlanPage() {
                     площа
                   </Th>
                 </Tr>
-                {myBusiness?.busCuls.map((el) => (
+                {myBusiness?.busCuls?.map((el) => (
                   <Tr>
-                    <Td>{el.culture.name}</Td>
-                    <Td>{el.cultivationTechnology.name}</Td>
+                    <Td>{el?.culture?.name}</Td>
+                    <Td>{el?.cultivationTechnology?.name}</Td>
                     <Td>{el.area}</Td>
                     {/* <Td>{}</Td> */}
                   </Tr>
@@ -1027,14 +1128,14 @@ function BiznesPlanPage() {
                   <Th rowSpan={2}>Вегетація</Th>
                   {myBusiness?.busCuls.map((el) => (
                     <Th colSpan={2}>
-                      {el.culture.name}
+                      {el.culture?.name}
                       <br />
-                      {el.cultivationTechnology.name}
+                      {el.cultivationTechnology?.name}
                     </Th>
                   ))}
                 </Tr>
                 <Tr>
-                  {myBusiness?.busCuls.map((el) => (
+                  {myBusiness?.busCuls.map(() => (
                     <>
                       <Th>Коеф.</Th>
                       <Th>Урожайн.</Th>
@@ -1046,10 +1147,34 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    const yearName = useVegetationYears[i - start + 1].name;
                     res.push(
                       <>
                         <Tr>
-                          <Td>{i}</Td>
+                          <Td>{i + " " + yearName}</Td>
+                          {myBusiness?.busCuls.map((el) => {
+                            const myYield = income.yieldPlant.find(
+                              (e) => e.cultureId == el.cultureId
+                            );
+                            const vegetation = income.vegetationYear.find(
+                              (e) =>
+                                e.yieldPlantId == myYield?.id &&
+                                e.year == yearName
+                            );
+
+                            return (
+                              <>
+                                <Th>{vegetation?.allCoeff || 0}</Th>
+                                <Th>
+                                  {Math.round(
+                                    myYield?.yieldPerHectare! *
+                                      (vegetation?.allCoeff || 0) *
+                                      100
+                                  ) / 100}
+                                </Th>
+                              </>
+                            );
+                          })}
                         </Tr>
                       </>
                     );
@@ -1141,7 +1266,11 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
-                    res.push(<Tr>{i}</Tr>);
+                    res.push(
+                      <Tr>
+                        <Td>{i}</Td>
+                      </Tr>
+                    );
                     for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
                       const e = myBusiness?.busCuls[j];
                       let maps = map.maps.map((m) => ({
@@ -1153,7 +1282,8 @@ function BiznesPlanPage() {
                           el.cultureId == e?.cultureId &&
                           el.cultivationTechnologyId ==
                             e?.cultivationTechnologyId &&
-                          el.year == i - start + 1
+                          //@ts-ignore
+                          el.year == i - +start + 1
                       );
                       res.push(
                         <>
@@ -1176,38 +1306,249 @@ function BiznesPlanPage() {
                 })()}
               </Tbody>
             </Table>
-            <Table size="sm">
-              <Tr>
-                <Th colSpan={6}>
-                  <Description>
-                    Виробництво продукції планується з врахуванням урожайності
-                    скоригованої по роках експлуатації насаджень.
-                  </Description>
-                </Th>
-              </Tr>
-              <Tr>
-                <Th colSpan={6}>
-                  <TableName>План виробництва продукції</TableName>
-                </Th>
-              </Tr>
-              <Tr>
-                <Th colSpan={6}>
-                  <TableNumber></TableNumber>
-                </Th>
-              </Tr>
-              <PlanIncomeProductionTableHeadRow isPlan={true} />
+            <Paragraph>
+              4.2.Основні засоби, ресурси та біологічні активи
+            </Paragraph>
+            <Description>
+              Основні засоби, що використовуються під час операційної діяльності
+              підприємства втрачають свою вартість через фізичний знос і
+              моральне старіння. Знос (або амортизація) є однією зі складових
+              собівартості товарів, але не є причиною відтоку реальних грошей.
+              Найбільшого поширення набув механізм лінійної амортизації, коли
+              річна норма амортизації встановлюється виходячи з терміну служби
+              обладнання. Первісна вартість основних засобів - це вартість, за
+              якою засіб було придбано чи оприбутковано на баланс підприємства.
+              Балансова вартість або залишкова вартість = Первісна вартість -
+              нарахований знос. Амортизаційні відрахування в розрахунках
+              прийняті відповідно нормативним значенням. В основу розрахунку
+              покладена вартість комплексу технічних приміщень та огорожі.В
+              якості базового методу розрахунку амортизації було обрано лінійний
+              метод. При розрахунку амортизації були використані положення
+              Податкового кодексу України.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Основні засоби</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>
+                    <Text>Назва основного засобу</Text>
+                    <Text>Первісн а вартість</Text>
+                    <Text>Термін амортизації</Text>
+                    <Text>Знос за …3 роки</Text>
+                    <Text>Залишкова вартість</Text>
+                  </Th>
+                </Tr>
+              </Thead>
             </Table>
-            {(() => {
-              const res = [];
-              for (let i = start; i < end; i++) {
-                res.push(
-                  <>
-                    <Text fontWeight={"bold"}>{i}</Text>
-                  </>
-                );
-              }
-              return res;
-            })()}
+            <Description>
+              В якості базового методу розрахунку амортизації біологічних
+              активів було обрано лінійний метод. При розрахунку амортизації
+              були використані положення Податкового кодексу України.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Біологічні активи</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Назва біологічного аактиву</Th>
+                  <Th>Первісна вартість</Th>
+                  <Th>Термін амортизації</Th>
+                  <Th>Знос за …3 роки</Th>
+                  <Th>Залишкова вартість</Th>
+                </Tr>
+              </Thead>
+            </Table>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th
+                    colSpan={
+                      (myBusiness?.realizationTime! <= 7
+                        ? myBusiness?.realizationTime!
+                        : 6) + 2
+                    }
+                  >
+                    <TableName>
+                      {`План амортизації перших${" "}
+                      ${
+                        myBusiness?.realizationTime! <= 7
+                          ? myBusiness?.realizationTime!
+                          : 6
+                      }
+                      років проекту`}
+                    </TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th
+                    colSpan={
+                      (myBusiness?.realizationTime! <= 7
+                        ? myBusiness?.realizationTime!
+                        : 6) + 2
+                    }
+                  >
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>
+                    Засоби <br />
+                    і&nbsp;активи
+                  </Th>
+                  {(() => {
+                    const res = [];
+                    for (let i = start; i < end; i++) {
+                      if (i <= start + 6) {
+                        res.push(
+                          <>
+                            <Th>{i}</Th>
+                          </>
+                        );
+                      }
+                    }
+                    return res;
+                  })()}
+                  <Th>
+                    Сума <br />
+                    амортизації
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>Основні засоби</Td>
+                </Tr>
+                <Tr>
+                  <Td>Біоактиви</Td>
+                </Tr>
+                <Tr>
+                  <Td>Разом</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+            <Description>
+              Для планування необхідних ресурсів використано нормативний метод
+              та дані про потребу основних ресурсів записано у табличному
+              вигляді.
+            </Description>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th colSpan={5}>
+                    <TableName>Основні ресурси</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th>Назва ресурсу</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                  <Th>Призначення</Th>
+                </Tr>
+              </Thead>
+            </Table>
+            <Paragraph>4.3. Опис продукту</Paragraph>
+            <Table size={"sm"}>
+              {[...productSet].map((el, ind) => {
+                if (ind == 0) {
+                  return (
+                    <Tr>
+                      <Th rowSpan={productSet.size}>Основний продукт</Th>
+                      <Th>{el}</Th>
+                    </Tr>
+                  );
+                } else {
+                  return (
+                    <Tr>
+                      <Th>{el}</Th>
+                    </Tr>
+                  );
+                }
+              })}
+            </Table>
+            <Table size="sm">
+              <Thead>
+                <Tr>
+                  <Th colSpan={6}>
+                    <Description>
+                      Виробництво продукції планується з врахуванням урожайності
+                      скоригованої по роках експлуатації насаджень.
+                    </Description>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableName>План виробництва продукції</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <PlanIncomeProductionTableHeadRow isPlan={true} />
+              </Thead>
+              <Tbody>
+                {(() => {
+                  const res = [];
+                  for (let i = start; i < end; i++) {
+                    const yearName = useVegetationYears[i - start + 1].name;
+
+                    let akk = myBusiness?.busCuls.map((el) => {
+                      const myYield = income.yieldPlant.find(
+                        (e) => e.cultureId == el.cultureId
+                      );
+
+                      const vegetation = income.vegetationYear.find(
+                        (e) =>
+                          e.yieldPlantId == myYield?.id && e.year == yearName
+                      );
+                      const sum =
+                        Math.round(
+                          (myYield?.yieldPerHectare! * vegetation?.allCoeff! ||
+                            0) * 100
+                        ) / 100;
+                      return (
+                        <Tr>
+                          <Td>{el.culture?.name}</Td>
+                          <Td>{sum}</Td>
+                          <Td>{el.area}</Td>
+                          <Td>{Math.round(sum * el.area * 100) / 100}</Td>
+                        </Tr>
+                      );
+                    });
+                    res.push(
+                      <>
+                        <Tr>
+                          <Td>
+                            <Text fontWeight={"bold"}>{i}</Text>
+                          </Td>
+                        </Tr>
+                        {akk}
+                      </>
+                    );
+                  }
+                  return res;
+                })()}
+              </Tbody>
+            </Table>
             {/* <Heading textAlign={"center"} size={"sm"} mt={5}>
               Продаж продукції
             </Heading> */}
@@ -1223,7 +1564,7 @@ function BiznesPlanPage() {
                 </Tr>
                 <Tr>
                   <Th colSpan={7}>
-                    <TableName>Графік реалізації продукції</TableName>
+                    <TableName>Графік збору продукції</TableName>
                   </Th>
                 </Tr>
                 <Tr>
@@ -1242,6 +1583,35 @@ function BiznesPlanPage() {
                         <Tr>
                           <Td>{i}</Td>
                         </Tr>
+                        {myBusiness?.busCuls?.map((el) => {
+                          const yearName =
+                            useVegetationYears[i - start + 1].name;
+                          const myYield = income.yieldPlant.find(
+                            (e) => e.cultureId == el.cultureId
+                          );
+
+                          const vegetation = income.vegetationYear.find(
+                            (e) =>
+                              e.yieldPlantId == myYield?.id &&
+                              e.year == yearName
+                          );
+                          const sum =
+                            Math.round(
+                              (myYield?.yieldPerHectare! *
+                                el.area *
+                                vegetation?.allCoeff! || 0) * 100
+                            ) / 100;
+                          return (
+                            <Tr>
+                              <Td>{el.culture?.name}</Td>
+                              <Td>{el.culture?.product}</Td>
+                              <Td>{el.culture?.collectPeriod}</Td>
+                              <Td>{sum}</Td>
+                              <Td>{el.culture?.priceBerry}</Td>
+                              <Td>{sum * el.culture?.priceBerry!}</Td>
+                            </Tr>
+                          );
+                        })}
                       </>
                     );
                   }
@@ -1422,15 +1792,56 @@ function BiznesPlanPage() {
             </Table>
             {(() => {
               const res = [];
+              let startSum = myBusiness?.initialAmount! / 1000;
+              let endSum = startSum;
               for (let i = start; i < end; i++) {
+                const obj: {
+                  "I квартал": number;
+                  "II квартал": number;
+                  "III квартал": number;
+                  "IV квартал": number;
+                } = {
+                  "I квартал": 0,
+                  "II квартал": 0,
+                  "III квартал": 0,
+                  "IV квартал": 0,
+                };
+                myBusiness?.busCuls?.forEach((el) => {
+                  const yearName = useVegetationYears[i - start + 1].name;
+                  console.log(i - start);
+
+                  const myYield = income.yieldPlant.find(
+                    (e) => e.cultureId == el.cultureId
+                  );
+
+                  const vegetation = income.vegetationYear.find(
+                    (e) => e.yieldPlantId == myYield?.id && e.year == yearName
+                  );
+                  const sum =
+                    Math.round(
+                      (myYield?.yieldPerHectare! *
+                        el.area *
+                        el.culture?.priceBerry! *
+                        vegetation?.allCoeff! || 0) * 100
+                    ) / 100;
+                  endSum += sum;
+                  endSum = Math.round(endSum * 1000) / 1000;
+                  obj[el.culture?.collectPeriod!] += sum;
+                });
                 res.push(
                   <Box mt={"50px"}>
                     <CashFlowTable
                       year={i}
-                      startSum={myBusiness?.initialAmount}
+                      startSum={startSum}
+                      endSum={endSum}
+                      fkIncome={obj["I квартал"]}
+                      skIncome={obj["II квартал"]}
+                      tkIncome={obj["III квартал"]}
+                      fourthkIncome={obj["IV квартал"]}
                     />
                   </Box>
                 );
+                startSum = endSum;
               }
               return res;
             })()}
@@ -1482,7 +1893,7 @@ function BiznesPlanPage() {
               }
               return res;
             })()}
-            <Table ref={indicatorRef}>
+            <Table size={"sm"} ref={indicatorRef}>
               <Thead>
                 <Tr>
                   <Th colSpan={9}>
@@ -1552,10 +1963,42 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    let fin = 0;
+                    myBusiness?.busCuls?.forEach((el) => {
+                      const yearName = useVegetationYears[i - start + 1].name;
+                      const myYield = income.yieldPlant.find(
+                        (e) => e.cultureId == el.cultureId
+                      );
+
+                      const vegetation = income.vegetationYear.find(
+                        (e) =>
+                          e.yieldPlantId == myYield?.id && e.year == yearName
+                      );
+                      const sum =
+                        Math.round(
+                          (myYield?.yieldPerHectare! *
+                            el.area *
+                            vegetation?.allCoeff! || 0) * 100
+                        ) / 100;
+                      fin += sum * el.culture?.priceBerry!;
+                    });
                     res.push(
-                      <Tr>
-                        <Td px={1}>{i + ".12"}</Td>
-                      </Tr>
+                      <>
+                        <Tr>
+                          <Td px={1}>{i + ".12"}</Td>
+                        </Tr>
+
+                        <Tr>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td>{fin}</Td>
+                        </Tr>
+                      </>
                     );
                   }
                   return res;
@@ -1585,8 +2028,6 @@ function BiznesPlanPage() {
         setOpen={setShowSelectCart}
         child={child!}
       />
-      <CreateResume open={openResume} setOpen={setOpenResume} />
-      <CreateTitlePage open={openTitle} setOpen={setOpenTitle} />
     </Box>
   );
 }

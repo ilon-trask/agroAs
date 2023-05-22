@@ -1,6 +1,9 @@
 import { Principal } from "..";
+import { YieldPlantLandingPeriodType } from "../../tsClient/src/pages/hook/useYieldPlantLandingPeriod";
 import {
+  cultivationTechnologies,
   culture,
+  IcultivationTechnologies,
   Iculture,
   Iincome,
   income,
@@ -15,6 +18,7 @@ import {
   CreateIncome,
   CreateProductType,
   createYieldCalcType,
+  CreateYieldPlantType,
   PatchIncome,
   setIsUsingIncomeType,
   UpdateYieldPlantType,
@@ -22,8 +26,13 @@ import {
 export interface resYieldPlant extends IyieldPlant {
   culture: Iculture;
   yieldCalculation: IyieldCalculation;
+  cultivationTechnology: IcultivationTechnologies;
 }
-const plantInclude = [{ model: culture }, { model: yieldCalculation }];
+const plantInclude = [
+  { model: culture },
+  { model: yieldCalculation },
+  { model: cultivationTechnologies },
+];
 class incomeService {
   async getCultural() {
     const cultures: Iculture[] = await culture.findAll();
@@ -49,7 +58,7 @@ class incomeService {
     return res;
   }
   async createYieldPlant(
-    data: { cultureId: number; cultivationTechnologyId: number },
+    data: CreateYieldPlantType,
     user: Principal | undefined
   ) {
     if (!user) return;
@@ -61,6 +70,7 @@ class incomeService {
       yieldPerRoll: 0,
       timesDow: 0,
       cultureId: data.cultureId,
+      landingPeriod: data.landingPeriod,
     });
     //@ts-ignore
     const res: resYieldPlant = await yieldPlant.findOne({
@@ -154,6 +164,7 @@ class incomeService {
       {
         cultivationTechnologyId: data.cultivationTechnologyId,
         cultureId: data.cultureId,
+        landingPeriod: data.landingPeriod,
       },
       { where: { id: data.yieldPlantId } }
     );

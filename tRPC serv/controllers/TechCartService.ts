@@ -22,6 +22,7 @@ import {
   tech_cart,
   tech_operation,
   tractor,
+  vegetationYears,
 } from "../models/models";
 import {
   changeOper,
@@ -294,6 +295,19 @@ class TechCartService {
     } = data;
 
     if (user) {
+      const cart = await tech_cart.findOne({
+        where: { id: id },
+      });
+      if (cart?.year != year) {
+        vegetationYears.update(
+          { techCartId: cart?.id! },
+          { where: { cultureId, cultivationTechnologyId, year } }
+        );
+        vegetationYears.update(
+          { techCartId: null },
+          { where: { cultureId, cultivationTechnologyId, year: cart?.year! } }
+        );
+      }
       await tech_cart.update(
         {
           nameCart,
@@ -339,10 +353,9 @@ class TechCartService {
       });
       tech_cart.update({ costHectare }, { where: { id: id } });
       res[0].costHectare = costHectare;
+
       return res;
     } else {
-      console.log(123);
-
       return await guestPatchCart(data);
     }
   }

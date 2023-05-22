@@ -9,6 +9,7 @@ import {
   Iinvestment,
   Iproduction,
   Isale,
+  IvegetationYears,
   IyieldCalculation,
   IyieldPlant,
   yieldCalculation,
@@ -25,6 +26,7 @@ export default class IncomeStore {
   private _investment: Iinvestment[] = [];
   private _derj: Iderj_support[] = [];
   private _grant: Igrant[] = [];
+  private _vegetationYear: IvegetationYears[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -93,6 +95,12 @@ export default class IncomeStore {
   public set newGrant(grant: Igrant) {
     this._grant.push(grant);
   }
+  public set vegetationYear(vegetationYear: IvegetationYears[]) {
+    this._vegetationYear = vegetationYear;
+  }
+  public set newVegetationYear(vegetationYear: IvegetationYears) {
+    this._vegetationYear.push(vegetationYear);
+  }
   public get yieldPlant() {
     return this._yieldPlant;
   }
@@ -122,5 +130,8 @@ export default class IncomeStore {
   }
   public get grant() {
     return this._grant;
+  }
+  public get vegetationYear() {
+    return this._vegetationYear;
   }
 }

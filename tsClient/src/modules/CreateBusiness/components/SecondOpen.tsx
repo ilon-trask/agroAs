@@ -181,7 +181,7 @@ function SecondOpen({ open, setOpen, res, setRes, cultureId }: props) {
         );
       })}
       <ModalFooter>
-        <Button>Внести</Button>
+        <Button onClick={() => setOpen(false)}>Внести</Button>
       </ModalFooter>
     </Dialog>
   );

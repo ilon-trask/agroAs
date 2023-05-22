@@ -3,6 +3,7 @@ import { Itech_cart } from "../../../tRPC serv/models/models";
 import Dialog, { func } from "../components/Dialog";
 import MapInputs from "../components/MapInputs";
 import { createCart, updateMap } from "../http/requests";
+import { VegetationYearsType } from "../pages/hook/useVegetationYears";
 import { Icart } from "../pages/MapJornal";
 export type cartProps = {
   id?: number;
@@ -15,7 +16,7 @@ export type cartProps = {
   sectionId?: number | "";
   cultivationTechnologyId?: number | "";
   cultureId?: number | "";
-  year: number | "";
+  year: VegetationYearsType | "";
 };
 export const CartProps: cartProps = {
   nameCart: "",

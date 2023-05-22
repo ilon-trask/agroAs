@@ -204,8 +204,8 @@ export function PlanIncomeProductionTableHeadRow({
       </Th>
       <Th>Площа (га)</Th>
       <Th>
-        Планове <br />
-        виробництво (т)
+        Плановий <br />
+        збір (т)
       </Th>
       <Th>
         Собівартість <br />

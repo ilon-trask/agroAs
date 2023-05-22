@@ -8,8 +8,6 @@ import {
 import { IncomeType } from "../../tsClient/src/pages/hook/useIncomeTypes";
 import { IncomeGroup } from "../../tsClient/src/pages/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
-import { string } from "zod";
-import { resTechCartsWithOpers } from "../controllers/TechCartService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
 import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
@@ -21,6 +19,8 @@ import { AdministrationPeriodCalcType } from "../../tsClient/src/pages/hook/useA
 import { EnterpriseFormType } from "../../tsClient/src/pages/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "../../tsClient/src/pages/hook/useEnterpriseTaxGroup";
 import { WorkerClassesType } from "../../tsClient/src/pages/hook/useWorkersClasses";
+import { YieldPlantLandingPeriodType } from "../../tsClient/src/pages/hook/useYieldPlantLandingPeriod";
+import { VegetationYearsType } from "../../tsClient/src/pages/hook/useVegetationYears";
 export interface Iuser {
   id?: number;
   email: string;
@@ -72,7 +72,7 @@ export interface Itech_cart {
   cultivationTechnologyId?: number;
   isComplex?: boolean;
   sectionId?: number | null;
-  year: number;
+  year: VegetationYearsType;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -97,7 +97,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare isComplex?: boolean;
   declare sectionId?: number;
   declare cultivationTechnologyId?: number;
-  declare year: number;
+  declare year: VegetationYearsType;
 }
 
 tech_cart.init(
@@ -126,7 +126,7 @@ tech_cart.init(
       defaultValue: false,
       allowNull: false,
     },
-    year: { type: DataTypes.INTEGER },
+    year: { type: DataTypes.STRING },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -686,6 +686,7 @@ export interface IyieldPlant {
   yieldPerHectare: number;
   yieldPerRoll: number;
   timesDow: number;
+  landingPeriod: YieldPlantLandingPeriodType;
   cultureId?: number;
   cultivationTechnologyId?: number;
 }
@@ -696,7 +697,9 @@ export class yieldPlant extends Model<IyieldPlant> {
   declare yieldPerHectare: number;
   declare yieldPerRoll: number;
   declare timesDow: number;
+  declare landingPeriod: YieldPlantLandingPeriodType;
   declare cultivationTechnologyId?: number;
+  declare cultureId?: number;
 }
 yieldPlant.init(
   {
@@ -706,6 +709,7 @@ yieldPlant.init(
     yieldPerHectare: { type: DataTypes.FLOAT },
     yieldPerRoll: { type: DataTypes.FLOAT },
     timesDow: { type: DataTypes.INTEGER },
+    landingPeriod: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -743,12 +747,18 @@ export interface Iculture {
   name: string;
   product: string;
   priceBerry: number;
+  collectPeriod: "I квартал" | "II квартал" | "III квартал" | "IV квартал";
 }
 export class culture extends Model<Iculture> {
   declare id?: number;
   declare name: string;
   declare product: string;
   declare priceBerry: number;
+  declare collectPeriod:
+    | "I квартал"
+    | "II квартал"
+    | "III квартал"
+    | "IV квартал";
 }
 culture.init(
   {
@@ -756,6 +766,7 @@ culture.init(
     name: { type: DataTypes.STRING },
     product: { type: DataTypes.STRING },
     priceBerry: { type: DataTypes.INTEGER },
+    collectPeriod: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -890,6 +901,7 @@ export interface Iproduct {
   price: number;
   cost: number;
   unitMeasure: string;
+  collectPeriod: string;
   userId: string;
   cultureId?: number;
 }
@@ -899,6 +911,7 @@ export class product extends Model<Iproduct> {
   declare price: number;
   declare cost: number;
   declare unitMeasure: string;
+  declare collectPeriod: string;
   declare userId: string;
   declare cultureId?: number;
 }
@@ -909,6 +922,7 @@ product.init(
     price: { type: DataTypes.FLOAT },
     cost: { type: DataTypes.FLOAT },
     unitMeasure: { type: DataTypes.STRING },
+    collectPeriod: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
@@ -1216,6 +1230,7 @@ export interface Iworker {
   dateFrom: string;
   dateTo: string;
   class: WorkerClassesType;
+  form: EnterpriseFormType;
   userId: string;
   enterpriseId?: number;
   jobId?: number;
@@ -1228,6 +1243,7 @@ export class worker extends Model<Iworker> {
   declare amount: number;
   declare dateFrom: string;
   declare dateTo: string;
+  declare form: EnterpriseFormType;
   declare class: WorkerClassesType;
   declare userId: string;
 }
@@ -1240,11 +1256,48 @@ worker.init(
     dateFrom: { type: DataTypes.DATEONLY },
     dateTo: { type: DataTypes.DATEONLY },
     class: { type: DataTypes.STRING },
+    form: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING },
   },
-  { sequelize }
+  {
+    sequelize,
+    defaultScope: {
+      order: [["createdAt", "ASC"]],
+    },
+  }
 );
 
+export interface IvegetationYears {
+  id?: number;
+  year: VegetationYearsType;
+  vegetationCoeff: number;
+  technologyCoeff: number;
+  seedlingsCoeff: number;
+  allCoeff?: number;
+  cultureId?: number;
+  cultivationTechnologyId?: number;
+  techCartId?: number | null;
+  yieldPlantId?: number | null;
+}
+
+export class vegetationYears extends Model<IvegetationYears> {
+  declare id?: number;
+  declare year: VegetationYearsType;
+  declare vegetationCoeff: number;
+  declare technologyCoeff: number;
+  declare seedlingsCoeff: number;
+}
+vegetationYears.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    vegetationCoeff: { type: DataTypes.FLOAT },
+    seedlingsCoeff: { type: DataTypes.FLOAT },
+    technologyCoeff: { type: DataTypes.FLOAT },
+    year: { type: DataTypes.STRING },
+  },
+
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1363,6 +1416,7 @@ enterprise.hasMany(businessPlan);
 businessPlan.belongsTo(enterprise);
 
 cultivationTechnologies.hasMany(yieldPlant);
+yieldPlant.belongsTo(cultivationTechnologies);
 
 culture.hasMany(tech_cart);
 tech_cart.belongsTo(culture);
@@ -1375,3 +1429,15 @@ worker.belongsTo(job);
 
 cultivationTechnologies.hasMany(tech_cart);
 tech_cart.belongsTo(cultivationTechnologies);
+
+culture.hasMany(vegetationYears);
+vegetationYears.belongsTo(culture);
+
+cultivationTechnologies.hasMany(vegetationYears);
+vegetationYears.belongsTo(cultivationTechnologies);
+
+tech_cart.hasMany(vegetationYears);
+vegetationYears.belongsTo(tech_cart);
+
+yieldPlant.hasMany(vegetationYears);
+vegetationYears.belongsTo(yieldPlant);

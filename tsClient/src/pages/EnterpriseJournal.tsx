@@ -20,7 +20,7 @@ import CartsTable from "../modules/CartsTable";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import CreateEnterprise from "../modules/CreateEnterprise";
 import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
-import { ENTERPRISE_ROUTER } from "../utils/consts";
+import { ENTERPRISE_FORM_ROUTER, ENTERPRISE_ROUTER } from "../utils/consts";
 
 function Enterprise() {
   const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ function Enterprise() {
     form: "",
     taxGroup: "",
   });
-  const { enterpriseStore, map } = useContext(Context);
+  const { enterpriseStore, map, user } = useContext(Context);
   useEffect(() => {
     if (!enterpriseStore.enterprise[0]) getEnterprise(enterpriseStore);
   }, []);
@@ -88,7 +88,17 @@ function Enterprise() {
                     <ViewIcon boxSize={5} color={"blue.400"} /> {el.name}
                   </Link>
                 </Td>
-                <Td>{el.form}</Td>
+                {user.role == "service_role" ? (
+                  <Td>
+                    <Link
+                      to={ENTERPRISE_FORM_ROUTER + "/" + el.form + "/" + el.id}
+                    >
+                      <ViewIcon boxSize={5} color={"blue.400"} /> {el.form}
+                    </Link>
+                  </Td>
+                ) : (
+                  <Td>{el.form}</Td>
+                )}
                 <Td>{el.taxGroup}</Td>
                 <Td>
                   <DeleteIcon w={"20px"} h={"auto"} color={"red"} />

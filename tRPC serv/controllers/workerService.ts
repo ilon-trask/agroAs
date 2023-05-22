@@ -19,6 +19,7 @@ class workerService {
       isConst: data.isConst,
       salary: data.salary,
       enterpriseId: data.enterpriseId,
+      form: data.form,
       jobId: data.jobId,
       class: data.class,
       userId: user.sub,
@@ -36,6 +37,7 @@ class workerService {
         salary: data.salary,
         enterpriseId: data.enterpriseId,
         class: data.class,
+        form: data.form,
         jobId: data.jobId,
       },
       { where: { id: data.workerId } }

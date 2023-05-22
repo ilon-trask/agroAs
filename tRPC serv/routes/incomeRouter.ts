@@ -14,6 +14,7 @@ export type createYieldCalcType = z.infer<typeof createYieldCalc>;
 const createYieldPlant = z.object({
   cultureId: z.number(),
   cultivationTechnologyId: z.number(),
+  landingPeriod: z.enum(["Весна", "Осінь"]),
 });
 export type CreateYieldPlantType = z.infer<typeof createYieldPlant>;
 const updateYieldPlant = createYieldPlant.extend({

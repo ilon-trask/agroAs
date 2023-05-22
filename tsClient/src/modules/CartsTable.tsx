@@ -124,7 +124,9 @@ const CartsTable = observer(
                     <>
                       <Tr>
                         <Td></Td>
-                        <Td>{el.name}</Td>
+                        <Td fontWeight={"bold"} textTransform={"uppercase"}>
+                          {el.name}
+                        </Td>
                         <Td></Td>
                         <Td></Td>
                         <Td></Td>
