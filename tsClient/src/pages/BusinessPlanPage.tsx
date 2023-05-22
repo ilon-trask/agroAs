@@ -30,7 +30,9 @@ import { names } from "../modules/TEJConceptTable/index";
 import SelectCart from "../modules/TEJConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
 import {
+  getJob,
   getVegetationYear,
+  getWorker,
   getYieldPlants,
   patchResume,
   patchTitlePage,
@@ -61,6 +63,8 @@ import {
 import Paragraph from "../ui/Paragraph";
 import useVegetationYears from "./hook/useVegetationYears";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
+import CreateEnterprise from "../modules/CreateEnterprise";
 export type iName = "resume" | "titlePage" | "";
 export type iChild =
   | "aboutProject"
@@ -69,9 +73,6 @@ export type iChild =
   | "deduction"
   | "title";
 function BiznesPlanPage() {
-  const [openResume, setOpenResume] = useState<boolean>(false);
-  const [openTitle, setOpenTitle] = useState<boolean>(false);
-  const [name, setName] = useState<iName>();
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
   const [infCartId, setInfCartId] = useState<number>(0);
@@ -84,7 +85,8 @@ function BiznesPlanPage() {
   useEffect(() => {
     getYieldPlants(income);
     getVegetationYear(income);
-    console.log(123);
+    getWorker(enterpriseStore);
+    getJob(enterpriseStore);
   }, []);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
@@ -92,22 +94,18 @@ function BiznesPlanPage() {
   );
   const myBusiness = Business.find((el) => el.id == id);
   // if (!myBusiness) return;
-  //@ts-ignore
-  let data = name && child ? myBusiness[name][child] : "";
-  const [nData, setNData] = useState<string>();
-  function getData(name: iName, children: iChild, infCartId: number | null) {
-    setIsActiveInput(false);
-    setInfCartId(infCartId || 0);
-    setChild(children);
-    setName(name);
-  }
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
   );
-  const [isActiveInput, setIsActiveInput] = useState(false);
   const [openQuiz, setOpenQuiz] = useState(false);
   const [updateQuiz, setUpdateQuiz] = useState(false);
-
+  const [openEnterprise, setOpenEnterprise] = useState(false);
+  const [resEnterprise, setResEnterprise] = useState<CreateEnterpriseProps>({
+    form: "",
+    name: "",
+    taxGroup: "",
+    entId: 0,
+  });
   const [quizRes, setQuizRes] = useState({});
   const start = +myBusiness?.dateStart?.split("-")[0]!;
   const end = +start + +myBusiness?.realizationTime!;
@@ -119,6 +117,10 @@ function BiznesPlanPage() {
   const productSet = new Set(
     myBusiness?.busCuls?.map((el) => el.culture?.product)
   );
+  let thisWorkers = enterpriseStore.worker.filter(
+    (e) => e.enterpriseId == myEnterprise?.id! && e.form == myEnterprise?.form
+  );
+
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
@@ -213,14 +215,13 @@ function BiznesPlanPage() {
             <Tr>
               <Td
                 onClick={() => {
-                  // setRes({
-                  //   entId: el.id,
-                  //   form: el.form,
-                  //   name: el.name,
-                  //   taxGroup: el.taxGroup,
-                  // });
-                  // setUpdate(true);
-                  // setOpen(true);
+                  setResEnterprise({
+                    entId: myEnterprise?.id,
+                    form: myEnterprise?.form!,
+                    name: myEnterprise?.name!,
+                    taxGroup: myEnterprise?.taxGroup!,
+                  });
+                  setOpenEnterprise(true);
                 }}
               >
                 <EditIcon
@@ -237,6 +238,14 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
+      <CreateEnterprise
+        open={openEnterprise}
+        setOpen={setOpenEnterprise}
+        res={resEnterprise}
+        setRes={setResEnterprise}
+        update={true}
+        setUpdate={() => {}}
+      />
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -244,7 +253,8 @@ function BiznesPlanPage() {
         setUpdate={setUpdateQuiz}
         res={quizRes}
         setRes={setQuizRes}
-        cultures={myBusiness?.busCuls?.map((el) => el.culture) || []}
+        //@ts-ignore
+        cultures={myBusiness?.busCuls?.map((el) => el.culture)}
       />
       <Box
         // display={"grid"}
@@ -290,9 +300,9 @@ function BiznesPlanPage() {
           gridColumnEnd={2}
         >
           <BusinessConceptTable
-            setOpenResume={setOpenResume}
-            setOpenTitle={setOpenTitle}
-            getData={getData}
+            setOpenResume={() => {}}
+            setOpenTitle={() => {}}
+            getData={() => {}}
             indicatorRef={indicatorRef}
             buttonsRef={buttonsRef}
           />
@@ -730,7 +740,7 @@ function BiznesPlanPage() {
                 <Tr>
                   <Th colSpan={7}>
                     <TableName>
-                      {`Штатний розпис ${myEnterprise?.form}`}
+                      {`Штатний розпис ${myEnterprise?.form} на 1 га`}
                     </TableName>
                   </Th>
                 </Tr>
@@ -739,21 +749,36 @@ function BiznesPlanPage() {
                     <TableNumber></TableNumber>
                   </Th>
                 </Tr>
-                <StaffingTableHeadRow />
+                <StaffingTableHeadRow isPlan={true} />
               </Thead>
               <Tbody>
                 {(() => {
+                  let sum = 0;
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    thisWorkers.forEach((el) => {
+                      sum += el.salary * 12 * el.amount;
+                    });
                     res.push(
                       <>
                         <Tr>
                           <Td>{i}</Td>
                         </Tr>
-                        <StaffingTableBodyRows thisWorkers={[]} />
+                        <StaffingTableBodyRows
+                          thisWorkers={thisWorkers}
+                          isPlan={true}
+                        />
                       </>
                     );
                   }
+                  res.push(
+                    <Tr fontWeight={"bold"}>
+                      <Td
+                        colSpan={3}
+                      >{`Разом фонд оплати праці, років - ${myBusiness?.realizationTime}`}</Td>
+                      <Td>{sum}</Td>
+                    </Tr>
+                  );
                   return res;
                 })()}
               </Tbody>
@@ -803,7 +828,40 @@ function BiznesPlanPage() {
               <Tbody>
                 {(() => {
                   const res = [];
+                  let sum = 0;
+                  thisWorkers = thisWorkers.map((el) => {
+                    if (el.class == "Виробничий")
+                      return {
+                        ...el,
+                        amount: Math.ceil(
+                          el.amount *
+                            //@ts-ignore
+                            myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0)
+                        ),
+                      };
+                    else return el;
+                  });
                   for (let i = start; i < end; i++) {
+                    let adAmount = 0;
+                    let adSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Адміністративний") {
+                        adAmount += e.amount;
+                        adSalary += e.salary * e.amount;
+                      }
+                    });
+                    let vAmount = 0;
+                    let vSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Виробничий") {
+                        vAmount += e.amount;
+                        vSalary += e.salary * e.amount;
+                      }
+                    });
+                    sum +=
+                      Math.round(adSalary * 12 * 0.235) +
+                      adSalary * 12 +
+                      (Math.round(vSalary * 12 * 0.235) + vSalary * 12);
                     res.push(
                       <>
                         <Tr>
@@ -811,13 +869,33 @@ function BiznesPlanPage() {
                         </Tr>
                         <Tr>
                           <Td>Адмін</Td>
+                          <Td>{adAmount}</Td>
+                          <Td>{Math.round(adSalary / adAmount)}</Td>
+                          <Td>{adSalary * 12}</Td>
+                          <Td>{Math.round(adSalary * 12 * 0.235)}</Td>
+                          <Td>
+                            {Math.round(adSalary * 12 * 0.235) + adSalary * 12}
+                          </Td>
                         </Tr>
                         <Tr>
                           <Td>Вироб</Td>
+                          <Td>{vAmount}</Td>
+                          <Td>{Math.round(vSalary / vAmount)}</Td>
+                          <Td>{vSalary * 12}</Td>
+                          <Td>{Math.round(vSalary * 12 * 0.235)}</Td>
+                          <Td>
+                            {Math.round(vSalary * 12 * 0.235) + vSalary * 12}
+                          </Td>
                         </Tr>
                       </>
                     );
                   }
+                  res.push(
+                    <Tr fontWeight={"bold"}>
+                      <Td colSpan={5}>Річний оплати праці з нарахуваннями</Td>
+                      <Td>{sum}</Td>
+                    </Tr>
+                  );
                   return res;
                 })()}
               </Tbody>
@@ -853,11 +931,19 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
+                    let vSalary = 0;
+                    thisWorkers.forEach((e) => {
+                      if (e.class == "Виробничий") {
+                        vSalary += e.salary * e.amount;
+                      }
+                    }, 0);
                     res.push(
                       <>
                         <Tr>
                           <Td>{i}</Td>
-                          <Td></Td>
+                          <Td>
+                            {Math.round(vSalary * 12 * 0.235) + vSalary * 12}
+                          </Td>
                           <Td></Td>
                           <Td></Td>
                           <Td></Td>
@@ -1061,7 +1147,7 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
-                    const yearName = useVegetationYears[i - start].name;
+                    const yearName = useVegetationYears[i - start + 1].name;
                     res.push(
                       <>
                         <Tr>
@@ -1081,7 +1167,7 @@ function BiznesPlanPage() {
                                 <Th>{vegetation?.allCoeff || 0}</Th>
                                 <Th>
                                   {Math.round(
-                                    myYield?.yieldPerHectare *
+                                    myYield?.yieldPerHectare! *
                                       (vegetation?.allCoeff || 0) *
                                       100
                                   ) / 100}
@@ -1180,7 +1266,11 @@ function BiznesPlanPage() {
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
-                    res.push(<Tr>{i}</Tr>);
+                    res.push(
+                      <Tr>
+                        <Td>{i}</Td>
+                      </Tr>
+                    );
                     for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
                       const e = myBusiness?.busCuls[j];
                       let maps = map.maps.map((m) => ({
@@ -1192,7 +1282,8 @@ function BiznesPlanPage() {
                           el.cultureId == e?.cultureId &&
                           el.cultivationTechnologyId ==
                             e?.cultivationTechnologyId &&
-                          el.year == i - start + 1
+                          //@ts-ignore
+                          el.year == i - +start + 1
                       );
                       res.push(
                         <>
@@ -1249,11 +1340,11 @@ function BiznesPlanPage() {
                 </Tr>
                 <Tr>
                   <Th>
-                    <Th>Назва основного засобу</Th>
-                    <Th>Первісн а вартість</Th>
-                    <Th>Термін амортизації</Th>
-                    <Th>Знос за …3 роки</Th>
-                    <Th>Залишкова вартість</Th>
+                    <Text>Назва основного засобу</Text>
+                    <Text>Первісн а вартість</Text>
+                    <Text>Термін амортизації</Text>
+                    <Text>Знос за …3 роки</Text>
+                    <Text>Залишкова вартість</Text>
                   </Th>
                 </Tr>
               </Thead>
@@ -1295,11 +1386,13 @@ function BiznesPlanPage() {
                     }
                   >
                     <TableName>
-                      План амортизації перших{" "}
-                      {myBusiness?.realizationTime! <= 7
-                        ? myBusiness?.realizationTime!
-                        : 6}{" "}
-                      років проекту
+                      {`План амортизації перших${" "}
+                      ${
+                        myBusiness?.realizationTime! <= 7
+                          ? myBusiness?.realizationTime!
+                          : 6
+                      }
+                      років проекту`}
                     </TableName>
                   </Th>
                 </Tr>
@@ -1391,30 +1484,32 @@ function BiznesPlanPage() {
               })}
             </Table>
             <Table size="sm">
-              <Tr>
-                <Th colSpan={6}>
-                  <Description>
-                    Виробництво продукції планується з врахуванням урожайності
-                    скоригованої по роках експлуатації насаджень.
-                  </Description>
-                </Th>
-              </Tr>
-              <Tr>
-                <Th colSpan={6}>
-                  <TableName>План виробництва продукції</TableName>
-                </Th>
-              </Tr>
-              <Tr>
-                <Th colSpan={6}>
-                  <TableNumber></TableNumber>
-                </Th>
-              </Tr>
-              <PlanIncomeProductionTableHeadRow isPlan={true} />
+              <Thead>
+                <Tr>
+                  <Th colSpan={6}>
+                    <Description>
+                      Виробництво продукції планується з врахуванням урожайності
+                      скоригованої по роках експлуатації насаджень.
+                    </Description>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableName>План виробництва продукції</TableName>
+                  </Th>
+                </Tr>
+                <Tr>
+                  <Th colSpan={6}>
+                    <TableNumber></TableNumber>
+                  </Th>
+                </Tr>
+                <PlanIncomeProductionTableHeadRow isPlan={true} />
+              </Thead>
               <Tbody>
                 {(() => {
                   const res = [];
                   for (let i = start; i < end; i++) {
-                    const yearName = useVegetationYears[i - start].name;
+                    const yearName = useVegetationYears[i - start + 1].name;
 
                     let akk = myBusiness?.busCuls.map((el) => {
                       const myYield = income.yieldPlant.find(
@@ -1489,7 +1584,8 @@ function BiznesPlanPage() {
                           <Td>{i}</Td>
                         </Tr>
                         {myBusiness?.busCuls?.map((el) => {
-                          const yearName = useVegetationYears[i - start].name;
+                          const yearName =
+                            useVegetationYears[i - start + 1].name;
                           const myYield = income.yieldPlant.find(
                             (e) => e.cultureId == el.cultureId
                           );
@@ -1512,7 +1608,7 @@ function BiznesPlanPage() {
                               <Td>{el.culture?.collectPeriod}</Td>
                               <Td>{sum}</Td>
                               <Td>{el.culture?.priceBerry}</Td>
-                              <Td>{sum * el.culture?.priceBerry}</Td>
+                              <Td>{sum * el.culture?.priceBerry!}</Td>
                             </Tr>
                           );
                         })}
@@ -1696,15 +1792,56 @@ function BiznesPlanPage() {
             </Table>
             {(() => {
               const res = [];
+              let startSum = myBusiness?.initialAmount! / 1000;
+              let endSum = startSum;
               for (let i = start; i < end; i++) {
+                const obj: {
+                  "I квартал": number;
+                  "II квартал": number;
+                  "III квартал": number;
+                  "IV квартал": number;
+                } = {
+                  "I квартал": 0,
+                  "II квартал": 0,
+                  "III квартал": 0,
+                  "IV квартал": 0,
+                };
+                myBusiness?.busCuls?.forEach((el) => {
+                  const yearName = useVegetationYears[i - start + 1].name;
+                  console.log(i - start);
+
+                  const myYield = income.yieldPlant.find(
+                    (e) => e.cultureId == el.cultureId
+                  );
+
+                  const vegetation = income.vegetationYear.find(
+                    (e) => e.yieldPlantId == myYield?.id && e.year == yearName
+                  );
+                  const sum =
+                    Math.round(
+                      (myYield?.yieldPerHectare! *
+                        el.area *
+                        el.culture?.priceBerry! *
+                        vegetation?.allCoeff! || 0) * 100
+                    ) / 100;
+                  endSum += sum;
+                  endSum = Math.round(endSum * 1000) / 1000;
+                  obj[el.culture?.collectPeriod!] += sum;
+                });
                 res.push(
                   <Box mt={"50px"}>
                     <CashFlowTable
                       year={i}
-                      startSum={myBusiness?.initialAmount}
+                      startSum={startSum}
+                      endSum={endSum}
+                      fkIncome={obj["I квартал"]}
+                      skIncome={obj["II квартал"]}
+                      tkIncome={obj["III квартал"]}
+                      fourthkIncome={obj["IV квартал"]}
                     />
                   </Box>
                 );
+                startSum = endSum;
               }
               return res;
             })()}
@@ -1828,7 +1965,7 @@ function BiznesPlanPage() {
                   for (let i = start; i < end; i++) {
                     let fin = 0;
                     myBusiness?.busCuls?.forEach((el) => {
-                      const yearName = useVegetationYears[i - start].name;
+                      const yearName = useVegetationYears[i - start + 1].name;
                       const myYield = income.yieldPlant.find(
                         (e) => e.cultureId == el.cultureId
                       );
@@ -1843,7 +1980,7 @@ function BiznesPlanPage() {
                             el.area *
                             vegetation?.allCoeff! || 0) * 100
                         ) / 100;
-                      fin += sum * el.culture?.priceBerry;
+                      fin += sum * el.culture?.priceBerry!;
                     });
                     res.push(
                       <>
@@ -1891,8 +2028,6 @@ function BiznesPlanPage() {
         setOpen={setShowSelectCart}
         child={child!}
       />
-      <CreateResume open={openResume} setOpen={setOpenResume} />
-      <CreateTitlePage open={openTitle} setOpen={setOpenTitle} />
     </Box>
   );
 }

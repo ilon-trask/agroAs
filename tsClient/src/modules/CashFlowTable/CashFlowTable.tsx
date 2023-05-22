@@ -3,7 +3,6 @@ import {
   Box,
   Checkbox,
   Popover,
-  PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
   PopoverContent,
@@ -57,14 +56,32 @@ const outcomeTypes = useOutcomeTypes;
 function CashFlowTable({
   year,
   startSum,
+  endSum,
+  fkIncome = 0,
+  fkOutcome = 0,
+  fourthkIncome = 0,
+  fourthkOutcome = 0,
+  skIncome = 0,
+  skOutcome = 0,
+  tkIncome = 0,
+  tkOutcome = 0,
+  yearOutcome = 0,
+  yearIncome = 0,
 }: {
   year: number;
   startSum?: number;
+  endSum?: number;
+  fkIncome?: number;
+  skIncome?: number;
+  tkIncome?: number;
+  fourthkIncome?: number;
+  yearOutcome?: number;
+  yearIncome?: number;
+  fkOutcome?: number;
+  skOutcome?: number;
+  tkOutcome?: number;
+  fourthkOutcome?: number;
 }) {
-  const { map, income } = useContext(Context);
-
-  const outcomes = map.outcome.filter((el) => el.isUsing! == true);
-  const incomes = income.income.filter((el) => el.isUsing! == true);
   const first = { income: 0, outcome: 0, type: "" };
   const second = { income: 0, outcome: 0, type: "" };
   const third = { income: 0, outcome: 0, type: "" };
@@ -91,110 +108,6 @@ function CashFlowTable({
     11: eleventh,
     12: twelfth,
   };
-  let yearIncome: number = 0;
-  let fkIncome: number = 0;
-  let skIncome: number = 0;
-  let tkIncome: number = 0;
-  let fourthkIncome: number = 0;
-  let yearOutcome: number = 0;
-  let fkOutcome: number = 0;
-  let skOutcome: number = 0;
-  let tkOutcome: number = 0;
-  let fourthkOutcome: number = 0;
-  incomes.forEach((el) => {
-    const sale = income.sale.find(
-      (e) => e.id == el.saleId && +e.date.split("-")[0] == year
-    );
-    const credit = income.credit.find(
-      (e) => e.id == el.creditId && +e.date.split("-")[0] == year
-    );
-    const derj = income.derj.find(
-      (e) => e.id == el.derjSupportId && +e.date.split("-")[0] == year
-    );
-    const investment = income.investment.find(
-      (e) => e.id == el.investmentId && +e.date.split("-")[0] == year
-    );
-    const grant = income.grant.find(
-      (e) => e.id == el.grantId && +e.date.split("-")[0] == year
-    );
-    const prop = credit || derj || investment || grant;
-    //@ts-ignore
-    const month = +prop?.date?.split("-")[1] || +sale?.date?.split("-")[1];
-    if (month) {
-      //@ts-ignore
-      obj[month].income += prop?.cost || sale?.price * sale?.amount;
-      yearIncome += prop?.cost || sale?.price! * sale?.amount!;
-      if (month >= 1 && month <= 3) {
-        fkIncome += prop?.cost || sale?.price! * sale?.amount!;
-      } else if (month >= 3 && month <= 5) {
-        skIncome += prop?.cost || sale?.price! * sale?.amount!;
-      } else if (month >= 6 && month < 9) {
-        tkIncome += prop?.cost || sale?.price! * sale?.amount!;
-      } else if (month >= 9 && month < 12) {
-        fourthkIncome += prop?.cost || sale?.price! * sale?.amount!;
-      }
-    }
-  });
-  outcomes.forEach((el) => {
-    // const cart = map.maps.find((e) => e.id == el.techCartId);
-    const buying = map.buyingMachine.find(
-      (e) => e.id == el.buyingMachineId && +e.date.split("-")[0] == year
-    );
-    const adm = map.administration.find((e) => e.id == el.administrationId);
-    akk = [];
-    if (adm?.periodCalc == "Поквартально") {
-      for (
-        let i = +adm.dateFrom.split("-")[1];
-        i <= +adm.dateTo.split("-")[1];
-        i++
-      ) {
-        if (i >= 1 && i <= 3) {
-          setAkk(1);
-        } else if (i > 3 && i <= 6) {
-          setAkk(2);
-        } else if (i >= 7 && i <= 9) {
-          setAkk(3);
-        } else if (i >= 10 && i <= 12) {
-          setAkk(4);
-        }
-      }
-
-      akk.forEach((e) => {
-        if (e == 1) {
-          fkOutcome += adm.price;
-        } else if (e == 2) {
-          skOutcome += adm.price;
-        } else if (e == 3) {
-          tkOutcome += adm.price;
-        } else if (e == 4) {
-          fourthkOutcome += adm.price;
-        }
-      });
-    }
-    let a = adm?.periodCalc == "Помісячно" ? adm : null;
-    const prop = buying || a;
-    //@ts-ignore
-    const month = +prop?.date?.split("-")[1];
-    if (month) {
-      //@ts-ignore
-      obj[month].outcome += prop?.cost * prop?.amount;
-      //@ts-ignore
-      yearOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
-      if (month >= 1 && month <= 3) {
-        //@ts-ignore
-        fkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
-      } else if (month >= 3 && month <= 5) {
-        //@ts-ignore
-        skOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
-      } else if (month >= 6 && month < 9) {
-        //@ts-ignore
-        tkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
-      } else if (month >= 9 && month < 12) {
-        //@ts-ignore
-        fourthkOutcome += (prop?.cost! * prop?.amount!) | prop?.cost!;
-      }
-    }
-  });
 
   return (
     <Table size={"sm"}>
@@ -202,7 +115,7 @@ function CashFlowTable({
         <Tr>
           <Th></Th>
           <Th></Th>
-          <Th>{startSum || 10000}</Th>
+          <Th>{startSum || 0}</Th>
           <Th colSpan={3}>Залишок на початок періоду {year || 2222}</Th>
           <Th></Th>
         </Tr>
@@ -344,23 +257,24 @@ function CashFlowTable({
         <Tr fontWeight={"bold"}>
           <Td>Рік</Td>
           <Td></Td>
-          <Td>{yearIncome}</Td>
+          <Td>
+            {yearIncome ||
+              Math.round(((endSum || 0) - (startSum || 0)) * 1000) / 1000}
+          </Td>
           <Td></Td>
           <Td>{yearOutcome}</Td>
         </Tr>
         <Tr>
           <Td>Оборот за рік</Td>
+          <Td></Td>
+          <Td>
+            {yearIncome ||
+              Math.round((endSum || 0) - (startSum || 0) * 1000) / 1000}
+          </Td>
         </Tr>
-        {outcomes.map((el) => {
-          const cart = map.maps.find((e) => e.id == el.techCartId);
-          const buying = map.buyingMachine.find(
-            (e) => e.id == el.buyingMachineId
-          );
-          const adm = map.administration.find(
-            (e) => e.id == el.administrationId
-          );
+        {/* {[].map((el, ind) => {
           return (
-            <Tr key={el.id}>
+            <Tr key={ind}>
               <Td></Td>
               <Td></Td>
               <Td></Td>
@@ -374,35 +288,8 @@ function CashFlowTable({
               <Td>{cart?.nameCart || buying?.name || adm?.name}</Td>
             </Tr>
           );
-        })}
-        {incomes.map((el) => {
-          const sale = income.sale.find((e) => e.id == el.saleId);
-          const credit = income.credit.find((e) => e.id == el.creditId);
-          const product = map.product.find(
-            (e) =>
-              e.id ==
-              income.production.find((e) => e.id == sale?.productionId)
-                ?.productId
-          );
-          const derj = income.derj.find((e) => e.id == el.derjSupportId);
-          const investment = income.investment.find(
-            //@ts-ignore
-            (e) => e.id == el.investmentId
-          );
-          const grant = income.grant.find((e) => e.id == el.grantId);
-
-          const conditionTime =
-            //@ts-ignore
-            +sale?.date?.split("-")[0] == year ||
-            //@ts-ignore
-            +credit?.date?.split("-")[0] == year ||
-            //@ts-ignore
-            +derj?.date?.split("-")[0] == year ||
-            //@ts-ignore
-            +investment?.date?.split("-")[0] == year ||
-            //@ts-ignore
-            +grant?.date?.split("-")[0] == year;
-          if (conditionTime)
+        })} */}
+        {/* {[].map((el) => {
             return (
               <Tr key={el.id}>
                 <Td></Td>
@@ -426,11 +313,11 @@ function CashFlowTable({
                 <Td></Td>
               </Tr>
             );
-        })}
+        })} */}
         <Tr>
           <Th></Th>
           <Th></Th>
-          <Th>10000</Th>
+          <Th>{endSum || 0}</Th>
           <Th colSpan={3}>Залишок на кінець періоду {year || 2222}</Th>
           <Th></Th>
         </Tr>
@@ -439,4 +326,4 @@ function CashFlowTable({
   );
 }
 
-export default observer(CashFlowTable);
+export default CashFlowTable;

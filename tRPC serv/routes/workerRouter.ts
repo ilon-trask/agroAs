@@ -12,6 +12,14 @@ const createWorker = z.object({
   salary: z.number(),
   enterpriseId: z.number(),
   class: z.enum(["Адміністративний", "Виробничий"]),
+  form: z.enum([
+    "ФОП",
+    "ФОП + 1",
+    "ФОП + 2",
+    "ФОП + 3",
+    "ФОП + 4",
+    "Юридична особа ФГ",
+  ]),
   jobId: z.number(),
 });
 export type CreateWorkerType = z.infer<typeof createWorker>;

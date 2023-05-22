@@ -36,12 +36,14 @@ import {
   GOODS_ROUTER,
   ENTERPRISE_JOURNAL_ROUTER,
   ENTERPRISE_ROUTER,
+  ENTERPRISE_FORM_ROUTER,
 } from "./utils/consts";
 import CashFlow from "./pages/CashFlow";
 import Goods from "./pages/Goods";
 import BusinessJurnal from "./pages/BusinessJurnal";
 import EnterpriseJournal from "./pages/EnterpriseJournal";
 import Enterprise from "./pages/Enterprise";
+import EnterpriseFormPage from "./pages/EnterpriseFormPage";
 
 export default function AppRouter() {
   const location = useLocation();
@@ -81,6 +83,10 @@ export default function AppRouter() {
       <Route path={GOODS_ROUTER} element={<Goods />} />
       <Route path={ENTERPRISE_JOURNAL_ROUTER} element={<EnterpriseJournal />} />
       <Route path={ENTERPRISE_ROUTER + "/:id"} element={<Enterprise />} />
+      <Route
+        path={ENTERPRISE_FORM_ROUTER + "/:form" + "/:id"}
+        element={<EnterpriseFormPage />}
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

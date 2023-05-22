@@ -97,6 +97,7 @@ import {
   PatchWorkerType,
 } from "../../../tRPC serv/routes/workerRouter";
 import { CreateVegetationType } from "../../../tRPC serv/routes/vegetationYearRouter";
+import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 
 let user = new User();
 export const supabase = createClient(
@@ -107,7 +108,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -571,7 +572,7 @@ export function agreeCarts(map: MapStore) {
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.get.query().then((res) => {
-    Bus.businessPlan = res;
+    Bus.businessPlan = res as resBusinessPlan[];
     map.isLoading = false;
   });
 }
@@ -584,7 +585,7 @@ export function createBusinessPlan(
   map.isLoading = true;
   client.business.create.query(data).then((res) => {
     if (!res) return;
-    Bus.newBusinessPlan = res;
+    Bus.newBusinessPlan = res as resBusinessPlan;
     map.isLoading = false;
   });
 }
@@ -610,7 +611,7 @@ export function patchBusinessPlan(
   client.business.patch.query(data).then((res) => {
     if (res) {
       Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != res.id);
-      Bus.newBusinessPlan = res;
+      Bus.newBusinessPlan = res as resBusinessPlan;
     }
     map.isLoading = false;
   });
@@ -624,7 +625,7 @@ export function setIsPublicBusiness(
   client.business.setIsPublic.query(data).then((res) => {
     if (res) {
       Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != data.planId);
-      Bus.newBusinessPlan = res;
+      Bus.newBusinessPlan = res as resBusinessPlan;
       getNoAgreeBusiness(map, Bus);
     }
     map.isLoading = false;
@@ -822,7 +823,7 @@ export function getCultureTEJMap(map: MapStore) {
 }
 export function getProductTEJMap(map: MapStore) {
   client.income.getProduct.query().then((res) => {
-    map.product = res;
+    if (res) map.product = res;
   });
 }
 export function createProduct(map: MapStore, data: CreateProductType) {

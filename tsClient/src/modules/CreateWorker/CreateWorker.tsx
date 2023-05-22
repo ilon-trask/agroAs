@@ -19,9 +19,11 @@ import React, {
 } from "react";
 import { CreateJobType } from "../../../../tRPC serv/routes/jobRouter";
 import Dialog from "../../components/Dialog";
-import { createWorker, getJob } from "../../http/requests";
+import { createWorker, getJob, patchWorker } from "../../http/requests";
 import { Context } from "../../main";
-import useEnterpriseForm from "../../pages/hook/useEnterpriseForm";
+import useEnterpriseForm, {
+  EnterpriseFormType,
+} from "../../pages/hook/useEnterpriseForm";
 import useWorkerClasses, {
   WorkerClassesType,
 } from "../../pages/hook/useWorkersClasses";
@@ -33,6 +35,7 @@ type props = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
   res: CreateWorkerProp;
   setRes: Dispatch<SetStateAction<CreateWorkerProp>>;
+  form: EnterpriseFormType;
 };
 const obj = {};
 export type CreateWorkerProp = {
@@ -41,6 +44,7 @@ export type CreateWorkerProp = {
   amount: number | "";
   salary: number | "";
   class: WorkerClassesType | "";
+  form: EnterpriseFormType | "";
   isConst: boolean | "";
   enterpriseId: number;
 };
@@ -51,6 +55,7 @@ function CreateWorker({
   setUpdate,
   res,
   setRes,
+  form,
 }: props) {
   const [openJob, setOpenJob] = useState(false);
   const [updateJob, setUpdateJob] = useState(false);
@@ -64,14 +69,13 @@ function CreateWorker({
   useEffect(() => {
     getJob(enterpriseStore);
   }, []);
-  console.log(res.enterpriseId);
 
   return (
     <Dialog
       open={open}
       setOpen={setOpen}
       isErr={false}
-      props={{ enterpriseId: res.enterpriseId }}
+      props={{ enterpriseId: res.enterpriseId, isConst: false, form: form }}
       update={true}
       setUpdate={setUpdate}
       res={obj}
@@ -168,13 +172,20 @@ function CreateWorker({
               res.jobId = +res.jobId;
               res.amount = +res.amount;
               res.salary = +res.salary;
+              res.form = form;
               if (update) {
+                //@ts-ignore
+                patchWorker(enterpriseStore, res);
               } else {
                 //@ts-ignore
                 createWorker(enterpriseStore, res);
               }
               //@ts-ignore
-              setRes((prev) => ({ enterpriseId: prev.enterpriseId }));
+              setRes((prev) => ({
+                enterpriseId: prev.enterpriseId,
+                isConst: false,
+                form: form,
+              }));
               setOpen(false);
               setUpdate(false);
             }

@@ -8,8 +8,6 @@ import {
 import { IncomeType } from "../../tsClient/src/pages/hook/useIncomeTypes";
 import { IncomeGroup } from "../../tsClient/src/pages/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
-import { string } from "zod";
-import { resTechCartsWithOpers } from "../controllers/TechCartService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
 import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
@@ -749,14 +747,18 @@ export interface Iculture {
   name: string;
   product: string;
   priceBerry: number;
-  collectPeriod: string;
+  collectPeriod: "I квартал" | "II квартал" | "III квартал" | "IV квартал";
 }
 export class culture extends Model<Iculture> {
   declare id?: number;
   declare name: string;
   declare product: string;
   declare priceBerry: number;
-  declare collectPeriod: number;
+  declare collectPeriod:
+    | "I квартал"
+    | "II квартал"
+    | "III квартал"
+    | "IV квартал";
 }
 culture.init(
   {
@@ -909,6 +911,7 @@ export class product extends Model<Iproduct> {
   declare price: number;
   declare cost: number;
   declare unitMeasure: string;
+  declare collectPeriod: string;
   declare userId: string;
   declare cultureId?: number;
 }
@@ -1227,6 +1230,7 @@ export interface Iworker {
   dateFrom: string;
   dateTo: string;
   class: WorkerClassesType;
+  form: EnterpriseFormType;
   userId: string;
   enterpriseId?: number;
   jobId?: number;
@@ -1239,6 +1243,7 @@ export class worker extends Model<Iworker> {
   declare amount: number;
   declare dateFrom: string;
   declare dateTo: string;
+  declare form: EnterpriseFormType;
   declare class: WorkerClassesType;
   declare userId: string;
 }
@@ -1251,9 +1256,15 @@ worker.init(
     dateFrom: { type: DataTypes.DATEONLY },
     dateTo: { type: DataTypes.DATEONLY },
     class: { type: DataTypes.STRING },
+    form: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING },
   },
-  { sequelize }
+  {
+    sequelize,
+    defaultScope: {
+      order: [["createdAt", "ASC"]],
+    },
+  }
 );
 
 export interface IvegetationYears {
