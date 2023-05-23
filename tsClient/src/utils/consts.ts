@@ -18,3 +18,4 @@ export const GOODS_ROUTER = "/Goods";
 export const ENTERPRISE_JOURNAL_ROUTER = "/EnterpriseJournal";
 export const ENTERPRISE_ROUTER = "/Enterprise";
 export const ENTERPRISE_FORM_ROUTER = "/EnterpriseForm";
+export const ENTERPRISE_TAX_GROUP = "/EnterpriseTax";

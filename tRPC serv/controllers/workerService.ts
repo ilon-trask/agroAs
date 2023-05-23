@@ -31,8 +31,8 @@ class workerService {
     await worker.update(
       {
         amount: data.amount,
-        dateFrom: data.dateFrom,
-        dateTo: data.dateTo,
+        dateFrom: data.dateFrom!,
+        dateTo: data.dateTo!,
         isConst: data.isConst,
         salary: data.salary,
         enterpriseId: data.enterpriseId,

@@ -1,12 +1,13 @@
 import { Box, Button, Container, Heading } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getWorker } from "../http/requests";
 import { Context } from "../main";
 import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import StaffingTable from "../modules/StaffingTable";
+import { ENTERPRISE_JOURNAL_ROUTER } from "../utils/consts";
 import { EnterpriseFormType } from "./hook/useEnterpriseForm";
 
 function EnterpriseFormPage() {
@@ -18,10 +19,12 @@ function EnterpriseFormPage() {
     amount: "",
     class: "",
     enterpriseId: +id!,
-    isConst: false,
+    isConst: true,
     form: form as EnterpriseFormType,
     jobId: "",
     salary: "",
+    dateFrom: "",
+    dateTo: "",
   });
   const thisWorkers = enterpriseStore.worker.filter(
     (el) => el.enterpriseId == id && el.form == form
@@ -30,8 +33,10 @@ function EnterpriseFormPage() {
   useEffect(() => {
     getWorker(enterpriseStore);
   }, []);
+  const navigate = useNavigate();
   return (
     <Container maxW={"container.lg"}>
+      <Button onClick={() => navigate(ENTERPRISE_JOURNAL_ROUTER)}>Назад</Button>
       <Heading textAlign={"center"} size={"md"} mt={3}>
         Штатний роспис <br /> для ОПФ - {form}
         <br />
