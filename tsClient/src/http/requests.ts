@@ -1385,3 +1385,12 @@ export function createVegetationYear(
     income.vegetationYear = res;
   });
 }
+
+export function getManyCartWithOpers(map: MapStore, ids: number[]) {
+  ids.forEach((el) =>
+    client.cart.getCart.query({ cartId: el }).then((res) => {
+      //@ts-ignore
+      map.opers.push(...res);
+    })
+  );
+}

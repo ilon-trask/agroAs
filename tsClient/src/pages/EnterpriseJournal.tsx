@@ -20,7 +20,11 @@ import CartsTable from "../modules/CartsTable";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import CreateEnterprise from "../modules/CreateEnterprise";
 import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
-import { ENTERPRISE_FORM_ROUTER, ENTERPRISE_ROUTER } from "../utils/consts";
+import {
+  ENTERPRISE_FORM_ROUTER,
+  ENTERPRISE_ROUTER,
+  ENTERPRISE_TAX_GROUP,
+} from "../utils/consts";
 
 function Enterprise() {
   const [open, setOpen] = useState(false);
@@ -99,7 +103,13 @@ function Enterprise() {
                 ) : (
                   <Td>{el.form}</Td>
                 )}
-                <Td>{el.taxGroup}</Td>
+                <Td>
+                  <Link
+                    to={ENTERPRISE_TAX_GROUP + "/" + el.taxGroup + "/" + el.id}
+                  >
+                    <ViewIcon boxSize={5} color={"blue.400"} /> {el.taxGroup}
+                  </Link>
+                </Td>
                 <Td>
                   <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
                 </Td>

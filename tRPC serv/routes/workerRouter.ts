@@ -6,8 +6,8 @@ import workerService from "../controllers/workerService";
 
 const createWorker = z.object({
   amount: z.number(),
-  dateFrom: z.string().optional(),
-  dateTo: z.string().optional(),
+  dateFrom: z.string().optional().nullable(),
+  dateTo: z.string().optional().nullable(),
   isConst: z.boolean(),
   salary: z.number(),
   enterpriseId: z.number(),

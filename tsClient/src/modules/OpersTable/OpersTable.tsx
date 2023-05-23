@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import getSectionsOpers from "../../store/GetSectionsOpers";
+import { IUserRole } from "../../../../tRPC serv";
 type props = {
   id: number;
   setRes: (res: any) => void;
@@ -26,6 +27,60 @@ type props = {
   deleteOpen: boolean;
   setDeleteOpen: (open: boolean) => void;
 };
+
+export function OpersTableHead({ role }: { role: IUserRole }) {
+  return (
+    <Tr>
+      {role != "" && <Th></Th>}
+      <Th>
+        Дата <br />
+        початку
+      </Th>
+      <Th>
+        Технологічна <br />
+        операція
+      </Th>
+      <Th>
+        Обсяг <br />
+        робіт
+      </Th>
+      <Th>
+        Одиниця <br />
+        виміру
+      </Th>
+      <Th>Разом</Th>
+      <Th>
+        Вартість <br />
+        Техніки
+      </Th>
+      <Th>
+        Вартість <br />
+        палива
+      </Th>
+      <Th>
+        Оплата праці
+        <br /> механізована
+      </Th>
+      <Th>
+        Оплата праці
+        <br /> ручна
+      </Th>
+      <Th>
+        Вартість
+        <br /> матеріалів
+      </Th>
+      <Th>
+        Вартість
+        <br /> транспорту
+      </Th>
+      <Th>
+        Вартість <br />
+        послуг
+      </Th>
+      {role != "" && <Th></Th>}
+    </Tr>
+  );
+}
 
 function OpersTable({
   id,
@@ -45,7 +100,6 @@ function OpersTable({
 
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, id);
-    console.log(a);
 
     return a;
   }, [map.opers, operData]);
@@ -87,55 +141,7 @@ function OpersTable({
     <TableContainer overflowX={"scroll"} as={"div"}>
       <Table size={"sm"}>
         <Thead>
-          <Tr>
-            {user.role != "" && <Th></Th>}
-            <Th>
-              Дата <br />
-              початку
-            </Th>
-            <Th>
-              Технологічна <br />
-              операція
-            </Th>
-            <Th>
-              Обсяг <br />
-              робіт
-            </Th>
-            <Th>
-              Одиниця <br />
-              виміру
-            </Th>
-            <Th>Разом</Th>
-            <Th>
-              Вартість <br />
-              Техніки
-            </Th>
-            <Th>
-              Вартість <br />
-              палива
-            </Th>
-            <Th>
-              Оплата праці
-              <br /> механізована
-            </Th>
-            <Th>
-              Оплата праці
-              <br /> ручна
-            </Th>
-            <Th>
-              Вартість
-              <br /> матеріалів
-            </Th>
-            <Th>
-              Вартість
-              <br /> транспорту
-            </Th>
-            <Th>
-              Вартість <br />
-              послуг
-            </Th>
-            {user.role != "" && <Th></Th>}
-          </Tr>
+          <OpersTableHead role={user.role} />
         </Thead>
         <Tbody>
           {map.isLoading ? <Loader /> : <></>}

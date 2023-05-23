@@ -45,6 +45,8 @@ export type CreateWorkerProp = {
   salary: number | "";
   class: WorkerClassesType | "";
   form: EnterpriseFormType | "";
+  dateFrom: string;
+  dateTo: string;
   isConst: boolean | "";
   enterpriseId: number;
 };
@@ -163,6 +165,30 @@ function CreateWorker({
             </Checkbox>
           </CheckboxGroup>
         </Box>
+        {!res.isConst && (
+          <Box display={"flex"} justifyContent={"space-around"}>
+            <Box>
+              <Text>Нанятий з </Text>
+              <Input
+                value={res.dateFrom}
+                type={"date"}
+                onChange={(e) =>
+                  setRes((prev) => ({ ...prev, dateFrom: e.target.value }))
+                }
+              />
+            </Box>
+            <Box>
+              <Text>Нанятий до</Text>
+              <Input
+                value={res.dateTo}
+                type={"date"}
+                onChange={(e) =>
+                  setRes((prev) => ({ ...prev, dateTo: e.target.value }))
+                }
+              />
+            </Box>
+          </Box>
+        )}
       </Box>
       <ModalFooter>
         <Button

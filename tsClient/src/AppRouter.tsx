@@ -37,6 +37,7 @@ import {
   ENTERPRISE_JOURNAL_ROUTER,
   ENTERPRISE_ROUTER,
   ENTERPRISE_FORM_ROUTER,
+  ENTERPRISE_TAX_GROUP,
 } from "./utils/consts";
 import CashFlow from "./pages/CashFlow";
 import Goods from "./pages/Goods";
@@ -44,6 +45,7 @@ import BusinessJurnal from "./pages/BusinessJurnal";
 import EnterpriseJournal from "./pages/EnterpriseJournal";
 import Enterprise from "./pages/Enterprise";
 import EnterpriseFormPage from "./pages/EnterpriseFormPage";
+import EnterpriseTaxPage from "./pages/EnterpriseTaxPage";
 
 export default function AppRouter() {
   const location = useLocation();
@@ -86,6 +88,10 @@ export default function AppRouter() {
       <Route
         path={ENTERPRISE_FORM_ROUTER + "/:form" + "/:id"}
         element={<EnterpriseFormPage />}
+      />
+      <Route
+        path={ENTERPRISE_TAX_GROUP + "/:tax" + "/:id"}
+        element={<EnterpriseTaxPage />}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

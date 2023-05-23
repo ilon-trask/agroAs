@@ -17,7 +17,13 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>Посада</Th>
       <Th>Кількість</Th>
       <Th>Місячний оклад</Th>
+      {isPlan && <Th>Дата початку</Th>}
+      <Th>Початок сезону</Th>
+      <Th>Кінець сезону</Th>
       <Th>Річний фонд ОП</Th>
+      <Th>ЄСВ 22%</Th>
+      <Th>Військовий збір 1,5%</Th>
+      <Th>Загальний фонд ОП</Th>
       <Th>Вид найму</Th>
       <Th>Вид витрат</Th>
       {!isPlan && <Th></Th>}
@@ -40,6 +46,10 @@ function StaffingTableRow({
   isPlan?: boolean;
 }) {
   const { enterpriseStore } = useContext(Context);
+  const yearSalary =
+    el.salary *
+    (+el.dateTo?.split("-")[1] - +el.dateFrom?.split("-")[1] + 1 || 12) *
+    el.amount;
   return (
     <Tr>
       {!isPlan && (
@@ -54,6 +64,8 @@ function StaffingTableRow({
                 jobId: el.jobId!,
                 salary: el.salary,
                 form: el.form,
+                dateFrom: el.dateFrom,
+                dateTo: el.dateTo,
                 workerId: el.id!,
               });
             if (setUpdate) setUpdate(true);
@@ -71,7 +83,21 @@ function StaffingTableRow({
       <Td>{name}</Td>
       <Td>{el.amount}</Td>
       <Td>{el.salary}</Td>
-      <Td>{el.salary * 12 * el.amount}</Td>
+      {isPlan && <Td></Td>}
+      <Td>
+        {(el.dateFrom?.split("-")[1] || "") +
+          "." +
+          (el.dateFrom?.split("-")[2] || "")}
+      </Td>
+      <Td>
+        {(el.dateTo?.split("-")[1] || "") +
+          "." +
+          (el.dateTo?.split("-")[2] || "")}
+      </Td>
+      <Td>{yearSalary}</Td>
+      <Td>{yearSalary * 0.22}</Td>
+      <Td>{yearSalary * 0.15}</Td>
+      <Td>{yearSalary + yearSalary * 0.22 + yearSalary * 0.015}</Td>
       <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
       <Td>{}</Td>
       {!isPlan && (
@@ -166,10 +192,53 @@ function StaffingTable({
         />
         <Tr fontWeight={"bold"}>
           <Td></Td>
-          <Td>Річний фонд оплати праці</Td>
+          <Td>Разом</Td>
           <Td></Td>
           <Td></Td>
-          <Td>{thisWorkers.reduce((p, c) => p + c.salary, 0) * 12}</Td>
+          <Td></Td>
+          <Td></Td>
+          <Td>
+            {thisWorkers.reduce(
+              (p, c) =>
+                p +
+                c.salary *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12),
+              0
+            )}
+          </Td>
+          <Td>
+            {thisWorkers.reduce(
+              (p, c) =>
+                p +
+                c.salary *
+                  0.22 *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12),
+              0
+            )}
+          </Td>
+          <Td>
+            {thisWorkers.reduce(
+              (p, c) =>
+                p +
+                c.salary *
+                  0.015 *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12),
+              0
+            )}
+          </Td>
+          <Td>
+            {thisWorkers.reduce(
+              (p, c) =>
+                p +
+                (c.salary * 0.015 + c.salary * 0.22 + c.salary) * //@ts-ignore
+                  (c.dateTo?.split("-")[1] - c.dateFrom?.split("-")[1] + 1 ||
+                    12),
+              0
+            )}
+          </Td>
           <Td></Td>
           <Td></Td>
           <Td></Td>

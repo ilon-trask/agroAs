@@ -258,8 +258,7 @@ function CashFlowTable({
           <Td>Рік</Td>
           <Td></Td>
           <Td>
-            {yearIncome ||
-              Math.round(((endSum || 0) - (startSum || 0)) * 1000) / 1000}
+            {yearIncome || Math.round((endSum! - startSum!) * 1000) / 1000}
           </Td>
           <Td></Td>
           <Td>{yearOutcome}</Td>
@@ -268,8 +267,7 @@ function CashFlowTable({
           <Td>Оборот за рік</Td>
           <Td></Td>
           <Td>
-            {yearIncome ||
-              Math.round((endSum || 0) - (startSum || 0) * 1000) / 1000}
+            {yearIncome || Math.round((endSum! - startSum!) * 1000) / 1000}
           </Td>
         </Tr>
         {/* {[].map((el, ind) => {
