@@ -6,6 +6,7 @@ const createGrant = z.object({
   name: z.string(),
   date: z.string(),
   purpose: z.enum(["Державні", "Комерційні"]),
+  enterpriseId: z.number(),
 });
 export type CreateGrantType = z.infer<typeof createGrant>;
 const patchGrant = createGrant.extend({ grantId: z.number() });

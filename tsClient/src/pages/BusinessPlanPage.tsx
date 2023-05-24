@@ -17,6 +17,7 @@ import {
   Tbody,
   Tr,
   Td,
+  useSafeLayoutEffect,
 } from "@chakra-ui/react";
 import { EditIcon, PlusSquareIcon, ViewIcon } from "@chakra-ui/icons";
 import CreateResume from "../modules/CreateResume";
@@ -30,6 +31,11 @@ import { names } from "../modules/TEJConceptTable/index";
 import SelectCart from "../modules/TEJConceptTable/component/SelectCart";
 import CartsTableInBusiness from "../modules/CartsTableInBusiness";
 import {
+  getBuyingMachine,
+  getCredit,
+  getDerj,
+  getGrant,
+  getInvestment,
   getJob,
   getManyCartWithOpers,
   getVegetationYear,
@@ -77,6 +83,14 @@ export type iChild =
 import getSectionsOpers from "../store/GetSectionsOpers";
 import { sectionsOpers } from "../store/GetSectionsOpers";
 import OperTableSection from "../modules/OpersTable/components/OperTableSection";
+import BuyingMachineTable from "../modules/BuyingMachineTable";
+import CreateBuyingMachine, {
+  CreateBuyingMachineProps,
+} from "../modules/CreateBuyingMachine";
+import {
+  BuyingMachineTableBodyRow,
+  BuyingMachineTableHead,
+} from "../modules/BuyingMachineTable/BuyingMachineTable";
 function BiznesPlanPage() {
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
@@ -92,6 +106,11 @@ function BiznesPlanPage() {
     getVegetationYear(income);
     getWorker(enterpriseStore);
     getJob(enterpriseStore);
+    getBuyingMachine(map);
+    getDerj(income);
+    getInvestment(income);
+    getCredit(income);
+    getGrant(income);
   }, []);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
@@ -112,6 +131,21 @@ function BiznesPlanPage() {
     entId: 0,
   });
   const [quizRes, setQuizRes] = useState({});
+  const [ready, setReady] = useState(false);
+  const [buyingMachineOpen, setBuyingMachineOpen] = useState(false);
+  const [buyingMachineRes, setBuyingMachineRes] =
+    useState<CreateBuyingMachineProps>({
+      amount: "",
+      brand: "",
+      cost: "",
+      date: "",
+      name: "",
+      purpose: "",
+      businessPlanId: myBusiness?.id!,
+      enterpriseId: myEnterprise?.id!,
+    });
+  const [buyingMachineUpdate, setBuyingMachineUpdate] = useState(false);
+
   const start = +myBusiness?.dateStart?.split("-")[0]!;
   const end = +start + +myBusiness?.realizationTime!;
   const indicatorRef = useRef<HTMLTableElement>(null);
@@ -126,42 +160,61 @@ function BiznesPlanPage() {
     (e) => e.enterpriseId == myEnterprise?.id! && e.form == myEnterprise?.form
   );
 
-  // let thisMaps = (() => {
-  //   let thisMaps = [];
-  //   for (let i = start; i < end; i++) {
-  //     for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
-  //       const e = myBusiness?.busCuls[j];
-  //       let maps = map.maps.map((m) => ({
-  //         ...m,
-  //         area: e?.area,
-  //       }));
+  let thisMaps = (() => {
+    let thisMaps = [];
+    for (let i = start; i < end; i++) {
+      for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
+        const e = myBusiness?.busCuls[j];
+        let maps = map.maps.map((m) => ({
+          ...m,
+          area: e?.area,
+        }));
 
-  //       maps = maps.filter((el) => {
-  //         return (
-  //           el.cultureId == e?.cultureId &&
-  //           el.cultivationTechnologyId == e?.cultivationTechnologyId &&
-  //           //@ts-ignore
-  //           el.year.split("")[0] == i - +start + 1
-  //         );
-  //       });
-  //       thisMaps.push(...maps);
-  //     }
-  //   }
-  //   return thisMaps;
-  // })();
-  // useEffect(
-  //   () =>
-  //     getManyCartWithOpers(
-  //       map,
-  //       thisMaps.map((el) => el.id!)
-  //     ),
-  //   []
-  // );
-  // let sections = useMemo(
-  //   () => thisMaps.map((el) => getSectionsOpers(map, el.id!)),
-  //   [map.opers]
-  // );
-  return (
+        maps = maps.filter((el) => {
+          return (
+            el.cultureId == e?.cultureId &&
+            el.cultivationTechnologyId == e?.cultivationTechnologyId &&
+            //@ts-ignore
+            el.year.split("")[0] == i - +start + 1
+          );
+        });
+        thisMaps.push(...maps);
+      }
+    }
+    return thisMaps;
+  })();
+  useEffect(() => {
+    if (thisMaps[0] && thisWorkers[0] && myBusiness && myEnterprise) {
+      console.log("є");
+
+      setReady(true);
+    }
+  }, [thisMaps, thisWorkers, myBusiness, myEnterprise]);
+  useEffect(() => {
+    if (ready) {
+      getManyCartWithOpers(
+        map,
+        thisMaps.map((el) => el.id!)
+      );
+    }
+  }, [ready]);
+  let sections = useMemo(() => {
+    if (ready) {
+      console.log("секція");
+      console.log(map.opers);
+
+      return thisMaps.map((el) => {
+        console.log(el.id);
+
+        return getSectionsOpers(map, el.id!);
+      });
+    }
+  }, [map.opers, ready]);
+  console.log(sections);
+
+  return !ready ? (
+    <Box></Box>
+  ) : (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Бізнес-план {myBusiness?.name}
@@ -230,6 +283,7 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
+
       <CreateBusiness
         open={businessOpen}
         setOpen={setBusinessOpen}
@@ -285,6 +339,145 @@ function BiznesPlanPage() {
         setRes={setResEnterprise}
         update={true}
         setUpdate={() => {}}
+      />
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Купівля техніки та обладнання
+      </Heading>
+
+      <TableContainer>
+        <Table size={"sm"}>
+          <Thead>
+            <BuyingMachineTableHead isPlan={true} />
+          </Thead>
+          <Tbody>
+            {map.buyingMachine.map((el) => {
+              if (
+                el.businessPlanId == myBusiness?.id &&
+                el.enterpriseId == myEnterprise?.id
+              )
+                return (
+                  <BuyingMachineTableBodyRow
+                    isPlan={true}
+                    el={el}
+                    setOpen={setBuyingMachineOpen}
+                    setRes={setBuyingMachineRes}
+                    setUpdate={setBuyingMachineUpdate}
+                  />
+                );
+            })}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Button
+        onClick={() => {
+          setBuyingMachineOpen(true);
+          setBuyingMachineRes({
+            businessPlanId: myBusiness?.id!,
+            enterpriseId: myEnterprise?.id!,
+            amount: "",
+            brand: "",
+            cost: "",
+            date: "",
+            name: "",
+            purpose: "",
+          });
+        }}
+      >
+        Додати нову техніку
+      </Button>
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Залучення фінансування
+      </Heading>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Вид фінансування</Th>
+            <Th>Назва</Th>
+            <Th>Дата</Th>
+            <Th>Сума</Th>
+            <Th>Призначення</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Tr fontWeight={"bold"}>
+            <Td>Кредит</Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+          {income.credit.map((el) => (
+            <Tr>
+              <Td></Td>
+              <Td>{el.name}</Td>
+              <Td>{el.date}</Td>
+              <Td>{el.cost}</Td>
+              <Td>{el.purpose}</Td>
+            </Tr>
+          ))}
+          <Tr fontWeight={"bold"}>
+            <Td>Інвестиції</Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+          {income.investment.map((el) => (
+            <Tr>
+              <Td></Td>
+              <Td>{el.name}</Td>
+              <Td>{el.date}</Td>
+              <Td>{el.cost}</Td>
+              <Td>{el.origin}</Td>
+            </Tr>
+          ))}
+          <Tr fontWeight={"bold"}>
+            <Td>Держ. підтримка</Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+          {income.derj.map((el) => (
+            <Tr>
+              <Td></Td>
+              <Td>{el.name}</Td>
+              <Td>{el.date}</Td>
+              <Td>{el.cost}</Td>
+              <Td>{el.purpose}</Td>
+            </Tr>
+          ))}
+          <Tr fontWeight={"bold"}>
+            <Td>Грант</Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+          {income.grant.map((el) => (
+            <Tr>
+              <Td></Td>
+              <Td>{el.name}</Td>
+              <Td>{el.date}</Td>
+              <Td>{el.cost}</Td>
+              <Td>{el.purpose}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+      <Button>Додати</Button>
+      <CreateBuyingMachine
+        open={buyingMachineOpen}
+        setOpen={setBuyingMachineOpen}
+        res={buyingMachineRes}
+        setRes={setBuyingMachineRes}
+        update={buyingMachineUpdate}
+        setUpdate={setBuyingMachineUpdate}
       />
       <QuizBusinessPopUp
         open={openQuiz}
@@ -1949,6 +2142,8 @@ function BiznesPlanPage() {
                           //       +e.costMachineWork! ||
                           //     e.costHandWork ||
                           //     0);
+                          // console.log(e.arr);
+
                           return (
                             <OperTableSection
                               key={ind}

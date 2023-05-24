@@ -10,6 +10,8 @@ const createBuyingMachine = z.object({
   amount: z.number(),
   purpose: z.enum(["Трактор", "СГ машина", "Технологічне обладнання"]),
   date: z.string(),
+  businessPlanId: z.number(),
+  enterpriseId: z.number(),
 });
 export type CreateBuyingMachine = z.infer<typeof createBuyingMachine>;
 const patchBuyingMachine = createBuyingMachine.extend({ buyingId: z.number() });

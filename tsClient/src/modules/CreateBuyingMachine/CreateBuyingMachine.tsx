@@ -29,6 +29,8 @@ export type CreateBuyingMachineProps = {
   purpose: BuyingMachinePurposeType | "";
   amount: number | "";
   cost: number | "";
+  businessPlanId: number;
+  enterpriseId: number;
 };
 const obj = {};
 function CreateBuyingMachine({
@@ -52,6 +54,18 @@ function CreateBuyingMachine({
       setRes={setRes}
       setUpdate={setUpdate}
       update={update}
+      onClose={() =>
+        setRes((prev) => ({
+          name: "",
+          amount: "",
+          brand: "",
+          cost: "",
+          date: "",
+          purpose: "",
+          businessPlanId: prev.businessPlanId,
+          enterpriseId: prev.enterpriseId,
+        }))
+      }
     >
       <Box>
         <Heading as={"h4"} size="md" textAlign={"center"}>
@@ -195,6 +209,8 @@ function CreateBuyingMachine({
             !res.purpose
           }
           onClick={() => {
+            console.log(res.businessPlanId);
+            console.log(res.enterpriseId);
             if (
               res.name &&
               res.brand &&
@@ -205,17 +221,30 @@ function CreateBuyingMachine({
             ) {
               res.cost = +res.cost;
               res.amount = +res.amount;
+
               if (update) {
-                //@ts-ignore
-                patchBuyingMachine(map, res);
+                patchBuyingMachine(map, {
+                  ...res,
+                  cost: +res.cost,
+                  amount: +res.amount,
+                  purpose: res.purpose,
+                  buyingId: res.buyingId!,
+                });
               } else {
-                //@ts-ignore
-                createBuyingMachine(map, res);
+                createBuyingMachine(map, {
+                  ...res,
+                  cost: +res.cost,
+                  amount: +res.amount,
+                  purpose: res.purpose,
+                });
               }
               setOpen(false);
               setUpdate(false);
               //@ts-ignore
-              setRes({});
+              setRes((prev) => ({
+                businessPlanId: prev.businessPlanId,
+                enterpriseId: prev.enterpriseId,
+              }));
             }
           }}
         >

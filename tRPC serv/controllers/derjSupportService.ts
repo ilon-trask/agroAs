@@ -21,6 +21,7 @@ class derjSupportService {
       date: data.date,
       name: data.name,
       purpose: data.purpose,
+      enterpriseId: data.enterpriseId,
       userId: user.sub,
     });
     return res;
@@ -33,6 +34,7 @@ class derjSupportService {
         cost: data.cost,
         date: data.date,
         purpose: data.purpose,
+        enterpriseId: data.enterpriseId,
       },
       { where: { id: data.derjId } }
     );

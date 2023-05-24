@@ -60,6 +60,7 @@ import CreateBuyingMachine, {
 } from "../modules/CreateBuyingMachine";
 import CreateAdministration from "../modules/CreateAdministration";
 import { CreateAdministrationProp } from "../modules/CreateAdministration/CreateAdministration";
+import BuyingMachineTable from "../modules/BuyingMachineTable";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -129,6 +130,8 @@ const MapJornal = observer(function () {
       amount: "",
       cost: "",
       purpose: "",
+      businessPlanId: 0,
+      enterpriseId: 0,
     });
   const [buyingMachineUpdate, setBuyingMachineUpdate] = useState(false);
   const [buyingMachineOpen, setBuyingMachineOpen] = useState(false);
@@ -557,69 +560,12 @@ const MapJornal = observer(function () {
             КУПІВЛЯ ТЕХНІКИ ТА ОБЛАДНАННЯ
           </Text>
           <TableContainer>
-            <Table size={"sm"}>
-              <Thead>
-                <Tr>
-                  <Th></Th>
-                  <Th>Дата</Th>
-                  <Th>Назва</Th>
-                  <Th>Марка</Th>
-                  <Th>Кількість</Th>
-                  <Th>Ціна</Th>
-                  <Th>Сума</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {map.buyingMachine.map((el) => (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        setBuyingMachineOpen(true);
-                        setBuyingMachineUpdate(true);
-                        setBuyingMachineRes({
-                          buyingId: el.id,
-                          amount: el.amount,
-                          brand: el.brand,
-                          cost: el.cost,
-                          date: el.date,
-                          name: el.name,
-                          purpose: el.purpose,
-                        });
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.brand}</Td>
-                    <Td>{el.amount}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.cost * el.amount}</Td>
-                    <Td
-                      onClick={() =>
-                        setDeleteOpen({
-                          isOpen: true,
-                          func: () => {
-                            deleteBuyingMachine(map, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                          text: "покупку техніки",
-                        })
-                      }
-                    >
-                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
+            <BuyingMachineTable
+              setDeleteOpen={setDeleteOpen}
+              setOpen={setBuyingMachineOpen}
+              setRes={setBuyingMachineRes}
+              setUpdate={setBuyingMachineUpdate}
+            />
           </TableContainer>
           <Button onClick={() => setBuyingMachineOpen(true)}>
             Добавити техніку або обладнання
