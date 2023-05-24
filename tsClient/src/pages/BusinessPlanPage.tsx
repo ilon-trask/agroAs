@@ -184,12 +184,12 @@ function BiznesPlanPage() {
     return thisMaps;
   })();
   useEffect(() => {
-    if (thisMaps[0] && thisWorkers[0] && myBusiness && myEnterprise) {
+    if (myBusiness) {
       console.log("є");
 
       setReady(true);
     }
-  }, [thisMaps, thisWorkers, myBusiness, myEnterprise]);
+  }, [myBusiness]);
   useEffect(() => {
     if (ready) {
       getManyCartWithOpers(
@@ -283,7 +283,6 @@ function BiznesPlanPage() {
           </Tbody>
         </Table>
       </TableContainer>
-
       <CreateBusiness
         open={businessOpen}
         setOpen={setBusinessOpen}
@@ -343,7 +342,6 @@ function BiznesPlanPage() {
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Купівля техніки та обладнання
       </Heading>
-
       <TableContainer>
         <Table size={"sm"}>
           <Thead>
@@ -385,6 +383,13 @@ function BiznesPlanPage() {
       >
         Додати нову техніку
       </Button>
+      <CreateBuyingMachine
+        open={buyingMachineOpen}
+        setOpen={setBuyingMachineOpen}
+        data={buyingMachineRes}
+        update={buyingMachineUpdate}
+        setUpdate={setBuyingMachineUpdate}
+      />
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Залучення фінансування
       </Heading>
@@ -471,14 +476,6 @@ function BiznesPlanPage() {
         </Tbody>
       </Table>
       <Button>Додати</Button>
-      <CreateBuyingMachine
-        open={buyingMachineOpen}
-        setOpen={setBuyingMachineOpen}
-        res={buyingMachineRes}
-        setRes={setBuyingMachineRes}
-        update={buyingMachineUpdate}
-        setUpdate={setBuyingMachineUpdate}
-      />
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -518,7 +515,6 @@ function BiznesPlanPage() {
         </Button>
         {/* </Box> */}
       </Box>
-
       <Box
         maxW={"1000px"}
         mx="auto"

@@ -65,7 +65,7 @@ function BusinessTable({ setOpen, setRes, setUpdate, setDeleteOpen }: props) {
           const enterprise = enterpriseStore.enterprise.find(
             (e) => e.id == el.enterpriseId
           );
-
+          const cultureSet = new Set(el.busCuls.map((el) => el.culture?.name!));
           return (
             <Tr key={el.id}>
               <Td
@@ -103,8 +103,8 @@ function BusinessTable({ setOpen, setRes, setUpdate, setDeleteOpen }: props) {
                 </Link>
               </Td>
               <Td>
-                {el?.cultures?.map((el) => (
-                  <Box>{el.name}</Box>
+                {[...cultureSet].map((el) => (
+                  <Box>{el}</Box>
                 ))}
               </Td>
               <Td>{el.dateStart}</Td>
