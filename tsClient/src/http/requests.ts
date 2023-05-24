@@ -1387,10 +1387,15 @@ export function createVegetationYear(
 }
 
 export function getManyCartWithOpers(map: MapStore, ids: number[]) {
-  ids.forEach((el) =>
+  console.log("work2");
+
+  ids.forEach((el) => {
     client.cart.getCart.query({ cartId: el }).then((res) => {
-      //@ts-ignore
-      map.opers.push(...res);
-    })
-  );
+      let a: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(res));
+      a.forEach((el) =>
+        el.tech_operations?.forEach((el) => (map.newOper = el))
+      );
+    });
+    console.log(map.opers);
+  });
 }

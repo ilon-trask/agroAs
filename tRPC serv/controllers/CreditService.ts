@@ -27,6 +27,7 @@ class CreditService {
       name: data.name,
       purpose: data.purpose,
       isUseCost: data.isUseCost,
+      enterpriseId: data.enterpriseId,
       userId: user.sub,
     });
     return giveRes([res])[0];
@@ -40,6 +41,7 @@ class CreditService {
         name: data.name,
         isUseCost: data.isUseCost,
         purpose: data.purpose,
+        enterpriseId: data.enterpriseId,
       },
       { where: { id: data.creditId } }
     );

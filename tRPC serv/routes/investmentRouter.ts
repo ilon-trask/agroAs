@@ -8,6 +8,7 @@ const createInvestment = z.object({
   name: z.string(),
   date: z.string(),
   origin: z.enum(["Власні", "Залучені"]),
+  enterpriseId: z.number(),
 });
 export type CreateInvestmentType = z.infer<typeof createInvestment>;
 const patchInvestment = createInvestment.extend({ investmentId: z.number() });

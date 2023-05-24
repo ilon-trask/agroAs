@@ -30,6 +30,8 @@ class buyingMachineService {
       name: data.name,
       purpose: data.purpose,
       userId: user.sub,
+      businessPlanId: data.businessPlanId,
+      enterpriseId: data.enterpriseId,
     });
     return res;
   }
@@ -43,6 +45,8 @@ class buyingMachineService {
         date: data.date,
         name: data.name,
         purpose: data.purpose,
+        businessPlanId: data.businessPlanId,
+        enterpriseId: data.enterpriseId,
       },
       { where: { id: data.buyingId } }
     );

@@ -21,6 +21,7 @@ export type CreditProps = {
   date: string;
   purpose: CreditPurposeType | "";
   cost: number | "";
+  enterpriseId: number;
   isUseCost: boolean;
 };
 type props = {
@@ -53,6 +54,16 @@ function CreateCredit({
       setUpdate={setUpdate}
       update={update}
       setIsErr={() => {}}
+      onClose={() =>
+        setRes((prev) => ({
+          enterpriseId: prev.enterpriseId,
+          cost: "",
+          date: "",
+          isUseCost: false,
+          name: "",
+          purpose: "",
+        }))
+      }
     >
       <Heading as={"h4"} size="md" textAlign={"center"}>
         Введіть данні для розрахунку кредиту
@@ -139,6 +150,8 @@ function CreateCredit({
         <Button
           onClick={() => {
             if (res.name && res.cost && res.date && res.purpose) {
+              res.cost = +res.cost;
+
               if (update) {
                 patchCredit(income, {
                   creditId: res.creditId!,
@@ -147,19 +160,28 @@ function CreateCredit({
                   name: res.name,
                   purpose: res.purpose,
                   isUseCost: res.isUseCost,
+                  enterpriseId: res.enterpriseId,
                 });
               } else {
-                res.cost = +res.cost;
                 createCredit(income, {
                   cost: res.cost,
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
                   isUseCost: res.isUseCost,
+                  enterpriseId: res.enterpriseId,
                 });
               }
               setOpen(false);
               setUpdate(false);
+              setRes((prev) => ({
+                enterpriseId: prev.enterpriseId,
+                cost: "",
+                date: "",
+                isUseCost: false,
+                name: "",
+                purpose: "",
+              }));
             }
           }}
         >

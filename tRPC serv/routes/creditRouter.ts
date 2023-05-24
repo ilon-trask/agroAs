@@ -9,6 +9,7 @@ const createCredit = z.object({
   date: z.string(),
   isUseCost: z.boolean(),
   purpose: z.enum(["Поповнення обігових коштів", "Закупка основних засобів"]),
+  enterpriseId: z.number(),
 });
 export type CreateCreditType = z.infer<typeof createCredit>;
 const patchCredit = createCredit.extend({ creditId: z.number() });

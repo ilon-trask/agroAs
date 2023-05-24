@@ -7,6 +7,7 @@ const createDerj = z.object({
   name: z.string(),
   date: z.string(),
   purpose: z.enum(["Субсидія", "Дотація", "Поворотна допомога"]),
+  enterpriseId: z.number(),
 });
 export type CreateDerjType = z.infer<typeof createDerj>;
 const patchDerj = createDerj.extend({ derjId: z.number() });

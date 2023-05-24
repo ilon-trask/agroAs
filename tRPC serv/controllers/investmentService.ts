@@ -21,6 +21,7 @@ class investmentService {
       name: data.name,
       origin: data.origin,
       userId: user.sub,
+      enterpriseId: data.enterpriseId,
     });
     return res;
   }
@@ -32,6 +33,7 @@ class investmentService {
         cost: data.cost,
         date: data.date,
         origin: data.origin,
+        enterpriseId: data.enterpriseId,
       },
       { where: { id: data.investmentId } }
     );

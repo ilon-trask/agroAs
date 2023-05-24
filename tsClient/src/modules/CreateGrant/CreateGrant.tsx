@@ -20,6 +20,7 @@ export type CreateGrantProps = {
   purpose: GrantPurposeType | "";
   cost: number | "";
   date: string;
+  enterpriseId: number;
 };
 type props = {
   open: boolean;
@@ -44,6 +45,15 @@ function CreateGrant({ open, setOpen, setUpdate, update, res, setRes }: props) {
       isErr={false}
       props={obj}
       res={obj}
+      onClose={() =>
+        setRes((prev) => ({
+          enterpriseId: prev.enterpriseId,
+          cost: "",
+          date: "",
+          name: "",
+          purpose: "",
+        }))
+      }
     >
       <Box>
         <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
@@ -128,22 +138,23 @@ function CreateGrant({ open, setOpen, setUpdate, update, res, setRes }: props) {
             console.log(res.purpose);
 
             if (res.cost && res.date && res.name && res.purpose) {
+              res.cost = +res.cost;
               if (update) {
                 //@ts-ignore
                 patchGrant(income, res);
               } else {
-                res.cost = +res.cost;
                 //@ts-ignore
                 createGrant(income, res);
               }
               setOpen(false);
               setUpdate(false);
-              setRes({
+              setRes((prev) => ({
                 cost: "",
                 date: "",
                 name: "",
                 purpose: "",
-              });
+                enterpriseId: prev.enterpriseId,
+              }));
             }
           }}
         >

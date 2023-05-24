@@ -20,6 +20,7 @@ export type CreateDerjProps = {
   purpose: DerjPurposeType | "";
   cost: number | "";
   date: string;
+  enterpriseId: number;
 };
 type props = {
   open: boolean;
@@ -52,6 +53,15 @@ function CreateDerjSupport({
       isErr={false}
       props={obj}
       res={obj}
+      onClose={() =>
+        setRes((prev) => ({
+          enterpriseId: prev.enterpriseId,
+          cost: "",
+          date: "",
+          name: "",
+          purpose: "",
+        }))
+      }
     >
       <Box>
         <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
@@ -131,17 +141,23 @@ function CreateDerjSupport({
           isDisabled={!res.cost && !res.date && !res.name && !res.purpose}
           onClick={() => {
             if (res.cost && res.date && res.name && res.purpose) {
+              res.cost = +res.cost;
               if (update) {
                 //@ts-ignore
                 patchDerj(income, res);
               } else {
-                res.cost = +res.cost;
                 //@ts-ignore
                 createDerj(income, res);
               }
               setOpen(false);
-              setUpdate(false); //@ts-ignore
-              setRes({});
+              setUpdate(false);
+              setRes((prev) => ({
+                enterpriseId: prev.enterpriseId,
+                cost: "",
+                date: "",
+                name: "",
+                purpose: "",
+              }));
             }
           }}
         >

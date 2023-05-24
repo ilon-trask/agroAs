@@ -19,6 +19,7 @@ export type CreateInvestmentProps = {
   origin: InvestmentOriginType | "";
   cost: number | "";
   date: string;
+  enterpriseId: number;
 };
 type props = {
   open: boolean;
@@ -50,6 +51,15 @@ function CreateInvestment({
       isErr={false}
       props={obj}
       res={obj}
+      onClose={() =>
+        setRes((prev) => ({
+          enterpriseId: prev.enterpriseId,
+          cost: "",
+          date: "",
+          name: "",
+          origin: "",
+        }))
+      }
     >
       <Box>
         <Heading textAlign={"center"} fontWeight={"bold"} size={"md"}>
@@ -129,18 +139,23 @@ function CreateInvestment({
           isDisabled={!res.cost && !res.date && !res.name && !res.origin}
           onClick={() => {
             if (res.cost && res.date && res.name && res.origin) {
+              res.cost = +res.cost;
               if (update) {
                 //@ts-ignore
                 patchInvestment(income, res);
               } else {
-                res.cost = +res.cost;
                 //@ts-ignore
                 createInvestment(income, res);
               }
               setOpen(false);
               setUpdate(false);
-              //@ts-ignore
-              setRes({});
+              setRes((prev) => ({
+                enterpriseId: prev.enterpriseId,
+                cost: "",
+                date: "",
+                name: "",
+                origin: "",
+              }));
             }
           }}
         >

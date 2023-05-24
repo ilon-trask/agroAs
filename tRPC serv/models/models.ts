@@ -994,6 +994,7 @@ export interface Icredit {
   businessCost?: number;
   userId?: string;
   createdAt?: string;
+  enterpriseId?: number;
 }
 export class credit extends Model<Icredit> {
   declare id?: number;
@@ -1029,6 +1030,7 @@ export interface Iinvestment {
   origin: InvestmentOriginType;
   userId?: string;
   createdAt?: string;
+  enterpriseId?: number;
 }
 export class investment extends Model<Iinvestment> {
   declare id?: number;
@@ -1056,6 +1058,7 @@ export interface Iderj_support {
   cost: number;
   purpose: DerjPurposeType;
   userId: string;
+  enterpriseId?: number;
 }
 export class derj_support extends Model<Iderj_support> {
   declare id?: number;
@@ -1083,6 +1086,7 @@ export type Igrant = {
   cost: number;
   purpose: GrantPurposeType;
   userId: string;
+  enterpriseId?: number;
 };
 export class grant extends Model<Igrant> {
   declare id?: number;
@@ -1112,6 +1116,8 @@ export interface Ibuying_machine {
   amount: number;
   purpose: BuyingMachinePurposeType;
   userId: string;
+  businessPlanId?: number;
+  enterpriseId?: number;
 }
 export class buying_machine extends Model<Ibuying_machine> {
   declare id?: number;
@@ -1441,3 +1447,21 @@ vegetationYears.belongsTo(tech_cart);
 
 yieldPlant.hasMany(vegetationYears);
 vegetationYears.belongsTo(yieldPlant);
+
+businessPlan.hasMany(buying_machine);
+buying_machine.belongsTo(businessPlan);
+
+enterprise.hasMany(buying_machine);
+buying_machine.belongsTo(enterprise);
+
+enterprise.hasMany(investment);
+investment.belongsTo(enterprise);
+
+enterprise.hasMany(credit);
+credit.belongsTo(enterprise);
+
+enterprise.hasMany(derj_support);
+derj_support.belongsTo(enterprise);
+
+enterprise.hasMany(grant);
+grant.belongsTo(enterprise);

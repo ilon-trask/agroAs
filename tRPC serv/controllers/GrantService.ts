@@ -17,6 +17,7 @@ class GrantService {
       date: data.date,
       name: data.name,
       purpose: data.purpose,
+      enterpriseId: data.enterpriseId,
       userId: user.sub,
     });
     return res;
@@ -29,6 +30,7 @@ class GrantService {
         date: data.date,
         name: data.name,
         purpose: data.purpose,
+        enterpriseId: data.enterpriseId,
       },
       { where: { id: data.grantId } }
     );
