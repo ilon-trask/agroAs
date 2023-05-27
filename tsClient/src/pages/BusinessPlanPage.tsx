@@ -24,7 +24,11 @@ import CreateResume from "../modules/CreateResume";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
-import { IbusinessPlan, Iproduct } from "../../../tRPC serv/models/models";
+import {
+  IbusinessPlan,
+  Iproduct,
+  Ispecial_work,
+} from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { names } from "../modules/TEJConceptTable/index";
@@ -34,10 +38,12 @@ import {
   getBuyingMachine,
   getCredit,
   getDerj,
+  getGrades,
   getGrant,
   getInvestment,
   getJob,
   getManyCartWithOpers,
+  getTEJ,
   getVegetationYear,
   getWorker,
   getYieldPlants,
@@ -91,6 +97,10 @@ import {
   BuyingMachineTableBodyRow,
   BuyingMachineTableHead,
 } from "../modules/BuyingMachineTable/BuyingMachineTable";
+import { LandPlatTableHead } from "../modules/LandPlotTable/LandPlatTable";
+import WorkTable from "../modules/WorkTable";
+import { workProps } from "../modules/CreateWork";
+import { resTechnologicalEconomicJustification } from "../../../tRPC serv/controllers/TEJService";
 function BiznesPlanPage() {
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
@@ -98,7 +108,8 @@ function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
-  const { map, user, enterpriseStore, business, income } = useContext(Context);
+  const { map, user, enterpriseStore, business, income, TEJ } =
+    useContext(Context);
   useBusiness(business, map);
   useEnterprise();
   useEffect(() => {
@@ -111,6 +122,8 @@ function BiznesPlanPage() {
     getInvestment(income);
     getCredit(income);
     getGrant(income);
+    getGrades(map);
+    getTEJ(TEJ);
   }, []);
   const { id } = useParams();
   const Business: resBusinessPlan[] = JSON.parse(
@@ -132,6 +145,8 @@ function BiznesPlanPage() {
   });
   const [quizRes, setQuizRes] = useState({});
   const [ready, setReady] = useState(false);
+  const [cartReady, setCartReady] = useState(false);
+  const [operReady, setOperReady] = useState(false);
   const [buyingMachineOpen, setBuyingMachineOpen] = useState(false);
   const [buyingMachineRes, setBuyingMachineRes] =
     useState<CreateBuyingMachineProps>({
@@ -191,27 +206,61 @@ function BiznesPlanPage() {
     }
   }, [myBusiness]);
   useEffect(() => {
-    if (ready) {
+    if (thisMaps[0]) {
+      console.log("є карта");
+
+      setCartReady(true);
+    }
+  }, [thisMaps]);
+  useEffect(() => {
+    if (map.opers[0]) {
+      console.log("є карта");
+
+      setOperReady(true);
+    }
+  }, [map.opers[0]?.nameOperation]);
+  useEffect(() => {
+    if (cartReady) {
       getManyCartWithOpers(
         map,
         thisMaps.map((el) => el.id!)
       );
     }
-  }, [ready]);
+  }, [cartReady]);
   let sections = useMemo(() => {
-    if (ready) {
+    if (operReady) {
       console.log("секція");
-      console.log(map.opers);
+      console.log(
+        thisMaps.map((el) => {
+          console.log(el.id);
+
+          return { data: getSectionsOpers(map, el.id!), year: el.year };
+        })
+      );
 
       return thisMaps.map((el) => {
         console.log(el.id);
 
-        return getSectionsOpers(map, el.id!);
+        return { data: getSectionsOpers(map, el.id!), year: el.year };
       });
     }
-  }, [map.opers, ready]);
-  console.log(sections);
+  }, [map.opers, cartReady, operReady]);
 
+  console.log(sections);
+  let works: Ispecial_work[] = JSON.parse(JSON.stringify(map.works));
+  works.sort((a, b) => a.id! - b.id!);
+  const [workRes, setWorkRes] = useState<workProps>({
+    nameWork: "",
+    area: "",
+    salary: "",
+    priceDiesel: "",
+  });
+  const [workOpen, setWorkOpen] = useState(false);
+  const [workUpdate, setWorkUpdate] = useState(false);
+
+  let costHand = 0;
+  let costMech = 0;
+  let costMechTot = 0;
   return !ready ? (
     <Box></Box>
   ) : (
@@ -390,6 +439,28 @@ function BiznesPlanPage() {
         update={buyingMachineUpdate}
         setUpdate={setBuyingMachineUpdate}
       />
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Будівництво будівель і споруд
+      </Heading>
+      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+        Спеціалізовані та будівельні роботи
+      </Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <WorkTable
+          works={works}
+          setRes={setWorkRes}
+          setOpen={setWorkOpen}
+          setUpdate={setWorkUpdate}
+          setShowAlert={() => {}}
+          deleteOpen={false}
+          setDeleteOpen={() => {}}
+        ></WorkTable>
+      </TableContainer>
+      <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
+        <Button onClick={() => setWorkOpen(true)}>
+          Добавити спеціалізовані роботи
+        </Button>
+      </Box>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Залучення фінансування
       </Heading>
@@ -943,6 +1014,15 @@ function BiznesPlanPage() {
               </Tr>
             </Tbody>
           </Table>
+          <Paragraph>
+            3.2. Власники, керуючий персонал, працівники підприємства.
+          </Paragraph>
+          <Description>
+            Для функціонування підприємства планується створити сімейне
+            фермерське господарство у вигляді ФОП з 2 членами сім’ї та найняти
+            …. працівників, з них …. На постійній основі, а …. Сезонно. Детальні
+            розрахунки зведено у вигляді таблиці.
+          </Description>
           <Description>
             Загальна кількість персоналу, який планується залучити для
             забезпечення роботи підприємства, становить … осіб, з яких…
@@ -1136,14 +1216,7 @@ function BiznesPlanPage() {
                   <TableNumber></TableNumber>
                 </Th>
               </Tr>
-              <Tr>
-                <Th>Вид оплати</Th>
-                <Th>Кадастровий номер</Th>
-                <Th>Площа</Th>
-                <Th>Ставка</Th>
-                <Th>Плата за землю</Th>
-                <Th>Власність</Th>
-              </Tr>
+              <LandPlatTableHead isPlan={true} />
             </Thead>
             <Tbody>
               {(() => {
@@ -1618,6 +1691,510 @@ function BiznesPlanPage() {
               </Tr>
             </Thead>
           </Table>
+          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+            Планування потреби в ресурсах
+          </Text>
+          <Text
+            textAlign={"center"}
+            fontSize={"14px"}
+            mt={"15px"}
+            fontWeight={"bold"}
+          >
+            Витрати праці
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Види робіт</Th>
+                  <Th>Операція</Th>
+                  <Th>Кількість</Th>
+                  <Th>Середня ціна</Th>
+                  <Th>Сума</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr fontWeight={"bold"}>
+                  <Td>Механізовані роботи</Td>
+                  <Td></Td>
+                  <Td>Люд/год</Td>
+                  <Td>Грн/год</Td>
+                  <Td></Td>
+                </Tr>
+                {thisMaps.map((e) => {
+                  let myJustification = TEJ.justification?.find((el) => {
+                    return el.techCartId! == +e.id!;
+                  });
+                  console.log(TEJ.justification);
+                  console.log(myJustification);
+
+                  return map.opers
+                    .filter((el) => el.techCartId == e.id)
+                    .map((el) => {
+                      const totalCost =
+                        el.costMachineWork! * myJustification?.area!;
+                      console.log(totalCost);
+                      console.log(el.costMachineWork!);
+                      console.log(myJustification?.area);
+
+                      const peopleHour =
+                        Math.round(
+                          (totalCost /
+                            ((e?.salary! / 176) *
+                              map.grade.find(
+                                (e) => e?.id! == el?.aggregate?.tractor.gradeId
+                              )?.coefficient!)) *
+                            100
+                        ) / 100;
+                      console.log(peopleHour);
+
+                      const costMech = Math.round(
+                        ((totalCost / peopleHour) * 100) / 100
+                      );
+                      console.log(costMech);
+                      if (el.cell == "costMechanical")
+                        return (
+                          <Tr key={el.id}>
+                            <Td>{}</Td>
+                            <Td>{el.nameOperation}</Td>
+                            <Td>{peopleHour}</Td>
+                            <Td>{costMech}</Td>
+                            <Td>
+                              {el.costMachineWork! * myJustification?.area!}
+                            </Td>
+                          </Tr>
+                        );
+                    });
+                })}
+                <Tr fontWeight={"bold"}>
+                  <Td>Ручні роботи</Td>
+                  <Td></Td>
+                  <Td>Люд/год</Td>
+                  <Td>Грн/год</Td>
+                  <Td></Td>
+                </Tr>
+                {thisMaps.map((e) => {
+                  let myJustification:
+                    | resTechnologicalEconomicJustification
+                    | undefined = TEJ.justification?.find((el) => {
+                    return el.techCartId! == +e.id!;
+                  });
+                  return map.opers
+                    .filter((el) => el.techCartId == e.id)
+                    .map((el) => {
+                      const totalCost =
+                        el.costHandWork! * myJustification?.area!;
+                      const peopleHour =
+                        Math.round(
+                          (totalCost /
+                            ((e?.salary! / 176) *
+                              map.grade.find(
+                                (e) =>
+                                  e.id! == el.cost_hand_work?.gradeId! ||
+                                  el.aggregate?.agricultural_machine.gradeId
+                              )?.coefficient!)) *
+                            100
+                        ) / 100;
+                      const costHand = Math.round(
+                        ((totalCost / peopleHour) * 100) / 100
+                      );
+                      if (
+                        el.cell == "costHandWork" ||
+                        (el.cell == "costMechanical" && el.costHandWork)
+                      )
+                        return (
+                          <Tr key={el.id}>
+                            <Td>{}</Td>
+                            <Td>{el.nameOperation}</Td>
+                            <Td>{peopleHour}</Td>
+                            <Td>{costHand}</Td>
+                            <Td>{totalCost}</Td>
+                          </Tr>
+                        );
+                    });
+                })}
+                <Tr fontWeight={"bold"}>
+                  <Td>Всього по оплаті праці</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{costHand + costMech}</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Text
+            textAlign={"center"}
+            fontSize={"14px"}
+            mt={"15px"}
+            fontWeight={"bold"}
+          >
+            Техніка й обладнання
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Назва</Th>
+                  <Th>Марка</Th>
+                  <Th>Одиниця виміру</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr fontWeight={"bold"}>
+                  <Td>Трактори</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+                {(() => {
+                  return thisMaps.map((e) => {
+                    let acc: number[] = [];
+                    let mechHours = 0;
+                    let myJustification:
+                      | resTechnologicalEconomicJustification
+                      | undefined = TEJ.justification?.find((el) => {
+                      return el.techCartId! == +e.id!;
+                    });
+                    return map.opers.map((el, ind) => {
+                      if (el.cell == "costMechanical") {
+                        let amountOfTractorDepreciationPerHour =
+                          el?.aggregate?.amountOfTractorDepreciationPerHour;
+                        const id = el.aggregate?.tractorId;
+                        const ex = acc.includes(id!);
+
+                        if (ex) return null;
+                        mechHours = el?.aggregate?.mechHours!;
+
+                        map.opers.forEach((e, indx) => {
+                          if (e.aggregate?.tractorId == id && ind != indx) {
+                            mechHours += e?.aggregate?.mechHours!;
+                          }
+                        });
+                        acc.push(id!);
+                        costMechTot +=
+                          mechHours *
+                          amountOfTractorDepreciationPerHour! *
+                          myJustification?.area! *
+                          1.05;
+                        return (
+                          <Tr key={el.id}>
+                            <Td>{el.aggregate?.tractor.nameTractor}</Td>
+                            <Td>{el?.aggregate?.tractor.brand}</Td>
+                            <Td>маш/год</Td>
+                            <Td>{Math.round(mechHours * 100) / 100}</Td>
+                            <Td>
+                              {Math.round(
+                                amountOfTractorDepreciationPerHour! * 100
+                              ) / 100}
+                            </Td>
+                            <Td>
+                              {Math.round(
+                                mechHours *
+                                  amountOfTractorDepreciationPerHour! *
+                                  myJustification?.area! *
+                                  1.05 *
+                                  100
+                              ) / 100}
+                            </Td>
+                          </Tr>
+                        );
+                      }
+                    });
+                  });
+                })()}
+                <Tr fontWeight={"bold"}>
+                  <Td>СГ машини</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+                {(() => {
+                  return thisMaps.map((e) => {
+                    let acc: number[] = [];
+                    let mechHours = 0;
+                    let myJustification:
+                      | resTechnologicalEconomicJustification
+                      | undefined = TEJ.justification?.find((el) => {
+                      return el.techCartId! == +e.id!;
+                    });
+                    return map.opers.map((el, ind) => {
+                      if (el.cell == "costMechanical") {
+                        let amountOfMachineDepreciationPerHour =
+                          el?.aggregate?.amountOfMachineDepreciationPerHour;
+                        const id = el.aggregate?.agriculturalMachineId;
+                        const ex = acc.includes(id!);
+
+                        if (ex) return null;
+                        mechHours = el?.aggregate?.mechHours!;
+
+                        map.opers.forEach((e, indx) => {
+                          if (
+                            e.aggregate?.agriculturalMachineId == id &&
+                            ind != indx
+                          ) {
+                            mechHours += e?.aggregate?.mechHours!;
+                          }
+                        });
+                        acc.push(id!);
+                        costMechTot +=
+                          mechHours *
+                          amountOfMachineDepreciationPerHour! *
+                          myJustification?.area! *
+                          1.05;
+                        return (
+                          <Tr key={el.id}>
+                            <Td>
+                              {el?.aggregate?.agricultural_machine.nameMachine}
+                            </Td>
+                            <Td>{el?.aggregate?.agricultural_machine.brand}</Td>
+                            <Td>маш/год</Td>
+                            <Td>{Math.round(mechHours * 100) / 100}</Td>
+                            <Td>
+                              {Math.round(
+                                amountOfMachineDepreciationPerHour! * 100
+                              ) / 100}
+                            </Td>
+                            <Td>
+                              {Math.round(
+                                mechHours *
+                                  amountOfMachineDepreciationPerHour! *
+                                  myJustification?.area! *
+                                  1.05 *
+                                  100
+                              ) / 100}
+                            </Td>
+                          </Tr>
+                        );
+                      }
+                    });
+                  });
+                })()}
+                <Tr fontWeight={"bold"}>
+                  <Td>Всього по техніці та обладнанню</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{Math.round(costMechTot)}</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Text
+            textAlign={"center"}
+            fontSize={"14px"}
+            mt={"15px"}
+            fontWeight={"bold"}
+          >
+            Матеріальні витрати
+          </Text>
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Призначення</Th>
+                  <Th>Назва</Th>
+                  <Th>Одиниця виміру</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(() => {
+                  return thisMaps.map((e) => {
+                    let myJustification:
+                      | resTechnologicalEconomicJustification
+                      | undefined = TEJ.justification?.find((el) => {
+                      return el.techCartId! == +e.id!;
+                    });
+                    let cost = 0;
+                    return (
+                      <>
+                        {map.purposeMaterial.map((el) => {
+                          const mat = map.costMaterials.filter(
+                            (e) => e?.purpose_material?.id == el?.id
+                          );
+                          if (mat[0])
+                            return (
+                              <>
+                                <Tr key={el.id}>
+                                  <Td fontWeight={"bold"}>{el.purpose}</Td>
+                                  <Td></Td>
+                                  <Td></Td>
+                                  <Td></Td>
+                                  <Td></Td>
+                                  <Td></Td>
+                                </Tr>
+                                {mat.map((elem) => {
+                                  const hco =
+                                    elem.consumptionPerHectare *
+                                    myJustification?.area!;
+                                  const hp = hco * elem.price;
+                                  cost += hp;
+                                  return (
+                                    <Tr key={elem.id}>
+                                      <Td></Td>
+                                      <Td>{elem.nameMaterials}</Td>
+                                      <Td>{elem.unitsOfConsumption}</Td>
+                                      <Td>{hco}</Td>
+                                      <Td>{elem.price}</Td>
+                                      <Td>{hp}</Td>
+                                    </Tr>
+                                  );
+                                })}
+                              </>
+                            );
+                        })}
+                        <Tr>
+                          <Td fontWeight={"bold"}>Всього матеріалів</Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td></Td>
+                          <Td fontWeight={"bold"}>{cost}</Td>
+                        </Tr>
+                      </>
+                    );
+                  });
+                })()}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Text
+            textAlign={"center"}
+            fontSize={"14px"}
+            mt={"15px"}
+            fontWeight={"bold"}
+          >
+            Витрати на послуги
+          </Text>{" "}
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Назва</Th>
+                  <Th>Одиниця виміру</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(() => {
+                  let cost = 0;
+                  const serv = map.costServices;
+                  return (
+                    <>
+                      {serv.map((elem) => {
+                        cost += myJustification?.area! * elem.price;
+                        return (
+                          <Tr key={elem.id}>
+                            <Td>{elem.nameService}</Td>
+                            <Td>{elem.unitsOfCost}</Td>
+                            <Td>{myJustification?.area}</Td>
+                            <Td>{elem.price}</Td>
+                            <Td>{myJustification?.area! * elem.price}</Td>
+                          </Tr>
+                        );
+                      })}
+                      <Tr>
+                        <Td fontWeight={"bold"}>Всього за послуги</Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td fontWeight={"bold"}>{cost}</Td>
+                      </Tr>
+                    </>
+                  );
+                })()}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          <Text
+            textAlign={"center"}
+            fontSize={"14px"}
+            mt={"15px"}
+            fontWeight={"bold"}
+          >
+            Витрати на транспорт
+          </Text>{" "}
+          <TableContainer
+            maxW="1000px"
+            mx="auto"
+            mt={"20px"}
+            overflowX={"scroll"}
+          >
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Назва</Th>
+                  <Th>Одиниця виміру</Th>
+                  <Th>Кількість</Th>
+                  <Th>Ціна</Th>
+                  <Th>Сума</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {/* {(() => {
+                  
+                  let cost = 0;
+                  const trans = map.costTransport;
+                  return (
+                    <>
+                      {trans.map((elem) => {
+                        cost += myJustification?.area! * elem.price;
+                        return (
+                          <Tr key={elem.id}>
+                            <Td>{elem.nameTransport}</Td>
+                            <Td>{elem.unitsOfCost}</Td>
+                            <Td>{myJustification?.area}</Td>
+                            <Td>{elem.price}</Td>
+                            <Td>{myJustification?.area! * elem.price}</Td>
+                          </Tr>
+                        );
+                      })}
+                      <Tr>
+                        <Td fontWeight={"bold"}>Всього за транспорт</Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td></Td>
+                        <Td fontWeight={"bold"}>{cost}</Td>
+                      </Tr>
+                    </>
+                  );
+                })()} */}
+              </Tbody>
+            </Table>
+          </TableContainer>
           <Paragraph>4.3. Опис продукту</Paragraph>
           <Table size={"sm"}>
             {[...productSet].map((el, ind) => {
@@ -2096,7 +2673,7 @@ function BiznesPlanPage() {
             </Tbody>
           </Table>
           <Paragraph>Додаток В. Технологічні карти</Paragraph>
-          {/* <Table size={"sm"}>
+          <Table size={"sm"}>
             <Thead>
               <OpersTableHead role="" />
             </Thead>
@@ -2111,63 +2688,77 @@ function BiznesPlanPage() {
                       area: e?.area,
                     }));
                     thisMaps = thisMaps.filter((el) => {
+                      console.log("lj");
+                      // console.log(el.year.split("")[0]);
+                      console.log(i - +start + 1);
+
                       return (
                         el.cultureId == e?.cultureId &&
                         el.cultivationTechnologyId ==
                           e?.cultivationTechnologyId &&
-                        //@ts-ignore
-                        el.year.split("")[0] == i - +start + 1
+                        +el.year.split("")[0] == i - +start + 1
                       );
                     });
 
                     res.push(
-                      sections.map((el, ind) => {
-                        const mapData = thisMaps.find(
-                          (e) => e.id == el[0]?.arr[0]?.id!
-                        );
-                        const sum = 0;
-                        return el.map((e) => {
-                          // sum +=
-                          //   mapData?.area! *
-                          //   (e.costMaterials ||
-                          //     e.costServices ||
-                          //     e.costTransport ||
-                          //     +e.costCars! +
-                          //       +e.costFuel! +
-                          //       +e.costHandWork! +
-                          //       +e.costMachineWork! ||
-                          //     e.costHandWork ||
-                          //     0);
-                          // console.log(e.arr);
-
-                          return (
-                            <OperTableSection
-                              key={ind}
-                              arr={e.arr}
-                              title={e.title}
-                              mapData={mapData!}
-                              id={mapData?.id!}
-                              deleteOpen={() => {}}
-                              setCell={() => {}}
-                              setDeleteOpen={() => {}}
-                              setOpen={() => {}}
-                              setRes={() => {}}
-                              setShowAlert={() => {}}
-                              setUpdate={() => {}}
-                              sum={sum}
-                            />
+                      sections
+                        ?.filter(
+                          (el) => +el.year.split("")[0] == i - +start + 1
+                        )
+                        .map((sec) => {
+                          const el = sec.data;
+                          const mapData = thisMaps.find(
+                            (e) => e.id == el[0]?.arr[0]?.techCartId!
                           );
-                        });
-                      })
+
+                          const sum = 0;
+                          return el.map((e) => {
+                            // sum +=
+                            //   mapData?.area! *
+                            //   (e.costMaterials ||
+                            //     e.costServices ||
+                            //     e.costTransport ||
+                            //     +e.costCars! +
+                            //       +e.costFuel! +
+                            //       +e.costHandWork! +
+                            //       +e.costMachineWork! ||
+                            //     e.costHandWork ||
+                            //     0);
+
+                            if (operReady)
+                              return (
+                                <>
+                                  {/* <карти></к> */}
+                                  <OperTableSection
+                                    arr={e.arr}
+                                    title={e.title}
+                                    mapData={{ area: 3 }}
+                                    id={mapData?.id!}
+                                    deleteOpen={() => {}}
+                                    setCell={() => {}}
+                                    setDeleteOpen={() => {}}
+                                    setOpen={() => {}}
+                                    setRes={() => {}}
+                                    setShowAlert={() => {}}
+                                    setUpdate={() => {}}
+                                    sum={sum}
+                                  />
+                                </>
+                              );
+                          });
+                        })
                     );
+                    console.log("цук");
+
+                    console.log(...res);
+                    console.log(res.flat().flat());
                   }
                 }
-                console.log(res.flat().flat());
 
                 return res.flat().flat();
               })()}
             </Tbody>
-          </Table> */}
+          </Table>
           <Paragraph>Додаток Г. Калькуляція собівартості</Paragraph>
           {(() => {
             const res = [];

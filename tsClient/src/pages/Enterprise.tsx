@@ -30,6 +30,7 @@ import {
   getWorker,
 } from "../http/requests";
 import { Context } from "../main";
+import BuyingMachineTable from "../modules/BuyingMachineTable";
 import CreateCredit, {
   CreditProps,
 } from "../modules/CreateCredit/CreateCredit";
@@ -44,7 +45,10 @@ import CreateInvestment, {
 } from "../modules/CreateInvestment/CreateInvestment";
 import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
+import LandPlatTable from "../modules/LandPlotTable";
 import StaffingTable from "../modules/StaffingTable";
+import CreateBuyingMachine from "../modules/CreateBuyingMachine";
+import WorkTable from "../modules/WorkTable";
 
 function Enterprise() {
   const { id } = useParams();
@@ -118,6 +122,9 @@ function Enterprise() {
   const grant: Igrant[] = JSON.parse(JSON.stringify(income.grant));
   //@ts-ignore
   grant.sort((a, b) => new Date(a.createdAt!) - new Date(b.createdAt!));
+  const [machineOpen, setMachineOpen] = useState(false);
+  const [machineUpdate, setMachineUpdate] = useState(false);
+  const [machineData, setMachineData] = useState({});
   return (
     <Container maxW={"container.lg"}>
       <Box mx={"auto"}>
@@ -139,6 +146,68 @@ function Enterprise() {
           </Tr>
         </Thead>
       </Table>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Земельні ділянки
+      </Text>
+      <LandPlatTable></LandPlatTable>
+      <Button>Додати ділянку</Button>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Техніка та обладнання
+      </Text>
+      <BuyingMachineTable
+        setOpen={setMachineOpen}
+        setDeleteOpen={setDeleteOpen}
+        setRes={setMachineData}
+        setUpdate={setMachineUpdate}
+      />
+      <CreateBuyingMachine
+        open={machineOpen}
+        setOpen={setMachineOpen}
+        update={machineUpdate}
+        setUpdate={setMachineUpdate}
+        data={machineData as any}
+      />
+      <Button onClick={() => setMachineOpen(true)}>
+        Додати техніку та обладнання
+      </Button>
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
+        Будівлі і споруди
+      </Text>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Назва</Th>
+            <Th>
+              Початкова <br /> вартість
+            </Th>
+            <Th>
+              Початок <br /> експлуатації
+            </Th>
+            <Th>
+              Термін <br /> амортищації
+            </Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Tr></Tr>
+        </Tbody>
+      </Table>
+      <Button>Додати будівлю або споруду</Button>
       <Text
         textAlign={"center"}
         fontSize={"25px"}

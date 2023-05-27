@@ -108,7 +108,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -124,8 +124,11 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
+  console.log("aaa");
+  console.log(carts);
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
+
     map.maps = map.maps.filter((el) => el.id != cart.id);
     map.complex = map.complex.filter((el) => el.id != cart.id);
     if (cart.isComplex) {
@@ -1386,16 +1389,14 @@ export function createVegetationYear(
   });
 }
 
-export function getManyCartWithOpers(map: MapStore, ids: number[]) {
+export async function getManyCartWithOpers(map: MapStore, ids: number[]) {
   console.log("work2");
-
-  ids.forEach((el) => {
-    client.cart.getCart.query({ cartId: el }).then((res) => {
-      let a: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(res));
-      a.forEach((el) =>
-        el.tech_operations?.forEach((el) => (map.newOper = el))
-      );
+  let a = [];
+  for (let i = 0; i < ids.length; i++) {
+    const el = ids[i];
+    await client.cart.getCart.query({ cartId: el }).then((res) => {
+      a.push(...res);
     });
-    console.log(map.opers);
-  });
+  }
+  operationsFilter(a, map);
 }
