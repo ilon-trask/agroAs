@@ -1,11 +1,19 @@
 import { makeAutoObservable } from "mobx";
 import { IUserRole } from "../../../tRPC serv";
-import { Ienterprise, Ijob, Iworker } from "../../../tRPC serv/models/models";
+import {
+  Ibuilding,
+  Ienterprise,
+  Ijob,
+  Iland,
+  Iworker,
+} from "../../../tRPC serv/models/models";
 
 export default class EnterpriseStore {
   private _enterprise: Ienterprise[] = [];
   private _job: Ijob[] = [];
   private _worker: Iworker[] = [];
+  private _land: Iland[] = [];
+  private _building: Ibuilding[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -29,6 +37,18 @@ export default class EnterpriseStore {
   set newWorker(worker: Iworker) {
     this._worker.push(worker);
   }
+  set land(land: Iland[]) {
+    this._land = land;
+  }
+  set newLand(land: Iland) {
+    this._land.push(land);
+  }
+  set building(build: Ibuilding[]) {
+    this._building = build;
+  }
+  set newBuilding(build: Ibuilding) {
+    this._building.push(build);
+  }
   get enterprise() {
     return this._enterprise;
   }
@@ -37,5 +57,11 @@ export default class EnterpriseStore {
   }
   get worker() {
     return this._worker;
+  }
+  get land() {
+    return this._land;
+  }
+  get building() {
+    return this._building;
   }
 }

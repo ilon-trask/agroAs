@@ -23,10 +23,10 @@ import { createWorker, getJob, patchWorker } from "../../http/requests";
 import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
-} from "../../pages/hook/useEnterpriseForm";
+} from "../../shared/hook/useEnterpriseForm";
 import useWorkerClasses, {
   WorkerClassesType,
-} from "../../pages/hook/useWorkersClasses";
+} from "../../shared/hook/useWorkersClasses";
 import CreateJob, { JobPropType } from "../CreateJob/CreateJob";
 type props = {
   open: boolean;

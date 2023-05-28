@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
-import { InvestmentOriginType } from "../../pages/hook/useInvestmentOrigin";
-import useInvestmentOrigin from "../../pages/hook/useInvestmentOrigin";
+import { InvestmentOriginType } from "../../shared/hook/useInvestmentOrigin";
+import useInvestmentOrigin from "../../shared/hook/useInvestmentOrigin";
 import { createInvestment, patchInvestment } from "../../http/requests";
 import { Context } from "../../main";
 export type CreateInvestmentProps = {

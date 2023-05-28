@@ -5,9 +5,9 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import { Iworker } from "../../../../tRPC serv/models/models";
 import { deleteWorker } from "../../http/requests";
 import { Context } from "../../main";
-import { EnterpriseFormType } from "../../pages/hook/useEnterpriseForm";
-import { EnterpriseTaxGroupType } from "../../pages/hook/useEnterpriseTaxGroup";
-import { WorkerClassesType } from "../../pages/hook/useWorkersClasses";
+import { EnterpriseFormType } from "../../shared/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../shared/hook/useEnterpriseTaxGroup";
+import { WorkerClassesType } from "../../shared/hook/useWorkersClasses";
 import EnterpriseStore from "../../store/EnterpriseStore";
 import { CreateWorkerProp } from "../CreateWorker/CreateWorker";
 export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {

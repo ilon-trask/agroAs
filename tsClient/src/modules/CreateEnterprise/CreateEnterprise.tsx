@@ -13,8 +13,8 @@ import { createEnterprise, patchEnterprise } from "../../http/requests";
 import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
-} from "../../pages/hook/useEnterpriseForm";
-import { EnterpriseTaxGroupType } from "../../pages/hook/useEnterpriseTaxGroup";
+} from "../../shared/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../shared/hook/useEnterpriseTaxGroup";
 import EnterpriseInputs from "./components/EnterpriseInputs";
 type props = {
   open: boolean;

@@ -12,10 +12,10 @@ import { createAdministration, patchAdministration } from "../../http/requests";
 import { Context } from "../../main";
 import useAdministrationPeriodCalc, {
   AdministrationPeriodCalcType,
-} from "../../pages/hook/useAdministrationPeriodCalc";
+} from "../../shared/hook/useAdministrationPeriodCalc";
 import useAdministrationPurpose, {
   AdministrationPurposeType,
-} from "../../pages/hook/useAdministrationPurpose";
+} from "../../shared/hook/useAdministrationPurpose";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;

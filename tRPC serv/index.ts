@@ -41,6 +41,8 @@ import { enterpriseRouter } from "./routes/enterpriseRouter";
 import { jobRouter } from "./routes/jobRouter";
 import { workerRouter } from "./routes/workerRouter";
 import { vegetationRouter } from "./routes/vegetationYearRouter";
+import { landRouter } from "./routes/landRouter";
+import { buildingRouter } from "./routes/buildingRouter";
 
 export const adminId = "c87cb1e9-6655-4f2e-8d9f-2ad2680b782c";
 
@@ -82,6 +84,8 @@ const appRouter = router({
   worker: workerRouter,
   job: jobRouter,
   vegetation: vegetationRouter,
+  land: landRouter,
+  building: buildingRouter,
   "": publicProcedure.query(() => "some text"),
 });
 

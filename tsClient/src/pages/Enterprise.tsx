@@ -387,7 +387,7 @@ function Enterprise() {
         mt={"15px"}
         textTransform={"uppercase"}
       >
-        Державна підтримка субсидія
+        Державна підтримка
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
         <Table size={"sm"}>

@@ -19,8 +19,8 @@ import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Context } from "../../main";
-import useIncomeTypes from "../../pages/hook/useIncomeTypes";
-import useOutcomeTypes from "../../pages/hook/useOutcomeTypes";
+import useIncomeTypes from "../../shared/hook/useIncomeTypes";
+import useOutcomeTypes from "../../shared/hook/useOutcomeTypes";
 let akk: number[] = [];
 function setAkk(value: number) {
   if (!akk.includes(value)) {

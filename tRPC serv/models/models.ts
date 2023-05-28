@@ -5,22 +5,22 @@ import {
   InferCreationAttributes,
   Model,
 } from "sequelize";
-import { IncomeType } from "../../tsClient/src/pages/hook/useIncomeTypes";
-import { IncomeGroup } from "../../tsClient/src/pages/hook/useIncomeGroup";
+import { IncomeType } from "../../tsClient/src/shared/hook/useIncomeTypes";
+import { IncomeGroup } from "../../tsClient/src/shared/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
-import { CreditPurposeType } from "../../tsClient/src/pages/hook/useCreditPurpose";
-import { InvestmentOriginType } from "../../tsClient/src/pages/hook/useInvestmentOrigin";
-import { DerjPurposeType } from "../../tsClient/src/pages/hook/useDerjPurpose";
-import { GrantPurposeType } from "../../tsClient/src/pages/hook/useGrantPurpose";
-import { BuyingMachinePurposeType } from "../../tsClient/src/pages/hook/useBuyingMachinePurpose";
-import { AdministrationPurposeType } from "../../tsClient/src/pages/hook/useAdministrationPurpose";
-import { AdministrationPeriodCalcType } from "../../tsClient/src/pages/hook/useAdministrationPeriodCalc";
-import { EnterpriseFormType } from "../../tsClient/src/pages/hook/useEnterpriseForm";
-import { EnterpriseTaxGroupType } from "../../tsClient/src/pages/hook/useEnterpriseTaxGroup";
-import { WorkerClassesType } from "../../tsClient/src/pages/hook/useWorkersClasses";
-import { YieldPlantLandingPeriodType } from "../../tsClient/src/pages/hook/useYieldPlantLandingPeriod";
-import { VegetationYearsType } from "../../tsClient/src/pages/hook/useVegetationYears";
+import { CreditPurposeType } from "../../tsClient/src/shared/hook/useCreditPurpose";
+import { InvestmentOriginType } from "../../tsClient/src/shared/hook/useInvestmentOrigin";
+import { DerjPurposeType } from "../../tsClient/src/shared/hook/useDerjPurpose";
+import { GrantPurposeType } from "../../tsClient/src/shared/hook/useGrantPurpose";
+import { BuyingMachinePurposeType } from "../../tsClient/src/shared/hook/useBuyingMachinePurpose";
+import { AdministrationPurposeType } from "../../tsClient/src/shared/hook/useAdministrationPurpose";
+import { AdministrationPeriodCalcType } from "../../tsClient/src/shared/hook/useAdministrationPeriodCalc";
+import { EnterpriseFormType } from "../../tsClient/src/shared/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../tsClient/src/shared/hook/useEnterpriseTaxGroup";
+import { WorkerClassesType } from "../../tsClient/src/shared/hook/useWorkersClasses";
+import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
+import { VegetationYearsType } from "../../tsClient/src/shared/hook/useVegetationYears";
 export interface Iuser {
   id?: number;
   email: string;
@@ -65,8 +65,8 @@ export interface Itech_cart {
   authorName?: string;
   isAgree?: boolean;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   timesDow?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
@@ -141,8 +141,8 @@ export interface Ispecial_work {
   totalCost?: number;
   isPublic?: boolean;
   userId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class special_work extends Model<Ispecial_work> {
@@ -181,8 +181,8 @@ export interface Itech_operation {
   costServices?: number;
   techCartId?: number;
   sectionId?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class tech_operation extends Model<Itech_operation> {
@@ -441,8 +441,8 @@ export interface Iaggregate {
   tractorId?: number;
   agriculturalMachineId?: number;
   mechHours?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class aggregate extends Model<Iaggregate> {
@@ -551,8 +551,8 @@ export interface IbusinessPlan {
   description?: string;
   enterpriseId?: number;
   userId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export class businessPlan extends Model<IbusinessPlan> {
   declare id?: number;
@@ -637,8 +637,8 @@ export interface Iresume {
   finIndicators: string | null;
   deduction: string | null;
   businessPlanId?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export class resume extends Model<Iresume> {
   declare id?: number;
@@ -664,8 +664,8 @@ export interface ItitlePage {
   id?: number;
   title: string | null;
   businessPlanId?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export class titlePage extends Model<ItitlePage> {
   declare id?: number;
@@ -796,8 +796,8 @@ export interface ItechnologicalEconomicJustification {
   techCartId?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   userId?: string;
 }
 export class technologicalEconomicJustification extends Model<ItechnologicalEconomicJustification> {
@@ -993,7 +993,7 @@ export interface Icredit {
   isUseCost: boolean;
   businessCost?: number;
   userId?: string;
-  createdAt?: string;
+  createdAt?: Date;
   enterpriseId?: number;
 }
 export class credit extends Model<Icredit> {
@@ -1029,7 +1029,7 @@ export interface Iinvestment {
   cost: number;
   origin: InvestmentOriginType;
   userId?: string;
-  createdAt?: string;
+  createdAt?: Date;
   enterpriseId?: number;
 }
 export class investment extends Model<Iinvestment> {
@@ -1304,6 +1304,68 @@ vegetationYears.init(
 
   { sequelize }
 );
+export interface Iland {
+  readonly id?: number;
+  name: string;
+  cadastreNumber: number;
+  area: number;
+  userId: string;
+  readonly enterpriseId?: number;
+  readonly businessPlanId?: number | null | undefined;
+  readonly createdAt?: Date;
+}
+export class land extends Model<Iland> {
+  declare id: number;
+  declare name: string;
+  declare cadastreNumber: number;
+  declare area: number;
+  declare userId: string;
+}
+land.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: { type: DataTypes.STRING },
+    cadastreNumber: { type: DataTypes.STRING },
+    area: { type: DataTypes.FLOAT },
+    userId: { type: DataTypes.STRING, allowNull: false },
+  },
+  {
+    sequelize,
+    defaultScope: {
+      order: [["createdAt", "ASC"]],
+    },
+  }
+);
+
+export interface Ibuilding {
+  readonly id?: number;
+  name: string;
+  startPrice: number;
+  depreciationPeriod: number;
+  userId: string;
+  readonly enterpriseId?: number;
+  readonly businessPlanId?: number | null;
+}
+export class building extends Model<Ibuilding> {
+  declare id: number;
+  declare name: string;
+  declare startPrice: number;
+  declare depreciationPeriod: number;
+  declare userId: string;
+}
+building.init(
+  {
+    name: { type: DataTypes.STRING },
+    startPrice: { type: DataTypes.DECIMAL(10, 2) },
+    depreciationPeriod: { type: DataTypes.INTEGER },
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+  },
+  { sequelize }
+);
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1465,3 +1527,15 @@ derj_support.belongsTo(enterprise);
 
 enterprise.hasMany(grant);
 grant.belongsTo(enterprise);
+
+enterprise.hasMany(land);
+land.belongsTo(enterprise);
+
+businessPlan.hasMany(land);
+land.belongsTo(businessPlan);
+
+enterprise.hasMany(building);
+building.belongsTo(enterprise);
+
+businessPlan.hasMany(building);
+building.belongsTo(businessPlan);

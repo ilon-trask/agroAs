@@ -13,7 +13,7 @@ import { createYieldPlant, updateYieldPlant } from "../../../http/requests";
 import { Context } from "../../../main";
 import useYieldPlantLandingPeriod, {
   YieldPlantLandingPeriodType,
-} from "../../../pages/hook/useYieldPlantLandingPeriod";
+} from "../../../shared/hook/useYieldPlantLandingPeriod";
 import { incProp } from "../CreateYield";
 type props = {
   res: incProp;

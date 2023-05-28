@@ -8,7 +8,7 @@ import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import StaffingTable from "../modules/StaffingTable";
 import { ENTERPRISE_JOURNAL_ROUTER } from "../utils/consts";
-import { EnterpriseFormType } from "./hook/useEnterpriseForm";
+import { EnterpriseFormType } from "../shared/hook/useEnterpriseForm";
 
 function EnterpriseFormPage() {
   const { form, id } = useParams();

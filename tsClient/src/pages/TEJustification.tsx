@@ -45,7 +45,7 @@ import {
   patchTitlePage,
 } from "../http/requests";
 import CreateTitlePage from "../modules/CreateTitlePage";
-import useBusiness from "./hook/useBusiness";
+import useBusiness from "../shared/hook/useBusiness";
 import denistina from "../../font/denistina_en.ttf";
 import {
   BUSINESScATALOG_ROUTER,
@@ -55,7 +55,7 @@ import {
   // TEJ_JORNAL_ROUTER,
   TEJ_ROUTER,
 } from "../utils/consts";
-import useTEJ from "./hook/useTEJ";
+import useTEJ from "../shared/hook/useTEJ";
 import UpdateAreaCart from "../modules/UpdateAreaTEJ";
 import { cartProps } from "../modules/CreateCart";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";

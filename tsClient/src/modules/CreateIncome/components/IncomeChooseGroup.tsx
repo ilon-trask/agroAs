@@ -9,9 +9,9 @@ import {
 import { observer } from "mobx-react-lite";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { Context } from "../../../main";
-import useIncomeGroup from "../../../pages/hook/useIncomeGroup";
+import useIncomeGroup from "../../../shared/hook/useIncomeGroup";
 import { IncomeProp } from "../CreateIncome";
-import useIncomeTypes from "../../../pages/hook/useIncomeTypes";
+import useIncomeTypes from "../../../shared/hook/useIncomeTypes";
 type props = {
   setScreen: Dispatch<SetStateAction<number>>;
   res: IncomeProp;

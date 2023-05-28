@@ -4,12 +4,12 @@ import CreateBusiness, { CreateBusinessProp } from "../modules/CreateBusiness";
 import BusinessTable from "../modules/BusinessTable";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import useBusiness from "./hook/useBusiness";
+import useBusiness from "../shared/hook/useBusiness";
 import { useNavigate } from "react-router-dom";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
 import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
 import DeleteAlert, { DeleteProps } from "../components/DeleteAlert";
-import useEnterprise from "./hook/useEnterprise";
+import useEnterprise from "../shared/hook/useEnterprise";
 
 function BusinessJurnal() {
   const { business, map } = useContext(Context);

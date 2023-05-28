@@ -13,7 +13,7 @@ import { createCredit, patchCredit } from "../../http/requests";
 import { Context } from "../../main";
 import useCreditPurpose, {
   CreditPurposeType,
-} from "../../pages/hook/useCreditPurpose";
+} from "../../shared/hook/useCreditPurpose";
 
 export type CreditProps = {
   creditId?: number;

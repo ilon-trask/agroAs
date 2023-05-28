@@ -16,7 +16,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
-import useVegetationYears from "../pages/hook/useVegetationYears";
+import useVegetationYears from "../shared/hook/useVegetationYears";
 const createCartFunc: func<cartProps> = (
   id,
   map,

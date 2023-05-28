@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
 import BusinessCatalogItem from "../components/BusinessCatalogItem";
 import { getBusinessPlans } from "../http/requests";
-import useBusiness from "./hook/useBusiness";
+import useBusiness from "../shared/hook/useBusiness";
 
 function MainPage() {
   const { map, business } = useContext(Context);

@@ -2,8 +2,8 @@ import React, { Dispatch, SetStateAction } from "react";
 import { Box, Heading, Text, Input, Select } from "@chakra-ui/react";
 import useEnterpriseForm, {
   EnterpriseFormType,
-} from "../../../pages/hook/useEnterpriseForm";
-import useEnterpriseTaxGroup from "../../../pages/hook/useEnterpriseTaxGroup";
+} from "../../../shared/hook/useEnterpriseForm";
+import useEnterpriseTaxGroup from "../../../shared/hook/useEnterpriseTaxGroup";
 import { CreateEnterpriseProps } from "../CreateEnterprise";
 type props = {
   res: CreateEnterpriseProps;

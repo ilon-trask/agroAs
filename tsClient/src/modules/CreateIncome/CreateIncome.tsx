@@ -2,8 +2,8 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import Dialog from "../../components/Dialog";
 import IncomeChooseType from "./components/IncomeChooseType";
 import IncomeChooseGroupe from "./components/IncomeChooseGroup";
-import { IncomeType } from "../../pages/hook/useIncomeTypes";
-import { IncomeGroup } from "../../pages/hook/useIncomeGroup";
+import { IncomeType } from "../../shared/hook/useIncomeTypes";
+import { IncomeGroup } from "../../shared/hook/useIncomeGroup";
 import IncomeChoseElem from "./components/IncomeChoseElem";
 
 export type IncomeProp = {

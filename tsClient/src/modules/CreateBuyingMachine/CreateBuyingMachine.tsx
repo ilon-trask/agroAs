@@ -19,7 +19,7 @@ import { createBuyingMachine, patchBuyingMachine } from "../../http/requests";
 import { Context } from "../../main";
 import useBuyingMachinePurpose, {
   BuyingMachinePurposeType,
-} from "../../pages/hook/useBuyingMachinePurpose";
+} from "../../shared/hook/useBuyingMachinePurpose";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;

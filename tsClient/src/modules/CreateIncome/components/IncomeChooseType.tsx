@@ -8,7 +8,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction } from "react";
-import useIncomeTypes from "../../../pages/hook/useIncomeTypes";
+import useIncomeTypes from "../../../shared/hook/useIncomeTypes";
 import { IncomeProp } from "../CreateIncome";
 const incomeTypes = useIncomeTypes;
 type props = {

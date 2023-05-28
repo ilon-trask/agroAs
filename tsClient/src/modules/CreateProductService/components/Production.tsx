@@ -10,7 +10,7 @@ import { observer } from "mobx-react-lite";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { createProduction, patchProduction } from "../../../http/requests";
 import { Context } from "../../../main";
-import useProductionTypes from "../../../pages/hook/useProductionTypes";
+import useProductionTypes from "../../../shared/hook/useProductionTypes";
 import { productionProp } from "../CreateProduction";
 type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;

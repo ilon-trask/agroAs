@@ -11,7 +11,7 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
 import useDerjPurpose, {
   DerjPurposeType,
-} from "../../pages/hook/useDerjPurpose";
+} from "../../shared/hook/useDerjPurpose";
 import { createDerj, patchDerj } from "../../http/requests";
 import { Context } from "../../main";
 export type CreateDerjProps = {
