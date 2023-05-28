@@ -31,12 +31,14 @@ function ProductionBusinessPlan({
   myBusiness,
   thisMaps,
   productSet,
+  area,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
   thisMaps: resTechCartsWithOpers[];
   productSet: Set<string>;
+  area: number;
 }) {
   const { income, map, TEJ } = useContext(Context);
   let costHand = 0;
@@ -829,14 +831,14 @@ function ProductionBusinessPlan({
               return (
                 <>
                   {serv.map((elem) => {
-                    cost += myJustification?.area! * elem.price;
+                    cost += area! * elem.price;
                     return (
                       <Tr key={elem.id}>
                         <Td>{elem.nameService}</Td>
                         <Td>{elem.unitsOfCost}</Td>
-                        <Td>{myJustification?.area}</Td>
+                        <Td>{area}</Td>
                         <Td>{elem.price}</Td>
-                        <Td>{myJustification?.area! * elem.price}</Td>
+                        <Td>{area! * elem.price}</Td>
                       </Tr>
                     );
                   })}

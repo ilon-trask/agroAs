@@ -5,7 +5,7 @@ import buildingService from "../controllers/buildingService";
 const createBuilding = z.object({
   name: z.string(),
   startPrice: z.number(),
-  depreciationPeriod: z.number(),
+  depreciationPeriod: z.string(),
   businessPlanId: z.number().optional().nullable(),
   enterpriseId: z.number(),
 });

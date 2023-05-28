@@ -576,6 +576,7 @@ function BiznesPlanPage() {
             myBusiness={myBusiness!}
             thisMaps={thisMaps}
             productSet={productSet}
+            area={myBusiness?.busCuls.reduce((p, c) => p + c.area, 0) || 0}
           />
           <FinancingBusinessPlan start={start} end={end} />
           <PlanedIndicatorsBusinessPlan

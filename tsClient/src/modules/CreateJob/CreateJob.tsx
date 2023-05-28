@@ -47,7 +47,7 @@ function CreateJob({ open, setOpen, update, setUpdate, res, setRes }: props) {
           onChange={(e) =>
             setRes((prev) => ({ ...prev, name: e.target.value }))
           }
-        ></Input>
+        />
       </Box>
       <Box display={"flex"} gap={3}>
         <Text>Враховувати для:</Text>

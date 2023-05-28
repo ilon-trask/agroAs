@@ -18,15 +18,17 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Icredit, Igrant, Iinvestment } from "../../../tRPC serv/models/models";
-import { IdeleteHeading } from "../components/DeleteAlert";
+import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import {
   deleteCredit,
   deleteDerj,
   deleteGrant,
   deleteInvestment,
+  getBuilding,
   getCredit,
   getGrant,
   getInvestment,
+  getLand,
   getWorker,
 } from "../http/requests";
 import { Context } from "../main";
@@ -49,7 +51,14 @@ import LandPlatTable from "../modules/LandPlotTable";
 import StaffingTable from "../modules/StaffingTable";
 import CreateBuyingMachine from "../modules/CreateBuyingMachine";
 import WorkTable from "../modules/WorkTable";
-
+import sort from "src/shared/funcs/sort";
+import CreateLand from "src/modules/CreateLand";
+import { CreateLandProps } from "src/modules/CreateLand/CreateLand";
+import { DeleteProps } from "../components/DeleteAlert";
+import BuildingTable from "src/modules/BuildingTable";
+import CreateBuilding, {
+  CreateBuildingProps,
+} from "src/modules/CreateBuilding/CreateBuilding";
 function Enterprise() {
   const { id } = useParams();
   const { enterpriseStore, income } = useContext(Context);
@@ -57,21 +66,17 @@ function Enterprise() {
     getInvestment(income);
     getCredit(income);
     getGrant(income);
+    getLand(enterpriseStore);
+    getBuilding(enterpriseStore);
   }, []);
   const myEnterprise = enterpriseStore.enterprise.find((el) => el.id == id);
-  const [deleteOpen, setDeleteOpen] = useState<{
-    isOpen: boolean;
-    text: IdeleteHeading;
-    func: any;
-    id: number;
-  }>({
+  const [deleteOpen, setDeleteOpen] = useState<DeleteProps>({
     isOpen: false,
     text: "планування",
     func: () => {},
-    id: 0,
   });
-  const [creditOpen, setCreditOpen] = useState<boolean>(false);
-  const [creditUpdate, setCreditUpdate] = useState<boolean>(false);
+  const [creditOpen, setCreditOpen] = useState(false);
+  const [update, setUpdate] = useState(false);
   const [creditRes, setCreditRes] = useState<CreditProps>({
     cost: "",
     date: "",
@@ -80,9 +85,7 @@ function Enterprise() {
     isUseCost: false,
     enterpriseId: +id!,
   });
-  const credits: Icredit[] = JSON.parse(JSON.stringify(income.credit));
-  //@ts-ignore
-  credits.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const credits = sort(income.credit);
   const [investOpen, setInvestOpen] = useState(false);
   const [investRes, setInvestRes] = useState<CreateInvestmentProps>({
     cost: "",
@@ -91,12 +94,8 @@ function Enterprise() {
     origin: "",
     enterpriseId: +id!,
   });
-  const [investUpdate, setInvestUpdate] = useState(false);
-  const investments: Iinvestment[] = JSON.parse(
-    JSON.stringify(income.investment)
-  );
-  //@ts-ignore
-  investments.sort((a, b) => new Date(a.createdAt!) - new Date(b.createdAt!));
+  const investments = sort(income.investment);
+
   const [derjOpen, setDerjOpen] = useState(false);
   const [derjRes, setDerjRes] = useState<CreateDerjProps>({
     cost: "",
@@ -105,11 +104,7 @@ function Enterprise() {
     purpose: "",
     enterpriseId: +id!,
   });
-  const [derjUpdate, setDerjUpdate] = useState(false);
-  //@ts-ignore
-  const derj: Iderj_support[] = JSON.parse(JSON.stringify(income.derj));
-  //@ts-ignore
-  derj.sort((a, b) => new Date(a.createdAt!) - new Date(b.createdAt!));
+  const derj = sort(income.derj);
   const [grantOpen, setGrantOpen] = useState(false);
   const [grantRes, setGrantRes] = useState<CreateGrantProps>({
     cost: "",
@@ -118,13 +113,25 @@ function Enterprise() {
     purpose: "",
     enterpriseId: +id!,
   });
-  const [grantUpdate, setGrantUpdate] = useState(false);
-  const grant: Igrant[] = JSON.parse(JSON.stringify(income.grant));
-  //@ts-ignore
-  grant.sort((a, b) => new Date(a.createdAt!) - new Date(b.createdAt!));
+  const grant = sort(income.grant);
   const [machineOpen, setMachineOpen] = useState(false);
-  const [machineUpdate, setMachineUpdate] = useState(false);
   const [machineData, setMachineData] = useState({});
+  const [landOpen, setLandOpen] = useState(false);
+  const [landData, setLandData] = useState<CreateLandProps>({
+    enterpriseId: +id!,
+    area: "",
+    cadastreNumber: "",
+    name: "",
+  });
+  const lands = sort(enterpriseStore.land);
+  const [buildingOpen, setBuildingOpen] = useState(false);
+  const [buildingData, setBuildingData] = useState<CreateBuildingProps>({
+    depreciationPeriod: "",
+    enterpriseId: +id!,
+    name: "",
+    startPrice: "",
+  });
+  const buildings = sort(enterpriseStore.building);
   return (
     <Container maxW={"container.lg"}>
       <Box mx={"auto"}>
@@ -154,8 +161,21 @@ function Enterprise() {
       >
         Земельні ділянки
       </Text>
-      <LandPlatTable></LandPlatTable>
-      <Button>Додати ділянку</Button>
+      <LandPlatTable
+        arr={lands}
+        setData={setLandData}
+        setOpen={setLandOpen}
+        setUpdate={setUpdate}
+        setDeleteOpen={setDeleteOpen}
+      ></LandPlatTable>
+      <Button onClick={() => setLandOpen(true)}>Додати ділянку</Button>
+      <CreateLand
+        open={landOpen}
+        setOpen={setLandOpen}
+        update={update}
+        setUpdate={setUpdate}
+        data={landData}
+      />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -168,13 +188,13 @@ function Enterprise() {
         setOpen={setMachineOpen}
         setDeleteOpen={setDeleteOpen}
         setRes={setMachineData}
-        setUpdate={setMachineUpdate}
+        setUpdate={setUpdate}
       />
       <CreateBuyingMachine
         open={machineOpen}
         setOpen={setMachineOpen}
-        update={machineUpdate}
-        setUpdate={setMachineUpdate}
+        update={update}
+        setUpdate={setUpdate}
         data={machineData as any}
       />
       <Button onClick={() => setMachineOpen(true)}>
@@ -188,26 +208,23 @@ function Enterprise() {
       >
         Будівлі і споруди
       </Text>
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Th>Назва</Th>
-            <Th>
-              Початкова <br /> вартість
-            </Th>
-            <Th>
-              Початок <br /> експлуатації
-            </Th>
-            <Th>
-              Термін <br /> амортищації
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr></Tr>
-        </Tbody>
-      </Table>
-      <Button>Додати будівлю або споруду</Button>
+      <BuildingTable
+        arr={buildings}
+        setData={setBuildingData}
+        setOpen={setBuildingOpen}
+        setDeleteOpen={setDeleteOpen}
+        setUpdate={setUpdate}
+      />
+      <Button onClick={() => setBuildingOpen(true)}>
+        Додати будівлю або споруду
+      </Button>
+      <CreateBuilding
+        data={buildingData}
+        open={buildingOpen}
+        setOpen={setBuildingOpen}
+        update={update}
+        setUpdate={setUpdate}
+      />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -244,7 +261,7 @@ function Enterprise() {
                           enterpriseId: +id!,
                           isUseCost: el.isUseCost,
                         });
-                        setCreditUpdate(true);
+                        setUpdate(true);
                         setCreditOpen(true);
                       }}
                     >
@@ -269,7 +286,6 @@ function Enterprise() {
                             //@ts-ignore
                             setDeleteOpen({ isOpen: false });
                           },
-                          id: el.id!,
                         });
                       }}
                     >
@@ -292,8 +308,8 @@ function Enterprise() {
         setOpen={setCreditOpen}
         res={creditRes}
         setRes={setCreditRes}
-        update={creditUpdate}
-        setUpdate={setCreditUpdate}
+        update={update}
+        setUpdate={setUpdate}
       />
       <Text
         textAlign={"center"}
@@ -330,7 +346,7 @@ function Enterprise() {
                           origin: el.origin,
                           enterpriseId: +id!,
                         });
-                        setInvestUpdate(true);
+                        setUpdate(true);
                         setInvestOpen(true);
                       }}
                     >
@@ -353,7 +369,6 @@ function Enterprise() {
                             //@ts-ignore
                             setDeleteOpen({ isOpen: false });
                           },
-                          id: el.id!,
                           isOpen: true,
                           text: "інвестицію",
                         });
@@ -378,8 +393,8 @@ function Enterprise() {
         setOpen={setInvestOpen}
         res={investRes}
         setRes={setInvestRes}
-        update={investUpdate}
-        setUpdate={setInvestUpdate}
+        update={update}
+        setUpdate={setUpdate}
       />
       <Text
         textAlign={"center"}
@@ -403,7 +418,7 @@ function Enterprise() {
           </Thead>
           <Tbody>
             {derj.map((el) => {
-              if (el.enterpriseId == id!)
+              if (el.enterpriseId! == +id!)
                 return (
                   <Tr key={el.id}>
                     <Td
@@ -417,7 +432,7 @@ function Enterprise() {
                           purpose: el.purpose,
                         });
                         setDerjOpen(true);
-                        setDerjUpdate(true);
+                        setUpdate(true);
                       }}
                     >
                       <EditIcon
@@ -439,7 +454,6 @@ function Enterprise() {
                             //@ts-ignore
                             setDeleteOpen({ isOpen: false });
                           },
-                          id: el.id!,
                           isOpen: true,
                           text: "державну допомогу",
                         });
@@ -466,9 +480,9 @@ function Enterprise() {
         setOpen={setDerjOpen}
         res={derjRes}
         setRes={setDerjRes}
-        update={derjUpdate}
-        setUpdate={setDerjUpdate}
-      />{" "}
+        update={update}
+        setUpdate={setUpdate}
+      />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -504,7 +518,7 @@ function Enterprise() {
                           name: el.name,
                           purpose: el.purpose,
                         });
-                        setGrantUpdate(true);
+                        setUpdate(true);
                         setGrantOpen(true);
                       }}
                     >
@@ -527,7 +541,6 @@ function Enterprise() {
                             //@ts-ignore
                             setDeleteOpen({ isOpen: false });
                           },
-                          id: el.id!,
                           isOpen: true,
                           text: "грант",
                         })
@@ -552,8 +565,15 @@ function Enterprise() {
         setOpen={setGrantOpen}
         res={grantRes}
         setRes={setGrantRes}
-        update={grantUpdate}
-        setUpdate={setGrantUpdate}
+        update={update}
+        setUpdate={setUpdate}
+      />
+
+      <DeleteAlert
+        open={deleteOpen.isOpen}
+        func={deleteOpen.func}
+        text={deleteOpen.text}
+        setOpen={setDeleteOpen}
       />
     </Container>
   );

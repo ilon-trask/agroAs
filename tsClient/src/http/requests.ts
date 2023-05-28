@@ -98,6 +98,14 @@ import {
 } from "../../../tRPC serv/routes/workerRouter";
 import { CreateVegetationType } from "../../../tRPC serv/routes/vegetationYearRouter";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
+import {
+  CreateLandType,
+  PatchLandType,
+} from "../../../tRPC serv/routes/landRouter";
+import {
+  CreateBuildingType,
+  PatchBuildingType,
+} from "../../../tRPC serv/routes/buildingRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -1399,4 +1407,64 @@ export async function getManyCartWithOpers(map: MapStore, ids: number[]) {
     });
   }
   operationsFilter(a, map);
+}
+export function getLand(enterprise: EnterpriseStore) {
+  client.land.get.query().then((res) => {
+    enterprise.land = res;
+  });
+}
+export function createLand(enterprise: EnterpriseStore, data: CreateLandType) {
+  client.land.create.query(data).then((res) => {
+    enterprise.newLand = res;
+  });
+}
+export function patchLand(enterprise: EnterpriseStore, data: PatchLandType) {
+  client.land.patch.query(data).then((res) => {
+    if (res) {
+      enterprise.land = enterprise.land.filter((el) => el.id != res.id);
+      enterprise.newLand = res;
+    }
+  });
+}
+export function deleteLand(
+  enterprise: EnterpriseStore,
+  data: { landId: number }
+) {
+  client.land.delete.query(data).then((res) => {
+    enterprise.land = enterprise.land.filter((el) => el.id != data.landId);
+  });
+}
+
+export function getBuilding(enterprise: EnterpriseStore) {
+  client.building.get.query().then((res) => {
+    enterprise.building = res;
+  });
+}
+export function createBuilding(
+  enterprise: EnterpriseStore,
+  data: CreateBuildingType
+) {
+  client.building.create.query(data).then((res) => {
+    enterprise.newBuilding = res;
+  });
+}
+export function patchBuilding(
+  enterprise: EnterpriseStore,
+  data: PatchBuildingType
+) {
+  client.building.patch.query(data).then((res) => {
+    if (!res) return;
+    enterprise.building = enterprise.building.filter((el) => el.id != res.id);
+    enterprise.newBuilding = res;
+  });
+}
+export function deleteBuilding(
+  enterprise: EnterpriseStore,
+  data: { buildId: number }
+) {
+  client.building.delete.query(data).then((res) => {
+    enterprise.building = enterprise.building.filter(
+      (el) => el.id != data.buildId
+    );
+  });
 }

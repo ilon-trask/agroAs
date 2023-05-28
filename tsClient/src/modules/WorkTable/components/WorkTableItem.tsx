@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { deleteWork, setIsPublic } from "../../../http/requests";
 import { Context } from "../../../main";
 import { workProps } from "../../CreateWork";
-import { TEHMAP_ROUTER } from "../../../utils/consts";
 
 import { Tr, Td, Checkbox } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 
 interface props {
   e: workProps;
@@ -43,12 +43,7 @@ const CartsTableItem = observer(
             });
           }}
         >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
+          <MyEditIcon />
         </Td>
         <Td>
           {/* <Link 
@@ -84,7 +79,7 @@ const CartsTableItem = observer(
                 }
           }
         >
-          <DeleteIcon w={"20px"} h={"auto"} />
+          <MyDeleteIcon />
         </Td>
 
         <Td>
