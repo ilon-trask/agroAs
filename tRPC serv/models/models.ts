@@ -50,7 +50,7 @@ export interface Itech_cart {
   nameCart: string;
   area: number;
   costHectare?: number;
-  totalCostMachines?: number;
+  totalCostCars?: number;
   totalCostServices?: number;
   totalCostTransport?: number;
   totalCostMaterials?: number;
@@ -73,6 +73,7 @@ export interface Itech_cart {
   isComplex?: boolean;
   sectionId?: number | null;
   year: VegetationYearsType;
+  isBasic: boolean | null;
 }
 export class tech_cart extends Model<Itech_cart> {
   declare id: number;
@@ -86,7 +87,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare isAgree?: boolean;
   declare description?: string;
   declare costHectare?: number;
-  declare totalCostMachines?: number;
+  declare totalCostCars?: number;
   declare totalCostServices?: number;
   declare totalCostTransport?: number;
   declare totalCostMaterials?: number;
@@ -97,6 +98,7 @@ export class tech_cart extends Model<Itech_cart> {
   declare isComplex?: boolean;
   declare sectionId?: number;
   declare cultivationTechnologyId?: number;
+  declare isBasic: boolean | null;
   declare year: VegetationYearsType;
 }
 
@@ -113,7 +115,7 @@ tech_cart.init(
     isAgree: { type: DataTypes.BOOLEAN, defaultValue: false },
     description: { type: DataTypes.STRING },
     costHectare: { type: DataTypes.NUMBER, defaultValue: 0 },
-    totalCostMachines: { type: DataTypes.NUMBER, defaultValue: 0 },
+    totalCostCars: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostServices: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostTransport: { type: DataTypes.NUMBER, defaultValue: 0 },
     totalCostMaterials: { type: DataTypes.NUMBER, defaultValue: 0 },
@@ -127,6 +129,7 @@ tech_cart.init(
       allowNull: false,
     },
     year: { type: DataTypes.STRING },
+    isBasic: { type: DataTypes.BOOLEAN },
   },
   { sequelize }
   // { sequelize, timestamps: false }
@@ -140,6 +143,7 @@ export interface Ispecial_work {
   priceDiesel: number;
   totalCost?: number;
   isPublic?: boolean;
+
   userId: string;
   createdAt?: Date;
   updatedAt?: Date;

@@ -55,6 +55,7 @@ export default class MapStore {
   private _product: Iproduct[] = [];
   private _buyingMachine: Ibuying_machine[] = [];
   private _administration: Iadministration[] = [];
+  private _businessCarts: resTechCartsWithOpers[] = [];
   constructor() {
     makeAutoObservable(this);
   }
@@ -190,6 +191,12 @@ export default class MapStore {
   public set newAdministration(administration: Iadministration) {
     this._administration.push(administration);
   }
+  public set businessCarts(maps: resTechCartsWithOpers[]) {
+    this._businessCarts = maps;
+  }
+  public set newBusinessCarts(maps: resTechCartsWithOpers) {
+    this._businessCarts.push(maps);
+  }
   public get maps() {
     return this._maps;
   }
@@ -267,5 +274,8 @@ export default class MapStore {
   }
   public get administration() {
     return this._administration;
+  }
+  public get businessCarts() {
+    return this._businessCarts;
   }
 }

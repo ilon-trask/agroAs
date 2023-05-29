@@ -1,4 +1,4 @@
-import { Table, Tbody, Td, Th, Thead, Tr, Box } from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { Context } from "src/main";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
@@ -180,6 +180,176 @@ function AdditionBusinessPlan({
             }
 
             return res.flat().flat();
+          })()}
+        </Tbody>
+      </Table>
+      <Paragraph>Культури технології</Paragraph>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Період</Th>
+            <Th>Рік</Th>
+            <Th>Культура</Th>
+            <Th>Технологія</Th>
+            <Th>Карта</Th>
+            <Th>Площа</Th>
+            <Th>Загальна вартість</Th>
+            <Th>Фонд ОП</Th>
+            <Th>ЄСВ&nbsp;+ ВЗ</Th>
+            <Th>Витрати</Th>
+            <Th>Постійні</Th>
+            <Th>Змінні</Th>
+            <Th>Прямі</Th>
+            <Th>Заг. Вир.</Th>
+            <Th>Доходи</Th>
+            <Th>Виручка</Th>
+            <Th>Інвестування</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(() => {
+            let years: number[] = new Array(
+              myBusiness.realizationTime + 1 < 11
+                ? myBusiness.realizationTime + 1
+                : 11
+            ).fill(1);
+
+            return years.map((el, ind) => {
+              const area = myBusiness.busCuls.reduce((p, c) => p + c.area, 0);
+              return (
+                <>
+                  <Tr>
+                    <Td>{ind}</Td>
+                    <Td>{start + ind}</Td>
+
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {el.culture?.name.split(" ").join("\u00A0")}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {el.cultivationTechnology?.name
+                            .split(" ")
+                            .join("\u00A0")}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {thisMaps.find(
+                            (e) =>
+                              e.cultureId == el.cultureId &&
+                              e.cultivationTechnologyId ==
+                                el.cultivationTechnologyId &&
+                              +e.year.split("")[0] == ind
+                          )?.nameCart || "Відсутня"}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>{area}</Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {(thisMaps.find(
+                            (e) =>
+                              e.cultureId == el.cultureId &&
+                              e.cultivationTechnologyId ==
+                                el.cultivationTechnologyId &&
+                              +e.year.split("")[0] == ind
+                          )?.costHectare || 0) * area}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {(() => {
+                            let cart = thisMaps.find(
+                              (e) =>
+                                e.cultureId == el.cultureId &&
+                                e.cultivationTechnologyId ==
+                                  el.cultivationTechnologyId &&
+                                +e.year.split("")[0] == ind
+                            );
+
+                            return (
+                              (cart?.totalCostHandWork ||
+                                0 + cart?.totalCostMachineWork! ||
+                                0) * area
+                            );
+                          })()}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {(() => {
+                            let cart = thisMaps.find(
+                              (e) =>
+                                e.cultureId == el.cultureId &&
+                                e.cultivationTechnologyId ==
+                                  el.cultivationTechnologyId &&
+                                +e.year.split("")[0] == ind
+                            );
+
+                            return Math.round(
+                              (cart?.totalCostHandWork ||
+                                0 + cart?.totalCostMachineWork! ||
+                                0) *
+                                area *
+                                0.235
+                            );
+                          })()}
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td></Td>
+                    <Td>
+                      {myBusiness.busCuls.map((el) => (
+                        <Text>
+                          {(() => {
+                            let cart = thisMaps.find(
+                              (e) =>
+                                e.cultureId == el.cultureId &&
+                                e.cultivationTechnologyId ==
+                                  el.cultivationTechnologyId &&
+                                +e.year.split("")[0] == ind
+                            );
+
+                            return (
+                              Math.round(
+                                (cart?.totalCostHandWork ||
+                                  0 + cart?.totalCostMachineWork! ||
+                                  0) *
+                                  area *
+                                  0.235
+                              ) +
+                                cart?.costHectare * area || 0
+                            );
+                          })()}
+                        </Text>
+                      ))}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td colSpan={2}>Разом за рік</Td>
+                    <Td></Td>
+                  </Tr>
+                </>
+              );
+            });
           })()}
         </Tbody>
       </Table>

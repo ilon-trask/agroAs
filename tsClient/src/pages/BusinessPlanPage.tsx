@@ -134,10 +134,12 @@ function BiznesPlanPage() {
     let thisMaps = [];
     for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
       const e = myBusiness?.busCuls[j];
-      let maps = map.maps.map((m) => ({
-        ...m,
-        area: e?.area!,
-      }));
+      let maps = map.businessCarts
+        .filter((el) => el.isBasic)
+        .map((m) => ({
+          ...m,
+          area: e?.area!,
+        }));
       maps = maps.filter((el) => {
         return (
           el.cultureId == e?.cultureId &&

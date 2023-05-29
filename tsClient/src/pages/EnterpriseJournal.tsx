@@ -39,6 +39,7 @@ function Enterprise() {
     year: "",
     cultivationTechnologyId: "",
     cultureId: "",
+    isBasic: null,
   });
   const [res, setRes] = useState<CreateEnterpriseProps>({
     name: "",
@@ -136,7 +137,7 @@ function Enterprise() {
         setOpen={setCartOpen}
         setPublicationOpen={() => {}}
         deleteOpen={false}
-        maps={map.maps}
+        maps={map.businessCarts}
         setRes={setCartRes}
         setShowAlert={() => {}}
         isCul={true}

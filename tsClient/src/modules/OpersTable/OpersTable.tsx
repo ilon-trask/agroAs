@@ -17,6 +17,7 @@ import {
 import { observer } from "mobx-react-lite";
 import getSectionsOpers from "../../store/GetSectionsOpers";
 import { IUserRole } from "../../../../tRPC serv";
+import { Itech_cart } from "../../../../tRPC serv/models/models";
 type props = {
   id: number;
   setRes: (res: any) => void;
@@ -26,6 +27,7 @@ type props = {
   setShowAlert: (showAlert: boolean) => void;
   deleteOpen: boolean;
   setDeleteOpen: (open: boolean) => void;
+  mapData: Itech_cart;
 };
 
 export function OpersTableHead({ role }: { role: IUserRole }) {
@@ -91,6 +93,7 @@ function OpersTable({
   setShowAlert,
   deleteOpen,
   setDeleteOpen,
+  mapData,
 }: props) {
   const { map, user } = useContext(Context);
 
@@ -104,10 +107,6 @@ function OpersTable({
     return a;
   }, [map.opers, operData]);
 
-  let mapData = map.maps.find((el) => el.id == id);
-  if (!mapData) {
-    mapData = map.complex.find((el) => el.id == id);
-  }
   let sum = 0;
   let technic = 0;
   let fuel = 0;

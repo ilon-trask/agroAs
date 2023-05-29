@@ -8,7 +8,6 @@ import {
 import MapStore from "../store/MapStore";
 import BusinessStore from "../store/BusinessStore";
 import {
-  IbusinessPlan,
   Igrade,
   Imachine,
   Isection,
@@ -17,7 +16,6 @@ import {
   Itech_operation,
   Itractor,
   tech_operation,
-  tractor,
 } from "../../../tRPC serv/models/models";
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
@@ -43,7 +41,10 @@ import {
   setIsPublicTEJType,
 } from "../../../tRPC serv/routes/TEJRouter";
 import { cartProps } from "../modules/CreateCart";
-import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
+import {
+  CreateCartType,
+  setIsBasicCartType,
+} from "../../../tRPC serv/routes/cartRouter";
 import {
   createOutcomeType,
   patchOutcomeType,
@@ -139,8 +140,11 @@ function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
 
     map.maps = map.maps.filter((el) => el.id != cart.id);
     map.complex = map.complex.filter((el) => el.id != cart.id);
+    map.businessCarts = map.businessCarts.filter((el) => el.id != cart.id);
     if (cart.isComplex) {
       map.newComplex = cart;
+    } else if (cart.isBasic != null) {
+      map.newBusinessCarts = cart;
     } else {
       map.newMap = cart;
     }
@@ -1466,5 +1470,22 @@ export function deleteBuilding(
     enterprise.building = enterprise.building.filter(
       (el) => el.id != data.buildId
     );
+  });
+}
+
+export function getCartForBusiness(map: MapStore) {
+  client.cart.getForBusiness.query().then((res) => {
+    map.businessCarts = res;
+  });
+}
+
+export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
+  client.cart.setIsBasicCart.query(data).then((res) => {
+    if (!res) return;
+    if (res == "присутній") {
+    } else {
+      map.businessCarts = map.businessCarts.filter((el) => el.id != res.id!);
+      map.newBusinessCarts = res;
+    }
   });
 }

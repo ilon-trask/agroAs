@@ -95,7 +95,6 @@ function Enterprise() {
     enterpriseId: +id!,
   });
   const investments = sort(income.investment);
-
   const [derjOpen, setDerjOpen] = useState(false);
   const [derjRes, setDerjRes] = useState<CreateDerjProps>({
     cost: "",

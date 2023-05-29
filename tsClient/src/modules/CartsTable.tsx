@@ -61,7 +61,7 @@ export function CartsTableHeadRow({
       <Th>Площа (га)</Th>
       <Th>Загальна вартість (грн)</Th>
       <Th>Витрати на 1 га (грн)</Th>
-      {!isCul && !isPlan && <Th></Th>}
+      {!isPlan && <Th></Th>}
       {(role == "ADMIN" || role == "AUTHOR" || role == "service_role") &&
         !isCul &&
         !isPlan && <Th></Th>}

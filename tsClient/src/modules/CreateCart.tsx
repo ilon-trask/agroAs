@@ -17,6 +17,7 @@ export type cartProps = {
   cultivationTechnologyId?: number | "";
   cultureId?: number | "";
   year: VegetationYearsType | "";
+  isBasic: boolean | null;
 };
 export const CartProps: cartProps = {
   nameCart: "",
@@ -26,8 +27,9 @@ export const CartProps: cartProps = {
   priceDiesel: "",
   sectionId: "",
   year: "",
+  isBasic: null,
 };
-
+let obj = {};
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -62,10 +64,11 @@ export default function CreateCart({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      props={CartProps}
+      props={obj}
       isErr={isErr}
       setIsErr={setIsErr}
       setComplex={setComplex}
+      onClose={() => setRes((prev) => ({ isBasic: prev.isBasic }))}
     >
       <MapInputs
         res={res}

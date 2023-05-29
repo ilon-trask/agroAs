@@ -23,6 +23,7 @@ import {
   getProductTEJMap,
   getProduction,
   getAdministration,
+  getCartForBusiness,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -49,7 +50,7 @@ function App() {
       getProductTEJMap(map);
       getProduction(income);
       getAdministration(map);
-
+      getCartForBusiness(map);
       if (user.role != "") getOnlyCart(map);
 
       console.log(123);
