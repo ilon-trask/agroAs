@@ -1242,6 +1242,7 @@ export interface Iworker {
   class: WorkerClassesType;
   form: EnterpriseFormType;
   userId: string;
+  amountOfMounths?: number;
   enterpriseId?: number;
   jobId?: number;
 }

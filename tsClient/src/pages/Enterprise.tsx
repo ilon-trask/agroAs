@@ -230,6 +230,91 @@ function Enterprise() {
         mt={"15px"}
         textTransform={"uppercase"}
       >
+        Інвестиції
+      </Text>
+      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th>Назва</Th>
+              <Th>Дата</Th>
+              <Th>Сума</Th>
+              <Th>Призначення</Th>
+              <Th></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {investments.map((el) => {
+              if (el.enterpriseId == +id!)
+                return (
+                  <Tr>
+                    <Td
+                      onClick={() => {
+                        setInvestRes({
+                          investmentId: el.id!,
+                          cost: el.cost,
+                          date: el.date,
+                          name: el.name,
+                          origin: el.origin,
+                          enterpriseId: +id!,
+                        });
+                        setUpdate(true);
+                        setInvestOpen(true);
+                      }}
+                    >
+                      <EditIcon
+                        color={"blue.400"}
+                        w={"20px"}
+                        h={"auto"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.date}</Td>
+                    <Td>{el.cost}</Td>
+                    <Td>{el.origin}</Td>
+                    <Td
+                      onClick={() => {
+                        setDeleteOpen({
+                          func: () => {
+                            deleteInvestment(income, el.id!);
+                            //@ts-ignore
+                            setDeleteOpen({ isOpen: false });
+                          },
+                          isOpen: true,
+                          text: "інвестицію",
+                        });
+                      }}
+                    >
+                      <DeleteIcon
+                        w={"20px"}
+                        h={"auto"}
+                        color={"red"}
+                        cursor={"pointer"}
+                      />
+                    </Td>
+                  </Tr>
+                );
+            })}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Button onClick={() => setInvestOpen(true)}>Додати інвестицію</Button>
+      <CreateInvestment
+        open={investOpen}
+        setOpen={setInvestOpen}
+        res={investRes}
+        setRes={setInvestRes}
+        update={update}
+        setUpdate={setUpdate}
+      />
+      <Text
+        textAlign={"center"}
+        fontSize={"25px"}
+        mt={"15px"}
+        textTransform={"uppercase"}
+      >
         Кредит
       </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
@@ -310,91 +395,7 @@ function Enterprise() {
         update={update}
         setUpdate={setUpdate}
       />
-      <Text
-        textAlign={"center"}
-        fontSize={"25px"}
-        mt={"15px"}
-        textTransform={"uppercase"}
-      >
-        Інвестиції
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Назва</Th>
-              <Th>Дата</Th>
-              <Th>Сума</Th>
-              <Th>Призначення</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {investments.map((el) => {
-              if (el.enterpriseId == +id!)
-                return (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        setInvestRes({
-                          investmentId: el.id!,
-                          cost: el.cost,
-                          date: el.date,
-                          name: el.name,
-                          origin: el.origin,
-                          enterpriseId: +id!,
-                        });
-                        setUpdate(true);
-                        setInvestOpen(true);
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.origin}</Td>
-                    <Td
-                      onClick={() => {
-                        setDeleteOpen({
-                          func: () => {
-                            deleteInvestment(income, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                          isOpen: true,
-                          text: "інвестицію",
-                        });
-                      }}
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
-            })}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <Button onClick={() => setInvestOpen(true)}>Додати інвестицію</Button>
-      <CreateInvestment
-        open={investOpen}
-        setOpen={setInvestOpen}
-        res={investRes}
-        setRes={setInvestRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
+
       <Text
         textAlign={"center"}
         fontSize={"25px"}

@@ -23,8 +23,8 @@ function EnterpriseFormPage() {
     form: form as EnterpriseFormType,
     jobId: "",
     salary: "",
-    dateFrom: "",
-    dateTo: "",
+    dateFrom: null,
+    dateTo: null,
   });
   const thisWorkers = enterpriseStore.worker.filter(
     (el) => el.enterpriseId == id && el.form == form

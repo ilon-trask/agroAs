@@ -68,6 +68,7 @@ export default function CreateCart({
       isErr={isErr}
       setIsErr={setIsErr}
       setComplex={setComplex}
+      //@ts-ignore
       onClose={() => setRes((prev) => ({ isBasic: prev.isBasic }))}
     >
       <MapInputs

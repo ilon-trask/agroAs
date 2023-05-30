@@ -64,6 +64,7 @@ import ProductionBusinessPlan from "src/modules/ProductionBusinessPlan/Productio
 import FinancingBusinessPlan from "src/modules/FinancingBusinessPlan";
 import PlanedIndicatorsBusinessPlan from "src/modules/PlanedIndicatorsBusinessPlan";
 import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
@@ -90,6 +91,7 @@ function BiznesPlanPage() {
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
   );
+
   const [openQuiz, setOpenQuiz] = useState(false);
   const [update, setUpdate] = useState(false);
   const [openEnterprise, setOpenEnterprise] = useState(false);
@@ -219,7 +221,7 @@ function BiznesPlanPage() {
               <Td>Площа</Td>
               <Td>Дата початку</Td>
               <Td>Термін реалізації</Td>
-              <Td>Початкова сума</Td>
+              <Td>Початкові інвестиції</Td>
             </Tr>
           </Thead>
           <Tbody>
@@ -241,12 +243,7 @@ function BiznesPlanPage() {
                   });
                 }}
               >
-                <EditIcon
-                  color={"blue.400"}
-                  w={"20px"}
-                  h={"auto"}
-                  cursor={"pointer"}
-                />
+                <MyEditIcon />
               </Td>
               <Td>
                 {myBusiness?.busCuls?.map((el) => (
@@ -304,12 +301,7 @@ function BiznesPlanPage() {
                   setOpenEnterprise(true);
                 }}
               >
-                <EditIcon
-                  color={"blue.400"}
-                  w={"20px"}
-                  h={"auto"}
-                  cursor={"pointer"}
-                />
+                <MyEditIcon />
               </Td>
               <Td>{myEnterprise?.name}</Td>
               <Td>{myEnterprise?.form}</Td>

@@ -66,7 +66,7 @@ function PlanedIndicatorsBusinessPlan({
               Виручка
             </Th>
             <Th p={0} fontWeight={"normal"}>
-              Підтримка
+              Залучення коштів
             </Th>
           </Tr>
         </Thead>
@@ -107,6 +107,7 @@ function PlanedIndicatorsBusinessPlan({
                   ) / 100;
                 fin += sum * el.culture?.priceBerry!;
               });
+
               res.push(
                 <>
                   <Tr>

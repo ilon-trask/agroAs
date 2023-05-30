@@ -175,7 +175,8 @@ const TechnologicalMap = observer(() => {
               setShowAlert={setShowAlert}
               deleteOpen={deleteOpen}
               setDeleteOpen={setDeleteOpen}
-              mapData={myMap}
+              //@ts-ignore
+              mapData={myMap!}
             />
           </Box>
         </Box>
