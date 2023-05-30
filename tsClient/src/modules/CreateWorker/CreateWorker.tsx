@@ -23,10 +23,10 @@ import { createWorker, getJob, patchWorker } from "../../http/requests";
 import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
-} from "../../pages/hook/useEnterpriseForm";
+} from "../../shared/hook/useEnterpriseForm";
 import useWorkerClasses, {
   WorkerClassesType,
-} from "../../pages/hook/useWorkersClasses";
+} from "../../shared/hook/useWorkersClasses";
 import CreateJob, { JobPropType } from "../CreateJob/CreateJob";
 type props = {
   open: boolean;
@@ -45,8 +45,8 @@ export type CreateWorkerProp = {
   salary: number | "";
   class: WorkerClassesType | "";
   form: EnterpriseFormType | "";
-  dateFrom: string;
-  dateTo: string;
+  dateFrom: string | null;
+  dateTo: string | null;
   isConst: boolean | "";
   enterpriseId: number;
 };
@@ -77,7 +77,7 @@ function CreateWorker({
       open={open}
       setOpen={setOpen}
       isErr={false}
-      props={{ enterpriseId: res.enterpriseId, isConst: false, form: form }}
+      props={{ enterpriseId: res.enterpriseId, isConst: true, form: form }}
       update={true}
       setUpdate={setUpdate}
       res={obj}
@@ -170,7 +170,7 @@ function CreateWorker({
             <Box>
               <Text>Нанятий з </Text>
               <Input
-                value={res.dateFrom}
+                value={res.dateFrom?.toLocaleString()}
                 type={"date"}
                 onChange={(e) =>
                   setRes((prev) => ({ ...prev, dateFrom: e.target.value }))
@@ -180,7 +180,7 @@ function CreateWorker({
             <Box>
               <Text>Нанятий до</Text>
               <Input
-                value={res.dateTo}
+                value={res.dateTo?.toLocaleString()}
                 type={"date"}
                 onChange={(e) =>
                   setRes((prev) => ({ ...prev, dateTo: e.target.value }))
@@ -209,7 +209,7 @@ function CreateWorker({
               //@ts-ignore
               setRes((prev) => ({
                 enterpriseId: prev.enterpriseId,
-                isConst: false,
+                isConst: true,
                 form: form,
               }));
               setOpen(false);

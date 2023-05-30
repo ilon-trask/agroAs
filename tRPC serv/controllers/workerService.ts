@@ -1,18 +1,36 @@
 import { Principal } from "..";
 import { worker, Iworker } from "../models/models";
 import { CreateWorkerType, PatchWorkerType } from "../routes/workerRouter";
+function changeRes(arr: Iworker[]) {
+  arr = JSON.parse(JSON.stringify(arr));
 
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+    if (el.dateFrom && el.dateTo) {
+      el.amountOfMounths =
+        +el.dateTo.split("-")[1] - +el.dateFrom.split("-")[1];
+    } else {
+      el.amountOfMounths = 12;
+    }
+  }
+
+  return arr;
+}
 class workerService {
   async get(user: Principal | undefined) {
     if (!user) return;
     const res: Iworker[] | null = await worker.findAll({
       where: { userId: user.sub },
     });
-    return res;
+    // console.log(res);
+
+    if (!res) return;
+
+    return changeRes(res);
   }
   async create(user: Principal | undefined, data: CreateWorkerType) {
     if (!user) return;
-    const res: Iworker = await worker.create({
+    let res: Iworker = await worker.create({
       amount: data.amount,
       dateFrom: data.dateFrom!,
       dateTo: data.dateTo!,
@@ -24,7 +42,8 @@ class workerService {
       class: data.class,
       userId: user.sub,
     });
-    return res;
+
+    return changeRes([res])[0];
   }
   async patch(user: Principal | undefined, data: PatchWorkerType) {
     if (!user) return;
@@ -45,7 +64,8 @@ class workerService {
     const res: Iworker | null = await worker.findOne({
       where: { id: data.workerId },
     });
-    return res;
+    if (!res) return;
+    return changeRes([res])[0];
   }
   async delete(user: Principal | undefined, data: { workerId: number }) {
     if (!user) return;

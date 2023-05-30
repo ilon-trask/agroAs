@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction } from "react";
 import { IoutcomeGroup } from "../../../../../tRPC serv/controllers/outComeService";
-import useOutcomeGroup from "../../../pages/hook/useOutcomeGroup";
+import useOutcomeGroup from "../../../shared/hook/useOutcomeGroup";
 import { outcomeProps } from "../CreateOutcome";
 const outcomeGroup = useOutcomeGroup;
 type props = {

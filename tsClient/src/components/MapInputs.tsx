@@ -16,7 +16,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
-import useVegetationYears from "../pages/hook/useVegetationYears";
+import useVegetationYears from "../shared/hook/useVegetationYears";
 const createCartFunc: func<cartProps> = (
   id,
   map,
@@ -68,6 +68,7 @@ const createCartFunc: func<cartProps> = (
         cultureId: res.cultureId,
         cultivationTechnologyId: res.cultivationTechnologyId,
         year: res.year ? res.year : undefined,
+        isBasic: res.isBasic,
       });
     }
   }
@@ -118,6 +119,8 @@ export default function MapInputs({
   setComplex,
   isCul,
 }: props) {
+  console.log(res.isBasic);
+
   const { map } = useContext(Context);
   const { id } = useParams();
 

@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Dialog from "../../components/Dialog";
-import { YieldPlantLandingPeriodType } from "../../pages/hook/useYieldPlantLandingPeriod";
+import { YieldPlantLandingPeriodType } from "../../shared/hook/useYieldPlantLandingPeriod";
 import YieldPlant from "./components/YieldPlant";
 
 type props = {

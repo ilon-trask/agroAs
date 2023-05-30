@@ -16,7 +16,7 @@ import { Iproduction } from "../../../../tRPC serv/models/models";
 import { DeleteProps } from "../../components/DeleteAlert";
 import { deleteProduction, productSetIsPlan } from "../../http/requests";
 import { Context } from "../../main";
-import useProductionTypes from "../../pages/hook/useProductionTypes";
+import useProductionTypes from "../../shared/hook/useProductionTypes";
 import IncomeStore from "../../store/IncomeStore";
 import { productionProp } from "../CreateProductService/CreateProduction";
 

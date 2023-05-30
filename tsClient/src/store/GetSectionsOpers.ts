@@ -1,3 +1,4 @@
+import { IIsObservableObject } from "mobx/dist/internal";
 import { Itech_operation } from "../../../tRPC serv/models/models";
 import MapStore from "./MapStore";
 export type sectionsOpers = {
@@ -5,21 +6,9 @@ export type sectionsOpers = {
   title: string;
 }[];
 export default function getSections(map: MapStore, id: number): sectionsOpers {
-  console.log("опер");
-  console.log(map.opers);
-  console.log(map.maps);
-
-  map.opers.map((el) => {
-    console.log(el);
-  });
-
   const operData = map.opers.filter((el) => {
-    console.log(el.techCartId);
-    console.log(id);
-
     return el?.techCartId == id;
   });
-  console.log(operData);
 
   operData.sort((a, b) => a.id! - b.id!);
   const soilPreparation = operData.filter((el) => el.sectionId == 1);

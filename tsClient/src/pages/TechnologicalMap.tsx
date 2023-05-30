@@ -71,7 +71,10 @@ const TechnologicalMap = observer(() => {
   if (!myMap) {
     myMap = map.complex.find((el) => el.id == id);
   }
-  console.log(map.maps.filter((el) => el.id == 119));
+  if (!myMap) {
+    myMap = map.businessCarts.find((el) => el.id == id);
+  }
+  console.log(myMap);
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {
@@ -172,6 +175,8 @@ const TechnologicalMap = observer(() => {
               setShowAlert={setShowAlert}
               deleteOpen={deleteOpen}
               setDeleteOpen={setDeleteOpen}
+              //@ts-ignore
+              mapData={myMap!}
             />
           </Box>
         </Box>

@@ -24,7 +24,7 @@ import { GOODS_ROUTER, INCOME_ROUTER } from "../utils/consts";
 import { IyieldCalculation } from "../../../tRPC serv/models/models";
 import useVegetationYears, {
   VegetationYearsType,
-} from "./hook/useVegetationYears";
+} from "../shared/hook/useVegetationYears";
 import { createVegetationYear, getVegetationYear } from "../http/requests";
 
 export const plantsHeads: Record<string, string[]> = {

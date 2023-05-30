@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { FC, useContext } from "react";
 import { Link } from "react-router-dom";
-import { deleteCart, setIsPublic } from "../http/requests";
+import { deleteCart, setIsBasicCart, setIsPublic } from "../http/requests";
 import { Context } from "../main";
 import { cartProps } from "../modules/CreateCart";
 import MapStore from "../store/MapStore";
@@ -119,7 +119,19 @@ const CartsTableItem = observer(
             />
           </Td>
         )}
-
+        {isCul && (
+          <Td>
+            <div
+              onClick={() =>
+                setIsBasicCart(map, { cartId: e.id!, isBasic: !e.isBasic })
+              }
+            >
+              <Checkbox size="md" colorScheme="green" isChecked={!!e.isBasic}>
+                до бізнес-плану
+              </Checkbox>
+            </div>
+          </Td>
+        )}
         {!isCul && (
           <Td>
             {(user.role == "ADMIN" ||

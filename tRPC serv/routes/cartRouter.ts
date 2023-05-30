@@ -30,8 +30,11 @@ const createCartProps = z.object({
       "Наступні",
     ])
     .optional(),
+  isBasic: z.boolean().nullable(),
 });
 export type CreateCartType = z.infer<typeof createCartProps>;
+const setIsBasicCart = z.object({ cartId: z.number(), isBasic: z.boolean() });
+export type setIsBasicCartType = z.infer<typeof setIsBasicCart>;
 export const cartRouter = router({
   getCart: publicProcedure
     .input(z.object({ cartId: z.number() }))
@@ -259,6 +262,16 @@ export const cartRouter = router({
         input.cartId,
         ctx.user
       );
+      return res;
+    }),
+  getForBusiness: publicProcedure.query(async () => {
+    const res: resTechCartsWithOpers[] = await TechCartService.getForBusiness();
+    return res;
+  }),
+  setIsBasicCart: publicProcedure
+    .input(setIsBasicCart)
+    .query(async ({ ctx, input }) => {
+      const res = await TechCartService.setIsBasicCart(ctx.user, input);
       return res;
     }),
 });

@@ -13,7 +13,7 @@ import { createGrant, patchGrant } from "../../http/requests";
 import { Context } from "../../main";
 import useGrantPurpose, {
   GrantPurposeType,
-} from "../../pages/hook/useGrantPurpose";
+} from "../../shared/hook/useGrantPurpose";
 export type CreateGrantProps = {
   grantId?: number;
   name: string;

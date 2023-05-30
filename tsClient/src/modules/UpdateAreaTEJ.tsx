@@ -24,6 +24,7 @@ export const CartProps: cartProps = {
   cultivationTechnologyId: 6,
   cultureId: 4,
   year: "",
+  isBasic: false,
 };
 
 interface props {

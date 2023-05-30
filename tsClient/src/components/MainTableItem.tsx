@@ -97,7 +97,7 @@ function MainTable({ e }: props) {
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Оновлено</Box>
-            <Box>{e?.updatedAt?.slice(0, 10) || "0"}</Box>
+            <Box>{e?.updatedAt?.toLocaleString().slice(0, 9) || "0"}</Box>
           </Box>
         </Stack>
       </CardBody>

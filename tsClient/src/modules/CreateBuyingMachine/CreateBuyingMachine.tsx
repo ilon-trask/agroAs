@@ -6,20 +6,28 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction, useContext } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Dialog from "../../components/Dialog";
 import { createBuyingMachine, patchBuyingMachine } from "../../http/requests";
 import { Context } from "../../main";
 import useBuyingMachinePurpose, {
   BuyingMachinePurposeType,
-} from "../../pages/hook/useBuyingMachinePurpose";
+} from "../../shared/hook/useBuyingMachinePurpose";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  res: CreateBuyingMachineProps;
-  setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+  res?: CreateBuyingMachineProps;
+  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+  data?: CreateBuyingMachineProps;
 };
 export type CreateBuyingMachineProps = {
   buyingId?: number;
@@ -40,9 +48,20 @@ function CreateBuyingMachine({
   setUpdate,
   res,
   setRes,
+  data,
 }: props) {
   const purpose = useBuyingMachinePurpose;
   const { map } = useContext(Context);
+
+  let [input, setInput] = useState(data as CreateBuyingMachineProps);
+  if (res && setRes) {
+    (input = res), (setInput = setRes as any);
+  }
+
+  useEffect(() => {
+    if (data) setInput(data);
+  }, [data]);
+
   return (
     <Dialog
       open={open}
@@ -51,11 +70,11 @@ function CreateBuyingMachine({
       res={obj}
       props={obj}
       setIsErr={() => {}}
-      setRes={setRes}
+      setRes={setInput}
       setUpdate={setUpdate}
       update={update}
       onClose={() =>
-        setRes((prev) => ({
+        setInput((prev) => ({
           name: "",
           amount: "",
           brand: "",
@@ -88,9 +107,9 @@ function CreateBuyingMachine({
               size={"sm"}
               placeholder="Вкажіть назву"
               type="text"
-              value={res?.name}
+              value={input?.name}
               onChange={(e) => {
-                setRes({ ...res, name: e.target.value });
+                setInput((prev) => ({ ...prev, name: e.target.value }));
               }}
             />
           </Box>
@@ -103,9 +122,9 @@ function CreateBuyingMachine({
               size={"sm"}
               placeholder="Вкажіть назву"
               type="text"
-              value={res?.brand}
+              value={input?.brand}
               onChange={(e) => {
-                setRes({ ...res, brand: e.target.value });
+                setInput((prev) => ({ ...prev, brand: e.target.value }));
               }}
             />
           </Box>
@@ -128,9 +147,9 @@ function CreateBuyingMachine({
               placeholder="Вкажіть ціну"
               inputMode="numeric"
               type="number"
-              value={res?.cost}
+              value={input?.cost}
               onChange={(e) => {
-                setRes({ ...res, cost: e.target.value as any });
+                setInput((prev) => ({ ...prev, cost: e.target.value as any }));
               }}
             />
           </Box>
@@ -144,9 +163,12 @@ function CreateBuyingMachine({
               placeholder="Вкажіть назву"
               inputMode="numeric"
               type="number"
-              value={res?.amount}
+              value={input?.amount}
               onChange={(e) => {
-                setRes({ ...res, amount: e.target.value as any });
+                setInput((prev) => ({
+                  ...prev,
+                  amount: e.target.value as any,
+                }));
               }}
             />
           </Box>
@@ -168,9 +190,9 @@ function CreateBuyingMachine({
               size={"sm"}
               placeholder="Вкажіть ціку"
               type="date"
-              value={res?.date}
+              value={input?.date}
               onChange={(e) => {
-                setRes({ ...res, date: e.target.value });
+                setInput((prev) => ({ ...prev, date: e.target.value }));
               }}
             />
           </Box>
@@ -181,9 +203,12 @@ function CreateBuyingMachine({
             </Heading>
             <Select
               size={"sm"}
-              value={res?.purpose}
+              value={input?.purpose}
               onChange={(e) => {
-                setRes({ ...res, purpose: e.target.value as any });
+                setInput((prev) => ({
+                  ...prev,
+                  purpose: e.target.value as any,
+                }));
               }}
             >
               <option value="" hidden defaultChecked>
@@ -201,41 +226,39 @@ function CreateBuyingMachine({
       <ModalFooter>
         <Button
           isDisabled={
-            !res.name &&
-            !res.brand &&
-            !res.amount &&
-            !res.cost &&
-            !res.date &&
-            !res.purpose
+            !input.name &&
+            !input.brand &&
+            !input.amount &&
+            !input.cost &&
+            !input.date &&
+            !input.purpose
           }
           onClick={() => {
-            console.log(res.businessPlanId);
-            console.log(res.enterpriseId);
             if (
-              res.name &&
-              res.brand &&
-              res.amount &&
-              res.cost &&
-              res.date &&
-              res.purpose
+              input.name &&
+              input.brand &&
+              input.amount &&
+              input.cost &&
+              input.date &&
+              input.purpose
             ) {
-              res.cost = +res.cost;
-              res.amount = +res.amount;
+              input.cost = +input.cost;
+              input.amount = +input.amount;
 
               if (update) {
                 patchBuyingMachine(map, {
-                  ...res,
-                  cost: +res.cost,
-                  amount: +res.amount,
-                  purpose: res.purpose,
-                  buyingId: res.buyingId!,
+                  ...input,
+                  cost: +input.cost,
+                  amount: +input.amount,
+                  purpose: input.purpose,
+                  buyingId: input.buyingId!,
                 });
               } else {
                 createBuyingMachine(map, {
-                  ...res,
-                  cost: +res.cost,
-                  amount: +res.amount,
-                  purpose: res.purpose,
+                  ...input,
+                  cost: +input.cost,
+                  amount: +input.amount,
+                  purpose: input.purpose,
                 });
               }
               setOpen(false);

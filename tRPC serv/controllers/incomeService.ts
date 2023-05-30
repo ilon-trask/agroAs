@@ -1,5 +1,5 @@
 import { Principal } from "..";
-import { YieldPlantLandingPeriodType } from "../../tsClient/src/pages/hook/useYieldPlantLandingPeriod";
+import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
 import {
   cultivationTechnologies,
   culture,

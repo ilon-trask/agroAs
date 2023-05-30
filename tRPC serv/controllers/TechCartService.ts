@@ -31,7 +31,7 @@ import {
   Icell,
   opeInclude,
 } from "./OperService";
-import { CreateCartType } from "../routes/cartRouter";
+import { CreateCartType, setIsBasicCartType } from "../routes/cartRouter";
 export interface resMater extends Icost_material {
   purpose_material: Ipurpose_material;
 }
@@ -81,7 +81,11 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
   let promises = [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
-    let costHectare = 0;
+    let costHectare = 0,
+      costMachineWork = 0,
+      costCars = 0,
+      costFuel = 0,
+      costHandWork = 0;
     if (!cart.tech_operations) throw new Error("");
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
@@ -102,8 +106,20 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
           el.costTransport ||
           el.costMaterials ||
           0;
-
-        tech_cart.update({ costHectare }, { where: { id: oper.techCartId } });
+        costMachineWork += el.costMachineWork || 0;
+        costCars += el.costCars || 0;
+        costFuel += el.costFuel || 0;
+        costHandWork += el.costHandWork || 0;
+        tech_cart.update(
+          {
+            costHectare,
+            totalCostFuel: costFuel,
+            totalCostHandWork: costHandWork,
+            totalCostCars: costCars,
+            totalCostMachineWork: costMachineWork,
+          },
+          { where: { id: oper.techCartId } }
+        );
       });
     }
   }
@@ -240,11 +256,11 @@ class TechCartService {
     let carts: Itech_cart[];
     if (!user?.sub) {
       carts = await tech_cart.findAll({
-        where: { isPublic: true },
+        where: { isPublic: true, isBasic: null },
       });
     } else {
       carts = await tech_cart.findAll({
-        where: { userId: user.sub },
+        where: { userId: user.sub, isBasic: null },
       });
     }
 
@@ -261,6 +277,7 @@ class TechCartService {
       cultureId,
       cultivationTechnologyId,
       year,
+      isBasic,
     } = data;
 
     if (!user) return;
@@ -274,6 +291,7 @@ class TechCartService {
       cultureId: cultureId,
       cultivationTechnologyId: cultivationTechnologyId,
       year: year!,
+      isBasic,
       userId: user?.sub,
     });
 
@@ -336,7 +354,11 @@ class TechCartService {
         });
       }
       const res = await changeCarts(techCart);
-      let costHectare = 0;
+      let costHectare = 0,
+        costMachineWork = 0,
+        costCars = 0,
+        costFuel = 0,
+        costHandWork = 0;
       res.forEach((cart) => {
         cart.tech_operations?.forEach((el) => {
           costHectare +=
@@ -349,9 +371,22 @@ class TechCartService {
             el.costTransport ||
             el.costMaterials ||
             0;
+          costMachineWork += el.costMachineWork || 0;
+          costCars += el.costCars || 0;
+          costFuel += el.costFuel || 0;
+          costHandWork += el.costHandWork || 0;
         });
       });
-      tech_cart.update({ costHectare }, { where: { id: id } });
+      tech_cart.update(
+        {
+          costHectare,
+          totalCostFuel: costFuel,
+          totalCostHandWork: costHandWork,
+          totalCostCars: costCars,
+          totalCostMachineWork: costMachineWork,
+        },
+        { where: { id: id } }
+      );
       res[0].costHectare = costHectare;
 
       return res;
@@ -737,6 +772,40 @@ class TechCartService {
     );
     if (!res) return;
     [res] = await changeCarts([res]);
+    return res;
+  }
+  async getForBusiness() {
+    //@ts-ignore
+    const res: resTechCartsWithOpers[] = await tech_cart.findAll({
+      where: { [Op.or]: [{ isBasic: false }, { isBasic: true }] },
+    });
+    return res;
+  }
+  async setIsBasicCart(user: Principal | undefined, data: setIsBasicCartType) {
+    if (!user) return;
+    const prop: Itech_cart | null = await tech_cart.findOne({
+      where: { id: data.cartId },
+    });
+    if (!prop) return;
+    const check = await tech_cart.findOne({
+      where: {
+        cultivationTechnologyId: prop?.cultivationTechnologyId,
+        cultureId: prop.cultureId,
+        year: prop.year,
+        id: {
+          [Op.ne]: prop.id,
+        },
+        isBasic: true,
+      },
+    });
+    if (check) return "присутній";
+    await tech_cart.update(
+      { isBasic: data.isBasic },
+      { where: { id: data.cartId } }
+    );
+    const res: resTechCartsWithOpers | null = await tech_cart.findOne({
+      where: { id: data.cartId },
+    });
     return res;
   }
 }

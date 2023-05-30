@@ -8,7 +8,6 @@ import {
 import MapStore from "../store/MapStore";
 import BusinessStore from "../store/BusinessStore";
 import {
-  IbusinessPlan,
   Igrade,
   Imachine,
   Isection,
@@ -17,7 +16,6 @@ import {
   Itech_operation,
   Itractor,
   tech_operation,
-  tractor,
 } from "../../../tRPC serv/models/models";
 import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
@@ -42,8 +40,10 @@ import {
   createTEJType,
   setIsPublicTEJType,
 } from "../../../tRPC serv/routes/TEJRouter";
-import { cartProps } from "../modules/CreateCart";
-import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
+import {
+  CreateCartType,
+  setIsBasicCartType,
+} from "../../../tRPC serv/routes/cartRouter";
 import {
   createOutcomeType,
   patchOutcomeType,
@@ -98,6 +98,14 @@ import {
 } from "../../../tRPC serv/routes/workerRouter";
 import { CreateVegetationType } from "../../../tRPC serv/routes/vegetationYearRouter";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
+import {
+  CreateLandType,
+  PatchLandType,
+} from "../../../tRPC serv/routes/landRouter";
+import {
+  CreateBuildingType,
+  PatchBuildingType,
+} from "../../../tRPC serv/routes/buildingRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -124,12 +132,18 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 function operationsFilter(carts: resTechCartsWithOpers[], map: MapStore) {
+  console.log("aaa");
+  console.log(carts);
   for (let i = 0; i < carts.length; i++) {
     const cart = carts[i];
+
     map.maps = map.maps.filter((el) => el.id != cart.id);
     map.complex = map.complex.filter((el) => el.id != cart.id);
+    map.businessCarts = map.businessCarts.filter((el) => el.id != cart.id);
     if (cart.isComplex) {
       map.newComplex = cart;
+    } else if (cart.isBasic != null) {
+      map.newBusinessCarts = cart;
     } else {
       map.newMap = cart;
     }
@@ -173,16 +187,19 @@ export async function getCarts(map: MapStore, cartId: number) {
   map.isLoading = true;
   console.log("try");
 
-  await client.cart.getCart.query({ cartId: cartId }).then((carts) => {
-    map.costMechanical = [];
-    map.costMaterials = [];
-    map.costServices = [];
-    map.costTransport = [];
-    map.opers = [];
-    map.opers = map.opers.filter((el) => el.techCartId != carts[0].id);
-    operationsFilter(carts, map);
-    map.isLoading = false;
-  });
+  await client.cart.getCart
+    .query({ cartId: cartId })
+    //@ts-ignore
+    .then((carts: resTechCartsWithOpers[]) => {
+      map.costMechanical = [];
+      map.costMaterials = [];
+      map.costServices = [];
+      map.costTransport = [];
+      map.opers = [];
+      map.opers = map.opers.filter((el) => el.techCartId != carts[0].id);
+      operationsFilter(carts, map);
+      map.isLoading = false;
+    });
 }
 
 export async function setIsPublic(
@@ -219,6 +236,7 @@ export async function setIsPublic(
       );
     });
     map.maps = map.maps.filter((el) => el.id != data.id);
+    //@ts-ignore
     operationsFilter(res, map);
     map.isLoading = false;
   });
@@ -272,6 +290,7 @@ export async function updateMap(map: MapStore, dat: resTechCartsWithOpers) {
         (el) => el.techOperationId != oper.id
       );
     });
+    //@ts-ignore
     operationsFilter(res, map);
 
     map.isLoading = false;
@@ -459,11 +478,12 @@ export function getGrades(map: MapStore) {
 }
 export function getCopyCarts(map: MapStore) {
   client.cart.getCopyCarts
-    .query()
+    .query() //@ts-ignore
     .then((data: Itech_cart[]) => (map.copyCarts = data));
 }
 export function makeCopyCarts(map: MapStore, cartId: number) {
   client.cart.makeCopy.query({ cartId }).then((data) => {
+    //@ts-ignore
     operationsFilter(data, map);
   });
 }
@@ -522,7 +542,7 @@ export function getCultural(map: MapStore) {
 }
 export function getIsAgreeCarts(map: MapStore) {
   client.cart.getNoAgreeCarts.query().then((res) => {
-    map.NoAgreeCarts = [];
+    map.NoAgreeCarts = []; //@ts-ignore
     map.NoAgreeCarts = res;
   });
 }
@@ -547,7 +567,7 @@ export function setIsAgreeCarts(
       if (res == 1) {
         map.NoAgreeCarts = map.NoAgreeCarts.filter((el) => el.id != cartId);
       } else {
-        map.maps = map.maps.filter((el) => el.id != cartId);
+        map.maps = map.maps.filter((el) => el.id != cartId); //@ts-ignore
         map.newMap = res[0];
       }
       map.isLoading = false;
@@ -556,7 +576,7 @@ export function setIsAgreeCarts(
 export function agreeCarts(map: MapStore) {
   map.isLoading = true;
   client.cart.getAgreeCarts.query().then((res) => {
-    map.agreeCarts = [];
+    map.agreeCarts = []; //@ts-ignore
     map.agreeCarts = res;
     map.isLoading = false;
   });
@@ -637,6 +657,7 @@ export function sendFeedBack(data: FeedBackProps) {
 export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.getNoAgree.query().then((res) => {
+    //@ts-ignore
     Bus.noAgreeBusinessPlan = res;
     map.isLoading = false;
   });
@@ -674,7 +695,7 @@ export function patchResume(
     const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
     if (!plan) {
       return;
-    }
+    } //@ts-ignore
     plan.resume = res!;
   });
 }
@@ -686,7 +707,7 @@ export function setIdTableInvestment(
     const plan = Bus.businessPlan.find((el) => el.id == data.businessPlanId);
     if (!plan) {
       return;
-    }
+    } //@ts-ignore
     plan.resume = res!;
   });
 }
@@ -699,7 +720,7 @@ export function patchTitlePage(
     const plan = Bus.businessPlan.find((el) => el.id == data.businessId);
     if (!plan) {
       return;
-    }
+    } //@ts-ignore
     plan.titlePage = res!;
   });
 }
@@ -714,10 +735,12 @@ export function getOnlyCart(map: MapStore) {
       });
 
       if (!myMap && el.isComplex == false) {
+        //@ts-ignore
         map.newMap = el;
       }
       let myComplex = map.complex.find((e) => e.id == el.id);
       if (!myComplex && el.isComplex == true) {
+        //@ts-ignore
         map.newComplex = el;
       }
     });
@@ -844,12 +867,14 @@ export function getCultivationTechnologiesMap(map: MapStore) {
 
 export function getTEJ(TEJ: TEJStore) {
   client.TEJ.get.query().then((res) => {
+    //@ts-ignore
     if (res) TEJ.justification = res;
   });
 }
 
 export function createTEJ(data: createTEJType, TEJ: TEJStore) {
   client.TEJ.create.query(data).then((res) => {
+    //@ts-ignore
     TEJ.newJustification = res;
   });
 }
@@ -875,7 +900,7 @@ export function patchTEJ(
 ) {
   client.TEJ.patch.query(data).then((res) => {
     if (res) {
-      TEJ.justification = TEJ.justification.filter((el) => el.id != res?.id);
+      TEJ.justification = TEJ.justification.filter((el) => el.id != res?.id); //@ts-ignore
       TEJ.newJustification = res;
     }
   });
@@ -884,8 +909,8 @@ export function patchTEJ(
 export function setIsPublicTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
   client.TEJ.setIsPublic.query(data).then((res) => {
     if (!res) return;
-    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
-    TEJ.newJustification = res;
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!); //@ts-ignore
+    TEJ.newJustification = res; //@ts-ignore
     if (data.isPublic) TEJ.newNoAgreeJustification = res;
     else
       TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
@@ -896,18 +921,19 @@ export function setIsPublicTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
 
 export function getNoAgreeJustification(TEJ: TEJStore) {
   client.TEJ.getNoAgree.query().then((res) => {
+    //@ts-ignore
     if (res[0]) TEJ.noAgreeJustification = res;
   });
 }
 
 export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
   client.TEJ.setIsAgree.query(data).then((res) => {
-    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!);
+    TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!); //@ts-ignore
     TEJ.newJustification = res;
     if (data.isAgree) {
       TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
         (el) => el.id != res.id
-      );
+      ); //@ts-ignore
       TEJ.newNoAgreeJustification = res;
     } else
       TEJ.noAgreeJustification = TEJ.noAgreeJustification.filter(
@@ -917,6 +943,7 @@ export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
 }
 export function getAgreeTEJ(TEJ: TEJStore) {
   client.TEJ.getAgreeTEJ.query().then((res) => {
+    //@ts-ignore
     TEJ.agreeJustification = res;
   });
 }
@@ -946,7 +973,7 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
       map.costHandWork = map.costHandWork.filter(
         (el) => el.techOperationId != oper.id
       );
-    });
+    }); //@ts-ignore
     operationsFilter([res], map);
   });
 }
@@ -1087,11 +1114,13 @@ export function deleteIncome(
 
 export function createCredit(IncomeStore: IncomeStore, data: CreateCreditType) {
   client.credit.create.query(data).then((res) => {
+    //@ts-ignore
     if (res) IncomeStore.newCredit = res;
   });
 }
 export function getCredit(IncomeStore: IncomeStore) {
   client.credit.get.query().then((res) => {
+    //@ts-ignore
     IncomeStore.credit = res;
   });
 }
@@ -1099,7 +1128,7 @@ export function getCredit(IncomeStore: IncomeStore) {
 export function patchCredit(incomeStore: IncomeStore, data: PatchCreditType) {
   client.credit.patch.query(data).then((res) => {
     if (!res) return;
-    incomeStore.credit = incomeStore.credit.filter((el) => el.id != res?.id);
+    incomeStore.credit = incomeStore.credit.filter((el) => el.id != res?.id); //@ts-ignore
     incomeStore.newCredit = res;
   });
 }
@@ -1116,11 +1145,13 @@ export function createInvestment(
   data: CreateInvestmentType
 ) {
   client.investment.create.query(data).then((res) => {
+    //@ts-ignore
     incomeStore.newInvestment = res;
   });
 }
 export function getInvestment(incomeStore: IncomeStore) {
   client.investment.get.query().then((res) => {
+    //@ts-ignore
     incomeStore.investment = res;
   });
 }
@@ -1133,7 +1164,7 @@ export function patchInvestment(
     if (!res) return;
     incomeStore.investment = incomeStore.investment.filter(
       (el) => el.id != res?.id!
-    );
+    ); //@ts-ignore
     incomeStore.newInvestment = res;
   });
 }
@@ -1335,7 +1366,8 @@ export function patchWorker(
 ) {
   client.worker.patch.query(data).then((res) => {
     if (!res) return;
-    enterprise.worker = enterprise.worker.filter((el) => el.id != res.id);
+
+    enterprise.worker = enterprise.worker.filter((el) => el.id != res.id!); //@ts-ignore
     enterprise.newWorker = res;
   });
 }
@@ -1386,16 +1418,96 @@ export function createVegetationYear(
   });
 }
 
-export function getManyCartWithOpers(map: MapStore, ids: number[]) {
+export async function getManyCartWithOpers(map: MapStore, ids: number[]) {
   console.log("work2");
-
-  ids.forEach((el) => {
-    client.cart.getCart.query({ cartId: el }).then((res) => {
-      let a: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(res));
-      a.forEach((el) =>
-        el.tech_operations?.forEach((el) => (map.newOper = el))
-      );
+  let a: resTechCartsWithOpers[] = [];
+  for (let i = 0; i < ids.length; i++) {
+    const el = ids[i];
+    await client.cart.getCart.query({ cartId: el }).then((res) => {
+      //@ts-ignore
+      a.push(...res);
     });
-    console.log(map.opers);
+  }
+  operationsFilter(a, map);
+}
+export function getLand(enterprise: EnterpriseStore) {
+  client.land.get.query().then((res) => {
+    //@ts-ignore
+    enterprise.land = res;
+  });
+}
+export function createLand(enterprise: EnterpriseStore, data: CreateLandType) {
+  client.land.create.query(data).then((res) => {
+    //@ts-ignore
+    enterprise.newLand = res;
+  });
+}
+export function patchLand(enterprise: EnterpriseStore, data: PatchLandType) {
+  client.land.patch.query(data).then((res) => {
+    if (res) {
+      enterprise.land = enterprise.land.filter((el) => el.id != res.id); //@ts-ignore
+      enterprise.newLand = res;
+    }
+  });
+}
+export function deleteLand(
+  enterprise: EnterpriseStore,
+  data: { landId: number }
+) {
+  client.land.delete.query(data).then((res) => {
+    enterprise.land = enterprise.land.filter((el) => el.id != data.landId);
+  });
+}
+
+export function getBuilding(enterprise: EnterpriseStore) {
+  client.building.get.query().then((res) => {
+    enterprise.building = res;
+  });
+}
+export function createBuilding(
+  enterprise: EnterpriseStore,
+  data: CreateBuildingType
+) {
+  client.building.create.query(data).then((res) => {
+    enterprise.newBuilding = res;
+  });
+}
+export function patchBuilding(
+  enterprise: EnterpriseStore,
+  data: PatchBuildingType
+) {
+  client.building.patch.query(data).then((res) => {
+    if (!res) return;
+    enterprise.building = enterprise.building.filter((el) => el.id != res.id);
+    enterprise.newBuilding = res;
+  });
+}
+export function deleteBuilding(
+  enterprise: EnterpriseStore,
+  data: { buildId: number }
+) {
+  client.building.delete.query(data).then((res) => {
+    enterprise.building = enterprise.building.filter(
+      (el) => el.id != data.buildId
+    );
+  });
+}
+
+export function getCartForBusiness(map: MapStore) {
+  client.cart.getForBusiness.query().then((res) => {
+    //@ts-ignore
+    map.businessCarts = res;
+  });
+}
+
+export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
+  client.cart.setIsBasicCart.query(data).then((res) => {
+    if (!res) return;
+    if (res == "присутній") {
+    } else {
+      map.businessCarts = map.businessCarts.filter((el) => el.id != res.id!);
+      //@ts-ignore
+      map.newBusinessCarts = res;
+    }
   });
 }

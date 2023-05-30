@@ -10,7 +10,7 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
 import { createJob, patchJob } from "../../http/requests";
 import { Context } from "../../main";
-import useEnterpriseForm from "../../pages/hook/useEnterpriseForm";
+import useEnterpriseForm from "../../shared/hook/useEnterpriseForm";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -47,7 +47,7 @@ function CreateJob({ open, setOpen, update, setUpdate, res, setRes }: props) {
           onChange={(e) =>
             setRes((prev) => ({ ...prev, name: e.target.value }))
           }
-        ></Input>
+        />
       </Box>
       <Box display={"flex"} gap={3}>
         <Text>Враховувати для:</Text>

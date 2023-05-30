@@ -17,7 +17,7 @@ interface props {
   aref: RefObject<HTMLDivElement>;
 }
 import names from "../names";
-import res from "../../../pages/hook/useIncomeTypes";
+import res from "../../../shared/hook/useIncomeTypes";
 function CartsTableItem({ e, aref }: props) {
   let props;
   if (e.children) props = Object.keys(e.children);

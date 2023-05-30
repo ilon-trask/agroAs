@@ -6,12 +6,12 @@ import workerService from "../controllers/workerService";
 
 const createWorker = z.object({
   amount: z.number(),
-  dateFrom: z.string().optional().nullable(),
-  dateTo: z.string().optional().nullable(),
+  dateFrom: z.string().optional().nullable().optional(),
+  dateTo: z.string().optional().nullable().optional(),
   isConst: z.boolean(),
   salary: z.number(),
   enterpriseId: z.number(),
-  class: z.enum(["Адміністративний", "Виробничий"]),
+  class: z.enum(["Адміністративний", "Виробничий", "Інженерно технічний"]),
   form: z.enum([
     "ФОП",
     "ФОП + 1",

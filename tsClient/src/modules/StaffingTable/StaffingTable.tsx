@@ -5,9 +5,9 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import { Iworker } from "../../../../tRPC serv/models/models";
 import { deleteWorker } from "../../http/requests";
 import { Context } from "../../main";
-import { EnterpriseFormType } from "../../pages/hook/useEnterpriseForm";
-import { EnterpriseTaxGroupType } from "../../pages/hook/useEnterpriseTaxGroup";
-import { WorkerClassesType } from "../../pages/hook/useWorkersClasses";
+import { EnterpriseFormType } from "../../shared/hook/useEnterpriseForm";
+import { EnterpriseTaxGroupType } from "../../shared/hook/useEnterpriseTaxGroup";
+import { WorkerClassesType } from "../../shared/hook/useWorkersClasses";
 import EnterpriseStore from "../../store/EnterpriseStore";
 import { CreateWorkerProp } from "../CreateWorker/CreateWorker";
 export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
@@ -25,7 +25,6 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>Військовий збір 1,5%</Th>
       <Th>Загальний фонд ОП</Th>
       <Th>Вид найму</Th>
-      <Th>Вид витрат</Th>
       {!isPlan && <Th></Th>}
     </Tr>
   );
@@ -99,7 +98,6 @@ function StaffingTableRow({
       <Td>{yearSalary * 0.15}</Td>
       <Td>{yearSalary + yearSalary * 0.22 + yearSalary * 0.015}</Td>
       <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
-      <Td>{}</Td>
       {!isPlan && (
         <Td
           onClick={() => {
@@ -134,6 +132,24 @@ export function StaffingTableBodyRows({
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job.find((e) => e.id == el.jobId);
         if (el.class == "Адміністративний")
+          return (
+            <StaffingTableRow
+              key={el.id}
+              name={job?.name!}
+              el={el}
+              setRes={setRes}
+              setOpen={setOpen}
+              setUpdate={setUpdate}
+              isPlan={isPlan}
+            />
+          );
+      })}
+      <Tr>
+        <Td colSpan={7}>Інженерно технічний</Td>
+      </Tr>
+      {thisWorkers?.map((el) => {
+        const job = enterpriseStore.job.find((e) => e.id == el.jobId);
+        if (el.class == "Інженерно технічний")
           return (
             <StaffingTableRow
               key={el.id}
@@ -233,8 +249,8 @@ function StaffingTable({
             {thisWorkers.reduce(
               (p, c) =>
                 p +
-                (c.salary * 0.015 + c.salary * 0.22 + c.salary) * //@ts-ignore
-                  (c.dateTo?.split("-")[1] - c.dateFrom?.split("-")[1] + 1 ||
+                (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
                     12),
               0
             )}

@@ -3,7 +3,7 @@ import { Itech_cart } from "../../../tRPC serv/models/models";
 import Dialog, { func } from "../components/Dialog";
 import MapInputs from "../components/MapInputs";
 import { createCart, updateMap } from "../http/requests";
-import { VegetationYearsType } from "../pages/hook/useVegetationYears";
+import { VegetationYearsType } from "../shared/hook/useVegetationYears";
 import { Icart } from "../pages/MapJornal";
 export type cartProps = {
   id?: number;
@@ -17,6 +17,7 @@ export type cartProps = {
   cultivationTechnologyId?: number | "";
   cultureId?: number | "";
   year: VegetationYearsType | "";
+  isBasic: boolean | null;
 };
 export const CartProps: cartProps = {
   nameCart: "",
@@ -26,8 +27,9 @@ export const CartProps: cartProps = {
   priceDiesel: "",
   sectionId: "",
   year: "",
+  isBasic: null,
 };
-
+let obj = {};
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -62,10 +64,12 @@ export default function CreateCart({
       setRes={setRes}
       update={update}
       setUpdate={setUpdate}
-      props={CartProps}
+      props={obj}
       isErr={isErr}
       setIsErr={setIsErr}
       setComplex={setComplex}
+      //@ts-ignore
+      onClose={() => setRes((prev) => ({ isBasic: prev.isBasic }))}
     >
       <MapInputs
         res={res}

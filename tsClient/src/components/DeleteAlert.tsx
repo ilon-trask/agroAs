@@ -23,7 +23,9 @@ export type IdeleteHeading =
   | "грант"
   | "покупку техніки"
   | "адміністрування"
-  | "виробинцтво";
+  | "виробинцтво"
+  | "земельну ділянку"
+  | "будівлю";
 export type DeleteProps = {
   isOpen: boolean;
   text: IdeleteHeading;
@@ -31,7 +33,7 @@ export type DeleteProps = {
 };
 type prop = {
   open: boolean;
-  setOpen: ({ isOpen }: { isOpen: false }) => void;
+  setOpen: any;
   text: IdeleteHeading;
   func: any;
 };
