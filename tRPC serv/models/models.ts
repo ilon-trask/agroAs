@@ -21,6 +21,8 @@ import { EnterpriseTaxGroupType } from "../../tsClient/src/shared/hook/useEnterp
 import { WorkerClassesType } from "../../tsClient/src/shared/hook/useWorkersClasses";
 import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
 import { VegetationYearsType } from "../../tsClient/src/shared/hook/useVegetationYears";
+import { CreditCalculationMethodType } from "../../tsClient/src/shared/hook/useCreditCalculationMethod";
+import { CreditCalculationTypeType } from "../../tsClient/src/shared/hook/useCreditCalculationType";
 export interface Iuser {
   id?: number;
   email: string;
@@ -996,6 +998,8 @@ export interface Icredit {
   purpose: CreditPurposeType;
   isUseCost: boolean;
   businessCost?: number;
+  calculationMethod: CreditCalculationMethodType;
+  calculationType: CreditCalculationTypeType;
   userId?: string;
   createdAt?: Date;
   enterpriseId?: number;
@@ -1006,6 +1010,8 @@ export class credit extends Model<Icredit> {
   declare date: string;
   declare cost: number;
   declare purpose: CreditPurposeType;
+  declare calculationMethod: CreditCalculationMethodType;
+  declare calculationType: CreditCalculationTypeType;
   declare isUseCost: boolean;
   declare userId?: string;
 }
@@ -1021,6 +1027,8 @@ credit.init(
       allowNull: false,
       defaultValue: false,
     },
+    calculationMethod: { type: DataTypes.STRING },
+    calculationType: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
 

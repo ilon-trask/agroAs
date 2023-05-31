@@ -8,6 +8,12 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import useCreditCalculationMethod, {
+  CreditCalculationMethodType,
+} from "src/shared/hook/useCreditCalculationMethod";
+import useCreditCalculationType, {
+  CreditCalculationTypeType,
+} from "src/shared/hook/useCreditCalculationType";
 import Dialog from "../../components/Dialog";
 import { createCredit, patchCredit } from "../../http/requests";
 import { Context } from "../../main";
@@ -23,6 +29,8 @@ export type CreditProps = {
   cost: number | "";
   enterpriseId: number;
   isUseCost: boolean;
+  calculationType: CreditCalculationTypeType | "";
+  calculationMethod: CreditCalculationMethodType | "";
 };
 type props = {
   open: boolean;
@@ -62,6 +70,8 @@ function CreateCredit({
           isUseCost: false,
           name: "",
           purpose: "",
+          calculationMethod: "",
+          calculationType: "",
         }))
       }
     >
@@ -136,20 +146,67 @@ function CreateCredit({
           </Select>
         </Box>
       </Box>
-      <Box width={"fit-content"} mx={"auto"}>
-        <Checkbox
-          isChecked={res.isUseCost}
-          onChange={() =>
-            setRes((prev) => ({ ...prev, isUseCost: !prev.isUseCost }))
-          }
-        >
-          Використовувати в бізнес-плані
-        </Checkbox>
+      <Box display={"flex"} justifyContent={"space-around"} mt={3}>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Вид розрахунку
+          </Heading>
+          <Select
+            size={"sm"}
+            value={res.calculationType}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                calculationType: e.target.value as any,
+              }))
+            }
+          >
+            <option value="" hidden>
+              Виберіть опцію
+            </option>
+            {useCreditCalculationType.map((el) => (
+              <option key={el.id} value={el.name}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Метод розрахунку
+          </Heading>
+          <Select
+            size={"sm"}
+            value={res.calculationMethod}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                calculationMethod: e.target.value as any,
+              }))
+            }
+          >
+            <option value="" hidden>
+              Виберіть опцію
+            </option>
+            {useCreditCalculationMethod.map((el) => (
+              <option key={el.id} value={el.name}>
+                {el.name}
+              </option>
+            ))}
+          </Select>
+        </Box>
       </Box>
       <ModalFooter>
         <Button
           onClick={() => {
-            if (res.name && res.cost && res.date && res.purpose) {
+            if (
+              res.name &&
+              res.cost &&
+              res.date &&
+              res.purpose &&
+              res.calculationMethod &&
+              res.calculationType
+            ) {
               res.cost = +res.cost;
 
               if (update) {
@@ -161,6 +218,8 @@ function CreateCredit({
                   purpose: res.purpose,
                   isUseCost: res.isUseCost,
                   enterpriseId: res.enterpriseId,
+                  calculationMethod: res.calculationMethod,
+                  calculationType: res.calculationType,
                 });
               } else {
                 createCredit(income, {
@@ -170,6 +229,8 @@ function CreateCredit({
                   purpose: res.purpose,
                   isUseCost: res.isUseCost,
                   enterpriseId: res.enterpriseId,
+                  calculationMethod: res.calculationMethod,
+                  calculationType: res.calculationType,
                 });
               }
               setOpen(false);
@@ -181,6 +242,8 @@ function CreateCredit({
                 isUseCost: false,
                 name: "",
                 purpose: "",
+                calculationMethod: "",
+                calculationType: "",
               }));
             }
           }}

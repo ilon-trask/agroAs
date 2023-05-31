@@ -397,11 +397,12 @@ function BiznesPlanPage() {
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th>Вид фінансування</Th>
             <Th>Назва</Th>
             <Th>Дата</Th>
             <Th>Сума</Th>
             <Th>Призначення</Th>
+            <Th>Метод розрахунку</Th>
+            <Th>Вид розрахунку</Th>
             <Th></Th>
           </Tr>
         </Thead>
@@ -413,16 +414,20 @@ function BiznesPlanPage() {
             <Td></Td>
             <Td></Td>
             <Td></Td>
+            <Td></Td>
           </Tr>
-          {income.credit.map((el) => (
-            <Tr>
-              <Td></Td>
-              <Td>{el.name}</Td>
-              <Td>{el.date}</Td>
-              <Td>{el.cost}</Td>
-              <Td>{el.purpose}</Td>
-            </Tr>
-          ))}
+          {income.credit
+            .filter((el) => el.calculationType == "Базовий")
+            .map((el) => (
+              <Tr>
+                <Td>{el.name}</Td>
+                <Td>{el.date}</Td>
+                <Td>{el.cost}</Td>
+                <Td>{el.purpose}</Td>
+                <Td>{el.calculationMethod}</Td>
+                <Td>{el.calculationType}</Td>
+              </Tr>
+            ))}
           <Tr fontWeight={"bold"}>
             <Td>Інвестиції</Td>
             <Td></Td>
@@ -433,7 +438,6 @@ function BiznesPlanPage() {
           </Tr>
           {income.investment.map((el) => (
             <Tr>
-              <Td></Td>
               <Td>{el.name}</Td>
               <Td>{el.date}</Td>
               <Td>{el.cost}</Td>
@@ -450,7 +454,6 @@ function BiznesPlanPage() {
           </Tr>
           {income.derj.map((el) => (
             <Tr>
-              <Td></Td>
               <Td>{el.name}</Td>
               <Td>{el.date}</Td>
               <Td>{el.cost}</Td>
@@ -467,7 +470,6 @@ function BiznesPlanPage() {
           </Tr>
           {income.grant.map((el) => (
             <Tr>
-              <Td></Td>
               <Td>{el.name}</Td>
               <Td>{el.date}</Td>
               <Td>{el.cost}</Td>

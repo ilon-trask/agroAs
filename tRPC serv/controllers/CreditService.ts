@@ -26,6 +26,8 @@ class CreditService {
       date: data.date,
       name: data.name,
       purpose: data.purpose,
+      calculationMethod: data.calculationMethod,
+      calculationType: data.calculationType,
       isUseCost: data.isUseCost,
       enterpriseId: data.enterpriseId,
       userId: user.sub,
@@ -41,6 +43,8 @@ class CreditService {
         name: data.name,
         isUseCost: data.isUseCost,
         purpose: data.purpose,
+        calculationMethod: data.calculationMethod,
+        calculationType: data.calculationType,
         enterpriseId: data.enterpriseId,
       },
       { where: { id: data.creditId } }

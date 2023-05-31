@@ -9,6 +9,8 @@ const createCredit = z.object({
   date: z.string(),
   isUseCost: z.boolean(),
   purpose: z.enum(["Поповнення обігових коштів", "Закупка основних засобів"]),
+  calculationType: z.enum(["Базовий", "Індивідуальний"]),
+  calculationMethod: z.enum(["На бізнес-план", "На гектар"]),
   enterpriseId: z.number(),
 });
 export type CreateCreditType = z.infer<typeof createCredit>;

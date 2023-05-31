@@ -84,6 +84,8 @@ function Enterprise() {
     purpose: "",
     isUseCost: false,
     enterpriseId: +id!,
+    calculationMethod: "",
+    calculationType: "",
   });
   const credits = sort(income.credit);
   const [investOpen, setInvestOpen] = useState(false);
@@ -326,6 +328,8 @@ function Enterprise() {
               <Th>Дата</Th>
               <Th>Сума</Th>
               <Th>Призначення</Th>
+              <Th>Вид розрахунку</Th>
+              <Th>Тип розрахунку</Th>
               <Th></Th>
             </Tr>
           </Thead>
@@ -344,6 +348,8 @@ function Enterprise() {
                           purpose: el.purpose,
                           enterpriseId: +id!,
                           isUseCost: el.isUseCost,
+                          calculationMethod: el.calculationMethod,
+                          calculationType: el.calculationType,
                         });
                         setUpdate(true);
                         setCreditOpen(true);
@@ -360,6 +366,8 @@ function Enterprise() {
                     <Td>{el.date}</Td>
                     <Td>{el.cost}</Td>
                     <Td>{el.purpose}</Td>
+                    <Td>{el.calculationType}</Td>
+                    <Td>{el.calculationMethod}</Td>
                     <Td
                       onClick={() => {
                         setDeleteOpen({
