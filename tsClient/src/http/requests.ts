@@ -1122,11 +1122,13 @@ export function createFinancing(
   data: CreateFinancingType
 ) {
   client.financing.create.query(data).then((res) => {
+    //@ts-ignore
     if (res) sortFinancing([res], IncomeStore);
   });
 }
 export function getFinancing(IncomeStore: IncomeStore) {
   client.financing.get.query().then((res) => {
+    //@ts-ignore
     sortFinancing(res, IncomeStore);
   });
 }
@@ -1136,6 +1138,7 @@ export function patchFinancing(
   data: PatchFinancingType
 ) {
   client.financing.patch.query(data).then((res) => {
+    //@ts-ignore
     if (res) sortFinancing([res], IncomeStore);
   });
 }
@@ -1427,5 +1430,14 @@ export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
       //@ts-ignore
       map.newBusinessCarts = res;
     }
+  });
+}
+
+export function addFinancingToBusinessPlan(data: {
+  businessId: number;
+  value: number[];
+}) {
+  client.business.addFinancing.query(data).then((res) => {
+    console.log(res);
   });
 }

@@ -4,9 +4,11 @@ import {
   businessPlan,
   cultivationTechnologies,
   culture,
+  financing,
   IbusinessPlan,
   IcultivationTechnologies,
   Iculture,
+  Ifinancing,
   Iresume,
   ItitlePage,
   resume,
@@ -24,6 +26,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 
   resume: Iresume;
   titlePage: ItitlePage;
+  financings:Ifinancing[];
   busCuls: {
     businessPlanId: number;
     cultivationTechnologyId: number;
@@ -37,6 +40,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 const includes = [
   { model: resume },
   { model: titlePage },
+  {model: financing,}
   // { model: culture },
   {
     model: busCul,
@@ -204,6 +208,22 @@ class BusinessService {
 
       return ind;
     }
+  }
+  async addFinancing(data: { businessId: number; value: number[] }) {
+    const business = await businessPlan.findOne({
+      where: { id: data.businessId },
+    });
+    await business.setFinancings(null);
+    for (let i = 0; i < data.value.length; i++) {
+      const el = data.value[i];
+
+      await business.addFinancing(el);
+    }
+    const res = await businessPlan.findOne({
+      where: { id: data.businessId },
+      include: financing,
+    });
+    return res;
   }
 }
 export default new BusinessService();

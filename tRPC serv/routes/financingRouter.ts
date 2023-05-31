@@ -23,6 +23,7 @@ const createFinancing = z.object({
   calculationType: z.enum(["Базовий", "Індивідуальний"]),
   calculationMethod: z.enum(["На бізнес-план", "На гектар"]),
   enterpriseId: z.number(),
+  cultureId: z.number().optional(),
 });
 export type CreateFinancingType = z.infer<typeof createFinancing>;
 const patchFinancing = createFinancing.extend({ financingId: z.number() });

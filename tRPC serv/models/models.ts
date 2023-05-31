@@ -995,6 +995,7 @@ export interface Ifinancing {
   businessCost?: number;
   calculationMethod: CreditCalculationMethodType;
   calculationType: CreditCalculationTypeType;
+  cultureId?: number;
   userId?: string;
   createdAt?: Date;
 }
@@ -1004,6 +1005,7 @@ export class financing extends Model<Ifinancing> {
   declare type: FinancingType;
   declare date: string;
   declare cost: number;
+  declare cultureId?: number;
   declare purpose:
     | CreditPurposeType
     | InvestmentOriginType
@@ -1295,6 +1297,12 @@ building.init(
   },
   { sequelize }
 );
+export class financBus extends Model<{}> {
+  declare busienssId: number;
+  declare financingId: number;
+}
+
+financBus.init({}, { sequelize });
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1447,3 +1455,9 @@ building.belongsTo(enterprise);
 
 businessPlan.hasMany(building);
 building.belongsTo(businessPlan);
+
+culture.hasMany(financing);
+financing.belongsTo(culture);
+
+financing.belongsToMany(businessPlan, { through: financBus });
+businessPlan.belongsToMany(financing, { through: financBus });

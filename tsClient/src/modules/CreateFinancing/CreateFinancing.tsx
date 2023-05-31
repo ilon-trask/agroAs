@@ -29,7 +29,9 @@ import { Context } from "../../main";
 import useCreditPurpose, {
   CreditPurposeType,
 } from "../../shared/hook/useCreditPurpose";
-
+import useDerjPurpose from "src/shared/hook/useDerjPurpose";
+import useGrantPurpose from "src/shared/hook/useGrantPurpose";
+import useInvestmentOrigin from "src/shared/hook/useInvestmentOrigin";
 export type FinancingProps = {
   id?: number;
   name: string;
@@ -46,6 +48,7 @@ export type FinancingProps = {
   isUseCost: boolean;
   calculationType: CreditCalculationTypeType | "";
   calculationMethod: CreditCalculationMethodType | "";
+  cultureId?: number;
 };
 type props = {
   open: boolean;
@@ -54,12 +57,22 @@ type props = {
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
 };
-const purpose = useCreditPurpose;
 const obj = {};
 function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
-  const { income } = useContext(Context);
+  const { income, map } = useContext(Context);
   const [res, setRes] = useState(data);
+  const arr =
+    res.type == "credit"
+      ? useCreditPurpose
+      : res.type == "derj_support"
+      ? useDerjPurpose
+      : res.type == "grant"
+      ? useGrantPurpose
+      : res.type == "investment"
+      ? useInvestmentOrigin
+      : [];
   useEffect(() => setRes(data), [data]);
+
   return (
     <Dialog
       open={open}
@@ -82,6 +95,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
           purpose: "",
           calculationMethod: "",
           calculationType: "",
+          cultureId: undefined,
         }))
       }
     >
@@ -148,7 +162,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
             <option value="" hidden defaultChecked>
               Виберіть опцію
             </option>
-            {purpose.map((el) => (
+            {arr.map((el) => (
               <option value={el.name} key={el.id}>
                 {el.name}
               </option>
@@ -205,6 +219,29 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
             ))}
           </Select>
         </Box>
+        {res.type == "grant" && (
+          <Box maxW={"190px"}>
+            <Heading as={"h4"} size="sm" minW={"max-content"}>
+              Виберіть культури
+            </Heading>
+            <Select
+              value={res.cultureId}
+              size={"sm"}
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, cultureId: +e.target.value }))
+              }
+            >
+              <option value="" hidden>
+                виберіть опцію
+              </option>
+              {map.culture.map((el) => (
+                <option key={el.id!} value={el.id}>
+                  {el.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        )}
       </Box>
       <ModalFooter>
         <Button
@@ -227,11 +264,12 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
-                  isUseCost: res.isUseCost,
+                  isUseCost: res.isUseCost || false,
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   calculationType: res.calculationType,
                   type: res.type,
+                  cultureId: res.cultureId,
                 });
               } else {
                 createFinancing(income, {
@@ -239,11 +277,12 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
-                  isUseCost: res.isUseCost,
+                  isUseCost: res.isUseCost || false,
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   calculationType: res.calculationType,
                   type: res.type,
+                  cultureId: res.cultureId,
                 });
               }
               setOpen(false);
@@ -258,6 +297,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                 calculationMethod: "",
                 calculationType: "",
                 type: prev.type,
+                cultureId: undefined,
               }));
             }
           }}

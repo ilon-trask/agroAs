@@ -14,7 +14,7 @@ import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
-import { Iworker } from "../../../../tRPC serv/models/models";
+import { Ifinancing, Iworker } from "../../../../tRPC serv/models/models";
 import CashFlowTable from "../CashFlowTable";
 import OperTableSection from "../OpersTable/components/OperTableSection";
 import { OpersTableHead } from "../OpersTable/OpersTable";
@@ -33,6 +33,7 @@ function AdditionBusinessPlan({
   cultureSet,
   sections,
   operReady,
+  thisCredit,
 }: {
   form: EnterpriseFormType;
   start: number;
@@ -43,6 +44,7 @@ function AdditionBusinessPlan({
   cultureSet: Set<string>;
   sections: { data: sectionsOpers; year: VegetationYearsType }[];
   operReady: boolean;
+  thisCredit: Ifinancing[];
 }) {
   const { map, income } = useContext(Context);
 
@@ -236,6 +238,9 @@ function AdditionBusinessPlan({
                 sumDirect = 0,
                 sumTake = 0;
               const thisYear = start + ind;
+              const sumCredit = thisCredit
+                .filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
               return (
                 <>
                   <Tr>
@@ -469,13 +474,7 @@ function AdditionBusinessPlan({
                             .map((el) => {
                               return <Text>{el.name}</Text>;
                             }) || <Text>0</Text>}
-                      <Text>
-                        {income.credit
-                          .filter(
-                            (el) => getYearFromString(el.date) == thisYear
-                          )
-                          .reduce((p, c) => p + c.cost, 0)}
-                      </Text>
+                      <Text>{sumCredit}</Text>
                       <Text>0</Text>
                       <Text>0</Text>
                       {/* {income.credit
@@ -579,7 +578,9 @@ function AdditionBusinessPlan({
                     <Td></Td>
                     <Td>{sumTake}</Td>
                     <Td></Td>
-                    <Td>{ind == 0 ? myBusiness.initialAmount : 0}</Td>
+                    <Td>
+                      {(ind == 0 ? myBusiness.initialAmount : 0) + sumCredit}
+                    </Td>
                   </Tr>
                 </>
               );

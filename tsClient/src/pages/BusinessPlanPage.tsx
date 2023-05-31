@@ -62,6 +62,8 @@ import FinancingBusinessPlan from "src/modules/FinancingBusinessPlan";
 import PlanedIndicatorsBusinessPlan from "src/modules/PlanedIndicatorsBusinessPlan";
 import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MainFinancingBusinessPlanTable from "src/modules/MainFinancingBusinessPlanTable";
+import AddFinancingToBusinessPlan from "src/modules/AddFinancingToBusinessPlan";
 function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
@@ -194,7 +196,17 @@ function BiznesPlanPage() {
     priceDiesel: "",
   });
   const [workOpen, setWorkOpen] = useState(false);
-
+  const thisCredit = income.credit.filter(
+    (el) => el.calculationType == "Базовий"
+  );
+  const thisInvestment = income.investment.filter(
+    (el) => el.calculationType == "Базовий"
+  );
+  const thisDerj = income.derj.filter((el) => el.calculationType == "Базовий");
+  const thisGrand = income.grant.filter(
+    (el) => el.calculationType == "Базовий"
+  );
+  const [addOpen, setAddOpen] = useState(false);
   return !ready ? (
     <Box></Box>
   ) : (
@@ -388,91 +400,19 @@ function BiznesPlanPage() {
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Залучення фінансування
       </Heading>
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Th>Назва</Th>
-            <Th>Дата</Th>
-            <Th>Сума</Th>
-            <Th>Призначення</Th>
-            <Th>Метод розрахунку</Th>
-            <Th>Вид розрахунку</Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr fontWeight={"bold"}>
-            <Td>Кредит</Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          {income.credit
-            .filter((el) => el.calculationType == "Базовий")
-            .map((el) => (
-              <Tr>
-                <Td>{el.name}</Td>
-                <Td>{el.date}</Td>
-                <Td>{el.cost}</Td>
-                <Td>{el.purpose}</Td>
-                <Td>{el.calculationMethod}</Td>
-                <Td>{el.calculationType}</Td>
-              </Tr>
-            ))}
-          <Tr fontWeight={"bold"}>
-            <Td>Інвестиції</Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          {income.investment.map((el) => (
-            <Tr>
-              <Td>{el.name}</Td>
-              <Td>{el.date}</Td>
-              <Td>{el.cost}</Td>
-              <Td>{el.purpose}</Td>
-            </Tr>
-          ))}
-          <Tr fontWeight={"bold"}>
-            <Td>Держ. підтримка</Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          {income.derj.map((el) => (
-            <Tr>
-              <Td>{el.name}</Td>
-              <Td>{el.date}</Td>
-              <Td>{el.cost}</Td>
-              <Td>{el.purpose}</Td>
-            </Tr>
-          ))}
-          <Tr fontWeight={"bold"}>
-            <Td>Грант</Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-            <Td></Td>
-          </Tr>
-          {income.grant.map((el) => (
-            <Tr>
-              <Td>{el.name}</Td>
-              <Td>{el.date}</Td>
-              <Td>{el.cost}</Td>
-              <Td>{el.purpose}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-      <Button>Додати</Button>
+      <MainFinancingBusinessPlanTable
+        thisCredit={thisCredit}
+        thisInvestment={thisInvestment}
+        thisDerj={thisDerj}
+        thisGrant={thisGrand}
+        isPlan={true}
+      />
+      <Button onClick={() => setAddOpen(true)}>Додати</Button>
+      <AddFinancingToBusinessPlan
+        open={addOpen}
+        setOpen={setAddOpen}
+        businessId={+id!}
+      />
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -585,6 +525,7 @@ function BiznesPlanPage() {
             cultureSet={cultureSet}
             sections={sections!}
             operReady={operReady}
+            thisCredit={thisCredit}
           />
         </Box>
       </Box>

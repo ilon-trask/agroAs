@@ -48,7 +48,7 @@ import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 function Enterprise() {
   const { id } = useParams();
-  const { enterpriseStore, income } = useContext(Context);
+  const { enterpriseStore, income, map } = useContext(Context);
   useEffect(() => {
     getFinancing(income);
     getLand(enterpriseStore);
@@ -263,6 +263,13 @@ function Enterprise() {
           setFinancingOpen(true);
           setFinancingData((prev) => ({
             ...prev,
+            calculationMethod: "",
+            calculationType: "",
+            cost: "",
+            date: "",
+            name: "",
+            purpose: "",
+            isUseCost: false,
             type: "investment",
           }));
         }}
@@ -346,7 +353,17 @@ function Enterprise() {
       <Button
         onClick={() => {
           setFinancingOpen(true);
-          setFinancingData((prev) => ({ ...prev, type: "credit" }));
+          setFinancingData((prev) => ({
+            ...prev,
+            calculationMethod: "",
+            calculationType: "",
+            cost: "",
+            date: "",
+            name: "",
+            purpose: "",
+            isUseCost: false,
+            type: "credit",
+          }));
         }}
       >
         Додати кредит
@@ -402,12 +419,7 @@ function Enterprise() {
                       setUpdate(true);
                     }}
                   >
-                    <EditIcon
-                      color={"blue.400"}
-                      w={"20px"}
-                      h={"auto"}
-                      cursor={"pointer"}
-                    />
+                    <MyEditIcon />
                   </Td>
                   <Td>{el.name}</Td>
                   <Td>{el.date}</Td>
@@ -426,12 +438,7 @@ function Enterprise() {
                       });
                     }}
                   >
-                    <DeleteIcon
-                      w={"20px"}
-                      h={"auto"}
-                      color={"red"}
-                      cursor={"pointer"}
-                    />
+                    <MyDeleteIcon />
                   </Td>
                 </Tr>
               );
@@ -442,7 +449,17 @@ function Enterprise() {
       <Button
         onClick={() => {
           setFinancingOpen(true);
-          setFinancingData((prev) => ({ ...prev, type: "derj_support" }));
+          setFinancingData((prev) => ({
+            ...prev,
+            calculationMethod: "",
+            calculationType: "",
+            cost: "",
+            date: "",
+            name: "",
+            purpose: "",
+            isUseCost: false,
+            type: "derj_support",
+          }));
         }}
       >
         Додати державну підтримку
@@ -461,6 +478,7 @@ function Enterprise() {
             <Tr>
               <Th></Th>
               <Th>Назва</Th>
+              <Th>Культура</Th>
               <Th>Дата</Th>
               <Th>Сума</Th>
               <Th>Призначення</Th>
@@ -485,6 +503,7 @@ function Enterprise() {
                         calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                         type: "grant",
+                        cultureId: el.cultureId,
                       });
                       setUpdate(true);
                       setFinancingOpen(true);
@@ -493,6 +512,7 @@ function Enterprise() {
                     <MyEditIcon />
                   </Td>
                   <Td>{el.name}</Td>
+                  <Td>{map.culture.find((e) => e.id == el.cultureId)?.name}</Td>
                   <Td>{el.date}</Td>
                   <Td>{el.cost}</Td>
                   <Td>{el.purpose}</Td>
@@ -520,7 +540,17 @@ function Enterprise() {
       <Button
         onClick={() => {
           setFinancingOpen(true);
-          setFinancingData((prev) => ({ ...prev, type: "grant" }));
+          setFinancingData((prev) => ({
+            ...prev,
+            calculationMethod: "",
+            calculationType: "",
+            cost: "",
+            date: "",
+            name: "",
+            purpose: "",
+            isUseCost: false,
+            type: "grant",
+          }));
         }}
       >
         Додати грант

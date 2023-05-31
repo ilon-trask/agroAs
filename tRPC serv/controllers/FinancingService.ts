@@ -33,6 +33,7 @@ class FinancingService {
       calculationMethod: data.calculationMethod,
       calculationType: data.calculationType,
       isUseCost: data.isUseCost,
+      cultureId: data.cultureId,
       userId: user.sub,
     });
     return giveRes([res])[0];
@@ -48,6 +49,7 @@ class FinancingService {
         purpose: data.purpose,
         calculationMethod: data.calculationMethod,
         calculationType: data.calculationType,
+        cultureId: data.cultureId,
       },
       { where: { id: data.financingId } }
     );

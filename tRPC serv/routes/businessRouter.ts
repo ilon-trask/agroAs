@@ -87,5 +87,11 @@ const businessRouter = router({
       );
       return res;
     }),
+  addFinancing: publicProcedure
+    .input(z.object({ businessId: z.number(), value: z.array(z.number()) }))
+    .query(async ({ input, ctx }) => {
+      let res = await BusinessService.addFinancing(input);
+      return res;
+    }),
 });
 export default businessRouter;
