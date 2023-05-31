@@ -5,27 +5,42 @@ import {
   Select,
   ModalFooter,
   Button,
-  Checkbox,
 } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction, useContext } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import useCreditCalculationMethod, {
   CreditCalculationMethodType,
 } from "src/shared/hook/useCreditCalculationMethod";
 import useCreditCalculationType, {
   CreditCalculationTypeType,
 } from "src/shared/hook/useCreditCalculationType";
+import { DerjPurposeType } from "src/shared/hook/useDerjPurpose";
+import { FinancingType } from "src/shared/hook/useFinancingType";
+import { GrantPurposeType } from "src/shared/hook/useGrantPurpose";
+import { InvestmentOriginType } from "src/shared/hook/useInvestmentOrigin";
 import Dialog from "../../components/Dialog";
-import { createCredit, patchCredit } from "../../http/requests";
+import { createFinancing, patchFinancing } from "../../http/requests";
 import { Context } from "../../main";
 import useCreditPurpose, {
   CreditPurposeType,
 } from "../../shared/hook/useCreditPurpose";
 
-export type CreditProps = {
-  creditId?: number;
+export type FinancingProps = {
+  id?: number;
   name: string;
+  type: FinancingType | "";
   date: string;
-  purpose: CreditPurposeType | "";
+  purpose:
+    | CreditPurposeType
+    | InvestmentOriginType
+    | DerjPurposeType
+    | GrantPurposeType
+    | "";
   cost: number | "";
   enterpriseId: number;
   isUseCost: boolean;
@@ -35,22 +50,16 @@ export type CreditProps = {
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  res: CreditProps;
-  setRes: Dispatch<SetStateAction<CreditProps>>;
+  data: FinancingProps;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
 };
 const purpose = useCreditPurpose;
 const obj = {};
-function CreateCredit({
-  open,
-  setOpen,
-  res,
-  setRes,
-  setUpdate,
-  update,
-}: props) {
+function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
   const { income } = useContext(Context);
+  const [res, setRes] = useState(data);
+  useEffect(() => setRes(data), [data]);
   return (
     <Dialog
       open={open}
@@ -67,6 +76,7 @@ function CreateCredit({
           enterpriseId: prev.enterpriseId,
           cost: "",
           date: "",
+          type: prev.type,
           isUseCost: false,
           name: "",
           purpose: "",
@@ -205,13 +215,14 @@ function CreateCredit({
               res.date &&
               res.purpose &&
               res.calculationMethod &&
-              res.calculationType
+              res.calculationType &&
+              res.type
             ) {
               res.cost = +res.cost;
 
               if (update) {
-                patchCredit(income, {
-                  creditId: res.creditId!,
+                patchFinancing(income, {
+                  financingId: res.id!,
                   cost: res.cost,
                   date: res.date,
                   name: res.name,
@@ -220,9 +231,10 @@ function CreateCredit({
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   calculationType: res.calculationType,
+                  type: res.type,
                 });
               } else {
-                createCredit(income, {
+                createFinancing(income, {
                   cost: res.cost,
                   date: res.date,
                   name: res.name,
@@ -231,6 +243,7 @@ function CreateCredit({
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   calculationType: res.calculationType,
+                  type: res.type,
                 });
               }
               setOpen(false);
@@ -244,6 +257,7 @@ function CreateCredit({
                 purpose: "",
                 calculationMethod: "",
                 calculationType: "",
+                type: prev.type,
               }));
             }
           }}
@@ -255,4 +269,4 @@ function CreateCredit({
   );
 }
 
-export default CreateCredit;
+export default CreateFinancing;

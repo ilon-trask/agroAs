@@ -20,11 +20,8 @@ import { Ispecial_work } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import {
   getBuyingMachine,
-  getCredit,
-  getDerj,
   getGrades,
-  getGrant,
-  getInvestment,
+  getFinancing,
   getJob,
   getManyCartWithOpers,
   getTEJ,
@@ -79,10 +76,7 @@ function BiznesPlanPage() {
     getWorker(enterpriseStore);
     getJob(enterpriseStore);
     getBuyingMachine(map);
-    getDerj(income);
-    getInvestment(income);
-    getCredit(income);
-    getGrant(income);
+    getFinancing(income);
     getGrades(map);
     getTEJ(TEJ);
   }, []);
@@ -441,7 +435,7 @@ function BiznesPlanPage() {
               <Td>{el.name}</Td>
               <Td>{el.date}</Td>
               <Td>{el.cost}</Td>
-              <Td>{el.origin}</Td>
+              <Td>{el.purpose}</Td>
             </Tr>
           ))}
           <Tr fontWeight={"bold"}>

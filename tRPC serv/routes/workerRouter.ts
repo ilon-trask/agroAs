@@ -1,7 +1,5 @@
 import { publicProcedure, router } from "../trpc";
 import * as z from "zod";
-import CreditService from "../controllers/CreditService";
-import { Icredit } from "../models/models";
 import workerService from "../controllers/workerService";
 
 const createWorker = z.object({

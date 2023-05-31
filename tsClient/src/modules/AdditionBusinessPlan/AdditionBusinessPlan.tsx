@@ -1,6 +1,7 @@
 import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { Context } from "src/main";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import useVegetationYears, {
   VegetationYearsType,
@@ -234,11 +235,12 @@ function AdditionBusinessPlan({
                 sumESV = 0,
                 sumDirect = 0,
                 sumTake = 0;
+              const thisYear = start + ind;
               return (
                 <>
                   <Tr>
                     <Td>{ind}</Td>
-                    <Td>{start + ind}</Td>
+                    <Td>{thisYear}</Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
                         <Text>
@@ -467,7 +469,13 @@ function AdditionBusinessPlan({
                             .map((el) => {
                               return <Text>{el.name}</Text>;
                             }) || <Text>0</Text>}
-                      <Text>0</Text>
+                      <Text>
+                        {income.credit
+                          .filter(
+                            (el) => getYearFromString(el.date) == thisYear
+                          )
+                          .reduce((p, c) => p + c.cost, 0)}
+                      </Text>
                       <Text>0</Text>
                       <Text>0</Text>
                       {/* {income.credit

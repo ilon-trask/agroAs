@@ -17,34 +17,19 @@ import {
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Icredit, Igrant, Iinvestment } from "../../../tRPC serv/models/models";
 import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
 import {
-  deleteCredit,
-  deleteDerj,
-  deleteGrant,
-  deleteInvestment,
+  deleteFinancing,
   getBuilding,
-  getCredit,
-  getGrant,
-  getInvestment,
+  getFinancing,
   getLand,
   getWorker,
 } from "../http/requests";
 import { Context } from "../main";
 import BuyingMachineTable from "../modules/BuyingMachineTable";
-import CreateCredit, {
-  CreditProps,
-} from "../modules/CreateCredit/CreateCredit";
-import CreateDerjSupport, {
-  CreateDerjProps,
-} from "../modules/CreateDerjSupport/CreateDerjSupport";
-import CreateGrant, {
-  CreateGrantProps,
-} from "../modules/CreateGrant/CreateGrant";
-import CreateInvestment, {
-  CreateInvestmentProps,
-} from "../modules/CreateInvestment/CreateInvestment";
+import CreateFinancing, {
+  FinancingProps,
+} from "../modules/CreateFinancing/CreateFinancing";
 import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import LandPlatTable from "../modules/LandPlotTable";
@@ -59,13 +44,13 @@ import BuildingTable from "src/modules/BuildingTable";
 import CreateBuilding, {
   CreateBuildingProps,
 } from "src/modules/CreateBuilding/CreateBuilding";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 function Enterprise() {
   const { id } = useParams();
   const { enterpriseStore, income } = useContext(Context);
   useEffect(() => {
-    getInvestment(income);
-    getCredit(income);
-    getGrant(income);
+    getFinancing(income);
     getLand(enterpriseStore);
     getBuilding(enterpriseStore);
   }, []);
@@ -75,45 +60,22 @@ function Enterprise() {
     text: "планування",
     func: () => {},
   });
-  const [creditOpen, setCreditOpen] = useState(false);
+  const [financingOpen, setFinancingOpen] = useState(false);
   const [update, setUpdate] = useState(false);
-  const [creditRes, setCreditRes] = useState<CreditProps>({
+  const [financingData, setFinancingData] = useState<FinancingProps>({
     cost: "",
     date: "",
     name: "",
     purpose: "",
+    type: "",
     isUseCost: false,
     enterpriseId: +id!,
     calculationMethod: "",
     calculationType: "",
   });
   const credits = sort(income.credit);
-  const [investOpen, setInvestOpen] = useState(false);
-  const [investRes, setInvestRes] = useState<CreateInvestmentProps>({
-    cost: "",
-    date: "",
-    name: "",
-    origin: "",
-    enterpriseId: +id!,
-  });
   const investments = sort(income.investment);
-  const [derjOpen, setDerjOpen] = useState(false);
-  const [derjRes, setDerjRes] = useState<CreateDerjProps>({
-    cost: "",
-    date: "",
-    name: "",
-    purpose: "",
-    enterpriseId: +id!,
-  });
   const derj = sort(income.derj);
-  const [grantOpen, setGrantOpen] = useState(false);
-  const [grantRes, setGrantRes] = useState<CreateGrantProps>({
-    cost: "",
-    date: "",
-    name: "",
-    purpose: "",
-    enterpriseId: +id!,
-  });
   const grant = sort(income.grant);
   const [machineOpen, setMachineOpen] = useState(false);
   const [machineData, setMachineData] = useState({});
@@ -248,69 +210,65 @@ function Enterprise() {
           </Thead>
           <Tbody>
             {investments.map((el) => {
-              if (el.enterpriseId == +id!)
-                return (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        setInvestRes({
-                          investmentId: el.id!,
-                          cost: el.cost,
-                          date: el.date,
-                          name: el.name,
-                          origin: el.origin,
-                          enterpriseId: +id!,
-                        });
-                        setUpdate(true);
-                        setInvestOpen(true);
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.origin}</Td>
-                    <Td
-                      onClick={() => {
-                        setDeleteOpen({
-                          func: () => {
-                            deleteInvestment(income, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                          isOpen: true,
-                          text: "інвестицію",
-                        });
-                      }}
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
+              // if (el.enterpriseId == +id!)
+              return (
+                <Tr>
+                  <Td
+                    onClick={() => {
+                      setFinancingData({
+                        type: "investment",
+                        id: el.id!,
+                        cost: el.cost,
+                        date: el.date,
+                        name: el.name,
+                        purpose: el.purpose,
+                        enterpriseId: +id!,
+                        calculationMethod: el.calculationMethod,
+                        calculationType: el.calculationType,
+                        isUseCost: el.isUseCost,
+                      });
+                      setUpdate(true);
+                      setFinancingOpen(true);
+                    }}
+                  >
+                    <MyEditIcon />
+                  </Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.cost}</Td>
+                  <Td>{el.purpose}</Td>
+                  <Td
+                    onClick={() => {
+                      setDeleteOpen({
+                        func: () => {
+                          deleteFinancing(income, el.id!);
+                          //@ts-ignore
+                          setDeleteOpen({ isOpen: false });
+                        },
+                        isOpen: true,
+                        text: "інвестицію",
+                      });
+                    }}
+                  >
+                    <MyDeleteIcon />
+                  </Td>
+                </Tr>
+              );
             })}
           </Tbody>
         </Table>
       </TableContainer>
-      <Button onClick={() => setInvestOpen(true)}>Додати інвестицію</Button>
-      <CreateInvestment
-        open={investOpen}
-        setOpen={setInvestOpen}
-        res={investRes}
-        setRes={setInvestRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
+      <Button
+        onClick={() => {
+          setFinancingOpen(true);
+          setFinancingData((prev) => ({
+            ...prev,
+            type: "investment",
+          }));
+        }}
+      >
+        Додати інвестицію
+      </Button>
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -335,71 +293,68 @@ function Enterprise() {
           </Thead>
           <Tbody>
             {credits?.map((el) => {
-              if (el.enterpriseId == +id!)
-                return (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        setCreditRes({
-                          creditId: el.id!,
-                          cost: el.cost,
-                          date: el.date,
-                          name: el.name,
-                          purpose: el.purpose,
-                          enterpriseId: +id!,
-                          isUseCost: el.isUseCost,
-                          calculationMethod: el.calculationMethod,
-                          calculationType: el.calculationType,
-                        });
-                        setUpdate(true);
-                        setCreditOpen(true);
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.purpose}</Td>
-                    <Td>{el.calculationType}</Td>
-                    <Td>{el.calculationMethod}</Td>
-                    <Td
-                      onClick={() => {
-                        setDeleteOpen({
-                          text: "кредит",
-                          isOpen: true,
-                          func: () => {
-                            deleteCredit(income, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                        });
-                      }}
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
+              // if (el.enterpriseId == +id!)
+              return (
+                <Tr>
+                  <Td
+                    onClick={() => {
+                      setFinancingData({
+                        id: el.id!,
+                        cost: el.cost,
+                        date: el.date,
+                        name: el.name,
+                        purpose: el.purpose,
+                        enterpriseId: +id!,
+                        isUseCost: el.isUseCost,
+                        calculationMethod: el.calculationMethod,
+                        calculationType: el.calculationType,
+                        type: "credit",
+                      });
+                      setUpdate(true);
+                      setFinancingOpen(true);
+                    }}
+                  >
+                    <MyEditIcon />
+                  </Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.cost}</Td>
+                  <Td>{el.purpose}</Td>
+                  <Td>{el.calculationType}</Td>
+                  <Td>{el.calculationMethod}</Td>
+                  <Td
+                    onClick={() => {
+                      setDeleteOpen({
+                        text: "кредит",
+                        isOpen: true,
+                        func: () => {
+                          deleteFinancing(income, el.id!);
+                          //@ts-ignore
+                          setDeleteOpen({ isOpen: false });
+                        },
+                      });
+                    }}
+                  >
+                    <MyDeleteIcon />
+                  </Td>
+                </Tr>
+              );
             })}
           </Tbody>
         </Table>
       </TableContainer>
-      <Button onClick={() => setCreditOpen(true)}>Додати кредит</Button>
-      <CreateCredit
-        open={creditOpen}
-        setOpen={setCreditOpen}
-        res={creditRes}
-        setRes={setCreditRes}
+      <Button
+        onClick={() => {
+          setFinancingOpen(true);
+          setFinancingData((prev) => ({ ...prev, type: "credit" }));
+        }}
+      >
+        Додати кредит
+      </Button>
+      <CreateFinancing
+        open={financingOpen}
+        setOpen={setFinancingOpen}
+        data={financingData}
         update={update}
         setUpdate={setUpdate}
       />
@@ -426,71 +381,72 @@ function Enterprise() {
           </Thead>
           <Tbody>
             {derj.map((el) => {
-              if (el.enterpriseId! == +id!)
-                return (
-                  <Tr key={el.id}>
-                    <Td
-                      onClick={() => {
-                        setDerjRes({
-                          derjId: el.id!,
-                          cost: el.cost,
-                          enterpriseId: +id!,
-                          date: el.date,
-                          name: el.name,
-                          purpose: el.purpose,
-                        });
-                        setDerjOpen(true);
-                        setUpdate(true);
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.purpose}</Td>
-                    <Td
-                      onClick={() => {
-                        setDeleteOpen({
-                          func: () => {
-                            deleteDerj(income, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                          isOpen: true,
-                          text: "державну допомогу",
-                        });
-                      }}
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
+              // if (el.enterpriseId! == +id!)
+              return (
+                <Tr key={el.id}>
+                  <Td
+                    onClick={() => {
+                      setFinancingData({
+                        id: el.id!,
+                        cost: el.cost,
+                        enterpriseId: +id!,
+                        date: el.date,
+                        name: el.name,
+                        purpose: el.purpose,
+                        calculationMethod: el.calculationMethod,
+                        calculationType: el.calculationType,
+                        isUseCost: el.isUseCost,
+                        type: "derj_support",
+                      });
+                      setFinancingOpen(true);
+                      setUpdate(true);
+                    }}
+                  >
+                    <EditIcon
+                      color={"blue.400"}
+                      w={"20px"}
+                      h={"auto"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.cost}</Td>
+                  <Td>{el.purpose}</Td>
+                  <Td
+                    onClick={() => {
+                      setDeleteOpen({
+                        func: () => {
+                          deleteFinancing(income, el.id!);
+                          //@ts-ignore
+                          setDeleteOpen({ isOpen: false });
+                        },
+                        isOpen: true,
+                        text: "державну допомогу",
+                      });
+                    }}
+                  >
+                    <DeleteIcon
+                      w={"20px"}
+                      h={"auto"}
+                      color={"red"}
+                      cursor={"pointer"}
+                    />
+                  </Td>
+                </Tr>
+              );
             })}
           </Tbody>
         </Table>
       </TableContainer>
-      <Button onClick={() => setDerjOpen(true)}>
+      <Button
+        onClick={() => {
+          setFinancingOpen(true);
+          setFinancingData((prev) => ({ ...prev, type: "derj_support" }));
+        }}
+      >
         Додати державну підтримку
       </Button>
-      <CreateDerjSupport
-        open={derjOpen}
-        setOpen={setDerjOpen}
-        res={derjRes}
-        setRes={setDerjRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -513,70 +469,62 @@ function Enterprise() {
           </Thead>
           <Tbody>
             {grant.map((el) => {
-              if (el.enterpriseId == +id!)
-                return (
-                  <Tr>
-                    <Td
-                      onClick={() => {
-                        setGrantRes({
-                          grantId: el.id!,
-                          enterpriseId: +id!,
-                          cost: el.cost,
-                          date: el.date,
-                          name: el.name,
-                          purpose: el.purpose,
-                        });
-                        setUpdate(true);
-                        setGrantOpen(true);
-                      }}
-                    >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                    <Td>{el.name}</Td>
-                    <Td>{el.date}</Td>
-                    <Td>{el.cost}</Td>
-                    <Td>{el.purpose}</Td>
-                    <Td
-                      onClick={() =>
-                        setDeleteOpen({
-                          func: () => {
-                            deleteGrant(income, el.id!);
-                            //@ts-ignore
-                            setDeleteOpen({ isOpen: false });
-                          },
-                          isOpen: true,
-                          text: "грант",
-                        })
-                      }
-                    >
-                      <DeleteIcon
-                        w={"20px"}
-                        h={"auto"}
-                        color={"red"}
-                        cursor={"pointer"}
-                      />
-                    </Td>
-                  </Tr>
-                );
+              // if (el.enterpriseId == +id!)
+              return (
+                <Tr>
+                  <Td
+                    onClick={() => {
+                      setFinancingData({
+                        id: el.id!,
+                        enterpriseId: +id!,
+                        cost: el.cost,
+                        date: el.date,
+                        name: el.name,
+                        purpose: el.purpose,
+                        calculationMethod: el.calculationMethod,
+                        calculationType: el.calculationType,
+                        isUseCost: el.isUseCost,
+                        type: "grant",
+                      });
+                      setUpdate(true);
+                      setFinancingOpen(true);
+                    }}
+                  >
+                    <MyEditIcon />
+                  </Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.date}</Td>
+                  <Td>{el.cost}</Td>
+                  <Td>{el.purpose}</Td>
+                  <Td
+                    onClick={() =>
+                      setDeleteOpen({
+                        func: () => {
+                          deleteFinancing(income, el.id!);
+                          //@ts-ignore
+                          setDeleteOpen({ isOpen: false });
+                        },
+                        isOpen: true,
+                        text: "грант",
+                      })
+                    }
+                  >
+                    <MyDeleteIcon />
+                  </Td>
+                </Tr>
+              );
             })}
           </Tbody>
         </Table>
       </TableContainer>
-      <Button onClick={() => setGrantOpen(true)}>Додати грант</Button>
-      <CreateGrant
-        open={grantOpen}
-        setOpen={setGrantOpen}
-        res={grantRes}
-        setRes={setGrantRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
-
+      <Button
+        onClick={() => {
+          setFinancingOpen(true);
+          setFinancingData((prev) => ({ ...prev, type: "grant" }));
+        }}
+      >
+        Додати грант
+      </Button>
       <DeleteAlert
         open={deleteOpen.isOpen}
         func={deleteOpen.func}

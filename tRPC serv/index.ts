@@ -31,10 +31,7 @@ import { TEJRouter } from "./routes/TEJRouter";
 import { outcomeRouter } from "./routes/outcomeRouter";
 import { productionRouter } from "./routes/productionRouter";
 import { saleRouter } from "./routes/saleRouter";
-import { creditRouter } from "./routes/creditRouter";
-import { investmentRouter } from "./routes/investmentRouter";
-import { derjSupportRouter } from "./routes/derjSupportRouter";
-import { grantRouter } from "./routes/grantRouter";
+import { financingRouter } from "./routes/financingRouter";
 import { buyingMachineRouter } from "./routes/buyingMachineRouter";
 import { administrationRouter } from "./routes/administrationRouter";
 import { enterpriseRouter } from "./routes/enterpriseRouter";
@@ -74,10 +71,7 @@ const appRouter = router({
   TEJ: TEJRouter,
   production: productionRouter,
   sale: saleRouter,
-  credit: creditRouter,
-  investment: investmentRouter,
-  derj_support: derjSupportRouter,
-  grant: grantRouter,
+  financing: financingRouter,
   buyingMachine: buyingMachineRouter,
   administration: administrationRouter,
   enterprise: enterpriseRouter,

@@ -1,18 +1,13 @@
 import { makeAutoObservable } from "mobx";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import {
-  Icredit,
+  Ifinancing,
   Iculture,
-  Iderj_support,
-  Igrant,
   Iincome,
-  Iinvestment,
   Iproduction,
   Isale,
   IvegetationYears,
   IyieldCalculation,
-  IyieldPlant,
-  yieldCalculation,
 } from "../../../tRPC serv/models/models";
 
 export default class IncomeStore {
@@ -22,10 +17,10 @@ export default class IncomeStore {
   private _income: Iincome[] = [];
   private _production: Iproduction[] = [];
   private _sale: Isale[] = [];
-  private _credit: Icredit[] = [];
-  private _investment: Iinvestment[] = [];
-  private _derj: Iderj_support[] = [];
-  private _grant: Igrant[] = [];
+  private _credit: Ifinancing[] = [];
+  private _investment: Ifinancing[] = [];
+  private _derj: Ifinancing[] = [];
+  private _grant: Ifinancing[] = [];
   private _vegetationYear: IvegetationYears[] = [];
   constructor() {
     makeAutoObservable(this);
@@ -71,28 +66,28 @@ export default class IncomeStore {
   public set newSale(sale: Isale) {
     this._sale.push(sale);
   }
-  public set credit(credit: Icredit[]) {
+  public set credit(credit: Ifinancing[]) {
     this._credit = credit;
   }
-  public set newCredit(credit: Icredit) {
+  public set newCredit(credit: Ifinancing) {
     this._credit.push(credit);
   }
-  public set investment(investment: Iinvestment[]) {
+  public set investment(investment: Ifinancing[]) {
     this._investment = investment;
   }
-  public set newInvestment(investment: Iinvestment) {
+  public set newInvestment(investment: Ifinancing) {
     this._investment.push(investment);
   }
-  public set derj(derj: Iderj_support[]) {
+  public set derj(derj: Ifinancing[]) {
     this._derj = derj;
   }
-  public set newDerj(derj: Iderj_support) {
+  public set newDerj(derj: Ifinancing) {
     this._derj.push(derj);
   }
-  public set grant(grant: Igrant[]) {
+  public set grant(grant: Ifinancing[]) {
     this._grant = grant;
   }
-  public set newGrant(grant: Igrant) {
+  public set newGrant(grant: Ifinancing) {
     this._grant.push(grant);
   }
   public set vegetationYear(vegetationYear: IvegetationYears[]) {
