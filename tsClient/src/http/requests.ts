@@ -1433,11 +1433,19 @@ export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
   });
 }
 
-export function addFinancingToBusinessPlan(data: {
-  businessId: number;
-  value: number[];
-}) {
+export function addFinancingToBusinessPlan(
+  income: IncomeStore,
+  bus: BusinessStore,
+  data: {
+    businessId: number;
+    value: number[];
+  }
+) {
   client.business.addFinancing.query(data).then((res) => {
-    console.log(res);
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+    //@ts-ignore
+    sortFinancing(res.financings, income);
   });
 }

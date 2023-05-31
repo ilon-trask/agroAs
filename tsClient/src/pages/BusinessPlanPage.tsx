@@ -84,6 +84,9 @@ function BiznesPlanPage() {
   }, []);
   const { id } = useParams();
   const myBusiness = business.businessPlan.find((el) => el.id == id);
+  console.log("bux");
+  console.log(myBusiness);
+
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
   );
@@ -119,7 +122,7 @@ function BiznesPlanPage() {
   const indicatorRef = useRef<HTMLTableElement>(null);
   const buttonsRef = useRef<HTMLParagraphElement>(null);
   const cultureSet = new Set(
-    myBusiness?.busCuls.map((el) => el?.culture?.name!)
+    myBusiness?.busCuls?.map((el) => el?.culture?.name!)
   );
   const productSet = new Set(
     myBusiness?.busCuls?.map((el) => el.culture?.product!)
@@ -196,16 +199,14 @@ function BiznesPlanPage() {
     priceDiesel: "",
   });
   const [workOpen, setWorkOpen] = useState(false);
-  const thisCredit = income.credit.filter(
-    (el) => el.calculationType == "Базовий"
+  const thisCredit = myBusiness?.financings.filter((el) => el.type == "credit");
+  const thisInvestment = myBusiness?.financings.filter(
+    (el) => el.type == "investment"
   );
-  const thisInvestment = income.investment.filter(
-    (el) => el.calculationType == "Базовий"
+  const thisDerj = myBusiness?.financings.filter(
+    (el) => el.type == "derj_support"
   );
-  const thisDerj = income.derj.filter((el) => el.calculationType == "Базовий");
-  const thisGrand = income.grant.filter(
-    (el) => el.calculationType == "Базовий"
-  );
+  const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
   const [addOpen, setAddOpen] = useState(false);
   return !ready ? (
     <Box></Box>
@@ -401,10 +402,10 @@ function BiznesPlanPage() {
         Залучення фінансування
       </Heading>
       <MainFinancingBusinessPlanTable
-        thisCredit={thisCredit}
-        thisInvestment={thisInvestment}
-        thisDerj={thisDerj}
-        thisGrant={thisGrand}
+        thisCredit={thisCredit!}
+        thisInvestment={thisInvestment!}
+        thisDerj={thisDerj!}
+        thisGrant={thisGrand!}
         isPlan={true}
       />
       <Button onClick={() => setAddOpen(true)}>Додати</Button>
@@ -506,7 +507,7 @@ function BiznesPlanPage() {
             myBusiness={myBusiness!}
             thisMaps={thisMaps}
             productSet={productSet}
-            area={myBusiness?.busCuls.reduce((p, c) => p + c.area, 0) || 0}
+            area={myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0) || 0}
           />
           <FinancingBusinessPlan start={start} end={end} />
           <PlanedIndicatorsBusinessPlan
@@ -525,7 +526,7 @@ function BiznesPlanPage() {
             cultureSet={cultureSet}
             sections={sections!}
             operReady={operReady}
-            thisCredit={thisCredit}
+            thisCredit={thisCredit!}
           />
         </Box>
       </Box>

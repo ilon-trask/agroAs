@@ -12,7 +12,7 @@ type props = {
 const obj = {};
 function AddFinancingToBusinessPlan({ open, setOpen, businessId }: props) {
   const [res, setRes] = useState<number[]>([]);
-  const { income } = useContext(Context);
+  const { income, business } = useContext(Context);
   const thisCredit = income.credit.filter(
     (el) => el.calculationType == "Базовий"
   );
@@ -50,7 +50,10 @@ function AddFinancingToBusinessPlan({ open, setOpen, businessId }: props) {
       <ModalFooter>
         <Button
           onClick={() => {
-            addFinancingToBusinessPlan({ businessId: businessId, value: res });
+            addFinancingToBusinessPlan(income, business, {
+              businessId: businessId,
+              value: res,
+            });
             setOpen(false);
           }}
         >

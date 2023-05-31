@@ -26,7 +26,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 
   resume: Iresume;
   titlePage: ItitlePage;
-  financings:Ifinancing[];
+  financings: Ifinancing[];
   busCuls: {
     businessPlanId: number;
     cultivationTechnologyId: number;
@@ -40,7 +40,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 const includes = [
   { model: resume },
   { model: titlePage },
-  {model: financing,}
+  { model: financing },
   // { model: culture },
   {
     model: busCul,
@@ -213,15 +213,17 @@ class BusinessService {
     const business = await businessPlan.findOne({
       where: { id: data.businessId },
     });
+    //@ts-ignore
     await business.setFinancings(null);
     for (let i = 0; i < data.value.length; i++) {
       const el = data.value[i];
-
+      //@ts-ignore
       await business.addFinancing(el);
     }
-    const res = await businessPlan.findOne({
+    //@ts-ignore
+    const res: resBusinessPlan = await businessPlan.findOne({
       where: { id: data.businessId },
-      include: financing,
+      include: includes,
     });
     return res;
   }
