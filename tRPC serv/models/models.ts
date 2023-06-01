@@ -1,10 +1,5 @@
 import sequelize from "../db";
-import {
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { IncomeType } from "../../tsClient/src/shared/hook/useIncomeTypes";
 import { IncomeGroup } from "../../tsClient/src/shared/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
@@ -21,6 +16,9 @@ import { EnterpriseTaxGroupType } from "../../tsClient/src/shared/hook/useEnterp
 import { WorkerClassesType } from "../../tsClient/src/shared/hook/useWorkersClasses";
 import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
 import { VegetationYearsType } from "../../tsClient/src/shared/hook/useVegetationYears";
+import { CreditCalculationMethodType } from "../../tsClient/src/shared/hook/useCreditCalculationMethod";
+import { CreditCalculationTypeType } from "../../tsClient/src/shared/hook/useCreditCalculationType";
+import { FinancingType } from "../../tsClient/src/shared/hook/useFinancingType";
 export interface Iuser {
   id?: number;
   email: string;
@@ -547,6 +545,7 @@ export interface IbusinessPlan {
   id?: number;
   name: string;
   initialAmount: number;
+  topic: string;
   dateStart: string;
   realizationTime: number;
   cultures?: Iculture[];
@@ -572,6 +571,7 @@ export class businessPlan extends Model<IbusinessPlan> {
 businessPlan.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    topic: { type: DataTypes.TEXT },
     name: { type: DataTypes.STRING, allowNull: false },
     initialAmount: { type: DataTypes.INTEGER },
     dateStart: { type: DataTypes.DATEONLY },
@@ -834,40 +834,34 @@ technologicalEconomicJustification.init(
   },
   { sequelize }
 );
-export interface Iincome {
-  id?: number;
-  type: IncomeType;
-  group: IncomeGroup;
-  isUsing: boolean;
-  UserId: string;
-  saleId?: number | null;
-  creditId?: number | null;
-  investmentId?: number | null;
-  derjSupportId?: number | null;
-  grantId?: number | null;
-}
-export class income extends Model<Iincome> {
-  declare id?: number;
-  declare type: IncomeType;
-  declare group: IncomeGroup;
-  declare UserId: string;
-  declare isUsing: boolean;
-  declare saleId?: number;
-  declare creditId?: number;
-  declare investmentId?: number;
-  declare derjSupportId?: number;
-  declare grantId?: number;
-}
-income.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    type: { type: DataTypes.STRING, allowNull: false },
-    group: { type: DataTypes.STRING },
-    isUsing: { type: DataTypes.BOOLEAN },
-    UserId: { type: DataTypes.STRING, allowNull: false },
-  },
-  { sequelize }
-);
+// export interface Iincome {
+//   id?: number;
+//   type: IncomeType;
+//   group: IncomeGroup;
+//   isUsing: boolean;
+//   UserId: string;
+//   saleId?: number | null;
+//   financingId?: number | null;
+// }
+// export class income extends Model<Iincome> {
+//   declare id?: number;
+//   declare type: IncomeType;
+//   declare group: IncomeGroup;
+//   declare UserId: string;
+//   declare isUsing: boolean;
+//   declare saleId?: number;
+//   declare financingId?: number;
+// }
+// income.init(
+//   {
+//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+//     type: { type: DataTypes.STRING, allowNull: false },
+//     group: { type: DataTypes.STRING },
+//     isUsing: { type: DataTypes.BOOLEAN },
+//     UserId: { type: DataTypes.STRING, allowNull: false },
+//   },
+//   { sequelize }
+// );
 
 export interface Ioutcome {
   id?: number;
@@ -988,31 +982,47 @@ sale.init(
   },
   { sequelize }
 );
-export interface Icredit {
+export interface Ifinancing {
   id?: number;
+  type: FinancingType;
   name: string;
   date: string;
   cost: number;
-  purpose: CreditPurposeType;
+  purpose:
+    | CreditPurposeType
+    | InvestmentOriginType
+    | DerjPurposeType
+    | GrantPurposeType;
   isUseCost: boolean;
-  businessCost?: number;
+  // businessCost?: number;
+  calculationMethod: CreditCalculationMethodType;
+  calculationType: CreditCalculationTypeType;
+  cultureId?: number;
   userId?: string;
   createdAt?: Date;
-  enterpriseId?: number;
 }
-export class credit extends Model<Icredit> {
+export class financing extends Model<Ifinancing> {
   declare id?: number;
   declare name: string;
+  declare type: FinancingType;
   declare date: string;
   declare cost: number;
-  declare purpose: CreditPurposeType;
+  declare cultureId?: number;
+  declare purpose:
+    | CreditPurposeType
+    | InvestmentOriginType
+    | DerjPurposeType
+    | GrantPurposeType;
+  declare calculationMethod: CreditCalculationMethodType;
+  declare calculationType: CreditCalculationTypeType;
   declare isUseCost: boolean;
   declare userId?: string;
 }
-credit.init(
+financing.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     cost: { type: DataTypes.INTEGER },
+    type: { type: DataTypes.STRING },
     date: { type: DataTypes.DATEONLY },
     name: { type: DataTypes.STRING },
     purpose: { type: DataTypes.STRING },
@@ -1021,96 +1031,14 @@ credit.init(
       allowNull: false,
       defaultValue: false,
     },
+    calculationMethod: { type: DataTypes.STRING },
+    calculationType: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
 
   { sequelize }
 );
-export interface Iinvestment {
-  id?: number;
-  name: string;
-  date: string;
-  cost: number;
-  origin: InvestmentOriginType;
-  userId?: string;
-  createdAt?: Date;
-  enterpriseId?: number;
-}
-export class investment extends Model<Iinvestment> {
-  declare id?: number;
-  declare name: string;
-  declare date: string;
-  declare cost: number;
-  declare origin: InvestmentOriginType;
-  declare userId?: string;
-}
-investment.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING },
-    cost: { type: DataTypes.INTEGER },
-    date: { type: DataTypes.DATEONLY },
-    origin: { type: DataTypes.STRING },
-    userId: { type: DataTypes.STRING, allowNull: false },
-  },
-  { sequelize }
-);
-export interface Iderj_support {
-  id?: number;
-  date: string;
-  name: string;
-  cost: number;
-  purpose: DerjPurposeType;
-  userId: string;
-  enterpriseId?: number;
-}
-export class derj_support extends Model<Iderj_support> {
-  declare id?: number;
-  declare date: string;
-  declare name: string;
-  declare cost: number;
-  declare purpose: DerjPurposeType;
-  declare userId: string;
-}
-derj_support.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    date: { type: DataTypes.DATEONLY },
-    name: { type: DataTypes.STRING },
-    cost: { type: DataTypes.INTEGER },
-    purpose: { type: DataTypes.STRING },
-    userId: { type: DataTypes.STRING, allowNull: false },
-  },
-  { sequelize }
-);
-export type Igrant = {
-  id?: number;
-  name: string;
-  date: string;
-  cost: number;
-  purpose: GrantPurposeType;
-  userId: string;
-  enterpriseId?: number;
-};
-export class grant extends Model<Igrant> {
-  declare id?: number;
-  declare name: string;
-  declare date: string;
-  declare cost: number;
-  declare purpose: GrantPurposeType;
-  declare userId: string;
-}
-grant.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING },
-    cost: { type: DataTypes.INTEGER },
-    date: { type: DataTypes.DATEONLY },
-    purpose: { type: DataTypes.STRING },
-    userId: { type: DataTypes.STRING, allowNull: false },
-  },
-  { sequelize }
-);
+
 export interface Ibuying_machine {
   id?: number;
   name: string;
@@ -1371,6 +1299,12 @@ building.init(
   },
   { sequelize }
 );
+export class financBus extends Model<{}> {
+  declare busienssId: number;
+  declare financingId: number;
+}
+
+financBus.init({}, { sequelize });
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
 
@@ -1459,20 +1393,11 @@ production.belongsTo(tech_cart);
 production.hasMany(sale);
 sale.belongsTo(production);
 
-sale.hasOne(income);
-income.belongsTo(sale);
+// sale.hasOne(income);
+// income.belongsTo(sale);
 
-credit.hasOne(income);
-income.belongsTo(credit);
-
-investment.hasOne(income);
-income.belongsTo(investment);
-
-derj_support.hasOne(income);
-income.belongsTo(derj_support);
-
-grant.hasOne(income);
-income.belongsTo(grant);
+// financing.hasOne(income);
+// income.belongsTo(financing);
 
 buying_machine.hasOne(outcome);
 outcome.belongsTo(buying_machine);
@@ -1521,18 +1446,6 @@ buying_machine.belongsTo(businessPlan);
 enterprise.hasMany(buying_machine);
 buying_machine.belongsTo(enterprise);
 
-enterprise.hasMany(investment);
-investment.belongsTo(enterprise);
-
-enterprise.hasMany(credit);
-credit.belongsTo(enterprise);
-
-enterprise.hasMany(derj_support);
-derj_support.belongsTo(enterprise);
-
-enterprise.hasMany(grant);
-grant.belongsTo(enterprise);
-
 enterprise.hasMany(land);
 land.belongsTo(enterprise);
 
@@ -1544,3 +1457,9 @@ building.belongsTo(enterprise);
 
 businessPlan.hasMany(building);
 building.belongsTo(businessPlan);
+
+culture.hasMany(financing);
+financing.belongsTo(culture);
+
+financing.belongsToMany(businessPlan, { through: financBus });
+businessPlan.belongsToMany(financing, { through: financBus });

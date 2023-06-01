@@ -70,6 +70,9 @@ const NavBar = observer(() => {
             >
               Бізнес-плани
             </Link>
+            <Link style={{ color: "#20401e", textDecoration: "none" }} to={"/"}>
+              База данних
+            </Link>
           </Box>
         )}
         {user.isAuth ? (

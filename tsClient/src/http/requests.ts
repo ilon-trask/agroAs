@@ -8,6 +8,7 @@ import {
 import MapStore from "../store/MapStore";
 import BusinessStore from "../store/BusinessStore";
 import {
+  Ifinancing,
   Igrade,
   Imachine,
   Isection,
@@ -26,15 +27,7 @@ import {
 } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import {
-  CreateIncome,
-  CreateProductType,
-  createYieldCalcType,
-  CreateYieldPlantType,
-  PatchIncome,
-  setIsUsingIncomeType,
-  UpdateYieldPlantType,
-} from "../../../tRPC serv/routes/incomeRouter";
+
 import TEJStore from "../store/TEJStore";
 import {
   createTEJType,
@@ -57,27 +50,9 @@ import {
   PatchSaleType,
 } from "../../../tRPC serv/routes/saleRouter";
 import {
-  CreateCreditType,
-  PatchCreditType,
-} from "../../../tRPC serv/routes/creditRouter";
-import {
-  CreateInvestmentType,
-  PatchInvestmentType,
-} from "../../../tRPC serv/routes/investmentRouter";
-import {
-  CreateDerjType,
-  PatchDerjType,
-} from "../../../tRPC serv/routes/derjSupportRouter";
-import {
-  CreateGrantType,
-  PatchGrantType,
-} from "../../../tRPC serv/routes/grantRouter";
-
-import {
   CreateBuyingMachine,
   PatchBuyingMachine,
 } from "../../../tRPC serv/routes/buyingMachineRouter";
-
 import {
   CreateAdministration,
   PatchAdministration,
@@ -106,6 +81,16 @@ import {
   CreateBuildingType,
   PatchBuildingType,
 } from "../../../tRPC serv/routes/buildingRouter";
+import {
+  CreateFinancingType,
+  PatchFinancingType,
+} from "../../../tRPC serv/routes/financingRouter";
+import {
+  CreateProductType,
+  createYieldCalcType,
+  CreateYieldPlantType,
+  UpdateYieldPlantType,
+} from "../../../tRPC serv/routes/incomeRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -978,25 +963,6 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
   });
 }
 
-export function createIncome(Income: IncomeStore, data: CreateIncome) {
-  client.income.create.query(data).then((res) => {
-    Income.newIncome = res;
-  });
-}
-export function getIncome(Income: IncomeStore) {
-  client.income.get.query().then((res) => {
-    Income.income = res;
-  });
-}
-export function setIsUsingIncome(
-  Income: IncomeStore,
-  data: setIsUsingIncomeType
-) {
-  client.income.setIsUsing.query(data).then((res) => {
-    Income.income = Income.income.filter((el) => el.id != res?.id);
-    Income.newIncome = res!;
-  });
-}
 export function createOutcome(map: MapStore, data: createOutcomeType) {
   client.outcome.create.query(data).then((res) => {
     map.newOutcome = res;
@@ -1093,146 +1059,62 @@ export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
   });
 }
 
-export function patchIncome(incomeStore: IncomeStore, data: PatchIncome) {
-  client.income.patch.query(data).then((res) => {
-    incomeStore.income = incomeStore.income.filter((el) => el.id != res?.id);
-    incomeStore.newIncome = res!;
-  });
-}
-
-export function deleteIncome(
-  incomeStore: IncomeStore,
-  data: { incomeId: number }
-) {
-  client.income.delete.query(data).then((res) => {
-    if (res)
-      incomeStore.income = incomeStore.income.filter(
-        (el) => el.id != data.incomeId
+function sortFinancing(arr: Ifinancing[], IncomeStore: IncomeStore) {
+  arr.forEach((el) => {
+    if (el.type == "credit") {
+      IncomeStore.credit = IncomeStore.credit.filter((e) => e.id! != el.id!);
+      IncomeStore.newCredit = el;
+    } else if (el.type == "investment") {
+      IncomeStore.investment = IncomeStore.investment.filter(
+        (e) => e.id != el.id!
       );
+      IncomeStore.newInvestment = el;
+    } else if (el.type == "derj_support") {
+      IncomeStore.derj = IncomeStore.derj.filter((e) => e.id != el.id!);
+      IncomeStore.newDerj = el;
+    } else if (el.type == "grant") {
+      IncomeStore.grant = IncomeStore.grant.filter((e) => e.id != el.id);
+      IncomeStore.newGrant = el;
+    }
+  });
+}
+export function createFinancing(
+  IncomeStore: IncomeStore,
+  data: CreateFinancingType
+) {
+  client.financing.create.query(data).then((res) => {
+    //@ts-ignore
+    if (res) sortFinancing([res], IncomeStore);
+  });
+}
+export function getFinancing(IncomeStore: IncomeStore) {
+  client.financing.get.query().then((res) => {
+    //@ts-ignore
+    sortFinancing(res, IncomeStore);
   });
 }
 
-export function createCredit(IncomeStore: IncomeStore, data: CreateCreditType) {
-  client.credit.create.query(data).then((res) => {
+export function patchFinancing(
+  IncomeStore: IncomeStore,
+  data: PatchFinancingType
+) {
+  client.financing.patch.query(data).then((res) => {
     //@ts-ignore
-    if (res) IncomeStore.newCredit = res;
+    if (res) sortFinancing([res], IncomeStore);
   });
 }
-export function getCredit(IncomeStore: IncomeStore) {
-  client.credit.get.query().then((res) => {
-    //@ts-ignore
-    IncomeStore.credit = res;
-  });
-}
-
-export function patchCredit(incomeStore: IncomeStore, data: PatchCreditType) {
-  client.credit.patch.query(data).then((res) => {
-    if (!res) return;
-    incomeStore.credit = incomeStore.credit.filter((el) => el.id != res?.id); //@ts-ignore
-    incomeStore.newCredit = res;
-  });
-}
-export function deleteCredit(incomeStore: IncomeStore, creditId: number) {
-  client.credit.delete.query({ creditId }).then((el) => {
-    incomeStore.credit = incomeStore.credit.filter((el) => el.id != creditId);
-    incomeStore.income = incomeStore.income.filter(
-      (el) => el.creditId != creditId
+export function deleteFinancing(incomeStore: IncomeStore, financingId: number) {
+  client.financing.delete.query({ financingId }).then((el) => {
+    incomeStore.credit = incomeStore.credit.filter(
+      (el) => el.id != financingId
     );
-  });
-}
-export function createInvestment(
-  incomeStore: IncomeStore,
-  data: CreateInvestmentType
-) {
-  client.investment.create.query(data).then((res) => {
-    //@ts-ignore
-    incomeStore.newInvestment = res;
-  });
-}
-export function getInvestment(incomeStore: IncomeStore) {
-  client.investment.get.query().then((res) => {
-    //@ts-ignore
-    incomeStore.investment = res;
-  });
-}
-
-export function patchInvestment(
-  incomeStore: IncomeStore,
-  data: PatchInvestmentType
-) {
-  client.investment.patch.query(data).then((res) => {
-    if (!res) return;
     incomeStore.investment = incomeStore.investment.filter(
-      (el) => el.id != res?.id!
-    ); //@ts-ignore
-    incomeStore.newInvestment = res;
-  });
-}
-
-export function deleteInvestment(
-  incomeStore: IncomeStore,
-  investmentId: number
-) {
-  client.investment.delete.query({ investmentId }).then((res) => {
-    incomeStore.investment = incomeStore.investment.filter(
-      (el) => el.id != investmentId
+      (el) => el.id != financingId
     );
+    incomeStore.derj = incomeStore.derj.filter((el) => el.id != financingId);
+    incomeStore.grant = incomeStore.grant.filter((el) => el.id != financingId);
     incomeStore.income = incomeStore.income.filter(
-      (el) => el.investmentId != investmentId
-    );
-  });
-}
-
-export function getDerj(incomeStore: IncomeStore) {
-  client.derj_support.get.query().then((res) => (incomeStore.derj = res));
-}
-
-export function createDerj(incomeStore: IncomeStore, data: CreateDerjType) {
-  client.derj_support.create.query(data).then((res) => {
-    incomeStore.newDerj = res;
-  });
-}
-
-export function patchDerj(incomeStore: IncomeStore, data: PatchDerjType) {
-  client.derj_support.patch.query(data).then((res) => {
-    if (!res) return;
-    incomeStore.derj = incomeStore.derj.filter((el) => el.id != res?.id);
-    incomeStore.newDerj = res;
-  });
-}
-
-export function deleteDerj(incomeStore: IncomeStore, derjId: number) {
-  client.derj_support.delete.query({ derjId }).then((res) => {
-    incomeStore.derj = incomeStore.derj.filter((el) => el.id != derjId);
-    incomeStore.income = incomeStore.income.filter(
-      (el) => el.derjSupportId != derjId
-    );
-  });
-}
-
-export function getGrant(incomeStore: IncomeStore) {
-  client.grant.get.query().then((res) => {
-    incomeStore.grant = res;
-  });
-}
-
-export function createGrant(incomeStore: IncomeStore, data: CreateGrantType) {
-  client.grant.create.query(data).then((res) => {
-    incomeStore.newGrant = res;
-  });
-}
-export function patchGrant(incomeStore: IncomeStore, data: PatchGrantType) {
-  client.grant.patch.query(data).then((res) => {
-    if (!res) return;
-    incomeStore.grant = incomeStore.grant.filter((el) => el.id != res.id);
-    incomeStore.newGrant = res;
-  });
-}
-export function deleteGrant(incomeStore: IncomeStore, grantId: number) {
-  client.grant.delete.query({ grantId }).then((res) => {
-    incomeStore.grant = incomeStore.grant.filter((el) => el.id != grantId);
-    incomeStore.income = incomeStore.income.filter(
-      (el) => el.grantId != grantId
+      (el) => el.financingId != financingId
     );
   });
 }
@@ -1509,5 +1391,22 @@ export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
       //@ts-ignore
       map.newBusinessCarts = res;
     }
+  });
+}
+
+export function addFinancingToBusinessPlan(
+  income: IncomeStore,
+  bus: BusinessStore,
+  data: {
+    businessId: number;
+    value: number[];
+  }
+) {
+  client.business.addFinancing.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+    //@ts-ignore
+    // sortFinancing(res.financings, income);
   });
 }

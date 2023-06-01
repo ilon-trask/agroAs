@@ -23,6 +23,7 @@ export type CreateBusinessProp = {
   enterpriseId: number | "";
   dateStart: string;
   realizationTime: number | "";
+  topic: string;
 };
 type props = {
   open: boolean;

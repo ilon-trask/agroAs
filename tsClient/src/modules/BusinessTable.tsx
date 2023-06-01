@@ -82,6 +82,7 @@ function BusinessTable({ setOpen, setRes, setUpdate, setDeleteOpen }: props) {
                     name: el.name,
                     realizationTime: el.realizationTime,
                     planId: el.id,
+                    topic: el.topic,
                   });
                 }}
               >

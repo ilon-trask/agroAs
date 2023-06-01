@@ -1,7 +1,7 @@
 import { Box, Text } from "@chakra-ui/react";
 import React from "react";
 
-function TitleBusinessPlan() {
+function TitleBusinessPlan({ topic, name }: { topic: string; name: string }) {
   return (
     <>
       <Box
@@ -12,14 +12,15 @@ function TitleBusinessPlan() {
         lineHeight={10}
         color={"#20401E"}
       >
-        <Text>Ягідна </Text>
-        <Text ml={"-20px"}>плантація</Text>
+        <Text width={"min-content"} textAlign={"right"}>
+          {topic}
+        </Text>
       </Box>
       <Text mt={40} fontSize={"32px"} fontWeight={"bold"} textAlign={"center"}>
         Бізнес-план
       </Text>
       <Text textAlign={"center"} mt={3}>
-        Вирощування та продаж ягід:
+        {name}
       </Text>
       <Box mt={200} maxW={"80%"} mx={"auto"}>
         <Box mt={5}>

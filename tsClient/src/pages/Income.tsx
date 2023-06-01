@@ -6,12 +6,9 @@ import React, {
   useState,
 } from "react";
 import {
-  Box,
   Button,
   Checkbox,
   Container,
-  Heading,
-  Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -32,32 +29,11 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import Dialog from "../components/Dialog";
-import CreateYield from "../modules/CreateYield";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import { Link } from "react-router-dom";
-import { YIELD_CALC_ROUTER } from "../utils/consts";
-import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
-import {
-  deleteCredit,
-  deleteDerj,
-  deleteGrant,
-  deleteIncome,
-  deleteInvestment,
-  deleteSale,
-  deleteYieldPlant,
-  getCredit,
-  getDerj,
-  getGrant,
-  getIncome,
-  getInvestment,
-  getSale,
-  patchSale,
-  setIsUsingIncome,
-} from "../http/requests";
+import { getFinancing, getSale } from "../http/requests";
 import { incProp } from "../modules/CreateYield/CreateYield";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import CreateIncome, { IncomeProp } from "../modules/CreateIncome/CreateIncome";
@@ -66,6 +42,8 @@ import MapStore from "../store/MapStore";
 import IncomeStore from "../store/IncomeStore";
 
 import SaleTable from "../modules/SaleTable";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 
 function Sale({
   map,
@@ -147,7 +125,6 @@ function Income() {
   });
   useEffect(() => {
     getSale(income);
-    getIncome(income);
   }, []);
 
   const [incomeOpen, setIncomeOpen] = useState(false);
@@ -161,7 +138,7 @@ function Income() {
     propId: "",
   });
   useEffect(() => {
-    if (!income.credit[0]) getCredit(income);
+    if (!income.credit[0]) getFinancing(income);
   }, []);
   const [time, setTime] = useState({
     year: new Date().getFullYear(),
@@ -253,18 +230,18 @@ function Income() {
           <Tbody>
             {income.income.map((el) => {
               const sale = income.sale.find((e) => e.id == el.saleId);
-              const credit = income.credit.find((e) => e.id == el.creditId);
+              const credit = income.credit.find((e) => e.id == el.financingId);
               const product = map.product.find(
                 (e) =>
                   e.id ==
                   income.production.find((e) => e.id == sale?.productionId)
                     ?.productId
               );
-              const derj = income.derj.find((e) => e.id == el.derjSupportId);
+              const derj = income.derj.find((e) => e.id == el.financingId);
               const investment = income.investment.find(
-                (e) => e.id == el.investmentId
+                (e) => e.id == el.financingId
               );
-              const grant = income.grant.find((e) => e.id == el.grantId);
+              const grant = income.grant.find((e) => e.id == el.financingId);
               return (
                 <Tr key={el.id}>
                   <Td
@@ -272,24 +249,14 @@ function Income() {
                       setIncomeUpdate(true);
                       setIncomeRes({
                         group: el.group,
-                        propId:
-                          el.saleId! ||
-                          el.creditId! ||
-                          el.derjSupportId! ||
-                          el.investmentId! ||
-                          el.grantId!,
+                        propId: el.saleId! || el.financingId!,
                         type: el.type,
                         id: el.id,
                       });
                       setIncomeOpen(true);
                     }}
                   >
-                    <EditIcon
-                      color={"blue.400"}
-                      w={"20px"}
-                      h={"auto"}
-                      cursor={"pointer"}
-                    />
+                    <MyEditIcon />
                   </Td>
                   <Td>
                     {product?.name ||
@@ -312,7 +279,6 @@ function Income() {
                       setDeleteOpen({
                         isOpen: true,
                         func: () => {
-                          deleteIncome(income, { incomeId: el.id! });
                           setDeleteOpen((prev) => ({ ...prev, isOpen: false }));
                         },
                         text: "прибуток",
@@ -320,21 +286,9 @@ function Income() {
                       });
                     }}
                   >
-                    <DeleteIcon
-                      w={"20px"}
-                      h={"auto"}
-                      color={"red"}
-                      cursor={"pointer"}
-                    />
+                    <MyDeleteIcon />
                   </Td>
-                  <Td
-                    onClick={() =>
-                      setIsUsingIncome(income, {
-                        incomeId: el.id!,
-                        value: !el.isUsing,
-                      })
-                    }
-                  >
+                  <Td onClick={() => {}}>
                     <Checkbox
                       size="md"
                       colorScheme="green"

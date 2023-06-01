@@ -313,8 +313,8 @@ function ProductionBusinessPlan({
             <Th>Назва основного засобу</Th>
             <Th>Первісн а вартість</Th>
             <Th>Термін амортизації</Th>
-            <Th>Знос за …3 роки</Th>
-            <Th>Залишкова вартість</Th>
+            <Th>Амортизація (місяць)</Th>
+            <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
       </Table>
@@ -336,13 +336,35 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
-            <Th>Назва біологічного аактиву</Th>
+            <Th>Назва біологічного активу</Th>
             <Th>Первісна вартість</Th>
             <Th>Термін амортизації</Th>
-            <Th>Знос за …3 роки</Th>
-            <Th>Залишкова вартість</Th>
+            <Th>Амортизація (місяць)</Th>
+            <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
+      </Table>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th colSpan={5}>
+              <TableName>Малоцінні і швидко зношувальні предмети</TableName>
+            </Th>
+          </Tr>
+          <Tr>
+            <Th colSpan={5}>
+              <TableNumber></TableNumber>
+            </Th>
+          </Tr>
+          <Tr>
+            <Th>Назва МШП</Th>
+            <Th>Первісна вартість</Th>
+            <Th>Термін амортизації</Th>
+            <Th>Амортизація (місяць)</Th>
+            <Th>Початок амортизації</Th>
+          </Tr>
+        </Thead>
+        <Tbody></Tbody>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -381,19 +403,9 @@ function ProductionBusinessPlan({
               Засоби <br />
               і&nbsp;активи
             </Th>
-            {(() => {
-              const res = [];
-              for (let i = start; i < end; i++) {
-                if (i <= start + 6) {
-                  res.push(
-                    <>
-                      <Th>{i}</Th>
-                    </>
-                  );
-                }
-              }
-              return res;
-            })()}
+            <Th>Основні засоби</Th>
+            <Th>Біо активи</Th>
+            <Th>МШП</Th>
             <Th>
               Сума <br />
               амортизації
@@ -401,12 +413,19 @@ function ProductionBusinessPlan({
           </Tr>
         </Thead>
         <Tbody>
-          <Tr>
-            <Td>Основні засоби</Td>
-          </Tr>
-          <Tr>
-            <Td>Біоактиви</Td>
-          </Tr>
+          {(() => {
+            const res = [];
+            for (let i = start; i < end; i++) {
+              if (i <= start + 6) {
+                res.push(
+                  <Tr>
+                    <Td>{i}</Td>
+                  </Tr>
+                );
+              }
+            }
+            return res;
+          })()}
           <Tr>
             <Td>Разом</Td>
           </Tr>

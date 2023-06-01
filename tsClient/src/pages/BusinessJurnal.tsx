@@ -32,6 +32,7 @@ function BusinessJurnal() {
     initialAmount: "",
     realizationTime: "",
     cultureIds: [],
+    topic: "",
   });
   useBusiness(business, map);
   const navigate = useNavigate();

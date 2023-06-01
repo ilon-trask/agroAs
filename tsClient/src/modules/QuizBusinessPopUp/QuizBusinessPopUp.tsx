@@ -11,6 +11,8 @@ import {
   Tbody,
   Td,
   Text,
+  Th,
+  Thead,
   Tr,
 } from "@chakra-ui/react";
 import React, {
@@ -21,6 +23,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { Iculture } from "../../../../tRPC serv/models/models";
 import Dialog from "../../components/Dialog";
 import { Context } from "../../main";
@@ -38,6 +42,8 @@ type props = {
   res: any;
   setRes: Dispatch<SetStateAction<any>>;
   cultures: Iculture[];
+  myBusiness: resBusinessPlan;
+  enterpriseId: number;
 };
 const obj = {};
 function Years({
@@ -59,7 +65,7 @@ function Years({
     arr.push(i);
   }
   return (
-    <Box>
+    <Box mx={"auto"} width={"fit-content"}>
       {arr.map((el) => (
         <Tag
           size={"lg"}
@@ -81,6 +87,8 @@ function QuizBusinessPopUp({
   res,
   setRes,
   cultures,
+  myBusiness,
+  enterpriseId,
 }: props) {
   const [screen, setScreen] = useState(1);
   const [isActive, setIsActive] = useState(true);
@@ -89,8 +97,11 @@ function QuizBusinessPopUp({
   const year = startYear + +res.realizationTime;
   const [period, setPeriod] = useState(startYear);
   useEffect(() => setPeriod(startYear), [startYear]);
-  const { income, map } = useContext(Context);
+  const { income, map, enterpriseStore } = useContext(Context);
   const sales = income.sale.filter((el) => el.isPlan);
+  const thisWorkers = enterpriseStore.worker.filter(
+    (el) => el.enterpriseId == enterpriseId
+  );
   function Footer() {
     return (
       <ModalFooter justifyContent={"space-between"}>
@@ -99,6 +110,7 @@ function QuizBusinessPopUp({
       </ModalFooter>
     );
   }
+
   return (
     <Dialog
       open={open}
@@ -136,28 +148,81 @@ function QuizBusinessPopUp({
             setPeriod={setPeriod}
           />
           <Table size={"sm"}>
+            <Thead>
+              <Tr>
+                <Th>Персонал</Th>
+                <Th>Кількість</Th>
+                <Th>Середня заробітна плата</Th>
+              </Tr>
+            </Thead>
             <Tbody>
               <Tr>
-                <Td>Кількість постійних працівників</Td>
+                <Td>Адміністративний</Td>
+                <Td>
+                  {thisWorkers
+                    .filter((el) => el.class == "Адміністративний")
+                    .reduce((p, c) => p + c.amount, 0)}
+                </Td>
                 <Td></Td>
                 <Td>
-                  <Button>Докладніше</Button>
-                </Td>
-                <Td>
                   <Button>
-                    <PlusSquareIcon />
+                    <MyEditIcon />
                   </Button>
                 </Td>
               </Tr>
               <Tr>
-                <Td>Кількість сезонних працівників</Td>
+                <Td>Інженерно технічний</Td>
+                <Td>
+                  {thisWorkers
+                    .filter((el) => el.class == "Інженерно технічний")
+                    .reduce((p, c) => p + c.amount, 0)}
+                </Td>
                 <Td></Td>
                 <Td>
-                  <Button>Докладніше</Button>
+                  <Button>
+                    <MyEditIcon />
+                  </Button>
                 </Td>
+              </Tr>
+              <Tr>
+                <Td>Виробничий</Td>
+                <Td>
+                  {thisWorkers
+                    .filter((el) => el.class == "Виробничий")
+                    .reduce((p, c) => p + c.amount, 0)}
+                </Td>
+                <Td></Td>
                 <Td>
                   <Button>
-                    <PlusSquareIcon />
+                    <MyEditIcon />
+                  </Button>
+                </Td>
+              </Tr>
+              <Tr>
+                <Td>У тому числі постійні</Td>
+                <Td>
+                  {thisWorkers
+                    .filter((el) => el.class == "Виробничий" && el.isConst)
+                    .reduce((p, c) => p + c.amount, 0)}
+                </Td>
+                <Td></Td>
+                <Td>
+                  <Button>
+                    <MyEditIcon />
+                  </Button>
+                </Td>
+              </Tr>
+              <Tr>
+                <Td>У тому числі сезонні</Td>
+                <Td>
+                  {thisWorkers
+                    .filter((el) => el.class == "Виробничий" && !el.isConst)
+                    .reduce((p, c) => p + c.amount, 0)}
+                </Td>
+                <Td></Td>
+                <Td>
+                  <Button>
+                    <MyEditIcon />
                   </Button>
                 </Td>
               </Tr>
@@ -177,6 +242,33 @@ function QuizBusinessPopUp({
             setPeriod={setPeriod}
           />
           <Box>
+            <Table size={"sm"}>
+              <Thead>
+                <Tr>
+                  <Th>Назва продукту</Th>
+                  <Th>Ціна</Th>
+                  <Th>Валовий збір</Th>
+                  <Th>Коефіцієнт</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(() => {
+                  const prodSet = Array.from(
+                    new Set(
+                      myBusiness.busCuls.map((obj) =>
+                        JSON.stringify(obj.culture)
+                      )
+                    )
+                  ).map((str) => JSON.parse(str));
+                  return [...prodSet].map((el) => (
+                    <Tr key={el}>
+                      <Td>{el.product}</Td>
+                      <Td>{el.priceBerry}</Td>
+                    </Tr>
+                  ));
+                })()}
+              </Tbody>
+            </Table>
             {sales.map((el) => {
               const production = income.production.find(
                 (e) => e.id == el.productionId
@@ -232,26 +324,39 @@ function QuizBusinessPopUp({
                   <Table size="sm">
                     <Tbody>
                       <Tr>
-                        <Td>Кредит</Td>
-                        <Td>{creditSum}</Td>
+                        <Td>Інвестицію</Td>
+                        <Td>{0}</Td>
                         <Td>
-                          <Button onClick={() => setCreditOpen(true)}>
-                            Додати
+                          <Button>
+                            <MyEditIcon />
                           </Button>
                         </Td>
                       </Tr>
                       <Tr>
-                        <Td>Інвестицію</Td>
+                        <Td>Кредит</Td>
+                        <Td>{creditSum}</Td>
+                        <Td>
+                          <Button onClick={() => setCreditOpen(true)}>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Державна підтримка</Td>
                         <Td>{0}</Td>
                         <Td>
-                          <Button>Додати</Button>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
                         </Td>
                       </Tr>
                       <Tr>
                         <Td>Грант</Td>
                         <Td>{0}</Td>
                         <Td>
-                          <Button>Додати</Button>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
                         </Td>
                       </Tr>
                     </Tbody>
@@ -265,14 +370,18 @@ function QuizBusinessPopUp({
                         <Td>Купівля техніки й обладнання</Td>
                         <Td>{0}</Td>
                         <Td>
-                          <Button>Додати</Button>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
                         </Td>
                       </Tr>
                       <Tr>
                         <Td>Будівництво будівель і споруд</Td>
                         <Td>{0}</Td>
                         <Td>
-                          <Button>Додати</Button>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
                         </Td>
                       </Tr>
                     </Tbody>
@@ -290,17 +399,23 @@ function QuizBusinessPopUp({
               <CreditTablePopUp
                 open={creditOpen}
                 setOpen={setCreditOpen}
-                credits={allCredits}
+                // credits={allCredits}
               />
             </Box>
           );
         })()
       ) : screen == 6 ? (
         (() => {
+          const allCredits = income.credit.filter((el) => el.isUseCost);
+          const credits = allCredits.filter(
+            (el) => +el.date?.split("-")[0] == period
+          );
+          let creditSum: number = credits?.reduce((a, b) => a + b.cost!, 0);
+
           return (
             <Box>
               <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
-                Показники
+                Внесіть дані для розрахунку витрат
               </Text>
               <Years
                 dateStart={res.dateStart}
@@ -308,6 +423,100 @@ function QuizBusinessPopUp({
                 period={period}
                 setPeriod={setPeriod}
               />
+              <Box display={"flex"} mx={"auto"} maxW={"fit-content"}>
+                <Box width="50%">
+                  <Text textAlign={"center"}>Постійні витрати</Text>
+                  <Table size="sm">
+                    <Tbody>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{creditSum}</Td>
+                        <Td>
+                          <Button onClick={() => setCreditOpen(true)}>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </Box>
+                <Box width="50%">
+                  <Text textAlign={"center"}>Загальновиробничі витрати</Text>
+                  <Table size="sm">
+                    <Tbody>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td></Td>
+                        <Td>{0}</Td>
+                        <Td>
+                          <Button>
+                            <MyEditIcon />
+                          </Button>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </Box>
+              </Box>
+              <ModalFooter justifyContent={"space-between"}>
+                <Button onClick={() => setScreen((prev) => prev - 1)}>
+                  Назад
+                </Button>
+                <Button onClick={() => setScreen((prev) => prev + 1)}>
+                  Далі
+                </Button>
+              </ModalFooter>
+              <CreditTablePopUp
+                open={creditOpen}
+                setOpen={setCreditOpen}
+                // credits={allCredits}
+              />
+            </Box>
+          );
+        })()
+      ) : screen == 7 ? (
+        (() => {
+          return (
+            <Box>
+              <Text fontWeight="bold" textAlign={"center"} size={"lg"}>
+                Показники
+              </Text>
+
               <Table size={"sm"}>
                 <Tbody>
                   <Tr>

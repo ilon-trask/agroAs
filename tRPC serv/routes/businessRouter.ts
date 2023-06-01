@@ -5,6 +5,7 @@ import BusinessService, {
 } from "../controllers/BusinessService";
 const createType = z.object({
   name: z.string(),
+  topic: z.string(),
   initialAmount: z.number(),
   enterpriseId: z.number(),
   cultureIds: z.array(
@@ -85,6 +86,12 @@ const businessRouter = router({
         ctx.user,
         input
       );
+      return res;
+    }),
+  addFinancing: publicProcedure
+    .input(z.object({ businessId: z.number(), value: z.array(z.number()) }))
+    .query(async ({ input, ctx }) => {
+      let res = await BusinessService.addFinancing(input);
       return res;
     }),
 });

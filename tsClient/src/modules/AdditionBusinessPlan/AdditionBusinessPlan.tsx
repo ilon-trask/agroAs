@@ -1,6 +1,7 @@
 import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { Context } from "src/main";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import useVegetationYears, {
   VegetationYearsType,
@@ -13,7 +14,7 @@ import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
-import { Iworker } from "../../../../tRPC serv/models/models";
+import { Ifinancing, Iworker } from "../../../../tRPC serv/models/models";
 import CashFlowTable from "../CashFlowTable";
 import OperTableSection from "../OpersTable/components/OperTableSection";
 import { OpersTableHead } from "../OpersTable/OpersTable";
@@ -32,6 +33,10 @@ function AdditionBusinessPlan({
   cultureSet,
   sections,
   operReady,
+  thisCredit,
+  thisDerj,
+  thisGrand,
+  thisInvestment,
 }: {
   form: EnterpriseFormType;
   start: number;
@@ -42,6 +47,10 @@ function AdditionBusinessPlan({
   cultureSet: Set<string>;
   sections: { data: sectionsOpers; year: VegetationYearsType }[];
   operReady: boolean;
+  thisCredit: Ifinancing[] | undefined;
+  thisInvestment: Ifinancing[] | undefined;
+  thisDerj: Ifinancing[] | undefined;
+  thisGrand: Ifinancing[] | undefined;
 }) {
   const { map, income } = useContext(Context);
 
@@ -234,11 +243,24 @@ function AdditionBusinessPlan({
                 sumESV = 0,
                 sumDirect = 0,
                 sumTake = 0;
+              const thisYear = start + ind;
+              const sumCredit = thisCredit
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumInv = thisInvestment
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumDerj = thisDerj
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumGrand = thisGrand
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
               return (
                 <>
                   <Tr>
                     <Td>{ind}</Td>
-                    <Td>{start + ind}</Td>
+                    <Td>{thisYear}</Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
                         <Text>
@@ -458,7 +480,8 @@ function AdditionBusinessPlan({
                       }
                     </Td>
                     <Td>
-                      {ind == 0
+                      {sumInv}
+                      {/* {ind == 0
                         ? myBusiness.initialAmount
                         : income.investment
                             .filter(
@@ -466,10 +489,10 @@ function AdditionBusinessPlan({
                             )
                             .map((el) => {
                               return <Text>{el.name}</Text>;
-                            }) || <Text>0</Text>}
-                      <Text>0</Text>
-                      <Text>0</Text>
-                      <Text>0</Text>
+                            }) || <Text>0</Text>} */}
+                      <Text>{sumCredit}</Text>
+                      <Text>{sumDerj}</Text>
+                      <Text>{sumGrand}</Text>
                       {/* {income.credit
                               .filter(
                                 (el) => +el.date.split("-")[0] - start == ind
@@ -529,21 +552,25 @@ function AdditionBusinessPlan({
                         .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)}
                     </Td>
                     <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) * 0.235}
+                      {Math.round(
+                        thisWorkers
+                          .filter((el) => el.class == "Адміністративний")
+                          .reduce(
+                            (p, c) => p + c.salary * c.amountOfMounths!,
+                            0
+                          ) * 0.235
+                      )}
                     </Td>
                     <Td>0</Td>
                     <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) * 1.235}
+                      {Math.round(
+                        thisWorkers
+                          .filter((el) => el.class == "Адміністративний")
+                          .reduce(
+                            (p, c) => p + c.salary * c.amountOfMounths!,
+                            0
+                          ) * 1.235
+                      )}
                     </Td>
                     <Td>
                       {thisWorkers
@@ -571,7 +598,12 @@ function AdditionBusinessPlan({
                     <Td></Td>
                     <Td>{sumTake}</Td>
                     <Td></Td>
-                    <Td>{ind == 0 ? myBusiness.initialAmount : 0}</Td>
+                    <Td>
+                      {(sumCredit || 0) +
+                        (sumInv || 0) +
+                        (sumDerj || 0) +
+                        (sumGrand || 0)}
+                    </Td>
                   </Tr>
                 </>
               );
