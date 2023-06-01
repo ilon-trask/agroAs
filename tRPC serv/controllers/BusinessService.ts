@@ -22,8 +22,6 @@ import {
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
 export interface resBusinessPlan extends IbusinessPlan {
-  area: number;
-
   resume: Iresume;
   titlePage: ItitlePage;
   financings: Ifinancing[];
@@ -48,6 +46,27 @@ const includes = [
   },
   // { model: cultivationTechnologies },
 ];
+function changeFinancing(res: resBusinessPlan[]) {
+  res = JSON.parse(JSON.stringify(res));
+  res.map(
+    (res) =>
+      (res.financings = res.financings.map((el) => {
+        let area = 1;
+        if (el.cultureId) {
+          area = res.busCuls
+            .filter((e) => e.cultureId == el.cultureId)
+            .reduce((p, c) => p + c.area, 0);
+        } else {
+          area = res.busCuls.reduce((p, c) => p + c.area, 0);
+        }
+        if (el.calculationMethod == "На гектар") {
+          el.cost = el.cost * area;
+        }
+        return el;
+      }))
+  );
+  return res;
+}
 class BusinessService {
   // async getCategory() {
   //   const category = await businessCategory.findAll();
@@ -56,17 +75,20 @@ class BusinessService {
   async get(user: Principal | undefined) {
     if (user) {
       //@ts-ignore
-      const plans: resBusinessPlan[] = await businessPlan.findAll({
+      let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { userId: user.sub },
         include: includes,
       });
+
+      plans = changeFinancing(plans);
       return plans;
     } else {
       //@ts-ignore
-      const plans: resBusinessPlan[] = await businessPlan.findAll({
+      let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
         include: includes,
       });
+      plans = changeFinancing(plans);
       return plans;
     }
   }
@@ -78,6 +100,7 @@ class BusinessService {
     const plan: resBusinessPlan = await businessPlan.create(
       {
         name: data.name,
+        topic: data.topic,
         initialAmount: data.initialAmount,
         dateStart: data.dateStart,
         enterpriseId: data.enterpriseId,
@@ -120,7 +143,7 @@ class BusinessService {
         initialAmount: data.initialAmount,
         enterpriseId: data.enterpriseId,
         realizationTime: data.realizationTime,
-
+        topic: data.topic,
         name: data.name,
       },
       { where: { id: data.planId } }
@@ -157,6 +180,7 @@ class BusinessService {
         include: includes,
       });
     }
+    res = changeFinancing([res!])[0];
     return res;
   }
   async delete(user: Principal | undefined, data: DeleteBusinessPlan) {
@@ -221,10 +245,11 @@ class BusinessService {
       await business.addFinancing(el);
     }
     //@ts-ignore
-    const res: resBusinessPlan = await businessPlan.findOne({
+    let res: resBusinessPlan = await businessPlan.findOne({
       where: { id: data.businessId },
       include: includes,
     });
+    res = changeFinancing([res])[0];
     return res;
   }
 }

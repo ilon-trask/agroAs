@@ -5,6 +5,7 @@ import BusinessService, {
 } from "../controllers/BusinessService";
 const createType = z.object({
   name: z.string(),
+  topic: z.string(),
   initialAmount: z.number(),
   enterpriseId: z.number(),
   cultureIds: z.array(

@@ -33,13 +33,7 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import NoAuthAlert from "../components/NoAuthAlert";
 import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
-import {
-  deleteIncome,
-  getFinancing,
-  getIncome,
-  getSale,
-  setIsUsingIncome,
-} from "../http/requests";
+import { getFinancing, getSale } from "../http/requests";
 import { incProp } from "../modules/CreateYield/CreateYield";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import CreateIncome, { IncomeProp } from "../modules/CreateIncome/CreateIncome";
@@ -131,7 +125,6 @@ function Income() {
   });
   useEffect(() => {
     getSale(income);
-    getIncome(income);
   }, []);
 
   const [incomeOpen, setIncomeOpen] = useState(false);
@@ -286,7 +279,6 @@ function Income() {
                       setDeleteOpen({
                         isOpen: true,
                         func: () => {
-                          deleteIncome(income, { incomeId: el.id! });
                           setDeleteOpen((prev) => ({ ...prev, isOpen: false }));
                         },
                         text: "прибуток",
@@ -296,14 +288,7 @@ function Income() {
                   >
                     <MyDeleteIcon />
                   </Td>
-                  <Td
-                    onClick={() =>
-                      setIsUsingIncome(income, {
-                        incomeId: el.id!,
-                        value: !el.isUsing,
-                      })
-                    }
-                  >
+                  <Td onClick={() => {}}>
                     <Checkbox
                       size="md"
                       colorScheme="green"

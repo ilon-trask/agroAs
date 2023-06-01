@@ -1,16 +1,29 @@
 import { Button, Heading, ModalFooter } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import Dialog from "src/components/Dialog";
 import { addFinancingToBusinessPlan } from "src/http/requests";
 import { Context } from "src/main";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import MainFinancingBusinessPlanTable from "../MainFinancingBusinessPlanTable";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   businessId: number;
+  data: number[];
 };
 const obj = {};
-function AddFinancingToBusinessPlan({ open, setOpen, businessId }: props) {
+function AddFinancingToBusinessPlan({
+  open,
+  setOpen,
+  businessId,
+  data,
+}: props) {
   const [res, setRes] = useState<number[]>([]);
   const { income, business } = useContext(Context);
   const thisCredit = income.credit.filter(
@@ -23,6 +36,9 @@ function AddFinancingToBusinessPlan({ open, setOpen, businessId }: props) {
   const thisGrand = income.grant.filter(
     (el) => el.calculationType == "Базовий"
   );
+  useEffect(() => {
+    setRes(data);
+  }, [data]);
   return (
     <Dialog
       res={res}

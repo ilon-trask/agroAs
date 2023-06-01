@@ -34,9 +34,6 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
 
     if (
       res.cultureIds?.find((el) => {
-        console.log(el.id);
-        console.log(id);
-
         return el.id == id;
       })
     ) {
@@ -72,15 +69,27 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           </>
         )}
       </Box>
-      <Box>
-        <Text>Вкажіть назву бізнес-плану</Text>
-        <Input
-          value={res.name}
-          onChange={(e) =>
-            setRes((prev) => ({ ...prev, name: e.target.value }))
-          }
-          placeholder="Впишіть назву"
-        />
+      <Box display={"flex"} justifyContent={"space-around"}>
+        <Box width={"40%"}>
+          <Text>Вкажіть назву бізнес-плану</Text>
+          <Input
+            value={res.name}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, name: e.target.value }))
+            }
+            placeholder="Впишіть назву"
+          />
+        </Box>
+        <Box width={"40%"}>
+          <Text>Вкажіть тему бізнес-плану</Text>
+          <Input
+            value={res.topic}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, topic: e.target.value }))
+            }
+            placeholder="Впишіть тему"
+          />
+        </Box>
       </Box>
       <Box>
         <Text>Виберіть культуру</Text>

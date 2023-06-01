@@ -64,6 +64,7 @@ import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MainFinancingBusinessPlanTable from "src/modules/MainFinancingBusinessPlanTable";
 import AddFinancingToBusinessPlan from "src/modules/AddFinancingToBusinessPlan";
+import TableName from "src/ui/TableName";
 function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
@@ -200,14 +201,31 @@ function BiznesPlanPage() {
   });
   const [workOpen, setWorkOpen] = useState(false);
   const thisCredit = myBusiness?.financings.filter((el) => el.type == "credit");
-  const thisInvestment = myBusiness?.financings.filter(
-    (el) => el.type == "investment"
-  );
+
+  let thisInvestment =
+    myBusiness?.financings.filter((el) => el.type == "investment") || [];
+  thisInvestment = [
+    ...thisInvestment,
+    {
+      date: myBusiness?.dateStart!,
+      calculationMethod: "На бізнес-план",
+      calculationType: "Індивідуальний",
+      cost: myBusiness?.initialAmount!,
+      isUseCost: false,
+      name: "Початкові інвестиції",
+      purpose: "Власні",
+      type: "investment",
+      id: 0,
+    },
+  ];
   const thisDerj = myBusiness?.financings.filter(
     (el) => el.type == "derj_support"
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
+  console.log("credit");
+  console.log(thisGrand);
   const [addOpen, setAddOpen] = useState(false);
+  const [addData, setAddData] = useState<number[]>([]);
   return !ready ? (
     <Box></Box>
   ) : (
@@ -247,6 +265,7 @@ function BiznesPlanPage() {
                     name: myBusiness?.name!,
                     realizationTime: myBusiness?.realizationTime!,
                     planId: myBusiness?.id,
+                    topic: myBusiness?.topic!,
                   });
                 }}
               >
@@ -326,6 +345,30 @@ function BiznesPlanPage() {
         setUpdate={() => {}}
       />
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Залучення фінансування
+      </Heading>
+      <MainFinancingBusinessPlanTable
+        thisCredit={thisCredit!}
+        thisInvestment={thisInvestment!}
+        thisDerj={thisDerj!}
+        thisGrant={thisGrand!}
+        isPlan={true}
+      />
+      <Button
+        onClick={() => {
+          setAddOpen(true);
+          setAddData(myBusiness?.financings.map((el) => el.id!)!);
+        }}
+      >
+        Додати
+      </Button>
+      <AddFinancingToBusinessPlan
+        open={addOpen}
+        setOpen={setAddOpen}
+        data={addData}
+        businessId={+id!}
+      />
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Купівля техніки та обладнання
       </Heading>
       <TableContainer>
@@ -379,19 +422,18 @@ function BiznesPlanPage() {
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Будівництво будівель і споруд
       </Heading>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Спеціалізовані та будівельні роботи
-      </Text>
       <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <WorkTable
-          works={works}
-          setRes={setWorkRes}
-          setOpen={setWorkOpen}
-          setUpdate={setUpdate}
-          setShowAlert={() => {}}
-          deleteOpen={false}
-          setDeleteOpen={() => {}}
-        />
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th>Назва</Th>
+              <Th>Початкова вартість</Th>
+              <Th>Початок екстплатації</Th>
+              <Th>Походження</Th>
+            </Tr>
+          </Thead>
+          <Tbody></Tbody>
+        </Table>
       </TableContainer>
       <Box mt={"15px"} ml={"auto"} mb={"25px"} display={"flex"} gap={"10px"}>
         <Button onClick={() => setWorkOpen(true)}>
@@ -399,21 +441,45 @@ function BiznesPlanPage() {
         </Button>
       </Box>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        Залучення фінансування
+        Малоцінні та швидкозношувальні прeдмети
       </Heading>
-      <MainFinancingBusinessPlanTable
-        thisCredit={thisCredit!}
-        thisInvestment={thisInvestment!}
-        thisDerj={thisDerj!}
-        thisGrant={thisGrand!}
-        isPlan={true}
-      />
-      <Button onClick={() => setAddOpen(true)}>Додати</Button>
-      <AddFinancingToBusinessPlan
-        open={addOpen}
-        setOpen={setAddOpen}
-        businessId={+id!}
-      />
+      <Table size={"sm"}>
+        <Thead>
+          <BuyingMachineTableHead isPlan={true} />
+        </Thead>
+        <Tbody></Tbody>
+      </Table>
+      <Button>Додати нове МШП</Button>
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Витрати постійні
+      </Heading>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Сатті витрат</Th>
+            <Th>Сума в місяць</Th>
+            <Th>Сума за рік</Th>
+            <Th>Вид розрахунку</Th>
+          </Tr>
+        </Thead>
+        <Tbody></Tbody>
+      </Table>
+      <Button>Додати витрату</Button>
+      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
+        Витрати загальновиробничі
+      </Heading>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Сатті витрат</Th>
+            <Th>Сума в місяць</Th>
+            <Th>Сума за рік</Th>
+            <Th>Вид розрахунку</Th>
+          </Tr>
+        </Thead>
+        <Tbody></Tbody>
+      </Table>
+      <Button>Додати витрату</Button>
       <QuizBusinessPopUp
         open={openQuiz}
         setOpen={setOpenQuiz}
@@ -421,8 +487,10 @@ function BiznesPlanPage() {
         setUpdate={setUpdate}
         res={quizRes}
         setRes={setQuizRes}
+        enterpriseId={myBusiness?.enterpriseId!}
         //@ts-ignore
         cultures={myBusiness?.busCuls?.map((el) => el.culture)}
+        myBusiness={myBusiness!}
       />
       <Box
         // display={"grid"}
@@ -485,9 +553,12 @@ function BiznesPlanPage() {
           // gridColumnStart={2}
           // gridColumnEnd={3}
         >
-          <TitleBusinessPlan />
+          <TitleBusinessPlan
+            topic={myBusiness?.topic!}
+            name={myBusiness?.name!}
+          />
           <ResumeBusinessPlan
-            area={myBusiness?.area!}
+            area={myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0) || 0}
             dateStart={myBusiness?.dateStart!}
             productSet={productSet}
           />
@@ -509,7 +580,14 @@ function BiznesPlanPage() {
             productSet={productSet}
             area={myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0) || 0}
           />
-          <FinancingBusinessPlan start={start} end={end} />
+          <FinancingBusinessPlan
+            start={start}
+            end={end}
+            thisCredit={thisCredit}
+            thisDerj={thisDerj}
+            thisGrand={thisGrand}
+            thisInvestment={thisInvestment}
+          />
           <PlanedIndicatorsBusinessPlan
             aref={indicatorRef}
             start={start}
@@ -526,7 +604,10 @@ function BiznesPlanPage() {
             cultureSet={cultureSet}
             sections={sections!}
             operReady={operReady}
-            thisCredit={thisCredit!}
+            thisCredit={thisCredit}
+            thisDerj={thisDerj}
+            thisGrand={thisGrand}
+            thisInvestment={thisInvestment}
           />
         </Box>
       </Box>

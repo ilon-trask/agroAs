@@ -8,22 +8,20 @@ import {
   getCultural,
   getIsAgreeCarts,
   agreeCarts,
-  getBusinessPlans,
   getNoAgreeBusiness,
   getOnlyCart,
-  getCulturalInc,
-  getYieldPlants,
   getPurposesMaterial,
-  getCultureTEJMap,
   getCultivationTechnologiesMap,
   getAgreeTEJ,
   getTechnologiesTEJ,
   getSection,
   getOutcome,
-  getProductTEJMap,
   getProduction,
   getAdministration,
   getCartForBusiness,
+  getYieldPlants,
+  getCultureTEJMap,
+  getProductTEJMap,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
@@ -39,7 +37,6 @@ function App() {
   useEffect(() => {
     if (ind > 0) {
       // getWorks(map);
-      getCulturalInc(income);
       getYieldPlants(income);
       getCultural(map);
       getPurposesMaterial(map);

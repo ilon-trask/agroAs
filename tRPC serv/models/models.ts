@@ -545,6 +545,7 @@ export interface IbusinessPlan {
   id?: number;
   name: string;
   initialAmount: number;
+  topic: string;
   dateStart: string;
   realizationTime: number;
   cultures?: Iculture[];
@@ -570,6 +571,7 @@ export class businessPlan extends Model<IbusinessPlan> {
 businessPlan.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    topic: { type: DataTypes.TEXT },
     name: { type: DataTypes.STRING, allowNull: false },
     initialAmount: { type: DataTypes.INTEGER },
     dateStart: { type: DataTypes.DATEONLY },
@@ -832,34 +834,34 @@ technologicalEconomicJustification.init(
   },
   { sequelize }
 );
-export interface Iincome {
-  id?: number;
-  type: IncomeType;
-  group: IncomeGroup;
-  isUsing: boolean;
-  UserId: string;
-  saleId?: number | null;
-  financingId?: number | null;
-}
-export class income extends Model<Iincome> {
-  declare id?: number;
-  declare type: IncomeType;
-  declare group: IncomeGroup;
-  declare UserId: string;
-  declare isUsing: boolean;
-  declare saleId?: number;
-  declare financingId?: number;
-}
-income.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    type: { type: DataTypes.STRING, allowNull: false },
-    group: { type: DataTypes.STRING },
-    isUsing: { type: DataTypes.BOOLEAN },
-    UserId: { type: DataTypes.STRING, allowNull: false },
-  },
-  { sequelize }
-);
+// export interface Iincome {
+//   id?: number;
+//   type: IncomeType;
+//   group: IncomeGroup;
+//   isUsing: boolean;
+//   UserId: string;
+//   saleId?: number | null;
+//   financingId?: number | null;
+// }
+// export class income extends Model<Iincome> {
+//   declare id?: number;
+//   declare type: IncomeType;
+//   declare group: IncomeGroup;
+//   declare UserId: string;
+//   declare isUsing: boolean;
+//   declare saleId?: number;
+//   declare financingId?: number;
+// }
+// income.init(
+//   {
+//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+//     type: { type: DataTypes.STRING, allowNull: false },
+//     group: { type: DataTypes.STRING },
+//     isUsing: { type: DataTypes.BOOLEAN },
+//     UserId: { type: DataTypes.STRING, allowNull: false },
+//   },
+//   { sequelize }
+// );
 
 export interface Ioutcome {
   id?: number;
@@ -992,7 +994,7 @@ export interface Ifinancing {
     | DerjPurposeType
     | GrantPurposeType;
   isUseCost: boolean;
-  businessCost?: number;
+  // businessCost?: number;
   calculationMethod: CreditCalculationMethodType;
   calculationType: CreditCalculationTypeType;
   cultureId?: number;
@@ -1391,11 +1393,11 @@ production.belongsTo(tech_cart);
 production.hasMany(sale);
 sale.belongsTo(production);
 
-sale.hasOne(income);
-income.belongsTo(sale);
+// sale.hasOne(income);
+// income.belongsTo(sale);
 
-financing.hasOne(income);
-income.belongsTo(financing);
+// financing.hasOne(income);
+// income.belongsTo(financing);
 
 buying_machine.hasOne(outcome);
 outcome.belongsTo(buying_machine);

@@ -1,64 +1,176 @@
-import { Heading, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import {
+  Heading,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { Context } from "src/main";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { Ifinancing } from "../../../../tRPC serv/models/models";
 
-function FinancingBusinessPlan({ start, end }: { start: number; end: number }) {
-  const { income } = useContext(Context);
+function FinancingBusinessPlan({
+  start,
+  end,
+  thisCredit,
+  thisDerj,
+  thisGrand,
+  thisInvestment,
+}: {
+  start: number;
+  end: number;
+  thisCredit: Ifinancing[] | undefined;
+  thisInvestment: Ifinancing[] | undefined;
+  thisDerj: Ifinancing[] | undefined;
+  thisGrand: Ifinancing[] | undefined;
+}) {
   return (
     <>
       <SectionTitle>Фінансування</SectionTitle>
       <Heading textAlign={"center"} size={"sm"} mt={5}>
         План залучення коштів
       </Heading>
-      {(() => {
-        const res = [];
-        for (let i = start; i < end; i++) {
-          res.push(
-            <Table size={"sm"}>
-              <Thead>
-                <Tr>
-                  <Th>Назва</Th>
-                  <Th>Дата</Th>
-                  <Th>Сума</Th>
-                  <Th>Призначення</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {(() => {
-                  const res = income.credit.map((e) => {
-                    if (e.isUseCost && +e.date.split("-")[0] == i)
-                      return (
-                        <Tr>
-                          <Td>{e.name}</Td>
-                          <Td>{e.date}</Td>
-                          <Td>{e.cost}</Td>
-                          <Td>{e.purpose}</Td>
-                        </Tr>
-                      );
-                  });
-                  if (res)
-                    return (
-                      <>
-                        <Tr>
-                          <Td fontWeight={"bold"}>Кредит</Td>
-                          <Td></Td>
-                          <Td></Td>
-                          <Td></Td>
-                        </Tr>
-                        {res}
-                      </>
-                    );
-                })()}
-              </Tbody>
-            </Table>
-          );
-        }
-        return res;
-      })()}
+
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th>Назва</Th>
+            <Th>Дата</Th>
+            <Th>Інвестиції</Th>
+            <Th>Кредит</Th>
+            <Th>Державна підтримка</Th>
+            <Th>Грант</Th>
+            <Th>Разом</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i < end; i++) {
+              res.push(
+                (() => {
+                  return (
+                    <>
+                      {(() => {
+                        const res = [];
+                        res.push(
+                          thisCredit
+                            ?.filter((el) => getYearFromString(el.date) == i)
+                            .map((el) => (
+                              <Tr key={el.id}>
+                                <Td>
+                                  <Text>{el.name}</Text>
+                                </Td>
+                                <Td>
+                                  <Text>{el.date}</Text>
+                                </Td>
+                                <Td></Td>
+                                <Td>{el.cost}</Td>
+                              </Tr>
+                            ))
+                        );
+
+                        res.push(
+                          thisInvestment
+                            ?.filter((el) => getYearFromString(el.date) == i)
+                            .map((el) => (
+                              <Tr key={el.id}>
+                                <Td>
+                                  <Text>{el.name}</Text>
+                                </Td>
+                                <Td>
+                                  <Text>{el.date}</Text>
+                                </Td>
+                                <Td>{el.cost}</Td>
+                              </Tr>
+                            ))
+                        );
+                        res.push(
+                          thisDerj
+                            ?.filter((el) => getYearFromString(el.date) == i)
+                            .map((el) => (
+                              <Tr key={el.id}>
+                                <Td>
+                                  <Text>{el.name}</Text>
+                                </Td>
+                                <Td>
+                                  <Text>{el.date}</Text>
+                                </Td>
+                                <Td></Td>
+                                <Td></Td>
+                                <Td>{el.cost}</Td>
+                              </Tr>
+                            ))
+                        );
+                        res.push(
+                          thisGrand
+                            ?.filter((el) => getYearFromString(el.date) == i)
+                            .map((el) => (
+                              <Tr key={el.id}>
+                                <Td>
+                                  <Text>{el.name}</Text>
+                                </Td>
+                                <Td>
+                                  <Text>{el.date}</Text>
+                                </Td>
+                                <Td></Td>
+                                <Td></Td>
+                                <Td></Td>
+                                <Td>{el.cost}</Td>
+                              </Tr>
+                            ))
+                        );
+                        return res;
+                      })()}
+                      {(() => {
+                        const sumInv = thisInvestment
+                          ?.filter((el) => getYearFromString(el.date) == i)
+                          .reduce((p, c) => p + c.cost, 0);
+                        const sumCred = thisCredit
+                          ?.filter((el) => getYearFromString(el.date) == i)
+                          .reduce((p, c) => p + c.cost, 0);
+                        const sumDerj = thisDerj
+                          ?.filter((el) => getYearFromString(el.date) == i)
+                          .reduce((p, c) => p + c.cost, 0);
+                        const sumGrand = thisGrand
+                          ?.filter((el) => getYearFromString(el.date) == i)
+                          .reduce((p, c) => p + c.cost, 0);
+                        return (
+                          <Tr fontWeight={"bold"}>
+                            <Td>{i}</Td>
+                            <Td></Td>
+                            <Td>{sumInv}</Td>
+                            <Td> {sumCred} </Td>
+                            <Td>{sumDerj}</Td>
+                            <Td>{sumGrand}</Td>
+                            <Td>
+                              {(sumInv || 0) +
+                                (sumCred || 0) +
+                                (sumDerj || 0) +
+                                (sumGrand || 0)}
+                            </Td>
+                          </Tr>
+                        );
+                      })()}
+                    </>
+                  );
+                })()
+              );
+            }
+            return res;
+          })()}
+        </Tbody>
+      </Table>
+
       <Table size={"sm"}>
         <Thead>
           <Tr>

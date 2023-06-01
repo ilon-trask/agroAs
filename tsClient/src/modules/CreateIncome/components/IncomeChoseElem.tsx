@@ -7,7 +7,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createIncome, patchIncome } from "../../../http/requests";
+// import { createIncome, patchIncome } from "../../../http/requests";
 import { Context } from "../../../main";
 import { IncomeProp } from "../CreateIncome";
 type props = {
@@ -80,22 +80,22 @@ function IncomeChoseElem({
         <Button onClick={() => setScreen(1)}>Назад</Button>
         <Button
           onClick={() => {
-            if (update) {
-              patchIncome(income, {
-                group: res.group,
-                incomeId: res.id!,
-                isUsing: false,
-                propId: +res.propId,
-                type: res.type,
-              });
-            } else {
-              createIncome(income, {
-                type: res.type,
-                group: res.group,
-                isUsing: true,
-                propId: +res.propId,
-              });
-            }
+            // if (update) {
+            //   patchIncome(income, {
+            //     group: res.group,
+            //     incomeId: res.id!,
+            //     isUsing: false,
+            //     propId: +res.propId,
+            //     type: res.type,
+            //   });
+            // } else {
+            //   createIncome(income, {
+            //     type: res.type,
+            //     group: res.group,
+            //     isUsing: true,
+            //     propId: +res.propId,
+            //   });
+            // }
             setOpen(false);
             setUpdate(false);
             setScreen(0); //@ts-ignore

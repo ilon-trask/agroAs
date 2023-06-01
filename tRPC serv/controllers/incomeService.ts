@@ -1,12 +1,9 @@
 import { Principal } from "..";
-import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
 import {
   cultivationTechnologies,
   culture,
   IcultivationTechnologies,
   Iculture,
-  Iincome,
-  income,
   Iproduct,
   IyieldCalculation,
   IyieldPlant,
@@ -15,12 +12,9 @@ import {
   yieldPlant,
 } from "../models/models";
 import {
-  CreateIncome,
   CreateProductType,
   createYieldCalcType,
   CreateYieldPlantType,
-  PatchIncome,
-  setIsUsingIncomeType,
   UpdateYieldPlantType,
 } from "../routes/incomeRouter";
 export interface resYieldPlant extends IyieldPlant {
@@ -175,55 +169,7 @@ class incomeService {
     });
     return res;
   }
-  async create(user: Principal | undefined, data: CreateIncome) {
-    if (!user) return;
-    let saleId = null;
-    let creditId = null;
-    let investmentId = null;
-    let derjId = null;
-    let grantId = null;
-    if (data.type == "Основне виробництво") {
-      saleId = data.propId;
-    } else if (data.type == "Кредит") {
-      creditId = data.propId;
-    } else if (data.type == "Інвестиції") {
-      investmentId = data.propId;
-    } else if (data.type == "Державна підтримка") {
-      derjId = data.propId;
-    } else if (data.type == "Грант") {
-      grantId = data.propId;
-    }
-    const res: Iincome | undefined = await income.create({
-      group: data.group,
-      isUsing: data.isUsing,
-      type: data.type,
-      saleId: saleId,
-      creditId: creditId,
-      investmentId: investmentId,
-      derjSupportId: derjId,
-      grantId: grantId,
-      UserId: user.sub,
-    });
-    return res;
-  }
-  async get(user: Principal | undefined) {
-    if (!user) return;
-    const res: Iincome[] | undefined = await income.findAll({
-      where: { UserId: user.sub },
-    });
-    return res;
-  }
-  async setIsUsing(user: Principal | undefined, data: setIsUsingIncomeType) {
-    if (!user) return;
-    await income.update(
-      { isUsing: data.value },
-      { where: { id: data.incomeId } }
-    );
-    const res: Iincome | null = await income.findOne({
-      where: { id: data.incomeId },
-    });
-    return res;
-  }
+
   async getProduct(user: Principal | undefined) {
     if (!user) return;
     const res: Iproduct[] | null = await product.findAll({
@@ -231,46 +177,7 @@ class incomeService {
     });
     return res;
   }
-  async patch(user: Principal | undefined, data: PatchIncome) {
-    if (!user) return;
-    let saleId = null;
-    let creditId = null;
-    let investmentId = null;
-    let derjId = null;
-    let grantId = null;
-    if (data.type == "Основне виробництво") {
-      saleId = data.propId;
-    } else if (data.type == "Кредит") {
-      creditId = data.propId;
-    } else if (data.type == "Інвестиції") {
-      investmentId = data.propId;
-    } else if (data.type == "Державна підтримка") {
-      derjId = data.propId;
-    } else if (data.type == "Грант") {
-      grantId = data.propId;
-    }
-    await income.update(
-      {
-        group: data.group,
-        saleId: saleId,
-        creditId: creditId,
-        investmentId: investmentId,
-        derjSupportId: derjId,
-        grantId: grantId,
-        type: data.type,
-      },
-      { where: { id: data.incomeId } }
-    );
-    const res: Iincome | null = await income.findOne({
-      where: { id: data.incomeId },
-    });
-    return res;
-  }
-  async delete(user: Principal | undefined, data: { incomeId: number }) {
-    if (!user) return;
-    const res = await income.destroy({ where: { id: data.incomeId } });
-    return res;
-  }
+
   async createProduct(user: Principal | undefined, data: CreateProductType) {
     if (!user) return;
     const res: Iproduct = await product.create({

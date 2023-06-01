@@ -34,6 +34,9 @@ function AdditionBusinessPlan({
   sections,
   operReady,
   thisCredit,
+  thisDerj,
+  thisGrand,
+  thisInvestment,
 }: {
   form: EnterpriseFormType;
   start: number;
@@ -44,7 +47,10 @@ function AdditionBusinessPlan({
   cultureSet: Set<string>;
   sections: { data: sectionsOpers; year: VegetationYearsType }[];
   operReady: boolean;
-  thisCredit: Ifinancing[];
+  thisCredit: Ifinancing[] | undefined;
+  thisInvestment: Ifinancing[] | undefined;
+  thisDerj: Ifinancing[] | undefined;
+  thisGrand: Ifinancing[] | undefined;
 }) {
   const { map, income } = useContext(Context);
 
@@ -239,7 +245,16 @@ function AdditionBusinessPlan({
                 sumTake = 0;
               const thisYear = start + ind;
               const sumCredit = thisCredit
-                .filter((el) => getYearFromString(el.date) == thisYear)
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumInv = thisInvestment
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumDerj = thisDerj
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
+                .reduce((p, c) => p + c.cost, 0);
+              const sumGrand = thisGrand
+                ?.filter((el) => getYearFromString(el.date) == thisYear)
                 .reduce((p, c) => p + c.cost, 0);
               return (
                 <>
@@ -465,7 +480,8 @@ function AdditionBusinessPlan({
                       }
                     </Td>
                     <Td>
-                      {ind == 0
+                      {sumInv}
+                      {/* {ind == 0
                         ? myBusiness.initialAmount
                         : income.investment
                             .filter(
@@ -473,10 +489,10 @@ function AdditionBusinessPlan({
                             )
                             .map((el) => {
                               return <Text>{el.name}</Text>;
-                            }) || <Text>0</Text>}
+                            }) || <Text>0</Text>} */}
                       <Text>{sumCredit}</Text>
-                      <Text>0</Text>
-                      <Text>0</Text>
+                      <Text>{sumDerj}</Text>
+                      <Text>{sumGrand}</Text>
                       {/* {income.credit
                               .filter(
                                 (el) => +el.date.split("-")[0] - start == ind
@@ -536,21 +552,25 @@ function AdditionBusinessPlan({
                         .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)}
                     </Td>
                     <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) * 0.235}
+                      {Math.round(
+                        thisWorkers
+                          .filter((el) => el.class == "Адміністративний")
+                          .reduce(
+                            (p, c) => p + c.salary * c.amountOfMounths!,
+                            0
+                          ) * 0.235
+                      )}
                     </Td>
                     <Td>0</Td>
                     <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) * 1.235}
+                      {Math.round(
+                        thisWorkers
+                          .filter((el) => el.class == "Адміністративний")
+                          .reduce(
+                            (p, c) => p + c.salary * c.amountOfMounths!,
+                            0
+                          ) * 1.235
+                      )}
                     </Td>
                     <Td>
                       {thisWorkers
@@ -579,7 +599,10 @@ function AdditionBusinessPlan({
                     <Td>{sumTake}</Td>
                     <Td></Td>
                     <Td>
-                      {(ind == 0 ? myBusiness.initialAmount : 0) + sumCredit}
+                      {(sumCredit || 0) +
+                        (sumInv || 0) +
+                        (sumDerj || 0) +
+                        (sumGrand || 0)}
                     </Td>
                   </Tr>
                 </>

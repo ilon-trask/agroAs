@@ -11,16 +11,16 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction } from "react";
-import { Icredit } from "../../../../../tRPC serv/models/models";
+// import { Icredit } from "../../../../../tRPC serv/models/models";
 import Dialog from "../../../components/Dialog";
 
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  credits: Icredit[];
+  // credits: Icredit[];
 };
 const obj = {};
-function CreditTablePopUp({ open, setOpen, credits }: props) {
+function CreditTablePopUp({ open, setOpen }: props) {
   return (
     <Dialog
       open={open}
@@ -48,7 +48,7 @@ function CreditTablePopUp({ open, setOpen, credits }: props) {
           </Tr>
         </Thead>
         <Tbody>
-          {credits.map((el) => (
+          {/* {credits.map((el) => (
             <Tr key={el.id}>
               <Td>
                 <EditIcon color="blue.400" w="20px" h="auto" />
@@ -59,7 +59,7 @@ function CreditTablePopUp({ open, setOpen, credits }: props) {
               <Td>{el.purpose}</Td>
               <Td>{el.date.split("-")[0]}</Td>
             </Tr>
-          ))}
+          ))} */}
           <Button mt={2} ml={2} mb={2}>
             Додати
           </Button>

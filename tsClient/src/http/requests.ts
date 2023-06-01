@@ -27,15 +27,7 @@ import {
 } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-import {
-  CreateIncome,
-  CreateProductType,
-  createYieldCalcType,
-  CreateYieldPlantType,
-  PatchIncome,
-  setIsUsingIncomeType,
-  UpdateYieldPlantType,
-} from "../../../tRPC serv/routes/incomeRouter";
+
 import TEJStore from "../store/TEJStore";
 import {
   createTEJType,
@@ -93,6 +85,12 @@ import {
   CreateFinancingType,
   PatchFinancingType,
 } from "../../../tRPC serv/routes/financingRouter";
+import {
+  CreateProductType,
+  createYieldCalcType,
+  CreateYieldPlantType,
+  UpdateYieldPlantType,
+} from "../../../tRPC serv/routes/incomeRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -103,7 +101,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -965,25 +963,6 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
   });
 }
 
-export function createIncome(Income: IncomeStore, data: CreateIncome) {
-  client.income.create.query(data).then((res) => {
-    Income.newIncome = res;
-  });
-}
-export function getIncome(Income: IncomeStore) {
-  client.income.get.query().then((res) => {
-    Income.income = res;
-  });
-}
-export function setIsUsingIncome(
-  Income: IncomeStore,
-  data: setIsUsingIncomeType
-) {
-  client.income.setIsUsing.query(data).then((res) => {
-    Income.income = Income.income.filter((el) => el.id != res?.id);
-    Income.newIncome = res!;
-  });
-}
 export function createOutcome(map: MapStore, data: createOutcomeType) {
   client.outcome.create.query(data).then((res) => {
     map.newOutcome = res;
@@ -1080,24 +1059,6 @@ export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
   });
 }
 
-export function patchIncome(incomeStore: IncomeStore, data: PatchIncome) {
-  client.income.patch.query(data).then((res) => {
-    incomeStore.income = incomeStore.income.filter((el) => el.id != res?.id);
-    incomeStore.newIncome = res!;
-  });
-}
-
-export function deleteIncome(
-  incomeStore: IncomeStore,
-  data: { incomeId: number }
-) {
-  client.income.delete.query(data).then((res) => {
-    if (res)
-      incomeStore.income = incomeStore.income.filter(
-        (el) => el.id != data.incomeId
-      );
-  });
-}
 function sortFinancing(arr: Ifinancing[], IncomeStore: IncomeStore) {
   arr.forEach((el) => {
     if (el.type == "credit") {
@@ -1446,6 +1407,6 @@ export function addFinancingToBusinessPlan(
     //@ts-ignore
     bus.newBusinessPlan = res;
     //@ts-ignore
-    sortFinancing(res.financings, income);
+    // sortFinancing(res.financings, income);
   });
 }

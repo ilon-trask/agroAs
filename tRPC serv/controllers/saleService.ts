@@ -1,5 +1,5 @@
 import { Principal } from "..";
-import { income, Iproduction, Isale, production, sale } from "../models/models";
+import { Iproduction, Isale, production, sale } from "../models/models";
 import { createProductionType } from "../routes/productionRouter";
 import { createSaleType, PatchSaleType } from "../routes/saleRouter";
 class SaleService {
@@ -42,7 +42,6 @@ class SaleService {
   async delete(user: Principal | undefined, data: { saleId: number }) {
     if (!user) return;
     const res = await sale.destroy({ where: { id: data.saleId } });
-    await income.destroy({ where: { saleId: data.saleId } });
     return res;
   }
   async setIsPlan(

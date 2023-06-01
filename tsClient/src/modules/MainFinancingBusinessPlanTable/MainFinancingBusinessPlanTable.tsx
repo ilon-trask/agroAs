@@ -1,6 +1,6 @@
 import { Checkbox, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { Context } from "src/main";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { Ifinancing } from "../../../../tRPC serv/models/models";
 type props = {
   thisCredit: Ifinancing[];
@@ -96,6 +96,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
           <Td></Td>
         </Tr>
+
         {thisInvestment.map((el) => (
           <Tr>
             {!isPlan && (

@@ -115,20 +115,7 @@ export const incomeRouter = router({
         await incomeService.updateYieldPlant(input, ctx.user);
       return res;
     }),
-  create: publicProcedure.input(createIncome).query(async ({ input, ctx }) => {
-    const res = await incomeService.create(ctx.user, input);
-    return res;
-  }),
-  get: publicProcedure.query(async ({ ctx }) => {
-    const res = await incomeService.get(ctx.user);
-    return res;
-  }),
-  setIsUsing: publicProcedure
-    .input(setIsUsingIncome)
-    .query(({ ctx, input }) => {
-      const res = incomeService.setIsUsing(ctx.user, input);
-      return res;
-    }),
+
   getProduct: publicProcedure.query(async ({ ctx }) => {
     const res = incomeService.getProduct(ctx.user);
     return res;
@@ -137,16 +124,6 @@ export const incomeRouter = router({
     .input(createProduct)
     .query(({ ctx, input }) => {
       const res = incomeService.createProduct(ctx.user, input);
-      return res;
-    }),
-  patch: publicProcedure.input(patchIncome).query(async ({ ctx, input }) => {
-    const res = await incomeService.patch(ctx.user, input);
-    return res;
-  }),
-  delete: publicProcedure
-    .input(z.object({ incomeId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const res = await incomeService.delete(ctx.user, input);
       return res;
     }),
 });

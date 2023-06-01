@@ -3,7 +3,6 @@ import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import {
   Ifinancing,
   Iculture,
-  Iincome,
   Iproduction,
   Isale,
   IvegetationYears,
@@ -14,7 +13,7 @@ export default class IncomeStore {
   private _yieldPlant: resYieldPlant[] = [];
   private _cultural: Iculture[] = [];
   private _yieldCalc: IyieldCalculation[] = [];
-  private _income: Iincome[] = [];
+  private _income: any[] = [];
   private _production: Iproduction[] = [];
   private _sale: Isale[] = [];
   private _credit: Ifinancing[] = [];
@@ -48,10 +47,10 @@ export default class IncomeStore {
   public set newYieldCalc(data: IyieldCalculation) {
     this._yieldCalc.push(data);
   }
-  public set income(data: Iincome[]) {
+  public set income(data: any[]) {
     this._income = data;
   }
-  public set newIncome(data: Iincome) {
+  public set newIncome(data: any) {
     this._income.push(data);
   }
   public set production(prod: Iproduction[]) {

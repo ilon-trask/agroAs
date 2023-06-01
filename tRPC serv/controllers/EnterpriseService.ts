@@ -1,5 +1,5 @@
 import { Principal } from "..";
-import { enterprise, Ienterprise, income } from "../models/models";
+import { enterprise, Ienterprise } from "../models/models";
 import {
   CreateEnterpriseType,
   PatchEnterpriseType,
