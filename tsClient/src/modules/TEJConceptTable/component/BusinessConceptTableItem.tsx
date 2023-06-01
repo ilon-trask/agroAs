@@ -37,6 +37,7 @@ function CartsTableItem({ e, aref }: props) {
             // );
           }
         }}
+        cursor={"pointer"}
       >
         <Td fontWeight={"600"}>{e.name}</Td>
       </Tr>

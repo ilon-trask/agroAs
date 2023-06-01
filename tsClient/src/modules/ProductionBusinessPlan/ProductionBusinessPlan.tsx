@@ -9,7 +9,7 @@ import {
   Box,
   Text,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { RefObject, useContext } from "react";
 import { Context } from "src/main";
 import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
@@ -32,6 +32,7 @@ function ProductionBusinessPlan({
   thisMaps,
   productSet,
   area,
+  aref,
 }: {
   start: number;
   end: number;
@@ -39,6 +40,7 @@ function ProductionBusinessPlan({
   thisMaps: resTechCartsWithOpers[];
   productSet: Set<string>;
   area: number;
+  aref: RefObject<HTMLTableElement>;
 }) {
   const { income, map, TEJ } = useContext(Context);
   let costHand = 0;
@@ -46,7 +48,7 @@ function ProductionBusinessPlan({
   let costMechTot = 0;
   return (
     <>
-      <SectionTitle>Виробництво</SectionTitle>
+      <SectionTitle aref={aref}>Виробництво</SectionTitle>
       <Paragraph>
         4.1. Загальна інформація про виробництво та технології.
       </Paragraph>

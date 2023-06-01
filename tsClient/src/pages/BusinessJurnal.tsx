@@ -58,7 +58,6 @@ function BusinessJurnal() {
       <Button onClick={() => setOpenBusiness(true)}>
         Створити бізнес-план
       </Button>
-      <Button>Добавити ТЕО</Button>
       <Button
         onClick={() => {
           navigate(BUSINESScATALOG_ROUTER);

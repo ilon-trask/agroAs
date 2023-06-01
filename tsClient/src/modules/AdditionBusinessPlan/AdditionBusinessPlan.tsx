@@ -1,5 +1,5 @@
 import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { RefObject, useContext } from "react";
 import { Context } from "src/main";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
@@ -37,6 +37,7 @@ function AdditionBusinessPlan({
   thisDerj,
   thisGrand,
   thisInvestment,
+  aref,
 }: {
   form: EnterpriseFormType;
   start: number;
@@ -51,12 +52,13 @@ function AdditionBusinessPlan({
   thisInvestment: Ifinancing[] | undefined;
   thisDerj: Ifinancing[] | undefined;
   thisGrand: Ifinancing[] | undefined;
+  aref: RefObject<HTMLTableElement>;
 }) {
   const { map, income } = useContext(Context);
 
   return (
     <>
-      <SectionTitle>Додатки</SectionTitle>
+      <SectionTitle aref={aref}>Додатки</SectionTitle>
       <Paragraph>Додаток А. Установчі документи</Paragraph>
       <Paragraph>Додаток Б. Штатний роспис</Paragraph>
       <Table size={"sm"}>
@@ -321,6 +323,7 @@ function AdditionBusinessPlan({
                                   el.cultivationTechnologyId &&
                                 +e.year.split("")[0] == ind
                             );
+
                             let res =
                               (cart?.totalCostHandWork ||
                                 0 + cart?.totalCostMachineWork! ||
@@ -547,9 +550,14 @@ function AdditionBusinessPlan({
                       ) + sumDirect}
                     </Td>
                     <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)}
+                      {Math.round(
+                        thisWorkers
+                          .filter((el) => el.class == "Адміністративний")
+                          .reduce(
+                            (p, c) => p + c.salary * c.amountOfMounths!,
+                            0
+                          )
+                      )}
                     </Td>
                     <Td>
                       {Math.round(

@@ -1,5 +1,5 @@
 import { Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import React from "react";
+import React, { RefObject } from "react";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "src/shared/hook/useEnterpriseTaxGroup";
 import Description from "../../ui/Description";
@@ -20,6 +20,7 @@ function EnterpriseBusinessPlan({
   end,
   myBusiness,
   start,
+  aref,
 }: {
   name: string;
   form: EnterpriseFormType;
@@ -29,10 +30,11 @@ function EnterpriseBusinessPlan({
   myBusiness: resBusinessPlan;
   start: number;
   end: number;
+  aref: RefObject<HTMLTableElement>;
 }) {
   return (
     <>
-      <Table size={"sm"}>
+      <Table size={"sm"} ref={aref}>
         <Thead>
           <Tr>
             <Th colSpan={2}>

@@ -120,7 +120,14 @@ function BiznesPlanPage() {
 
   const start = +myBusiness?.dateStart?.split("-")[0]!;
   const end = +start + +myBusiness?.realizationTime!;
+  const titleRef = useRef<HTMLTableElement>(null);
+  const resumeRef = useRef<HTMLTableElement>(null);
+  const enterpriseRef = useRef<HTMLTableElement>(null);
+  const productionRef = useRef<HTMLTableElement>(null);
+  const financingRef = useRef<HTMLTableElement>(null);
   const indicatorRef = useRef<HTMLTableElement>(null);
+  const additionRef = useRef<HTMLTableElement>(null);
+
   const buttonsRef = useRef<HTMLParagraphElement>(null);
   const cultureSet = new Set(
     myBusiness?.busCuls?.map((el) => el?.culture?.name!)
@@ -539,6 +546,12 @@ function BiznesPlanPage() {
             setOpenTitle={() => {}}
             getData={() => {}}
             indicatorRef={indicatorRef}
+            additionRef={additionRef}
+            enterpriseRef={enterpriseRef}
+            financingRef={financingRef}
+            productionRef={productionRef}
+            resumeRef={resumeRef}
+            titleRef={titleRef}
             buttonsRef={buttonsRef}
           />
         </TableContainer>
@@ -556,11 +569,13 @@ function BiznesPlanPage() {
           <TitleBusinessPlan
             topic={myBusiness?.topic!}
             name={myBusiness?.name!}
+            aref={titleRef}
           />
           <ResumeBusinessPlan
             area={myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0) || 0}
             dateStart={myBusiness?.dateStart!}
             productSet={productSet}
+            aref={resumeRef}
           />
           <EnterpriseBusinessPlan
             cultureSet={cultureSet}
@@ -571,6 +586,7 @@ function BiznesPlanPage() {
             name={myEnterprise?.name!}
             taxGroup={myEnterprise?.taxGroup!}
             thisWorkers={thisWorkers}
+            aref={enterpriseRef}
           />
           <ProductionBusinessPlan
             end={end}
@@ -579,6 +595,7 @@ function BiznesPlanPage() {
             thisMaps={thisMaps}
             productSet={productSet}
             area={myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0) || 0}
+            aref={productionRef}
           />
           <FinancingBusinessPlan
             start={start}
@@ -587,12 +604,15 @@ function BiznesPlanPage() {
             thisDerj={thisDerj}
             thisGrand={thisGrand}
             thisInvestment={thisInvestment}
+            aref={financingRef}
           />
           <PlanedIndicatorsBusinessPlan
             aref={indicatorRef}
             start={start}
             end={end}
             myBusiness={myBusiness!}
+            thisWorkers={thisWorkers}
+            thisMaps={thisMaps}
           />
           <AdditionBusinessPlan
             start={start}
@@ -608,6 +628,7 @@ function BiznesPlanPage() {
             thisDerj={thisDerj}
             thisGrand={thisGrand}
             thisInvestment={thisInvestment}
+            aref={additionRef}
           />
         </Box>
       </Box>

@@ -8,7 +8,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { RefObject, useContext } from "react";
 import { Context } from "src/main";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import Description from "src/ui/Description";
@@ -25,6 +25,7 @@ function FinancingBusinessPlan({
   thisDerj,
   thisGrand,
   thisInvestment,
+  aref,
 }: {
   start: number;
   end: number;
@@ -32,10 +33,11 @@ function FinancingBusinessPlan({
   thisInvestment: Ifinancing[] | undefined;
   thisDerj: Ifinancing[] | undefined;
   thisGrand: Ifinancing[] | undefined;
+  aref: RefObject<HTMLTableElement>;
 }) {
   return (
     <>
-      <SectionTitle>Фінансування</SectionTitle>
+      <SectionTitle aref={aref}>Фінансування</SectionTitle>
       <Heading textAlign={"center"} size={"sm"} mt={5}>
         План залучення коштів
       </Heading>

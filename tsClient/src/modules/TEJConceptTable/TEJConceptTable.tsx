@@ -24,10 +24,28 @@ interface props {
   setOpenTitle: Dispatch<SetStateAction<boolean>>;
   getData: (name: iName, children: iChild, infCartId: number | null) => void;
   indicatorRef: RefObject<HTMLParagraphElement>;
+  resumeRef: RefObject<HTMLParagraphElement>;
+  titleRef: RefObject<HTMLParagraphElement>;
+  enterpriseRef: RefObject<HTMLParagraphElement>;
+  productionRef: RefObject<HTMLParagraphElement>;
+  financingRef: RefObject<HTMLParagraphElement>;
+  additionRef: RefObject<HTMLParagraphElement>;
   buttonsRef: RefObject<HTMLDivElement>;
 }
 const CartsTable = observer(
-  ({ setOpenResume, setOpenTitle, indicatorRef, buttonsRef }: props) => {
+  ({
+    setOpenResume,
+    setOpenTitle,
+    indicatorRef,
+    buttonsRef,
+    additionRef,
+    enterpriseRef,
+    financingRef,
+    getData,
+    productionRef,
+    resumeRef,
+    titleRef,
+  }: props) => {
     const { map, user, business } = useContext(Context);
     const { id } = useParams();
     const Business: resBusinessPlan[] = JSON.parse(
@@ -50,7 +68,7 @@ const CartsTable = observer(
         label: "titlePage",
         setOpen: setOpenTitle,
         children: myBusiness?.titlePage,
-        ref: {} as any,
+        ref: titleRef,
       },
       {
         id: 2,
@@ -58,7 +76,7 @@ const CartsTable = observer(
         label: "resume",
         setOpen: setOpenResume,
         children: myBusiness?.resume,
-        ref: {} as any,
+        ref: resumeRef,
       },
       {
         id: 3,
@@ -66,7 +84,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: enterpriseRef,
       },
       {
         id: 4,
@@ -74,7 +92,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: productionRef,
       },
       {
         id: 5,
@@ -82,7 +100,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: financingRef,
       },
       {
         id: 6,
@@ -98,7 +116,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: additionRef,
       },
     ];
     return (

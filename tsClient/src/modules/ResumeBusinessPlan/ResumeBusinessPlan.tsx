@@ -1,5 +1,5 @@
 import { Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import React from "react";
+import React, { RefObject } from "react";
 import Paragraph from "../../ui/Paragraph";
 import SectionTitle from "../../ui/SectionTitle";
 
@@ -7,14 +7,18 @@ function ResumeBusinessPlan({
   area,
   dateStart,
   productSet,
+  aref,
 }: {
   area: number;
   dateStart: string;
   productSet: Set<String>;
+  aref: RefObject<HTMLTableElement>;
 }) {
   return (
     <>
-      <SectionTitle mt={5}>Резюме</SectionTitle>
+      <SectionTitle aref={aref} mt={5}>
+        Резюме
+      </SectionTitle>
       <Paragraph>2.1 Про проект</Paragraph>
       <Table size={"sm"}>
         <Tbody>

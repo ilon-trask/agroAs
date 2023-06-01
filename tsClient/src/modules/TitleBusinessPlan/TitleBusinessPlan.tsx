@@ -1,10 +1,19 @@
 import { Box, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { RefObject } from "react";
 
-function TitleBusinessPlan({ topic, name }: { topic: string; name: string }) {
+function TitleBusinessPlan({
+  topic,
+  name,
+  aref,
+}: {
+  topic: string;
+  name: string;
+  aref: RefObject<HTMLTableElement>;
+}) {
   return (
     <>
       <Box
+        ref={aref}
         mx={"auto"}
         w={"fit-content"}
         mt={20}
