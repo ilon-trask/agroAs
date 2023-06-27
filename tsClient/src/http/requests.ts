@@ -101,13 +101,14 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
           error,
         } = await supabase.auth.getSession();
         if (!session) return {};
+
         return {
           authorization: "Bearer " + session.access_token,
         };

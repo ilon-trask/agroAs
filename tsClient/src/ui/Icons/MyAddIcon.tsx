@@ -1,8 +1,9 @@
-import { EditIcon } from "@chakra-ui/icons";
+import { PlusSquareIcon } from "@chakra-ui/icons";
 import iconPropsType from "src/shared/Types/IconPropType";
-function MyEditIcon(prop: iconPropsType) {
+
+function MyAddIcon(prop: iconPropsType) {
   return (
-    <EditIcon
+    <PlusSquareIcon
       {...prop}
       color={"blue.400"}
       boxSize={"22px"}
@@ -11,4 +12,4 @@ function MyEditIcon(prop: iconPropsType) {
   );
 }
 
-export default MyEditIcon;
+export default MyAddIcon;

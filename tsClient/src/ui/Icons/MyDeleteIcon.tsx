@@ -1,8 +1,14 @@
 import { DeleteIcon } from "@chakra-ui/icons";
-import React from "react";
-
-function MyDeleteIcon() {
-  return <DeleteIcon w={"20px"} h={"auto"} cursor={"pointer"} color={"red"} />;
+import iconPropsType from "src/shared/Types/IconPropType";
+function MyDeleteIcon(prop: iconPropsType) {
+  return (
+    <DeleteIcon
+      {...prop}
+      color={"red.500"}
+      boxSize={"22px"}
+      cursor={"pointer"}
+    />
+  );
 }
 
 export default MyDeleteIcon;

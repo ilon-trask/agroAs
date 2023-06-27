@@ -186,10 +186,6 @@ function AdditionBusinessPlan({
                       });
                     })
                 );
-                console.log("цук");
-
-                console.log(...res);
-                console.log(res.flat().flat());
               }
             }
 
@@ -745,7 +741,6 @@ function AdditionBusinessPlan({
           };
           myBusiness?.busCuls?.forEach((el) => {
             const yearName = useVegetationYears[i - start + 1].name;
-            console.log(i - start);
 
             const myYield = income.yieldPlant.find(
               (e) => e.cultureId == el.cultureId
