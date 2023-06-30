@@ -106,7 +106,7 @@ function BuyingMachineTable({
         <BuyingMachineTableHead isPlan={isPlan} />
       </Thead>
       <Tbody>
-        {map.buyingMachine.map((el) => (
+        {map.buyingMachine?.map((el) => (
           <BuyingMachineTableBodyRow
             el={el}
             isPlan={isPlan}

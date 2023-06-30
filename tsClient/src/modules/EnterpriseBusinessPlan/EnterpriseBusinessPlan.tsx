@@ -1,5 +1,5 @@
-import { Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import React, { RefObject } from "react";
+import { Table, Tbody, Td, Text, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
+import React, { RefObject, useMemo } from "react";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "src/shared/hook/useEnterpriseTaxGroup";
 import Description from "../../ui/Description";
@@ -7,9 +7,11 @@ import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { LandPlatTableHead } from "../LandPlotTable/LandPlatTable";
 import { Iworker } from "../../../../tRPC serv/models/models";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { ColumnDef } from "@tanstack/react-table";
+import TableComponent from "src/components/TableComponent";
+import TableContent from "src/components/TableComponent/TableContent";
 
 function EnterpriseBusinessPlan({
   name,
@@ -32,6 +34,154 @@ function EnterpriseBusinessPlan({
   end: number;
   aref: RefObject<HTMLTableElement>;
 }) {
+  let sum = 0;
+  const salaryExpensesData = [];
+  const wageAnalysisData = [];
+  const groundSectionData = [];
+  const areasUsageData = [];
+  (() => {
+    thisWorkers = thisWorkers.map((el) => {
+      if (el.class == "Виробничий")
+        return {
+          ...el,
+          amount: Math.ceil(
+            el.amount *
+              //@ts-ignore
+              myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0)
+          ),
+        };
+      else return el;
+    });
+
+    for (let i = start; i < end; i++) {
+      let adAmount = 0;
+      let adSalary = 0;
+      thisWorkers.forEach((e) => {
+        if (e.class == "Адміністративний") {
+          adAmount += e.amount;
+          adSalary += e.salary * e.amount;
+        }
+      });
+      let vAmount = 0;
+      let vSalary = 0;
+      thisWorkers.forEach((e) => {
+        if (e.class == "Виробничий") {
+          vAmount += e.amount;
+          vSalary += e.salary * e.amount;
+        }
+      });
+      sum +=
+        Math.round(adSalary * 12 * 0.235) +
+        adSalary * 12 +
+        (Math.round(vSalary * 12 * 0.235) + vSalary * 12);
+      salaryExpensesData.push(
+        { type: i },
+        {
+          type: "Адмін",
+          amount: adAmount,
+          averageZP: Math.round(adSalary / adAmount),
+          AnnualSalaryFund: adSalary * 12,
+          tax: Math.round(adSalary * 12 * 0.235),
+          general: Math.round(adSalary * 12 * 0.235) + adSalary * 12,
+        },
+        {
+          type: "Вироб",
+          amount: vAmount,
+          averageZP: Math.round(vSalary / vAmount),
+          AnnualSalaryFund: vSalary * 12,
+          tax: Math.round(vSalary * 12 * 0.235),
+          general: Math.round(vSalary * 12 * 0.235) + vSalary * 12,
+        }
+      );
+      wageAnalysisData.push({
+        year: i,
+        amount: Math.round(vSalary * 12 * 0.235) + vSalary * 12,
+      });
+      groundSectionData.push(
+        { paymentType: i },
+        { paymentType: "Оренда Землі" },
+        { paymentType: "Податок" }
+      );
+      areasUsageData.push({
+        year: i,
+        ...[...cultureSet].reduce((acc, el) => {
+          //@ts-ignore
+          acc[el] = myBusiness?.busCuls.reduce(
+            (p, c) => (el == c.culture?.name ? p + c.area : p),
+            0
+          );
+          return acc;
+        }, {}),
+        area: myBusiness?.busCuls.reduce((p, c) => p + c.area, 0),
+      });
+    }
+  })();
+
+  const salaryExpensesColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      { header: "ПЕРСОНАЛ", accessorKey: "type" },
+      { header: "КІЛЬКІСТЬ ПЕРСОНАЛУ", accessorKey: "amount" },
+      { header: "СЕРЕДНЬО-МІСЯЧНА ЗАРОБІТНА ПЛАТА", accessorKey: "averageZP" },
+      { header: "Річний фонд оплати праці", accessorKey: "AnnualSalaryFund" },
+      { header: "ЄСВ 22% ВІЙСЬКОВИЙ ЗБІР 1,5%", accessorKey: "tax" },
+      { header: "Загальні витрати по оплаті праці", accessorKey: "general" },
+    ];
+  }, []);
+  const wageAnalysisColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      {
+        header: "РІК",
+        accessorKey: "year",
+      },
+      {
+        header: "РІЧНИЙ ФОНД ОПЛАТИ ПРАЦІ ВИРОБНИЧОГО ПЕРСОНАЛУ",
+        columns: [
+          {
+            header: "ЗГІДНО ШТАТНОГО РОЗПИСУ",
+            accessorKey: "amount",
+          },
+          {
+            header: "ЗГІДНО ПОТРЕБ ТЕХНОЛОГІЇ",
+          },
+        ],
+      },
+      {
+        header: "ХАРАКТЕРИСТИКА",
+        accessorKey: "",
+      },
+      {
+        header: "ЗАПЛАНОВАНІ ЗАХОДИ",
+        accessorKey: "",
+      },
+    ];
+  }, []);
+  const groundSectionColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      {
+        header: "ВИД ОПЛАТИ",
+        accessorKey: "paymentType",
+      },
+      { header: "КАДАСТРОВИЙ НОМЕР" },
+      { header: "ПЛОЩА" },
+      { header: "СТАВКА" },
+      { header: "ПЛАТА ЗА ЗЕМЛЮ" },
+      { header: "ВЛАСНІСТЬ" },
+    ];
+  }, []);
+  const areasUsageColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      {
+        header: "Вегетація",
+        accessorKey: "year",
+      },
+      {
+        id: "Площа під культурою",
+        header: () => <Text textAlign={"center"}>Площа під культурою</Text>,
+        columns: [...cultureSet].map((el) => ({ header: el, accessorKey: el })),
+      },
+      { header: "Загальна площа", accessorKey: "area" },
+    ];
+  }, []);
   return (
     <>
       <Table size={"sm"} ref={aref}>
@@ -185,96 +335,17 @@ function EnterpriseBusinessPlan({
               <TableNumber></TableNumber>
             </Th>
           </Tr>
-          <Tr>
-            <Th>Персонал</Th>
-            <Th>Кількість персоналу</Th>
-            <Th>
-              Середньо-місячна
-              <br /> заробітна <br /> плата
-            </Th>
-            <Th>
-              Річний фонд <br /> оплати праці
-            </Th>
-            <Th>
-              ЄСВ 22% <br />
-              Військовий <br />
-              збір 1,5%
-            </Th>
-            <Th>
-              Загальні <br /> витрати по <br /> оплаті праці
-            </Th>
-          </Tr>
         </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            let sum = 0;
-            thisWorkers = thisWorkers.map((el) => {
-              if (el.class == "Виробничий")
-                return {
-                  ...el,
-                  amount: Math.ceil(
-                    el.amount *
-                      //@ts-ignore
-                      myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0)
-                  ),
-                };
-              else return el;
-            });
-            for (let i = start; i < end; i++) {
-              let adAmount = 0;
-              let adSalary = 0;
-              thisWorkers.forEach((e) => {
-                if (e.class == "Адміністративний") {
-                  adAmount += e.amount;
-                  adSalary += e.salary * e.amount;
-                }
-              });
-              let vAmount = 0;
-              let vSalary = 0;
-              thisWorkers.forEach((e) => {
-                if (e.class == "Виробничий") {
-                  vAmount += e.amount;
-                  vSalary += e.salary * e.amount;
-                }
-              });
-              sum +=
-                Math.round(adSalary * 12 * 0.235) +
-                adSalary * 12 +
-                (Math.round(vSalary * 12 * 0.235) + vSalary * 12);
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Адмін</Td>
-                    <Td>{adAmount}</Td>
-                    <Td>{Math.round(adSalary / adAmount)}</Td>
-                    <Td>{adSalary * 12}</Td>
-                    <Td>{Math.round(adSalary * 12 * 0.235)}</Td>
-                    <Td>{Math.round(adSalary * 12 * 0.235) + adSalary * 12}</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Вироб</Td>
-                    <Td>{vAmount}</Td>
-                    <Td>{Math.round(vSalary / vAmount)}</Td>
-                    <Td>{vSalary * 12}</Td>
-                    <Td>{Math.round(vSalary * 12 * 0.235)}</Td>
-                    <Td>{Math.round(vSalary * 12 * 0.235) + vSalary * 12}</Td>
-                  </Tr>
-                </>
-              );
-            }
-            res.push(
-              <Tr fontWeight={"bold"}>
-                <Td colSpan={5}>Річний оплати праці з нарахуваннями</Td>
-                <Td>{sum}</Td>
-              </Tr>
-            );
-            return res;
-          })()}
-        </Tbody>
+        <TableContent
+          data={salaryExpensesData}
+          columns={salaryExpensesColumns}
+        />
+        <Tfoot>
+          <Tr fontWeight={"bold"} key={0}>
+            <Td colSpan={5}>Річний оплати праці з нарахуваннями</Td>
+            <Td>{sum}</Td>
+          </Tr>
+        </Tfoot>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -290,48 +361,13 @@ function EnterpriseBusinessPlan({
               <TableNumber></TableNumber>
             </Th>
           </Tr>
-          <Tr>
-            <Th rowSpan={2}>Рік</Th>
-            <Th colSpan={2}>Річний фонд оплати праці виробничого персоналу</Th>
-            <Th rowSpan={2}>Характеристика</Th>
-            <Th rowSpan={2}>Заплановані заходи</Th>
-          </Tr>
-          <Tr>
-            <Th>Згідно штатного розпису</Th>
-            <Th>Згідно потреб технології</Th>
-          </Tr>
         </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              let vSalary = 0;
-              thisWorkers.forEach((e) => {
-                if (e.class == "Виробничий") {
-                  vSalary += e.salary * e.amount;
-                }
-              }, 0);
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i}</Td>
-                    <Td>{Math.round(vSalary * 12 * 0.235) + vSalary * 12}</Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                  </Tr>
-                </>
-              );
-            }
-            return res;
-          })()}
-        </Tbody>
+        <TableContent data={wageAnalysisData} columns={wageAnalysisColumns} />
       </Table>
       <Paragraph>3.3. Земельні ділянки та структура насаджень</Paragraph>
       <Description>
         {`Проект буде здійснюватися на земельній ділянці загальною площею 
-    ${" " + myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)}га, з правом
+    ${myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)}га, з правом
     використання на весь період реалізації.`}
       </Description>
       <Table size={"sm"}>
@@ -346,87 +382,13 @@ function EnterpriseBusinessPlan({
               <TableNumber></TableNumber>
             </Th>
           </Tr>
-          <LandPlatTableHead isPlan={true} />
         </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Оренда Землі</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Податок</Td>
-                  </Tr>
-                </>
-              );
-            }
-            return res;
-          })()}
-        </Tbody>
+        <TableContent data={groundSectionData} columns={groundSectionColumns} />
       </Table>
       <Description>
         Використання площ під культурою описано у табличному вигляді.
       </Description>
-      <Table size={"sm"}>
-        <Thead>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i}</Td>
-                    {[...cultureSet].map((el) => (
-                      <Td>
-                        {myBusiness?.busCuls.reduce(
-                          (p, c) => (el == c.culture?.name ? p + c.area : p),
-                          0
-                        )}
-                      </Td>
-                    ))}
-                    <Td>
-                      {myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)}
-                    </Td>
-                  </Tr>
-                </>
-              );
-            }
-            return (
-              <>
-                <Tr>
-                  <Th colSpan={cultureSet.size + 2}>
-                    <TableName>Планова структура насаджень</TableName>
-                  </Th>
-                </Tr>
-                <Tr>
-                  <Th colSpan={cultureSet.size + 2}>
-                    <TableNumber></TableNumber>
-                  </Th>
-                </Tr>
-                <Tr>
-                  <Th rowSpan={2}>Вегетація</Th>
-                  <Th colSpan={cultureSet.size}>
-                    <Text textAlign={"center"}>Площа під культурою</Text>
-                  </Th>
-                  <Th rowSpan={2}>Загальна площа</Th>
-                </Tr>
-                <Tr>
-                  {[...cultureSet].map((el) => (
-                    <Th>{el}</Th>
-                  ))}
-                </Tr>
-                {res}
-              </>
-            );
-          })()}
-        </Thead>
-      </Table>
+      <TableComponent data={areasUsageData} columns={areasUsageColumns} />
     </>
   );
 }

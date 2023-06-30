@@ -32,7 +32,7 @@ function useBusinessPlanFinancingData(
         generalProduction: 0,
         variables: 0,
         outcome: 0,
-        financingFin: 0,
+        incomeNum: 0,
         fin: 0,
         financing: 0,
       });
@@ -44,6 +44,7 @@ function useBusinessPlanFinancingData(
     const generalProduction = useBusinessPlanData.generalProduct(thisWorkers);
     const variables = useBusinessPlanData.variables(thisWorkers, sumDirect);
     const outcome = useBusinessPlanData.outcome(thisWorkers, sumDirect);
+    console.log(direct);
 
     sumPermanent += permanent;
     sumDirect += direct;
@@ -53,7 +54,7 @@ function useBusinessPlanFinancingData(
     sumIncome += financing + fin;
     sumFin += fin;
     sumFinancing += financing;
-    res.push({
+    let akk = {
       date: i + ".12",
       permanent: permanent,
       direct: direct,
@@ -63,8 +64,13 @@ function useBusinessPlanFinancingData(
       incomeNum: financing + fin,
       fin: fin,
       financing: financing,
-    });
+    };
+    console.log("akk");
+    console.log(akk);
+
+    res.push(akk);
   }
+  console.log(sumDirect);
   res.push({
     date: "Разом",
     permanent: sumPermanent,

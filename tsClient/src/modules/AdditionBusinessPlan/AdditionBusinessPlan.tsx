@@ -101,7 +101,7 @@ function AdditionBusinessPlan({
                 sum += el.salary * 12 * el.amount;
               });
               res.push(
-                <>
+                <React.Fragment key={i}>
                   <Tr>
                     <Td>{i}</Td>
                   </Tr>
@@ -109,7 +109,7 @@ function AdditionBusinessPlan({
                     thisWorkers={thisWorkers}
                     isPlan={true}
                   />
-                </>
+                </React.Fragment>
               );
             }
             res.push(
@@ -148,7 +148,7 @@ function AdditionBusinessPlan({
                         .find((e) => e.id == el[0]?.arr[0]?.techCartId!);
 
                       const sum = 0;
-                      return el.map((e) => {
+                      return el.map((el) => {
                         // sum +=
                         //   mapData?.area! *
                         //   (e.costMaterials ||
@@ -163,11 +163,11 @@ function AdditionBusinessPlan({
 
                         if (operReady)
                           return (
-                            <>
+                            <React.Fragment>
                               {/* <карти></к> */}
                               <OperTableSection
-                                arr={e.arr}
-                                title={e.title}
+                                arr={el.arr}
+                                title={el.title}
                                 //@ts-ignore
                                 mapData={{ area: 3 }}
                                 id={mapData?.id!}
@@ -181,7 +181,7 @@ function AdditionBusinessPlan({
                                 setUpdate={() => {}}
                                 sum={sum}
                               />
-                            </>
+                            </React.Fragment>
                           );
                       });
                     })
@@ -255,20 +255,20 @@ function AdditionBusinessPlan({
                 ?.filter((el) => getYearFromString(el.date) == thisYear)
                 .reduce((p, c) => p + c.cost, 0);
               return (
-                <>
+                <React.Fragment key={ind}>
                   <Tr>
                     <Td>{ind}</Td>
                     <Td>{thisYear}</Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {el.culture?.name.split(" ").join("\u00A0")}
                         </Text>
                       ))}
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {el.cultivationTechnology?.name
                             .split(" ")
                             .join("\u00A0")}
@@ -277,7 +277,7 @@ function AdditionBusinessPlan({
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {thisMaps.find(
                             (e) =>
                               e.cultureId == el.cultureId &&
@@ -291,7 +291,7 @@ function AdditionBusinessPlan({
                     <Td>
                       {myBusiness.busCuls.map((el) => {
                         sumArea += el.area;
-                        return <Text>{el.area}</Text>;
+                        return <Text key={el.id}>{el.area}</Text>;
                       })}
                     </Td>
                     <Td>
@@ -305,12 +305,12 @@ function AdditionBusinessPlan({
                               +e.year.split("")[0] == ind
                           )?.costHectare || 0) * el.area;
                         sumCost += res;
-                        return <Text>{res}</Text>;
+                        return <Text key={el.id}>{res}</Text>;
                       })}
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {(() => {
                             let cart = thisMaps.find(
                               (e) =>
@@ -332,7 +332,7 @@ function AdditionBusinessPlan({
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {(() => {
                             let cart = thisMaps.find(
                               (e) =>
@@ -356,7 +356,7 @@ function AdditionBusinessPlan({
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {(() => {
                             let cart = thisMaps.find(
                               (e) =>
@@ -393,7 +393,7 @@ function AdditionBusinessPlan({
                     <Td></Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>
+                        <Text key={el.id}>
                           {el.culture?.product.split(" ").join("\u00A0")}
                         </Text>
                       ))}
@@ -409,7 +409,7 @@ function AdditionBusinessPlan({
                             +e.year.split("")[0] == ind
                         );
                         return (
-                          <Text>
+                          <Text key={el.id}>
                             {Math.round(
                               myYield?.yieldPerHectare! *
                                 vegetation?.allCoeff! *
@@ -421,7 +421,9 @@ function AdditionBusinessPlan({
                     </Td>
                     <Td>
                       {myBusiness.busCuls.map((el) => (
-                        <Text>{el.culture?.priceBerry! * 1000}</Text>
+                        <Text key={el.id}>
+                          {el.culture?.priceBerry! * 1000}
+                        </Text>
                       ))}
                     </Td>
                     <Td>
@@ -443,7 +445,7 @@ function AdditionBusinessPlan({
                             el.culture?.priceBerry! *
                             1000 || 0;
                         sumTake += res;
-                        return <Text>{res}</Text>;
+                        return <Text key={el.id}>{res}</Text>;
                       })}
                     </Td>
                     <Td>
@@ -609,7 +611,7 @@ function AdditionBusinessPlan({
                         (sumGrand || 0)}
                     </Td>
                   </Tr>
-                </>
+                </React.Fragment>
               );
             });
           })()}
@@ -637,7 +639,7 @@ function AdditionBusinessPlan({
                 </Tr>
                 <Tr>
                   {[...cultureSet].map((el) => (
-                    <Td>{el}</Td>
+                    <Td key={el}>{el}</Td>
                   ))}
                 </Tr>
               </Thead>

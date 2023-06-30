@@ -1061,7 +1061,7 @@ export function deleteSale(incomeStore: IncomeStore, data: { saleId: number }) {
 }
 
 function sortFinancing(arr: Ifinancing[], IncomeStore: IncomeStore) {
-  arr.forEach((el) => {
+  arr?.forEach((el) => {
     if (el.type == "credit") {
       IncomeStore.credit = IncomeStore.credit.filter((e) => e.id! != el.id!);
       IncomeStore.newCredit = el;
@@ -1376,11 +1376,10 @@ export function deleteBuilding(
   });
 }
 
-export function getCartForBusiness(map: MapStore) {
-  client.cart.getForBusiness.query().then((res) => {
-    //@ts-ignore
-    map.businessCarts = res;
-  });
+export async function getCartForBusiness(map: MapStore) {
+  const res = await client.cart.getForBusiness.query();
+  //@ts-ignore
+  map.businessCarts = res;
 }
 
 export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {

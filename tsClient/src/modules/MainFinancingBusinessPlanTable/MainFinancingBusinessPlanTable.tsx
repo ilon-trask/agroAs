@@ -73,7 +73,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
         </Tr>
         {thisCredit.map((el) => (
-          <Tr>
+          <Tr key={el.id!}>
             {!isPlan && (
               <Td>
                 <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
@@ -98,7 +98,7 @@ function MainFinancingBusinessPlanTable({
         </Tr>
 
         {thisInvestment.map((el) => (
-          <Tr>
+          <Tr key={el.id!}>
             {!isPlan && (
               <Td>
                 <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
@@ -122,7 +122,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
         </Tr>
         {thisDerj.map((el) => (
-          <Tr>
+          <Tr key={el.id!}>
             {!isPlan && (
               <Td>
                 <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
@@ -146,7 +146,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
         </Tr>
         {thisGrant.map((el) => (
-          <Tr>
+          <Tr key={el.id!}>
             {!isPlan && (
               <Td>
                 <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />

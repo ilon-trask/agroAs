@@ -7,26 +7,18 @@ import useVegetationYears from "../useVegetationYears";
 
 class BusinessPlanData {
   variables(thisWorkers: Iworker[], sumDirect: number) {
-    return (
-      Math.round(
-        thisWorkers
-          .filter((el) => el.class == "Інженерно технічний")
-          .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-      ) + sumDirect
-    );
+    return this.generalProduct(thisWorkers) + sumDirect;
   }
   outcome(thisWorkers: Iworker[], sumDirect: number) {
     return (
+      this.permanent(thisWorkers) + this.generalProduct(thisWorkers) + sumDirect
+    );
+  }
+  itrLaborRemuneration(thisWorkers: Iworker[]) {
+    return Math.round(
       thisWorkers
-        .filter((el) => el.class == "Адміністративний")
-        .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) *
-        1.235 +
-      Math.round(
-        thisWorkers
-          .filter((el) => el.class == "Інженерно технічний")
-          .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-      ) +
-      sumDirect
+        .filter((el) => el.class == "Інженерно технічний")
+        .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)
     );
   }
   generalProduct(thisWorkers: Iworker[]) {

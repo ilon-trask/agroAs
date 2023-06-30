@@ -12,7 +12,6 @@ import {
   Tr,
   Td,
 } from "@chakra-ui/react";
-import { EditIcon } from "@chakra-ui/icons";
 import BusinessConceptTable from "../modules/TEJConceptTable";
 import { useParams } from "react-router-dom";
 import { Context } from "../main";
@@ -85,8 +84,6 @@ function BiznesPlanPage() {
   }, []);
   const { id } = useParams();
   const myBusiness = business.businessPlan.find((el) => el.id == id);
-  console.log("bux");
-  console.log(myBusiness);
 
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
@@ -135,7 +132,7 @@ function BiznesPlanPage() {
   const productSet = new Set(
     myBusiness?.busCuls?.map((el) => el.culture?.product!)
   );
-  let thisWorkers = enterpriseStore.worker.filter(
+  let thisWorkers = enterpriseStore.worker?.filter(
     (e) => e.enterpriseId == myEnterprise?.id! && e.form == myEnterprise?.form
   );
 
@@ -172,7 +169,7 @@ function BiznesPlanPage() {
 
       setCartReady(true);
     }
-  }, [thisMaps]);
+  }, [thisMaps[0]]);
   useEffect(() => {
     if (map.opers[0]) {
       console.log("є карта");
@@ -233,7 +230,7 @@ function BiznesPlanPage() {
   console.log(thisGrand);
   const [addOpen, setAddOpen] = useState(false);
   const [addData, setAddData] = useState<number[]>([]);
-  return !ready ? (
+  return !ready && !cartReady ? (
     <Box></Box>
   ) : (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
@@ -280,17 +277,17 @@ function BiznesPlanPage() {
               </Td>
               <Td>
                 {myBusiness?.busCuls?.map((el) => (
-                  <Box>{el?.culture?.name}</Box>
+                  <Box key={el.id}>{el?.culture?.name}</Box>
                 ))}
               </Td>
               <Td>
                 {myBusiness?.busCuls?.map((el) => (
-                  <Box>{el?.cultivationTechnology?.name}</Box>
+                  <Box key={el.id}>{el?.cultivationTechnology?.name}</Box>
                 ))}
               </Td>
               <Td>
                 {myBusiness?.busCuls?.map((el) => (
-                  <Box>{el.area}</Box>
+                  <Box key={el.id}>{el.area}</Box>
                 ))}
               </Td>
               <Td>{myBusiness?.dateStart}</Td>
@@ -391,6 +388,7 @@ function BiznesPlanPage() {
               )
                 return (
                   <BuyingMachineTableBodyRow
+                    key={el.id!}
                     isPlan={true}
                     el={el}
                     setOpen={setBuyingMachineOpen}

@@ -77,16 +77,16 @@ function ResumeBusinessPlan({
           {(() => {
             return [...productSet].map((el, ind) =>
               ind == 0 ? (
-                <>
+                <React.Fragment key={el as string}>
                   <Tr>
                     <Td rowSpan={productSet.size}>
                       Основні продукти підприємства
                     </Td>
                     <Td>{el}, охолоджені для реалізації (т)</Td>
                   </Tr>
-                </>
+                </React.Fragment>
               ) : (
-                <Tr>
+                <Tr key={el}>
                   <Td>{el}, охолоджені для реалізації (т)</Td>
                 </Tr>
               )

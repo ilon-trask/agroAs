@@ -1,16 +1,13 @@
-import {
-  Table,
-  Th,
-  Thead,
-  Tr,
-  Heading,
-  Tbody,
-  Td,
-  Text,
-} from "@chakra-ui/react";
-import React, { RefObject, useContext } from "react";
+import { Table, Th, Thead, Tr, Heading, Td, Text } from "@chakra-ui/react";
+import React, {
+  RefObject,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import TableComponent from "src/components/TableComponent";
-import { TableColumnsType } from "src/components/TableComponent/TableComponent";
+import { ColumnDef } from "@tanstack/react-table";
 import { Context } from "src/main";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import useBusinessPlanFinancingData from "src/shared/hook/BusinessPlanFinancingData/useBusinessPlanFinancingData";
@@ -39,6 +36,11 @@ function PlanedIndicatorsBusinessPlan({
   thisMaps: resTechCartsWithOpers[];
 }) {
   const { income } = useContext(Context);
+  console.log("mapD");
+
+  console.log(thisMaps);
+  console.log(thisWorkers);
+
   const data = useBusinessPlanFinancingData(
     start,
     end,
@@ -47,17 +49,20 @@ function PlanedIndicatorsBusinessPlan({
     income,
     thisWorkers
   );
-  const columns: TableColumnsType = [
-    { header: "", accessorKey: "date" },
-    { header: "Постійні", accessorKey: "permanent" },
-    { header: "Прямі", accessorKey: "direct" },
-    { header: "Заг вир", accessorKey: "generalProduction" },
-    { header: "Змінні", accessorKey: "variables" },
-    { header: "Витрати", accessorKey: "outcome" },
-    { header: "Дохід", accessorKey: "incomeNum" },
-    { header: "Виручка", accessorKey: "fin" },
-    { header: "Залучення коштів", accessorKey: "financing" },
-  ];
+
+  const columns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      { header: "", accessorKey: "date" },
+      { header: "Постійні", accessorKey: "permanent" },
+      { header: "Прямі", accessorKey: "direct" },
+      { header: "Заг вир", accessorKey: "generalProduction" },
+      { header: "Змінні", accessorKey: "variables" },
+      { header: "Витрати", accessorKey: "outcome" },
+      { header: "Дохід", accessorKey: "incomeNum" },
+      { header: "Виручка", accessorKey: "fin" },
+      { header: "Залучення коштів", accessorKey: "financing" },
+    ];
+  }, []);
   return (
     <>
       <Table size={"sm"} ref={aref}>
@@ -85,17 +90,12 @@ function PlanedIndicatorsBusinessPlan({
           </Tr>
           <Tr>
             <Td colSpan={9} py={1}>
-              <TableNumber></TableNumber>
+              <TableNumber />
             </Td>
           </Tr>
         </Thead>
       </Table>
-      <TableComponent
-        setOpen={() => {}}
-        data={data}
-        columns={columns}
-        needIcons={false}
-      />
+      <TableComponent data={data} columns={columns} />
       <Text fontWeight={"bold"} fontSize={"20px"}>
         Результат: період років - {end - start}; Прибуток:
         {data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
