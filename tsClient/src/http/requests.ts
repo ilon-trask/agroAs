@@ -578,6 +578,8 @@ export function agreeCarts(map: MapStore) {
 export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.get.query().then((res) => {
+    console.log(res);
+
     Bus.businessPlan = res as resBusinessPlan[];
     map.isLoading = false;
   });
@@ -643,8 +645,14 @@ export function sendFeedBack(data: FeedBackProps) {
 export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.getNoAgree.query().then((res) => {
-    //@ts-ignore
     Bus.noAgreeBusinessPlan = res;
+    map.isLoading = false;
+  });
+}
+export function getPublicBusiness(map: MapStore, Bus: BusinessStore) {
+  map.isLoading = true;
+  client.business.getPublic.query().then((res) => {
+    Bus.publicBusinessPlan = res;
     map.isLoading = false;
   });
 }

@@ -1,8 +1,19 @@
 import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Box, Checkbox, Table, Tbody, Td, Thead, Tr } from "@chakra-ui/react";
+import { ColumnDef } from "@tanstack/react-table";
 import { observer } from "mobx-react-lite";
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
+import TableComponent from "src/components/TableComponent";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import { resBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 import { DeleteProps } from "../components/DeleteAlert";
 import { deleteBusinessPlan, setIsPublicBusiness } from "../http/requests";
@@ -15,6 +26,7 @@ type props = {
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  businessData: resBusinessPlan[];
 };
 export function setPatchBusinessPlan(el: resBusinessPlan) {
   const cultureIds: {
@@ -37,132 +49,146 @@ export function setPatchBusinessPlan(el: resBusinessPlan) {
   });
   return cultureIds;
 }
-function BusinessTable({ setOpen, setRes, setUpdate, setDeleteOpen }: props) {
-  const { map, business, enterpriseStore } = useContext(Context);
+function BusinessTable({
+  setOpen,
+  setRes,
+  setUpdate,
+  setDeleteOpen,
+  businessData,
+}: props) {
+  const { map, business } = useContext(Context);
   const [publicOpen, setPublicOpen] = useState(false);
   const [publicRes, setPublicRes] = useState<{
     BusinessId: number;
     isPublic: boolean;
     isAgree?: boolean;
   }>({ BusinessId: 0, isPublic: true, isAgree: true });
+  const onEditClick = (original: resBusinessPlan) => {
+    setOpen(true);
+    setUpdate(true);
+    const cultureIds = setPatchBusinessPlan(original);
+    setRes({
+      cultureIds: cultureIds,
+      dateStart: original.dateStart,
+      enterpriseId: original.enterpriseId!,
+      initialAmount: original.initialAmount,
+      name: original.name,
+      realizationTime: original.realizationTime,
+      planId: original.id,
+      topic: original.topic,
+    });
+  };
+  const columns = useMemo<ColumnDef<resBusinessPlan>[]>(
+    () => [
+      {
+        header: "",
+        accessorKey: "id",
+        cell: ({ row: { original } }) => (
+          <Box onClick={() => onEditClick(original)}>
+            <MyEditIcon />
+          </Box>
+        ),
+      },
+      {
+        header: "Назва підприємства",
+        accessorKey: "enterprise.name",
+        cell: ({ row: { original } }) => (
+          <Link to={ENTERPRISE_ROUTER + "/" + original.enterpriseId}>
+            <MyViewIcon /> {original.enterprise?.name}
+          </Link>
+        ),
+      },
+      {
+        header: "Назва бізнес-плану",
+        accessorKey: "name",
+        cell: ({ row: { original } }) => (
+          <Box minW={"max-content"}>
+            <Link to={BUSINESSpLAN_ROUTER + "/" + original.id}>
+              <MyViewIcon /> {original.name}
+            </Link>
+          </Box>
+        ),
+      },
+      {
+        header: "Культура",
+        accessorKey: "cultures",
+        cell: ({ row: { original } }) => {
+          const cultureSet = new Set(
+            original.busCuls.map((el) => el.culture?.name!)
+          );
+          return [...cultureSet].map((el) => (
+            <Box key={el} minW={"max-content"}>
+              {el}
+            </Box>
+          ));
+        },
+      },
+      { header: "Дата початку", accessorKey: "dateStart" },
+      { header: "Термін реалізації", accessorKey: "realizationTime" },
+      { header: "Початкова сума", accessorKey: "initialAmount" },
+      {
+        header: "",
+        accessorKey: "createdAt",
+        cell: ({ row: { original } }) => (
+          <Box
+            onClick={() =>
+              setDeleteOpen({
+                isOpen: true,
+                func: () => {
+                  deleteBusinessPlan(map, business, original.id!);
+                  //@ts-ignore
+                  setDeleteOpen({ isOpen: false });
+                },
+                text: "бізнес-план",
+              })
+            }
+          >
+            <MyDeleteIcon />
+          </Box>
+        ),
+      },
+      {
+        header: "",
+        accessorKey: "updatedAt",
+        cell: ({ row: { original } }) => (
+          <Checkbox
+            isChecked={original.isPublic}
+            onChange={() => {
+              if (original.isPublic) {
+                setIsPublicBusiness(map, business, {
+                  planId: original.id!,
+                  isPublic: !original.isPublic,
+                  description: original.description,
+                });
+              } else {
+                setPublicOpen(true);
+                setPublicRes({
+                  BusinessId: original.id!,
+                  isPublic: !original.isPublic,
+                  isAgree: !original.isAgree,
+                });
+              }
+            }}
+          >
+            Опублікувати
+          </Checkbox>
+        ),
+      },
+    ],
+    []
+  );
+  const data = businessData;
+
   return (
-    <Table size="sm">
-      <Thead>
-        <Tr>
-          <Td></Td>
-          <Td>Назва підприємства</Td>
-          <Td>Назва бізнес-плану</Td>
-          <Td>Культура</Td>
-          <Td>Дата початку</Td>
-          <Td>Термін реалізації</Td>
-          <Td>Початкова сума</Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {business.businessPlan.map((el) => {
-          const enterprise = enterpriseStore.enterprise.find(
-            (e) => e.id == el.enterpriseId
-          );
-          const cultureSet = new Set(el.busCuls.map((el) => el.culture?.name!));
-          return (
-            <Tr key={el.id}>
-              <Td
-                onClick={() => {
-                  setOpen(true);
-                  setUpdate(true);
-                  const cultureIds = setPatchBusinessPlan(el);
-
-                  setRes({
-                    cultureIds: cultureIds,
-                    dateStart: el.dateStart,
-                    enterpriseId: el.enterpriseId!,
-                    initialAmount: el.initialAmount,
-                    name: el.name,
-                    realizationTime: el.realizationTime,
-                    planId: el.id,
-                    topic: el.topic,
-                  });
-                }}
-              >
-                <EditIcon
-                  color={"blue.400"}
-                  w={"20px"}
-                  h={"auto"}
-                  cursor={"pointer"}
-                />
-              </Td>
-              <Td>
-                <Link to={ENTERPRISE_ROUTER + "/" + el.enterpriseId}>
-                  <ViewIcon boxSize={5} color={"blue.400"} /> {enterprise?.name}
-                </Link>
-              </Td>
-              <Td>
-                <Link to={BUSINESSpLAN_ROUTER + "/" + el.id}>
-                  <ViewIcon boxSize={5} color={"blue.400"} /> {el.name}
-                </Link>
-              </Td>
-              <Td>
-                {[...cultureSet].map((el) => (
-                  <Box>{el}</Box>
-                ))}
-              </Td>
-              <Td>{el.dateStart}</Td>
-              <Td>{el.realizationTime}</Td>
-              <Td>{el.initialAmount}</Td>
-              <Td
-                cursor={"pointer"}
-                onClick={() =>
-                  setDeleteOpen({
-                    isOpen: true,
-                    func: () => {
-                      deleteBusinessPlan(map, business, el.id!);
-                      //@ts-ignore
-                      setDeleteOpen({ isOpen: false });
-                    },
-                    text: "бізнес-план",
-                  })
-                }
-              >
-                <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
-              </Td>
-              <Td>
-                <Checkbox
-                  isChecked={el.isPublic}
-                  onChange={() => {
-                    console.log(el.isPublic);
-
-                    if (el.isPublic) {
-                      setIsPublicBusiness(map, business, {
-                        planId: el.id!,
-                        isPublic: !el.isPublic,
-                        description: el.description,
-                      });
-                    } else {
-                      setPublicOpen(true);
-                      setPublicRes({
-                        BusinessId: el.id!,
-                        isPublic: !el.isPublic,
-                        isAgree: !el.isAgree,
-                      });
-                    }
-                  }}
-                >
-                  Опублікувати
-                </Checkbox>
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
+    <>
+      <TableComponent data={data} columns={columns} />
       <BusinessPublicationPopUp
         open={publicOpen}
         setOpen={setPublicOpen}
         data={publicRes}
         setData={setPublicRes}
       />
-    </Table>
+    </>
   );
 }
 

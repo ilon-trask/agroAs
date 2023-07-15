@@ -27,6 +27,7 @@ import {
   getVegetationYear,
   getWorker,
   getYieldPlants,
+  getPublicBusiness,
 } from "../http/requests";
 import useBusiness from "../shared/hook/useBusiness";
 import CreateBusiness, { CreateBusinessProp } from "../modules/CreateBusiness";
@@ -50,7 +51,6 @@ import {
   BuyingMachineTableBodyRow,
   BuyingMachineTableHead,
 } from "../modules/BuyingMachineTable/BuyingMachineTable";
-import WorkTable from "../modules/WorkTable";
 import { workProps } from "../modules/CreateWork";
 import sort from "../shared/funcs/sort";
 import TitleBusinessPlan from "src/modules/TitleBusinessPlan";
@@ -63,7 +63,6 @@ import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MainFinancingBusinessPlanTable from "src/modules/MainFinancingBusinessPlanTable";
 import AddFinancingToBusinessPlan from "src/modules/AddFinancingToBusinessPlan";
-import TableName from "src/ui/TableName";
 function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
@@ -81,9 +80,12 @@ function BiznesPlanPage() {
     getFinancing(income);
     getGrades(map);
     getTEJ(TEJ);
+    getPublicBusiness(map, business);
   }, []);
   const { id } = useParams();
-  const myBusiness = business.businessPlan.find((el) => el.id == id);
+  const myBusiness =
+    business.businessPlan.find((el) => el.id == id) ||
+    business.publicBusinessPlan.find((el) => el.id == id);
 
   const myEnterprise = enterpriseStore.enterprise?.find(
     (el) => el.id == myBusiness?.enterpriseId
@@ -226,10 +228,9 @@ function BiznesPlanPage() {
     (el) => el.type == "derj_support"
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
-  console.log("credit");
-  console.log(thisGrand);
   const [addOpen, setAddOpen] = useState(false);
   const [addData, setAddData] = useState<number[]>([]);
+
   return !ready && !cartReady ? (
     <Box></Box>
   ) : (

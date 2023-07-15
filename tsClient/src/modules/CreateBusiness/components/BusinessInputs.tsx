@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import {
   Box,
   Input,
@@ -7,10 +13,16 @@ import {
   Text,
   Checkbox,
   Button,
+  Table,
+  Tr,
+  Td,
 } from "@chakra-ui/react";
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
 import SecondOpen from "./SecondOpen";
+import TableComponent from "src/components/TableComponent";
+import { ColumnDef } from "@tanstack/react-table";
+import TableContent from "src/components/TableComponent/TableContent";
 type props = {
   res: CreateBusinessProp;
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
@@ -28,6 +40,7 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
   //     setRes((prev) => ({ ...prev, cultureIds: [...prev.cultureIds, id] }));
   //   }
   // }
+  // console.log(map.culture);
 
   function isCheckedCulture(id: number) {
     console.log(res.cultureIds);
@@ -50,7 +63,7 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
       <Box>
         {isEnterprise && (
           <>
-            <Text>Виберіть підприємство</Text>
+            <Text fontWeight={"bold"}>Виберіть підприємство</Text>
             <Select
               value={res.enterpriseId}
               onChange={(e) =>
@@ -71,7 +84,7 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
       </Box>
       <Box display={"flex"} justifyContent={"space-around"}>
         <Box width={"40%"}>
-          <Text>Вкажіть назву бізнес-плану</Text>
+          <Text fontWeight={"bold"}>Вкажіть назву бізнес-плану</Text>
           <Input
             value={res.name}
             onChange={(e) =>
@@ -81,7 +94,7 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           />
         </Box>
         <Box width={"40%"}>
-          <Text>Вкажіть тему бізнес-плану</Text>
+          <Text fontWeight={"bold"}>Вкажіть тему бізнес-плану</Text>
           <Input
             value={res.topic}
             onChange={(e) =>
@@ -91,8 +104,51 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           />
         </Box>
       </Box>
+      <Box display={"flex"} justifyContent={"space-around"}>
+        <Box width={"40%"}>
+          <Text fontWeight={"bold"}>Вкажіть дату початку</Text>
+          <Input
+            value={res.dateStart}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, dateStart: e.target.value }))
+            }
+            placeholder="Впишіть дату"
+            type={"date"}
+          />
+        </Box>
+        <Box width={"40%"}>
+          <Text fontWeight={"bold"}>Вкажіть термін реалізації</Text>
+          <Input
+            value={res.realizationTime}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                realizationTime: e.target.value as any,
+              }))
+            }
+            placeholder="Впишіть термін"
+            type={"number"}
+            inputMode={"numeric"}
+          />
+        </Box>
+      </Box>
       <Box>
-        <Text>Виберіть культуру</Text>
+        <Text fontWeight={"bold"}>Вкажіть початкову суму</Text>
+        <Input
+          value={res.initialAmount}
+          onChange={(e) =>
+            setRes((prev) => ({
+              ...prev,
+              initialAmount: e.target.value as any,
+            }))
+          }
+          placeholder="Впишіть термін"
+          type={"number"}
+          inputMode={"numeric"}
+        />
+      </Box>
+      <Box>
+        <Text fontWeight={"bold"}>Виберіть продукт</Text>
         <Box>
           {map.culture.map((el) => (
             <Box key={el.id} as="span" ml={2} display={"inline-flex"} gap={1}>
@@ -123,47 +179,53 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
             </Box>
           ))}
         </Box>
-      </Box>
-      <Box>
-        <Text>Вкажіть дату початку</Text>
-        <Input
-          value={res.dateStart}
-          onChange={(e) =>
-            setRes((prev) => ({ ...prev, dateStart: e.target.value }))
-          }
-          placeholder="Впишіть дату"
-          type={"date"}
-        />
-      </Box>
-      <Box>
-        <Text>Вкажіть термін реалізації</Text>
-        <Input
-          value={res.realizationTime}
-          onChange={(e) =>
-            setRes((prev) => ({
-              ...prev,
-              realizationTime: e.target.value as any,
-            }))
-          }
-          placeholder="Впишіть термін"
-          type={"number"}
-          inputMode={"numeric"}
-        />
-      </Box>
-      <Box>
-        <Text>Вкажіть початкову суму</Text>
-        <Input
-          value={res.initialAmount}
-          onChange={(e) =>
-            setRes((prev) => ({
-              ...prev,
-              initialAmount: e.target.value as any,
-            }))
-          }
-          placeholder="Впишіть термін"
-          type={"number"}
-          inputMode={"numeric"}
-        />
+        <Box>
+          {(() => {
+            const data = [
+              ...res.cultureIds
+                .map((cul) =>
+                  cul.tech.map((tech) => ({
+                    id: tech.techId,
+                    product: "",
+                    culture: map.culture.find((el) => el.id == cul.id)?.name,
+                    technology: map.cultivationTechnologies.find(
+                      (el) => el.id == tech.techId
+                    )?.name,
+                    area: tech.area,
+                  }))
+                )
+                .flat(),
+            ];
+            const sum = data.reduce((p, c) => p + c.area, 0);
+            const columns = useMemo<
+              ColumnDef<{
+                id: number;
+                product: string;
+                culture: string;
+                technology: string;
+                area: string;
+              }>
+            >(
+              () => [
+                { header: "", accessorKey: "id" },
+                { header: "Продукт", accessorKey: "product" },
+                { header: "Культура", accessorKey: "culture" },
+                { header: "Технологія", accessorKey: "technology" },
+                { header: "Площа", accessorKey: "area" },
+              ],
+              []
+            );
+            return (
+              <Table size={"sm"}>
+                <TableContent columns={columns} data={data} />
+                <Tr>
+                  <Td colSpan={4}>Корисна площа</Td>
+                  <Td>{sum}</Td>
+                </Tr>
+              </Table>
+            );
+          })()}
+        </Box>
       </Box>
       <SecondOpen
         cultureId={culture}

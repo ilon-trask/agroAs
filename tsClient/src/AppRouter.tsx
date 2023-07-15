@@ -18,7 +18,6 @@ import YieldСalculation from "./pages/YieldСalculation";
 import Auth from "./pages/Auth";
 import CalendarPage from "./pages/CalendarPage";
 TEJJornal;
-import { publicRoutes } from "./routes";
 import {
   HOW_ROUTER,
   INCOME_ROUTER,
@@ -38,6 +37,7 @@ import {
   ENTERPRISE_ROUTER,
   ENTERPRISE_FORM_ROUTER,
   ENTERPRISE_TAX_GROUP,
+  DATA_BASE_ROUTER,
 } from "./utils/consts";
 import CashFlow from "./pages/CashFlow";
 import Goods from "./pages/Goods";
@@ -46,6 +46,7 @@ import EnterpriseJournal from "./pages/EnterpriseJournal";
 import Enterprise from "./pages/Enterprise";
 import EnterpriseFormPage from "./pages/EnterpriseFormPage";
 import EnterpriseTaxPage from "./pages/EnterpriseTaxPage";
+import DataBasePage from "./pages/DataBasePage";
 
 export default function AppRouter() {
   const location = useLocation();
@@ -93,6 +94,7 @@ export default function AppRouter() {
         path={ENTERPRISE_TAX_GROUP + "/:tax" + "/:id"}
         element={<EnterpriseTaxPage />}
       />
+      <Route path={DATA_BASE_ROUTER} element={<DataBasePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

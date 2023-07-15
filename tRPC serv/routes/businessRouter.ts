@@ -68,6 +68,10 @@ const businessRouter = router({
     );
     return res;
   }),
+  getPublic: publicProcedure.query(async () => {
+    const res = await BusinessService.getPublic();
+    return res;
+  }),
   setIsPublic: publicProcedure
     .input(setIsPublic)
     .query(async ({ input, ctx }) => {

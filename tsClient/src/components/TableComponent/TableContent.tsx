@@ -39,9 +39,10 @@ function TableContent({ data, columns }: TableProps) {
         {getRowModel().rows.map((row) => {
           return (
             <Tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
+              {row.getVisibleCells().map((cell, ind) => (
                 <Td
                   key={cell.id}
+                  style={{ whiteSpace: "pre-wrap" }}
                   fontWeight={row.original.bold == true ? "bold" : "normal"}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

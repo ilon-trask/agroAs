@@ -1,20 +1,16 @@
 import { observer } from "mobx-react-lite";
-import React, { FC, useContext } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { deleteCart, setIsBasicCart, setIsPublic } from "../http/requests";
 import { Context } from "../main";
 import { cartProps } from "../modules/CreateCart";
-import MapStore from "../store/MapStore";
-import { TEHMAP_ROUTER } from "../utils/consts";
+import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
 
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import {
-  EditIcon,
-  DeleteIcon,
-  QuestionOutlineIcon,
-  ViewIcon,
-} from "@chakra-ui/icons";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 
 interface props {
   e: resTechCartsWithOpers;
@@ -46,13 +42,11 @@ const CartsTableItem = observer(
     setPublicationOpen,
     isCul,
   }: props) => {
-    const { map, user } = useContext(Context);
-    // console.log(e);
-
+    const { map, user, TEJ } = useContext(Context);
+    const myTEJ = TEJ.justification.find((el) => el.techCartId == e.id);
     return (
       <Tr key={e.id!}>
         <Td
-          textAlign={"center"}
           onClick={() => {
             setUpdate(true);
             setOpen(true);
@@ -62,12 +56,7 @@ const CartsTableItem = observer(
             });
           }}
         >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
+          <MyEditIcon />
         </Td>
         {isCul && (
           <>
@@ -83,21 +72,23 @@ const CartsTableItem = observer(
         )}
         <Td>
           <Link to={TEHMAP_ROUTER + `/${e.id}`}>
-            <ViewIcon boxSize={5} color={"blue.400"} /> {e.nameCart}
+            <MyViewIcon /> {e.nameCart}
           </Link>
         </Td>
         <Td>{e.area}</Td>
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
         <Td>{e.costHectare || "0"}</Td>
+        <Td>
+          <Link to={TEJ_ROUTER + "/" + myTEJ?.id}>
+            <MyViewIcon /> ТЕП
+          </Link>
+        </Td>
         {!isCul && (
           <Td
-            textAlign={"center"}
             onClick={
               user.role == ""
                 ? () => setShowAlert(true)
                 : () => {
-                    console.log(e.id);
-
                     setDeleteOpen(() => ({
                       ...deleteOpen,
                       isOpen: true,
@@ -111,12 +102,7 @@ const CartsTableItem = observer(
                   }
             }
           >
-            <DeleteIcon
-              w={"20px"}
-              h={"auto"}
-              color={"red"}
-              cursor={"pointer"}
-            />
+            <MyDeleteIcon />
           </Td>
         )}
         {isCul && (

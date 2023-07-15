@@ -4,10 +4,12 @@ import {
   businessPlan,
   cultivationTechnologies,
   culture,
+  enterprise,
   financing,
   IbusinessPlan,
   IcultivationTechnologies,
   Iculture,
+  Ienterprise,
   Ifinancing,
   Iresume,
   ItitlePage,
@@ -24,6 +26,7 @@ import {
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
   titlePage: ItitlePage;
+  enterprise: Ienterprise | undefined;
   financings: Ifinancing[];
   busCuls: {
     businessPlanId: number;
@@ -39,6 +42,7 @@ const includes = [
   { model: resume },
   { model: titlePage },
   { model: financing },
+  { model: enterprise },
   // { model: culture },
   {
     model: busCul,
@@ -217,6 +221,14 @@ class BusinessService {
     //@ts-ignore
     const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true, isAgree: false },
+      include: includes,
+    });
+    return res;
+  }
+  async getPublic() {
+    //@ts-ignore
+    const res: resBusinessPlan[] = await businessPlan.findAll({
+      where: { isPublic: true },
       include: includes,
     });
     return res;

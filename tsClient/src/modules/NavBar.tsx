@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   BUSINESS_ROUTER,
   CASH_FLOW,
+  DATA_BASE_ROUTER,
   ENTERPRISE_JOURNAL_ROUTER,
   GOODS_ROUTER,
   INCOME_ROUTER,
@@ -70,7 +71,10 @@ const NavBar = observer(() => {
             >
               Бізнес-плани
             </Link>
-            <Link style={{ color: "#20401e", textDecoration: "none" }} to={"/"}>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={DATA_BASE_ROUTER}
+            >
               База данних
             </Link>
           </Box>

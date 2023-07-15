@@ -1,5 +1,7 @@
 import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
-import React, { RefObject, useContext } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import React, { RefObject, useContext, useMemo } from "react";
+import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
@@ -55,7 +57,324 @@ function AdditionBusinessPlan({
   aref: RefObject<HTMLTableElement>;
 }) {
   const { map, income } = useContext(Context);
+  const technologyCultureData = (() => {
+    const res: {
+      period: string | number;
+      year: string | number;
+      culture: string | number;
+      technology: string | number;
+      map: string | number;
+      area: string | number;
+      totalCost: string | number;
+      OPFund: string | number;
+      ESV_VZ: string | number;
+      direct: string | number;
+      OP_ITR_Fund: string | number;
+      ESV_VZ_ITR: string | number;
+      otherTotalProduction: string | number;
+      totalProduction: string | number;
+      variable: string | number;
+      OP_ADM_Fund: string | number;
+      ESV_VZ_ADM: string | number;
+      otherPermanent: string | number;
+      permanent: string | number;
+      expenses: string | number;
+      income: string | number;
+      product: string | number;
+      grossHarvest: string | number;
+      cost: string | number;
+      revenue: string | number;
+      investment: string | number;
+      sum: string | number;
+      bold?: boolean;
+    }[] = [];
+    let years: number[] = new Array(
+      myBusiness.realizationTime + 1 < 11 ? myBusiness.realizationTime + 1 : 11
+    ).fill(1);
 
+    years.map((el, ind) => {
+      let sumArea = 0,
+        sumCost = 0,
+        sumSalary = 0,
+        sumESV = 0,
+        sumDirect = 0,
+        sumTake = 0;
+      const thisYear = start + ind;
+      const sumCredit = thisCredit
+        ?.filter((el) => getYearFromString(el.date) == thisYear)
+        .reduce((p, c) => p + c.cost, 0);
+      const sumInv = thisInvestment
+        ?.filter((el) => getYearFromString(el.date) == thisYear)
+        .reduce((p, c) => p + c.cost, 0);
+      const sumDerj = thisDerj
+        ?.filter((el) => getYearFromString(el.date) == thisYear)
+        .reduce((p, c) => p + c.cost, 0);
+      const sumGrand = thisGrand
+        ?.filter((el) => getYearFromString(el.date) == thisYear)
+        .reduce((p, c) => p + c.cost, 0);
+      res.push(
+        {
+          period: ind,
+          year: thisYear,
+          culture: myBusiness.busCuls
+            .map((el) => el.culture?.name.split(" ").join("\u00A0"))
+            .join("\n"),
+          technology: myBusiness.busCuls
+            .map((el) =>
+              el.cultivationTechnology?.name.split(" ").join("\u00A0")
+            )
+            .join("\n"),
+          map: myBusiness.busCuls
+            .map(
+              (el) =>
+                thisMaps.find(
+                  (e) =>
+                    e.cultureId == el.cultureId &&
+                    e.cultivationTechnologyId == el.cultivationTechnologyId &&
+                    +e.year.split("")[0] == ind
+                )?.nameCart || "Відсутня"
+            )
+            .join("\n"),
+          area: myBusiness.busCuls
+            .map((el) => {
+              sumArea += el.area;
+              return el.area;
+            })
+            .join("\n"),
+          totalCost: myBusiness.busCuls
+            .map((el) => {
+              let res =
+                (thisMaps.find(
+                  (e) =>
+                    e.cultureId == el.cultureId &&
+                    e.cultivationTechnologyId == el.cultivationTechnologyId &&
+                    +e.year.split("")[0] == ind
+                )?.costHectare || 0) * el.area;
+              sumCost += res;
+              return res;
+            })
+            .join("\n"),
+          OPFund: myBusiness.busCuls
+            .map((el) => {
+              let cart = thisMaps.find(
+                (e) =>
+                  e.cultureId == el.cultureId &&
+                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
+                  +e.year.split("")[0] == ind
+              );
+
+              let res =
+                (cart?.totalCostHandWork ||
+                  0 + cart?.totalCostMachineWork! ||
+                  0) * el.area;
+              sumSalary += res;
+              return res;
+            })
+            .join("\n"),
+          ESV_VZ: myBusiness.busCuls
+            .map((el) => {
+              let cart = thisMaps.find(
+                (e) =>
+                  e.cultureId == el.cultureId &&
+                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
+                  +e.year.split("")[0] == ind
+              );
+              let res = Math.round(
+                (cart?.totalCostHandWork ||
+                  0 + cart?.totalCostMachineWork! ||
+                  0) *
+                  el.area *
+                  0.235
+              );
+              sumESV += res;
+              return res;
+            })
+            .join("\n"),
+          direct: myBusiness.busCuls
+            .map((el) => {
+              let cart = thisMaps.find(
+                (e) =>
+                  e.cultureId == el.cultureId &&
+                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
+                  +e.year.split("")[0] == ind
+              );
+              let res =
+                Math.round(
+                  (cart?.totalCostHandWork ||
+                    0 + cart?.totalCostMachineWork! ||
+                    0) *
+                    el.area *
+                    0.235
+                ) +
+                  cart?.costHectare! * el.area || 0;
+              sumDirect += res;
+              return res;
+            })
+            .join("\n"),
+          OP_ITR_Fund: "",
+          ESV_VZ_ITR: "",
+          otherTotalProduction: "",
+          totalProduction: "",
+          variable: "",
+          OP_ADM_Fund: "",
+          ESV_VZ_ADM: "",
+          otherPermanent: "",
+          permanent: "",
+          expenses: "",
+          income: "",
+          product: myBusiness.busCuls
+            .map((el) => el.culture?.product.split(" ").join("\u00A0"))
+            .join("\n"),
+          grossHarvest: myBusiness.busCuls
+            .map((el) => {
+              let myYield = income.yieldPlant.find(
+                (e) => e.cultureId == el.cultureId
+              );
+              const vegetation = income.vegetationYear.find(
+                (e) =>
+                  e.yieldPlantId == myYield?.id && +e.year.split("")[0] == ind
+              );
+              return (
+                Math.round(
+                  myYield?.yieldPerHectare! * vegetation?.allCoeff! * el.area
+                ) || 0
+              );
+            })
+            .join("\n"),
+          cost: myBusiness.busCuls
+            .map((el) => el.culture?.priceBerry! * 1000)
+            .join("\n"),
+
+          revenue: myBusiness.busCuls
+            .map((el) => {
+              let myYield = income.yieldPlant.find(
+                (e) => e.cultureId == el.cultureId
+              );
+              const vegetation = income.vegetationYear.find(
+                (e) =>
+                  e.yieldPlantId == myYield?.id && +e.year.split("")[0] == ind
+              );
+              let res =
+                Math.round(
+                  myYield?.yieldPerHectare! * vegetation?.allCoeff! * el.area
+                ) *
+                  el.culture?.priceBerry! *
+                  1000 || 0;
+              sumTake += res;
+              return res;
+            })
+            .join("\n"),
+          investment: [
+            ind == 0 ? "Початкові\u00A0інвестиції" : "Інвестиції",
+            "Кредит",
+            "Держ\u00A0підтримка",
+            "Грант",
+          ].join("\n"),
+          sum: [sumInv, sumCredit, sumDerj, sumGrand].join("\n"),
+        },
+        {
+          bold: true,
+          period: "Разом\u00A0за\u00A0рік",
+          year: "",
+          culture: "",
+          technology: "",
+          map: "",
+          area: sumArea,
+          totalCost: sumCost,
+          OPFund: sumSalary,
+          ESV_VZ: sumESV,
+          direct: sumDirect,
+          OP_ITR_Fund: thisWorkers
+            .filter((el) => el.class == "Інженерно технічний")
+            .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0),
+          ESV_VZ_ITR:
+            thisWorkers
+              .filter((el) => el.class == "Інженерно технічний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 0.235,
+          otherTotalProduction: 0,
+          totalProduction: Math.round(
+            thisWorkers
+              .filter((el) => el.class == "Інженерно технічний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
+          ),
+          variable:
+            Math.round(
+              thisWorkers
+                .filter((el) => el.class == "Інженерно технічний")
+                .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
+            ) + sumDirect,
+          OP_ADM_Fund: Math.round(
+            thisWorkers
+              .filter((el) => el.class == "Адміністративний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)
+          ),
+          ESV_VZ_ADM: Math.round(
+            thisWorkers
+              .filter((el) => el.class == "Адміністративний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 0.235
+          ),
+          otherPermanent: 0,
+          permanent: Math.round(
+            thisWorkers
+              .filter((el) => el.class == "Адміністративний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
+          ),
+          expenses:
+            thisWorkers
+              .filter((el) => el.class == "Адміністративний")
+              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) *
+              1.235 +
+            Math.round(
+              thisWorkers
+                .filter((el) => el.class == "Інженерно технічний")
+                .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
+            ) +
+            sumDirect,
+          income: sumTake + (ind == 0 ? myBusiness.initialAmount : 0),
+          product: "",
+          grossHarvest: "",
+          cost: "",
+          revenue: sumTake,
+          investment: "",
+          sum:
+            (sumCredit || 0) + (sumInv || 0) + (sumDerj || 0) + (sumGrand || 0),
+        }
+      );
+    });
+    return res;
+  })();
+  const technologyCultureColumns = useMemo<ColumnDef<any>[]>(
+    () => [
+      { header: "Період", accessorKey: "period" },
+      { header: "Рік", accessorKey: "year" },
+      { header: "Культура", accessorKey: "culture" },
+      { header: "Технологія", accessorKey: "technology" },
+      { header: "Карта", accessorKey: "map" },
+      { header: "Площа", accessorKey: "area" },
+      { header: "Загальна вартість", accessorKey: "totalCost" },
+      { header: "Фонд ОП", accessorKey: "OPFund" },
+      { header: "ЄСВ + ВЗ", accessorKey: "ESV_VZ" },
+      { header: "Прямі", accessorKey: "direct" },
+      { header: "Фонд ОП ІТР", accessorKey: "OP_ITR_Fund" },
+      { header: "ЄСВ ВЗ ІТР", accessorKey: "ESV_VZ_ITR" },
+      { header: "інші заг. вир.", accessorKey: "otherTotalProduction" },
+      { header: "Заг. Вир.", accessorKey: "totalProduction" },
+      { header: "Змінні", accessorKey: "variable" },
+      { header: "Фонд ОП АДМ", accessorKey: "OP_ADM_Fund" },
+      { header: "ЄСВ ВЗ АДМ", accessorKey: "ESV_VZ_ADM" },
+      { header: "Інші постійні", accessorKey: "otherPermanent" },
+      { header: "Постійні", accessorKey: "permanent" },
+      { header: "Витрати", accessorKey: "expenses" },
+      { header: "Доходи", accessorKey: "income" },
+      { header: "Продукт", accessorKey: "product" },
+      { header: "Валовий збір тон", accessorKey: "grossHarvest" },
+      { header: "Ціна", accessorKey: "cost" },
+      { header: "Виручка", accessorKey: "revenue" },
+      { header: "Інвестування", accessorKey: "investment" },
+      { header: "Сума", accessorKey: "sum" },
+    ],
+    []
+  );
   return (
     <>
       <SectionTitle aref={aref}>Додатки</SectionTitle>
@@ -195,427 +514,10 @@ function AdditionBusinessPlan({
       </Table>
       <Paragraph>Культури технології</Paragraph>
       <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Th>Період</Th>
-            <Th>Рік</Th>
-            <Th>Культура</Th>
-            <Th>Технологія</Th>
-            <Th>Карта</Th>
-            <Th>Площа</Th>
-            <Th>Загальна вартість</Th>
-            <Th>Фонд ОП</Th>
-            <Th>ЄСВ&nbsp;+ ВЗ</Th>
-            <Th>Прямі</Th>
-            <Th>Фонд ОП ІТР</Th>
-            <Th>ЄСВ ВЗ ІТР</Th>
-            <Th>інші заг. вир.</Th>
-            <Th>Заг. Вир.</Th>
-            <Th>Змінні</Th>
-            <Th>Фонд ОП АДМ</Th>
-            <Th>ЄСВ ВЗ АДМ</Th>
-            <Th>інші постійні</Th>
-            <Th>Постійні</Th>
-            <Th>Витрати</Th>
-            <Th>Доходи</Th>
-            <Th>Продукт</Th>
-            <Th>Валовий збір тон</Th>
-            <Th>Ціна</Th>
-            <Th>Виручка</Th>
-            <Th>Інвестування</Th>
-            <Th>Сума</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {(() => {
-            let years: number[] = new Array(
-              myBusiness.realizationTime + 1 < 11
-                ? myBusiness.realizationTime + 1
-                : 11
-            ).fill(1);
-
-            return years.map((el, ind) => {
-              let sumArea = 0,
-                sumCost = 0,
-                sumSalary = 0,
-                sumESV = 0,
-                sumDirect = 0,
-                sumTake = 0;
-              const thisYear = start + ind;
-              const sumCredit = thisCredit
-                ?.filter((el) => getYearFromString(el.date) == thisYear)
-                .reduce((p, c) => p + c.cost, 0);
-              const sumInv = thisInvestment
-                ?.filter((el) => getYearFromString(el.date) == thisYear)
-                .reduce((p, c) => p + c.cost, 0);
-              const sumDerj = thisDerj
-                ?.filter((el) => getYearFromString(el.date) == thisYear)
-                .reduce((p, c) => p + c.cost, 0);
-              const sumGrand = thisGrand
-                ?.filter((el) => getYearFromString(el.date) == thisYear)
-                .reduce((p, c) => p + c.cost, 0);
-              return (
-                <React.Fragment key={ind}>
-                  <Tr>
-                    <Td>{ind}</Td>
-                    <Td>{thisYear}</Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {el.culture?.name.split(" ").join("\u00A0")}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {el.cultivationTechnology?.name
-                            .split(" ")
-                            .join("\u00A0")}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {thisMaps.find(
-                            (e) =>
-                              e.cultureId == el.cultureId &&
-                              e.cultivationTechnologyId ==
-                                el.cultivationTechnologyId &&
-                              +e.year.split("")[0] == ind
-                          )?.nameCart || "Відсутня"}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => {
-                        sumArea += el.area;
-                        return <Text key={el.id}>{el.area}</Text>;
-                      })}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => {
-                        let res =
-                          (thisMaps.find(
-                            (e) =>
-                              e.cultureId == el.cultureId &&
-                              e.cultivationTechnologyId ==
-                                el.cultivationTechnologyId &&
-                              +e.year.split("")[0] == ind
-                          )?.costHectare || 0) * el.area;
-                        sumCost += res;
-                        return <Text key={el.id}>{res}</Text>;
-                      })}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {(() => {
-                            let cart = thisMaps.find(
-                              (e) =>
-                                e.cultureId == el.cultureId &&
-                                e.cultivationTechnologyId ==
-                                  el.cultivationTechnologyId &&
-                                +e.year.split("")[0] == ind
-                            );
-
-                            let res =
-                              (cart?.totalCostHandWork ||
-                                0 + cart?.totalCostMachineWork! ||
-                                0) * el.area;
-                            sumSalary += res;
-                            return res;
-                          })()}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {(() => {
-                            let cart = thisMaps.find(
-                              (e) =>
-                                e.cultureId == el.cultureId &&
-                                e.cultivationTechnologyId ==
-                                  el.cultivationTechnologyId &&
-                                +e.year.split("")[0] == ind
-                            );
-                            let res = Math.round(
-                              (cart?.totalCostHandWork ||
-                                0 + cart?.totalCostMachineWork! ||
-                                0) *
-                                el.area *
-                                0.235
-                            );
-                            sumESV += res;
-                            return res;
-                          })()}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {(() => {
-                            let cart = thisMaps.find(
-                              (e) =>
-                                e.cultureId == el.cultureId &&
-                                e.cultivationTechnologyId ==
-                                  el.cultivationTechnologyId &&
-                                +e.year.split("")[0] == ind
-                            );
-                            let res =
-                              Math.round(
-                                (cart?.totalCostHandWork ||
-                                  0 + cart?.totalCostMachineWork! ||
-                                  0) *
-                                  el.area *
-                                  0.235
-                              ) +
-                                cart?.costHectare! * el.area || 0;
-                            sumDirect += res;
-                            return res;
-                          })()}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {el.culture?.product.split(" ").join("\u00A0")}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => {
-                        let myYield = income.yieldPlant.find(
-                          (e) => e.cultureId == el.cultureId
-                        );
-                        const vegetation = income.vegetationYear.find(
-                          (e) =>
-                            e.yieldPlantId == myYield?.id &&
-                            +e.year.split("")[0] == ind
-                        );
-                        return (
-                          <Text key={el.id}>
-                            {Math.round(
-                              myYield?.yieldPerHectare! *
-                                vegetation?.allCoeff! *
-                                el.area
-                            ) || 0}
-                          </Text>
-                        );
-                      })}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => (
-                        <Text key={el.id}>
-                          {el.culture?.priceBerry! * 1000}
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td>
-                      {myBusiness.busCuls.map((el) => {
-                        let myYield = income.yieldPlant.find(
-                          (e) => e.cultureId == el.cultureId
-                        );
-                        const vegetation = income.vegetationYear.find(
-                          (e) =>
-                            e.yieldPlantId == myYield?.id &&
-                            +e.year.split("")[0] == ind
-                        );
-                        let res =
-                          Math.round(
-                            myYield?.yieldPerHectare! *
-                              vegetation?.allCoeff! *
-                              el.area
-                          ) *
-                            el.culture?.priceBerry! *
-                            1000 || 0;
-                        sumTake += res;
-                        return <Text key={el.id}>{res}</Text>;
-                      })}
-                    </Td>
-                    <Td>
-                      {
-                        <>
-                          <Box>
-                            {ind == 0
-                              ? "Початкові\u00A0інвестиції"
-                              : "Інвестиції"}
-                          </Box>
-                          <Box>Кредит</Box>
-                          <Box>
-                            Держ.&nbsp;підтримка
-                            {/* {income.credit
-                              .filter(
-                                (el) => +el.date.split("-")[2] - start == ind
-                              )
-                              .map((el) => {
-                                <Text>{el.name}</Text>;
-                              })} */}
-                          </Box>
-                          <Box>
-                            Грант
-                            {/* {income.credit
-                              .filter(
-                                (el) => +el.date.split("-")[2] - start == ind
-                              )
-                              .map((el) => {
-                                <Text>{el.name}</Text>;
-                              })} */}
-                          </Box>
-                        </>
-                      }
-                    </Td>
-                    <Td>
-                      {sumInv}
-                      {/* {ind == 0
-                        ? myBusiness.initialAmount
-                        : income.investment
-                            .filter(
-                              (el) => +el.date.split("-")[0] - start == ind
-                            )
-                            .map((el) => {
-                              return <Text>{el.name}</Text>;
-                            }) || <Text>0</Text>} */}
-                      <Text>{sumCredit}</Text>
-                      <Text>{sumDerj}</Text>
-                      <Text>{sumGrand}</Text>
-                      {/* {income.credit
-                              .filter(
-                                (el) => +el.date.split("-")[0] - start == ind
-                              )
-                              .map((el) => {
-                                return <Text>{el.name}</Text>;
-                              })} */}
-                    </Td>
-                  </Tr>
-                  <Tr fontWeight={"bold"}>
-                    <Td colSpan={2}>Разом за рік</Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td>{sumArea}</Td>
-                    <Td>{sumCost}</Td>
-                    <Td>{sumSalary}</Td>
-                    <Td>{sumESV}</Td>
-                    <Td>{sumDirect}</Td>
-                    <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Інженерно технічний")
-                        .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)}
-                    </Td>
-                    <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Інженерно технічний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) * 0.235}
-                    </Td>
-                    <Td>0</Td>
-                    <Td>
-                      {Math.round(
-                        thisWorkers
-                          .filter((el) => el.class == "Інженерно технічний")
-                          .reduce(
-                            (p, c) => p + c.salary * c.amountOfMounths!,
-                            0
-                          ) * 1.235
-                      )}
-                    </Td>
-                    <Td>
-                      {Math.round(
-                        thisWorkers
-                          .filter((el) => el.class == "Інженерно технічний")
-                          .reduce(
-                            (p, c) => p + c.salary * c.amountOfMounths!,
-                            0
-                          ) * 1.235
-                      ) + sumDirect}
-                    </Td>
-                    <Td>
-                      {Math.round(
-                        thisWorkers
-                          .filter((el) => el.class == "Адміністративний")
-                          .reduce(
-                            (p, c) => p + c.salary * c.amountOfMounths!,
-                            0
-                          )
-                      )}
-                    </Td>
-                    <Td>
-                      {Math.round(
-                        thisWorkers
-                          .filter((el) => el.class == "Адміністративний")
-                          .reduce(
-                            (p, c) => p + c.salary * c.amountOfMounths!,
-                            0
-                          ) * 0.235
-                      )}
-                    </Td>
-                    <Td>0</Td>
-                    <Td>
-                      {Math.round(
-                        thisWorkers
-                          .filter((el) => el.class == "Адміністративний")
-                          .reduce(
-                            (p, c) => p + c.salary * c.amountOfMounths!,
-                            0
-                          ) * 1.235
-                      )}
-                    </Td>
-                    <Td>
-                      {thisWorkers
-                        .filter((el) => el.class == "Адміністративний")
-                        .reduce(
-                          (p, c) => p + c.salary * c.amountOfMounths!,
-                          0
-                        ) *
-                        1.235 +
-                        Math.round(
-                          thisWorkers
-                            .filter((el) => el.class == "Інженерно технічний")
-                            .reduce(
-                              (p, c) => p + c.salary * c.amountOfMounths!,
-                              0
-                            ) * 1.235
-                        ) +
-                        sumDirect}
-                    </Td>
-                    <Td>
-                      {sumTake + (ind == 0 ? myBusiness.initialAmount : 0)}
-                    </Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td>{sumTake}</Td>
-                    <Td></Td>
-                    <Td>
-                      {(sumCredit || 0) +
-                        (sumInv || 0) +
-                        (sumDerj || 0) +
-                        (sumGrand || 0)}
-                    </Td>
-                  </Tr>
-                </React.Fragment>
-              );
-            });
-          })()}
-        </Tbody>
+        <TableContent
+          data={technologyCultureData}
+          columns={technologyCultureColumns}
+        />
       </Table>
       <Paragraph>Додаток Г. Калькуляція собівартості</Paragraph>
       {(() => {
