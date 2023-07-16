@@ -1,6 +1,6 @@
 import { Principal } from "..";
 import {
-  busCul,
+  busProd,
   businessPlan,
   cultivationTechnologies,
   culture,
@@ -15,6 +15,8 @@ import {
   ItitlePage,
   resume,
   titlePage,
+  Iproduct,
+  product,
 } from "../models/models";
 import {
   CreateBusinessPlan,
@@ -23,19 +25,23 @@ import {
   SetIsAgreeBusinessPlan,
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
+export interface includeProduct extends Iproduct {
+  culture: Iculture | undefined;
+}
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
   titlePage: ItitlePage;
   enterprise: Ienterprise | undefined;
   financings: Ifinancing[];
-  busCuls: {
+  busProds: {
     businessPlanId: number;
     cultivationTechnologyId: number;
-    cultureId: number;
+    productId: number;
+    product: includeProduct | undefined;
     id: number;
     cultivationTechnology: IcultivationTechnologies | undefined;
-    culture: Iculture | undefined;
     area: number;
+    year: number | null;
   }[];
 }
 const includes = [
@@ -43,32 +49,37 @@ const includes = [
   { model: titlePage },
   { model: financing },
   { model: enterprise },
-  // { model: culture },
   {
-    model: busCul,
-    include: [{ model: culture }, { model: cultivationTechnologies }],
+    model: busProd,
+    include: [
+      { model: product, include: { model: culture } },
+      { model: cultivationTechnologies },
+    ],
   },
   // { model: cultivationTechnologies },
 ];
 function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
-  res.map(
-    (res) =>
-      (res.financings = res.financings.map((el) => {
-        let area = 1;
-        if (el.cultureId) {
-          area = res.busCuls
-            .filter((e) => e.cultureId == el.cultureId)
-            .reduce((p, c) => p + c.area, 0);
-        } else {
-          area = res.busCuls.reduce((p, c) => p + c.area, 0);
-        }
-        if (el.calculationMethod == "На гектар") {
-          el.cost = el.cost * area;
-        }
-        return el;
-      }))
-  );
+
+  res.forEach((res) => {
+    res.financings = res.financings.map((el) => {
+      let area = 1;
+      if (el.cultureId) {
+        area = res.busProds
+          .filter((e) => e.product?.cultureId == el.cultureId)
+          .reduce((p, c) => p + c.area, 0);
+      } else {
+        area =
+          res.busProds.length > 0
+            ? res.busProds.reduce((p, c) => p + c.area, 0)
+            : 0;
+      }
+      if (el.calculationMethod == "На гектар") {
+        el.cost = el.cost * area;
+      }
+      return el;
+    });
+  });
   return res;
 }
 class BusinessService {
@@ -81,6 +92,7 @@ class BusinessService {
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { userId: user.sub },
+        //@ts-ignore
         include: includes,
       });
 
@@ -90,6 +102,7 @@ class BusinessService {
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
+        //@ts-ignore
         include: includes,
       });
       plans = changeFinancing(plans);
@@ -111,6 +124,7 @@ class BusinessService {
         realizationTime: data.realizationTime,
         userId: user.sub,
       },
+      //@ts-ignore
       { include: includes }
     );
     for (let i = 0; i < data.cultureIds.length; i++) {
@@ -118,22 +132,24 @@ class BusinessService {
       //@ts-ignore
       for (let j = 0; j < el.tech.length; j++) {
         const e = el.tech[j];
-        const last = await busCul.findOne({
+        const last = await busProd.findOne({
           order: [["id", "DESC"]],
         });
 
-        await busCul.create({
+        await busProd.create({
           id: last?.id! + 1,
           businessPlanId: plan?.id,
           cultureId: el.id,
           cultivationTechnologyId: e.techId,
           area: e.area,
+          year: e.year,
         });
       }
     }
     //@ts-ignore
     const res: resBusinessPlan | null = await businessPlan.findOne({
       where: { id: plan.id },
+      //@ts-ignore
       include: includes,
     });
     return res;
@@ -157,30 +173,33 @@ class BusinessService {
       //@ts-ignore
       res = await businessPlan.findOne({
         where: { id: data.planId },
+        //@ts-ignore
         include: includes,
       });
       //@ts-ignore
-      await busCul.destroy({ where: { businessPlanId: res.id } });
+      await busProd.destroy({ where: { businessPlanId: res.id } });
       for (let i = 0; i < data.cultureIds.length; i++) {
         const el = data.cultureIds[i];
         //@ts-ignore
         for (let j = 0; j < el.tech.length; j++) {
           const e = el.tech[j];
-          const last = await busCul.findOne({
+          const last = await busProd.findOne({
             order: [["id", "DESC"]],
           });
-          await busCul.create({
+          await busProd.create({
             id: last?.id! + 1,
             businessPlanId: res?.id,
             cultureId: el.id,
             cultivationTechnologyId: e.techId,
             area: e.area,
+            year: e.year,
           });
         }
       }
       //@ts-ignore
       res = await businessPlan.findOne({
         where: { id: data.planId },
+        //@ts-ignore
         include: includes,
       });
     }
@@ -212,6 +231,7 @@ class BusinessService {
       //@ts-ignore
       res = await businessPlan.findOne({
         where: { id: data.planId },
+        //@ts-ignore
         include: includes,
       });
     }
@@ -221,6 +241,7 @@ class BusinessService {
     //@ts-ignore
     const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true, isAgree: false },
+      //@ts-ignore
       include: includes,
     });
     return res;
@@ -229,6 +250,7 @@ class BusinessService {
     //@ts-ignore
     const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true },
+      //@ts-ignore
       include: includes,
     });
     return res;
@@ -259,6 +281,7 @@ class BusinessService {
     //@ts-ignore
     let res: resBusinessPlan = await businessPlan.findOne({
       where: { id: data.businessId },
+      //@ts-ignore
       include: includes,
     });
     res = changeFinancing([res])[0];

@@ -10,12 +10,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
+import { observer } from "mobx-react-lite";
 import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
 import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
+import MyTableContainer from "src/ui/MyTableContainer";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
@@ -49,8 +51,8 @@ function ProductionBusinessPlan({
   let costHand = 0;
   let costMech = 0;
   let costMechTot = 0;
-  const generalData = myBusiness?.busCuls?.map((el) => ({
-    culture: el.culture?.name,
+  const generalData = myBusiness?.busProds?.map((el) => ({
+    culture: el.product?.culture?.name,
     name,
     technology: el.cultivationTechnology?.name,
     area: el.area,
@@ -163,11 +165,11 @@ function ProductionBusinessPlan({
     const yearName = useVegetationYears[i - start + 1].name;
     plannedStructureData.push({
       year: i + " " + yearName,
-      ...myBusiness?.busCuls.reduce((p, el) => {
-        const myYield = income.yieldPlant.find(
-          (e) => e.cultureId == el.cultureId
+      ...myBusiness?.busProds.reduce((p, el) => {
+        const myYield = income.yieldPlant?.find(
+          (e) => e.cultureId == el.product?.cultureId
         );
-        const vegetation = income.vegetationYear.find(
+        const vegetation = income.vegetationYear?.find(
           (e) => e.yieldPlantId == myYield?.id && e.year == yearName
         );
         //@ts-ignore
@@ -193,18 +195,22 @@ function ProductionBusinessPlan({
   const plannedStructureColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
       { header: "Вегетація", accessorKey: "year" },
-      ...myBusiness?.busCuls.map((el) => ({
-        header: el?.culture?.name! + el.cultivationTechnology?.name!,
+      ...myBusiness?.busProds.map((el) => ({
+        header: el?.product?.culture?.name! + el.cultivationTechnology?.name!,
         columns: [
           {
             header: "Коеф.",
             accessorKey:
-              el?.culture?.name! + el.cultivationTechnology?.name! + "coef",
+              el?.product?.culture?.name! +
+              el.cultivationTechnology?.name! +
+              "coef",
           },
           {
             header: "Урожайн.",
             accessorKey:
-              el?.culture?.name! + el.cultivationTechnology?.name! + "yield",
+              el?.product?.culture?.name! +
+              el.cultivationTechnology?.name! +
+              "yield",
           },
         ],
       })),
@@ -247,12 +253,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
+            <Th colSpan={1 + myBusiness?.busProds.length! * 2}>
               <TableName>Планова структура урожайності</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
+            <Th colSpan={1 + myBusiness?.busProds.length! * 2}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
@@ -350,15 +356,15 @@ function ProductionBusinessPlan({
                   <Td>{i}</Td>
                 </Tr>
               );
-              for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
-                const e = myBusiness?.busCuls[j];
+              for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
+                const e = myBusiness?.busProds[j];
                 let thisMaps = map.maps.map((m) => ({
                   ...m,
                   area: e?.area,
                 }));
                 thisMaps = thisMaps.filter((el) => {
                   return (
-                    el.cultureId == e?.cultureId &&
+                    el.cultureId == e?.product?.cultureId &&
                     el.cultivationTechnologyId == e?.cultivationTechnologyId &&
                     //@ts-ignore
                     el.year.split("")[0] == i - +start + 1
@@ -742,7 +748,7 @@ function ProductionBusinessPlan({
       >
         Матеріальні витрати
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -814,7 +820,7 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -822,8 +828,8 @@ function ProductionBusinessPlan({
         fontWeight={"bold"}
       >
         Витрати на послуги
-      </Text>{" "}
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      </Text>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -864,7 +870,7 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -873,7 +879,7 @@ function ProductionBusinessPlan({
       >
         Витрати на транспорт
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -885,37 +891,38 @@ function ProductionBusinessPlan({
             </Tr>
           </Thead>
           <Tbody>
-            {/* {(() => {
-          
-          let cost = 0;
-          const trans = map.costTransport;
-          return (
-            <>
-              {trans.map((elem) => {
-                cost += myJustification?.area! * elem.price;
-                return (
-                  <Tr key={elem.id}>
-                    <Td>{elem.nameTransport}</Td>
-                    <Td>{elem.unitsOfCost}</Td>
-                    <Td>{myJustification?.area}</Td>
-                    <Td>{elem.price}</Td>
-                    <Td>{myJustification?.area! * elem.price}</Td>
-                  </Tr>
-                );
-              })}
-              <Tr>
-                <Td fontWeight={"bold"}>Всього за транспорт</Td>
-                <Td></Td>
-                <Td></Td>
-                <Td></Td>
-                <Td fontWeight={"bold"}>{cost}</Td>
-              </Tr>
-            </>
-          );
-        })()} */}
+            {(() => {
+              return null;
+              // let cost = 0;
+              // const trans = map.costTransport;
+              // return (
+              //   <>
+              //     {trans.map((elem) => {
+              //       cost += myJustification?.area! * elem.price;
+              //       return (
+              //         <Tr key={elem.id}>
+              //           <Td>{elem.nameTransport}</Td>
+              //           <Td>{elem.unitsOfCost}</Td>
+              //           <Td>{myJustification?.area}</Td>
+              //           <Td>{elem.price}</Td>
+              //           <Td>{myJustification?.area! * elem.price}</Td>
+              //         </Tr>
+              //       );
+              //     })}
+              //     <Tr>
+              //       <Td fontWeight={"bold"}>Всього за транспорт</Td>
+              //       <Td></Td>
+              //       <Td></Td>
+              //       <Td></Td>
+              //       <Td fontWeight={"bold"}>{cost}</Td>
+              //     </Tr>
+              //   </>
+              // );
+            })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
+
       <Paragraph>4.3. Опис продукту</Paragraph>
       <Table size={"sm"}>
         {[...productSet].map((el, ind) => {
@@ -963,12 +970,12 @@ function ProductionBusinessPlan({
             for (let i = start; i < end; i++) {
               const yearName = useVegetationYears[i - start + 1].name;
 
-              let akk = myBusiness?.busCuls.map((el) => {
-                const myYield = income.yieldPlant.find(
-                  (e) => e.cultureId == el.cultureId
+              let akk = myBusiness?.busProds.map((el) => {
+                const myYield = income.yieldPlant?.find(
+                  (e) => e.cultureId == el.product?.cultureId
                 );
 
-                const vegetation = income.vegetationYear.find(
+                const vegetation = income.vegetationYear?.find(
                   (e) => e.yieldPlantId == myYield?.id && e.year == yearName
                 );
                 const sum =
@@ -978,7 +985,7 @@ function ProductionBusinessPlan({
                   ) / 100;
                 return (
                   <Tr key={el.id}>
-                    <Td>{el.culture?.name}</Td>
+                    <Td>{el.product?.culture?.name}</Td>
                     <Td>{sum}</Td>
                     <Td>{el.area}</Td>
                     <Td>{Math.round(sum * el.area * 100) / 100}</Td>
@@ -1034,13 +1041,13 @@ function ProductionBusinessPlan({
                   <Tr>
                     <Td>{i}</Td>
                   </Tr>
-                  {myBusiness?.busCuls?.map((el) => {
+                  {myBusiness?.busProds?.map((el) => {
                     const yearName = useVegetationYears[i - start + 1].name;
-                    const myYield = income.yieldPlant.find(
-                      (e) => e.cultureId == el.cultureId
+                    const myYield = income.yieldPlant?.find(
+                      (e) => e.cultureId == el.product?.cultureId
                     );
 
-                    const vegetation = income.vegetationYear.find(
+                    const vegetation = income.vegetationYear?.find(
                       (e) => e.yieldPlantId == myYield?.id && e.year == yearName
                     );
                     const sum =
@@ -1051,12 +1058,12 @@ function ProductionBusinessPlan({
                       ) / 100;
                     return (
                       <Tr key={el.id}>
-                        <Td>{el.culture?.name}</Td>
-                        <Td>{el.culture?.product}</Td>
-                        <Td>{el.culture?.collectPeriod}</Td>
+                        <Td>{el.product?.culture?.name}</Td>
+                        <Td>{el.product?.culture?.product}</Td>
+                        <Td>{el.product?.culture?.collectPeriod}</Td>
                         <Td>{sum}</Td>
-                        <Td>{el.culture?.priceBerry}</Td>
-                        <Td>{sum * el.culture?.priceBerry!}</Td>
+                        <Td>{el.product?.culture?.priceBerry}</Td>
+                        <Td>{sum * el.product?.culture?.priceBerry!}</Td>
                       </Tr>
                     );
                   })}
@@ -1112,4 +1119,4 @@ function ProductionBusinessPlan({
   );
 }
 
-export default ProductionBusinessPlan;
+export default observer(ProductionBusinessPlan);

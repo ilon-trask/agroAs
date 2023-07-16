@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction } from "react";
 // import { Icredit } from "../../../../../tRPC serv/models/models";
-import Dialog from "../../../components/Dialog";
+import Dialog from "src/components/Dialog";
 
 type props = {
   open: boolean;

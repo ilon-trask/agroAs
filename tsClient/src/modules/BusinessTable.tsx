@@ -33,8 +33,8 @@ export function setPatchBusinessPlan(el: resBusinessPlan) {
     id: number;
     tech: { techId: number; area: number }[];
   }[] = [];
-  el?.busCuls?.forEach((el) => {
-    const myCulture = cultureIds.find((e) => e.id == el.cultureId);
+  el?.busProds?.forEach((el) => {
+    const myCulture = cultureIds.find((e) => e.id == el.product?.cultureId);
     if (myCulture) {
       myCulture.tech.push({
         techId: el.cultivationTechnologyId,
@@ -42,7 +42,7 @@ export function setPatchBusinessPlan(el: resBusinessPlan) {
       });
     } else {
       cultureIds.push({
-        id: el.cultureId,
+        id: el.product?.cultureId || 0,
         tech: [{ techId: el.cultivationTechnologyId, area: el.area }],
       });
     }
@@ -68,9 +68,7 @@ function BusinessTable({
     setUpdate(true);
     const cultureIds = setPatchBusinessPlan(original);
     setRes({
-      cultureIds: cultureIds,
       dateStart: original.dateStart,
-      enterpriseId: original.enterpriseId!,
       initialAmount: original.initialAmount,
       name: original.name,
       realizationTime: original.realizationTime,
@@ -114,7 +112,7 @@ function BusinessTable({
         accessorKey: "cultures",
         cell: ({ row: { original } }) => {
           const cultureSet = new Set(
-            original.busCuls.map((el) => el.culture?.name!)
+            original.busProds.map((el) => el.product?.culture?.name!)
           );
           return [...cultureSet].map((el) => (
             <Box key={el} minW={"max-content"}>

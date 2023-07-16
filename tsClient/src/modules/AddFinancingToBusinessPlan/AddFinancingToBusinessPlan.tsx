@@ -10,7 +10,7 @@ import Dialog from "src/components/Dialog";
 import { addFinancingToBusinessPlan } from "src/http/requests";
 import { Context } from "src/main";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import MainFinancingBusinessPlanTable from "../MainFinancingBusinessPlanTable";
+import MainFinancingBusinessPlanTable from "../../pages/BusinessPlanPage/modules/MainFinancingBusTable";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;

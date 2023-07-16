@@ -11,7 +11,9 @@ const createType = z.object({
   cultureIds: z.array(
     z.object({
       id: z.number(),
-      tech: z.array(z.object({ techId: z.number(), area: z.number() })),
+      tech: z.array(
+        z.object({ techId: z.number(), area: z.number(), year: z.number() })
+      ),
     })
   ),
   dateStart: z.string(),

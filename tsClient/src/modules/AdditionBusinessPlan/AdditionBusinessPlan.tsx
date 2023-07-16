@@ -89,7 +89,9 @@ function AdditionBusinessPlan({
       bold?: boolean;
     }[] = [];
     let years: number[] = new Array(
-      myBusiness.realizationTime + 1 < 11 ? myBusiness.realizationTime + 1 : 11
+      myBusiness?.realizationTime! + 1 < 11
+        ? myBusiness?.realizationTime! + 1
+        : 11
     ).fill(1);
 
     years.map((el, ind) => {
@@ -116,37 +118,37 @@ function AdditionBusinessPlan({
         {
           period: ind,
           year: thisYear,
-          culture: myBusiness.busCuls
-            .map((el) => el.culture?.name.split(" ").join("\u00A0"))
+          culture: myBusiness.busProds
+            .map((el) => el.product?.culture?.name.split(" ").join("\u00A0"))
             .join("\n"),
-          technology: myBusiness.busCuls
+          technology: myBusiness.busProds
             .map((el) =>
               el.cultivationTechnology?.name.split(" ").join("\u00A0")
             )
             .join("\n"),
-          map: myBusiness.busCuls
+          map: myBusiness.busProds
             .map(
               (el) =>
                 thisMaps.find(
                   (e) =>
-                    e.cultureId == el.cultureId &&
+                    e.cultureId == el.product?.cultureId &&
                     e.cultivationTechnologyId == el.cultivationTechnologyId &&
                     +e.year.split("")[0] == ind
                 )?.nameCart || "Відсутня"
             )
             .join("\n"),
-          area: myBusiness.busCuls
+          area: myBusiness.busProds
             .map((el) => {
               sumArea += el.area;
               return el.area;
             })
             .join("\n"),
-          totalCost: myBusiness.busCuls
+          totalCost: myBusiness.busProds
             .map((el) => {
               let res =
                 (thisMaps.find(
                   (e) =>
-                    e.cultureId == el.cultureId &&
+                    e.cultureId == el.product?.cultureId &&
                     e.cultivationTechnologyId == el.cultivationTechnologyId &&
                     +e.year.split("")[0] == ind
                 )?.costHectare || 0) * el.area;
@@ -154,11 +156,11 @@ function AdditionBusinessPlan({
               return res;
             })
             .join("\n"),
-          OPFund: myBusiness.busCuls
+          OPFund: myBusiness.busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
-                  e.cultureId == el.cultureId &&
+                  e.cultureId == el.product?.cultureId &&
                   e.cultivationTechnologyId == el.cultivationTechnologyId &&
                   +e.year.split("")[0] == ind
               );
@@ -171,11 +173,11 @@ function AdditionBusinessPlan({
               return res;
             })
             .join("\n"),
-          ESV_VZ: myBusiness.busCuls
+          ESV_VZ: myBusiness.busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
-                  e.cultureId == el.cultureId &&
+                  e.cultureId == el.product?.cultureId &&
                   e.cultivationTechnologyId == el.cultivationTechnologyId &&
                   +e.year.split("")[0] == ind
               );
@@ -190,11 +192,11 @@ function AdditionBusinessPlan({
               return res;
             })
             .join("\n"),
-          direct: myBusiness.busCuls
+          direct: myBusiness.busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
-                  e.cultureId == el.cultureId &&
+                  e.cultureId == el.product?.cultureId &&
                   e.cultivationTechnologyId == el.cultivationTechnologyId &&
                   +e.year.split("")[0] == ind
               );
@@ -222,13 +224,13 @@ function AdditionBusinessPlan({
           permanent: "",
           expenses: "",
           income: "",
-          product: myBusiness.busCuls
-            .map((el) => el.culture?.product.split(" ").join("\u00A0"))
+          product: myBusiness.busProds
+            .map((el) => el.product?.culture?.product.split(" ").join("\u00A0"))
             .join("\n"),
-          grossHarvest: myBusiness.busCuls
+          grossHarvest: myBusiness.busProds
             .map((el) => {
               let myYield = income.yieldPlant.find(
-                (e) => e.cultureId == el.cultureId
+                (e) => e.cultureId == el.product?.cultureId
               );
               const vegetation = income.vegetationYear.find(
                 (e) =>
@@ -241,14 +243,14 @@ function AdditionBusinessPlan({
               );
             })
             .join("\n"),
-          cost: myBusiness.busCuls
-            .map((el) => el.culture?.priceBerry! * 1000)
+          cost: myBusiness.busProds
+            .map((el) => el.product?.culture?.priceBerry! * 1000)
             .join("\n"),
 
-          revenue: myBusiness.busCuls
+          revenue: myBusiness.busProds
             .map((el) => {
               let myYield = income.yieldPlant.find(
-                (e) => e.cultureId == el.cultureId
+                (e) => e.cultureId == el.product?.cultureId
               );
               const vegetation = income.vegetationYear.find(
                 (e) =>
@@ -258,7 +260,7 @@ function AdditionBusinessPlan({
                 Math.round(
                   myYield?.yieldPerHectare! * vegetation?.allCoeff! * el.area
                 ) *
-                  el.culture?.priceBerry! *
+                  el.product?.culture?.priceBerry! *
                   1000 || 0;
               sumTake += res;
               return res;
@@ -452,8 +454,8 @@ function AdditionBusinessPlan({
           {(() => {
             let res = [];
             for (let i = start; i < end; i++) {
-              for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
-                const e = myBusiness?.busCuls[j];
+              for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
+                const e = myBusiness?.busProds[j];
 
                 res.push(
                   sections
@@ -643,11 +645,11 @@ function AdditionBusinessPlan({
             "III квартал": 0,
             "IV квартал": 0,
           };
-          myBusiness?.busCuls?.forEach((el) => {
+          myBusiness?.busProds?.forEach((el) => {
             const yearName = useVegetationYears[i - start + 1].name;
 
             const myYield = income.yieldPlant.find(
-              (e) => e.cultureId == el.cultureId
+              (e) => e.cultureId == el.product?.cultureId
             );
 
             const vegetation = income.vegetationYear.find(
@@ -657,12 +659,12 @@ function AdditionBusinessPlan({
               Math.round(
                 (myYield?.yieldPerHectare! *
                   el.area *
-                  el.culture?.priceBerry! *
+                  el.product?.culture?.priceBerry! *
                   vegetation?.allCoeff! || 0) * 100
               ) / 100;
             endSum += sum;
             endSum = Math.round(endSum * 1000) / 1000;
-            obj[el.culture?.collectPeriod!] += sum;
+            obj[el.product?.culture?.collectPeriod!] += sum;
           });
           res.push(
             <Box mt={"50px"}>

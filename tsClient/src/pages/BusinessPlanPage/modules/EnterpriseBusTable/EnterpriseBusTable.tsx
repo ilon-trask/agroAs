@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import CreateEnterprise, {
   CreateEnterpriseProps,
-} from "../CreateEnterprise/CreateEnterprise";
+} from "../../../../modules/CreateEnterprise/CreateEnterprise";
 import ChoseEnterprise from "./ChoseEnterprise";
 function EnterpriseBusTable({
   myBusiness,

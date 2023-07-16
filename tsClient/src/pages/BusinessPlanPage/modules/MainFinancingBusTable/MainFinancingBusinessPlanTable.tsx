@@ -1,7 +1,6 @@
 import { Checkbox, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Ifinancing } from "../../../../tRPC serv/models/models";
+import { Ifinancing } from "../../../../../../tRPC serv/models/models";
 type props = {
   thisCredit: Ifinancing[];
   thisInvestment: Ifinancing[];
@@ -72,7 +71,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
           <Td></Td>
         </Tr>
-        {thisCredit.map((el) => (
+        {thisCredit?.map((el) => (
           <Tr key={el.id!}>
             {!isPlan && (
               <Td>
@@ -97,7 +96,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
         </Tr>
 
-        {thisInvestment.map((el) => (
+        {thisInvestment?.map((el) => (
           <Tr key={el.id!}>
             {!isPlan && (
               <Td>
@@ -121,7 +120,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
           <Td></Td>
         </Tr>
-        {thisDerj.map((el) => (
+        {thisDerj?.map((el) => (
           <Tr key={el.id!}>
             {!isPlan && (
               <Td>
@@ -145,7 +144,7 @@ function MainFinancingBusinessPlanTable({
           <Td></Td>
           <Td></Td>
         </Tr>
-        {thisGrant.map((el) => (
+        {thisGrant?.map((el) => (
           <Tr key={el.id!}>
             {!isPlan && (
               <Td>

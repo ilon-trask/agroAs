@@ -13,12 +13,9 @@ import BusinessTableItem from "./component/BusinessConceptTableItem";
 import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
-import { PlusSquareIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 import { useParams } from "react-router-dom";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { iChild, iName } from "../../pages/BusinessPlanPage";
-
+import { iChild, iName } from "src/pages/BusinessPlanPage/BusinessPlanPage";
 interface props {
   setOpenResume: Dispatch<SetStateAction<boolean>>;
   setOpenTitle: Dispatch<SetStateAction<boolean>>;
@@ -135,8 +132,6 @@ const CartsTable = observer(
             <></>
           )}
           {data.map((e) => {
-            console.log(e.ref);
-
             return <BusinessTableItem key={e.id} e={e} aref={buttonsRef} />;
           })}
         </Tbody>

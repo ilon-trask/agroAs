@@ -1,7 +1,7 @@
 import { Table, Tbody, Td, Tr } from "@chakra-ui/react";
 import React, { RefObject } from "react";
-import Paragraph from "../../ui/Paragraph";
-import SectionTitle from "../../ui/SectionTitle";
+import Paragraph from "../../../../ui/Paragraph";
+import SectionTitle from "../../../../ui/SectionTitle";
 
 function ResumeBusinessPlan({
   area,

@@ -7,12 +7,7 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import Dialog from "../../../components/Dialog";
 import { Context } from "../../../main";
 import { CreateBusinessProp } from "../CreateBusiness";

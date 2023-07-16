@@ -1,4 +1,3 @@
-import { PlusSquareIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -20,19 +19,17 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Iculture } from "../../../../tRPC serv/models/models";
-import Dialog from "../../components/Dialog";
-import { Context } from "../../main";
-import { BusinessInputs } from "../CreateBusiness";
-import EnterpriseInputs from "../CreateEnterprise/components/EnterpriseInputs";
-import ProductInputs from "../CreateProduct/components/ProductInputs";
-import SaleInputs from "../CreateSale/component/SaleInputs";
+import { resBusinessPlan } from "../../../../../../../tRPC serv/controllers/BusinessService";
+import { Iculture } from "../../../../../../../tRPC serv/models/models";
+import Dialog from "src/components/Dialog";
+import { Context } from "src/main";
+import { BusinessInputs } from "src/modules/CreateBusiness";
+import EnterpriseInputs from "src/modules/CreateEnterprise/components/EnterpriseInputs";
 import CreditTablePopUp from "./compponents/CreditTablePopUp";
+import { observer } from "mobx-react-lite";
 
 type props = {
   open: boolean;
@@ -99,7 +96,7 @@ function QuizBusinessPopUp({
   useEffect(() => setPeriod(startYear), [startYear]);
   const { income, map, enterpriseStore } = useContext(Context);
   const sales = income.sale.filter((el) => el.isPlan);
-  const thisWorkers = enterpriseStore.worker.filter(
+  const thisWorkers = enterpriseStore.worker?.filter(
     (el) => el.enterpriseId == enterpriseId
   );
   function Footer() {
@@ -255,8 +252,8 @@ function QuizBusinessPopUp({
                 {(() => {
                   const prodSet = Array.from(
                     new Set(
-                      myBusiness.busCuls.map((obj) =>
-                        JSON.stringify(obj.culture)
+                      myBusiness.busProds.map((obj) =>
+                        JSON.stringify(obj.product?.culture)
                       )
                     )
                   ).map((str) => JSON.parse(str));
@@ -569,4 +566,4 @@ function QuizBusinessPopUp({
   );
 }
 
-export default QuizBusinessPopUp;
+export default observer(QuizBusinessPopUp);

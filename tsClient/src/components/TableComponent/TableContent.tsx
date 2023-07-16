@@ -11,7 +11,7 @@ function TableContent({ data, columns }: TableProps) {
   const [newData, setData] = useState<any[]>([]);
   useEffect(() => {
     setData(JSON.parse(JSON.stringify(data)));
-  }, [data.length]);
+  }, [data?.length]);
   const { getHeaderGroups, getRowModel } = useReactTable({
     columns: columns,
     data: newData,

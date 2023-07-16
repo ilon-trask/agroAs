@@ -28,7 +28,7 @@ function EnterpriseBusinessPlan({
   form: EnterpriseFormType;
   taxGroup: EnterpriseTaxGroupType;
   cultureSet: Set<string>;
-  thisWorkers: Iworker[];
+  thisWorkers: Iworker[] | undefined;
   myBusiness: resBusinessPlan;
   start: number;
   end: number;
@@ -40,14 +40,14 @@ function EnterpriseBusinessPlan({
   const groundSectionData = [];
   const areasUsageData = [];
   (() => {
-    thisWorkers = thisWorkers.map((el) => {
+    thisWorkers = thisWorkers?.map((el) => {
       if (el.class == "Виробничий")
         return {
           ...el,
           amount: Math.ceil(
             el.amount *
               //@ts-ignore
-              myBusiness?.busCuls?.reduce((p, c) => p + c.area, 0)
+              myBusiness?.busProds?.reduce((p, c) => p + c.area, 0)
           ),
         };
       else return el;
@@ -56,7 +56,7 @@ function EnterpriseBusinessPlan({
     for (let i = start; i < end; i++) {
       let adAmount = 0;
       let adSalary = 0;
-      thisWorkers.forEach((e) => {
+      thisWorkers?.forEach((e) => {
         if (e.class == "Адміністративний") {
           adAmount += e.amount;
           adSalary += e.salary * e.amount;
@@ -64,7 +64,7 @@ function EnterpriseBusinessPlan({
       });
       let vAmount = 0;
       let vSalary = 0;
-      thisWorkers.forEach((e) => {
+      thisWorkers?.forEach((e) => {
         if (e.class == "Виробничий") {
           vAmount += e.amount;
           vSalary += e.salary * e.amount;
@@ -106,13 +106,13 @@ function EnterpriseBusinessPlan({
         year: i,
         ...[...cultureSet].reduce((acc, el) => {
           //@ts-ignore
-          acc[el] = myBusiness?.busCuls.reduce(
-            (p, c) => (el == c.culture?.name ? p + c.area : p),
+          acc[el] = myBusiness?.busProds.reduce(
+            (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
             0
           );
           return acc;
         }, {}),
-        area: myBusiness?.busCuls.reduce((p, c) => p + c.area, 0),
+        area: myBusiness?.busProds.reduce((p, c) => p + c.area, 0),
       });
     }
   })();
@@ -367,7 +367,7 @@ function EnterpriseBusinessPlan({
       <Paragraph>3.3. Земельні ділянки та структура насаджень</Paragraph>
       <Description>
         {`Проект буде здійснюватися на земельній ділянці загальною площею 
-    ${myBusiness?.busCuls.reduce((p, c) => p + c.area, 0)}га, з правом
+    ${myBusiness?.busProds.reduce((p, c) => p + c.area, 0)}га, з правом
     використання на весь період реалізації.`}
       </Description>
       <Table size={"sm"}>

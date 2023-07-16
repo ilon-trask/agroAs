@@ -592,24 +592,27 @@ businessPlan.init(
   { sequelize }
 );
 
-export interface IbusCul {
+export interface IbusProd {
   id?: number;
   businessPlanId?: number;
   cultureId?: number;
   cultivationTechnologyId?: number;
   area: number;
+  year: number;
 }
-export class busCul extends Model<IbusCul> {
+export class busProd extends Model<IbusProd> {
   declare id?: number;
   declare businessPlanId?: number;
   declare cultureId?: number;
   declare cultivationTechnologyId?: number;
   declare area: number;
+  declare year: number;
 }
-busCul.init(
+busProd.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     area: { type: DataTypes.FLOAT },
+    year: { type: DataTypes.INTEGER },
   },
   { sequelize, timestamps: false }
 );
@@ -1345,18 +1348,18 @@ businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
 
-cultivationTechnologies.hasMany(busCul);
+cultivationTechnologies.hasMany(busProd);
 
-businessPlan.belongsToMany(culture, { through: busCul });
-culture.belongsToMany(businessPlan, { through: busCul });
-cultivationTechnologies.belongsToMany(culture, { through: busCul });
-businessPlan.belongsToMany(cultivationTechnologies, { through: busCul });
-businessPlan.hasMany(busCul);
-busCul.belongsTo(businessPlan);
-culture.hasMany(busCul);
-busCul.belongsTo(culture);
-cultivationTechnologies.hasMany(busCul);
-busCul.belongsTo(cultivationTechnologies);
+// businessPlan.belongsToMany(product, { through: busProd });
+// product.belongsToMany(businessPlan, { through: busProd });
+// cultivationTechnologies.belongsToMany(product, { through: busProd });
+// businessPlan.belongsToMany(cultivationTechnologies, { through: busProd });
+businessPlan.hasMany(busProd);
+busProd.belongsTo(businessPlan);
+product.hasMany(busProd);
+busProd.belongsTo(product);
+cultivationTechnologies.hasMany(busProd);
+busProd.belongsTo(cultivationTechnologies);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
