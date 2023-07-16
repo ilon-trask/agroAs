@@ -1,6 +1,5 @@
-import { EditIcon } from "@chakra-ui/icons";
-import iconPropsType from "src/shared/Types/IconPropType";
-function MyEditIcon(prop: iconPropsType) {
+import { EditIcon, IconProps } from "@chakra-ui/icons";
+function MyEditIcon(prop: IconProps) {
   return (
     <EditIcon
       {...prop}

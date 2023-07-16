@@ -11,7 +11,6 @@ import React, {
   Dispatch,
   SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import Dialog from "../../../components/Dialog";
@@ -28,10 +27,6 @@ type props = {
 };
 const obj = {};
 function SecondOpen({ open, setOpen, res, setRes, cultureId }: props) {
-  console.log(res);
-  console.log("рендер");
-  console.log(cultureId);
-
   const [upd, setUpd] = useState(false);
   function checkIsActive(techId: number) {
     for (let i = 0; i < res.cultureIds?.length; i++) {

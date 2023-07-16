@@ -1,28 +1,8 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Box,
-  Input,
-  Heading,
-  Select,
-  Text,
-  Checkbox,
-  Button,
-  Table,
-  Tr,
-  Td,
-} from "@chakra-ui/react";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Box, Input, Heading, Text } from "@chakra-ui/react";
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
 import SecondOpen from "./SecondOpen";
-import TableComponent from "src/components/TableComponent";
-import { ColumnDef } from "@tanstack/react-table";
-import TableContent from "src/components/TableComponent/TableContent";
 type props = {
   res: CreateBusinessProp;
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
@@ -42,46 +22,25 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
   // }
   // console.log(map.culture);
 
-  function isCheckedCulture(id: number) {
-    console.log(res.cultureIds);
+  // function isCheckedCulture(id: number) {
+  //   console.log(res.cultureIds);
 
-    if (
-      res.cultureIds?.find((el) => {
-        return el.id == id;
-      })
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  //   if (
+  //     res.cultureIds?.find((el) => {
+  //       return el.id == id;
+  //     })
+  //   ) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
   return (
     <Box>
       <Heading as={"h4"} size="md" textAlign={"center"}>
         Внесіть загальні дані бізнес-плану
       </Heading>
-      <Box>
-        {isEnterprise && (
-          <>
-            <Text fontWeight={"bold"}>Виберіть підприємство</Text>
-            <Select
-              value={res.enterpriseId}
-              onChange={(e) =>
-                setRes((prev) => ({ ...prev, enterpriseId: +e.target.value }))
-              }
-            >
-              <option value="" hidden defaultChecked>
-                Виберіть опцію
-              </option>
-              {enterpriseStore.enterprise?.map((el) => (
-                <option key={el.id} value={el.id}>
-                  {el.name}
-                </option>
-              ))}
-            </Select>
-          </>
-        )}
-      </Box>
       <Box display={"flex"} justifyContent={"space-around"}>
         <Box width={"40%"}>
           <Text fontWeight={"bold"}>Вкажіть назву бізнес-плану</Text>
@@ -147,93 +106,6 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           inputMode={"numeric"}
         />
       </Box>
-      <Box>
-        <Text fontWeight={"bold"}>Виберіть продукт</Text>
-        <Box>
-          {map.culture.map((el) => (
-            <Box key={el.id} as="span" ml={2} display={"inline-flex"} gap={1}>
-              <Button
-                onClick={() => {
-                  setSecondOpen(true);
-                  setRes((prev) => {
-                    console.log(prev);
-
-                    if (!prev.cultureIds?.find((e) => e.id == el.id)) {
-                      return {
-                        ...prev,
-                        cultureIds: [
-                          ...prev.cultureIds,
-                          { id: +el.id!, tech: [] },
-                        ],
-                      };
-                    } else {
-                      return prev;
-                    }
-                  });
-                  setCulture(el.id!);
-                }}
-                variant={isCheckedCulture(el.id!) ? "solid" : "outline"}
-              >
-                {el.name}
-              </Button>
-            </Box>
-          ))}
-        </Box>
-        <Box>
-          {(() => {
-            const data = [
-              ...res.cultureIds
-                .map((cul) =>
-                  cul.tech.map((tech) => ({
-                    id: tech.techId,
-                    product: "",
-                    culture: map.culture.find((el) => el.id == cul.id)?.name,
-                    technology: map.cultivationTechnologies.find(
-                      (el) => el.id == tech.techId
-                    )?.name,
-                    area: tech.area,
-                  }))
-                )
-                .flat(),
-            ];
-            const sum = data.reduce((p, c) => p + c.area, 0);
-            const columns = useMemo<
-              ColumnDef<{
-                id: number;
-                product: string;
-                culture: string;
-                technology: string;
-                area: string;
-              }>
-            >(
-              () => [
-                { header: "", accessorKey: "id" },
-                { header: "Продукт", accessorKey: "product" },
-                { header: "Культура", accessorKey: "culture" },
-                { header: "Технологія", accessorKey: "technology" },
-                { header: "Площа", accessorKey: "area" },
-              ],
-              []
-            );
-            return (
-              <Table size={"sm"}>
-                <TableContent columns={columns} data={data} />
-                <Tr>
-                  <Td colSpan={4}>Корисна площа</Td>
-                  <Td>{sum}</Td>
-                </Tr>
-              </Table>
-            );
-          })()}
-        </Box>
-      </Box>
-      <SecondOpen
-        cultureId={culture}
-        open={secondOpen}
-        setOpen={setSecondOpen}
-        res={res}
-        setRes={setRes}
-      />
     </Box>
   );
 }

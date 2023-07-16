@@ -19,8 +19,6 @@ export type CreateBusinessProp = {
   planId?: number;
   name: string;
   initialAmount: number | "";
-  cultureIds: { id: number; tech: { techId: number; area: number }[] }[];
-  enterpriseId: number | "";
   dateStart: string;
   realizationTime: number | "";
   topic: string;
@@ -80,10 +78,8 @@ function CreateBusiness({
                 });
               });
               if (update) {
-                //@ts-ignore
                 patchBusinessPlan(map, business, res);
               } else {
-                //@ts-ignore
                 createBusinessPlan(map, business, res);
               }
               setOpen(false);

@@ -1,6 +1,5 @@
-import { ViewIcon } from "@chakra-ui/icons";
-import iconPropsType from "src/shared/Types/IconPropType";
-function MyViewIcon(prop: iconPropsType) {
+import { ViewIcon, IconProps } from "@chakra-ui/icons";
+function MyViewIcon(prop: IconProps) {
   return (
     <ViewIcon
       {...prop}

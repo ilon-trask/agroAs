@@ -1,6 +1,5 @@
 import { PlusSquareIcon, IconProps } from "@chakra-ui/icons";
-
-function MyAddIcon(prop: IconProps) {
+function MyPlusIcon(prop: IconProps) {
   return (
     <PlusSquareIcon
       {...prop}
@@ -11,4 +10,4 @@ function MyAddIcon(prop: IconProps) {
   );
 }
 
-export default MyAddIcon;
+export default MyPlusIcon;

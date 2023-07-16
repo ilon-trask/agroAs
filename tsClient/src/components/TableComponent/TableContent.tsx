@@ -39,7 +39,7 @@ function TableContent({ data, columns }: TableProps) {
         {getRowModel().rows.map((row) => {
           return (
             <Tr key={row.id}>
-              {row.getVisibleCells().map((cell, ind) => (
+              {row.getVisibleCells().map((cell) => (
                 <Td
                   key={cell.id}
                   style={{ whiteSpace: "pre-wrap" }}

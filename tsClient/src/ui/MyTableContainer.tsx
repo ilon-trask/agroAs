@@ -1,9 +1,7 @@
 import { TableContainer, TableContainerProps } from "@chakra-ui/react";
 import React from "react";
-interface props extends TableContainerProps {
-  children: any;
-}
-function MyTableContainer(props: props) {
+
+function MyTableContainer(props: TableContainerProps) {
   return (
     <TableContainer
       maxW="1000px"

@@ -63,6 +63,11 @@ import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MainFinancingBusinessPlanTable from "src/modules/MainFinancingBusinessPlanTable";
 import AddFinancingToBusinessPlan from "src/modules/AddFinancingToBusinessPlan";
+import { ColumnDef } from "@tanstack/react-table";
+import TableContent from "src/components/TableComponent/TableContent";
+import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import EnterpriseBusTable from "src/modules/EnterpriseBusTable";
 function BiznesPlanPage() {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
@@ -87,19 +92,8 @@ function BiznesPlanPage() {
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
 
-  const myEnterprise = enterpriseStore.enterprise?.find(
-    (el) => el.id == myBusiness?.enterpriseId
-  );
-
   const [openQuiz, setOpenQuiz] = useState(false);
   const [update, setUpdate] = useState(false);
-  const [openEnterprise, setOpenEnterprise] = useState(false);
-  const [resEnterprise, setResEnterprise] = useState<CreateEnterpriseProps>({
-    form: "",
-    name: "",
-    taxGroup: "",
-    entId: 0,
-  });
   const [quizRes, setQuizRes] = useState({});
   const [ready, setReady] = useState(false);
   const [cartReady, setCartReady] = useState(false);
@@ -114,7 +108,7 @@ function BiznesPlanPage() {
       name: "",
       purpose: "",
       businessPlanId: myBusiness?.id!,
-      enterpriseId: myEnterprise?.id!,
+      enterpriseId: myBusiness?.enterpriseId!,
     });
 
   const start = +myBusiness?.dateStart?.split("-")[0]!;
@@ -135,9 +129,54 @@ function BiznesPlanPage() {
     myBusiness?.busCuls?.map((el) => el.culture?.product!)
   );
   let thisWorkers = enterpriseStore.worker?.filter(
-    (e) => e.enterpriseId == myEnterprise?.id! && e.form == myEnterprise?.form
+    (e) =>
+      e.enterpriseId == myBusiness?.enterpriseId! &&
+      e.form == myBusiness?.enterprise?.form
   );
+  const specData =
+    myBusiness?.busCuls.map((cul) => ({
+      id: cul.id,
+      product: "",
+      culture: cul.culture?.name,
+      technology: cul.cultivationTechnology?.name,
+      area: cul.area,
+    })) || [];
 
+  const specColumns = useMemo<
+    ColumnDef<{
+      id: number;
+      product: string;
+      culture: string;
+      technology: string;
+      area: string;
+    }>[]
+  >(
+    () => [
+      {
+        header: "",
+        accessorKey: "id",
+        cell: ({ row: { original } }) => (
+          <Box>
+            <MyEditIcon />
+          </Box>
+        ),
+      },
+      { header: "Продукт", accessorKey: "product" },
+      { header: "Культура", accessorKey: "culture" },
+      { header: "Технологія", accessorKey: "technology" },
+      { header: "Площа", accessorKey: "area" },
+      {
+        header: "",
+        accessorKey: "id",
+        cell: ({ row: { original } }) => (
+          <Box>
+            <MyDeleteIcon />
+          </Box>
+        ),
+      },
+    ],
+    []
+  );
   let thisMaps = (() => {
     let thisMaps = [];
     for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
@@ -246,9 +285,8 @@ function BiznesPlanPage() {
           <Thead>
             <Tr>
               <Td></Td>
-              <Td>Культура</Td>
-              <Td>Технологія</Td>
-              <Td>Площа</Td>
+              <Td>Ім'я</Td>
+              <Td>Тема</Td>
               <Td>Дата початку</Td>
               <Td>Термін реалізації</Td>
               <Td>Початкові інвестиції</Td>
@@ -263,9 +301,7 @@ function BiznesPlanPage() {
                     ? setPatchBusinessPlan(myBusiness)
                     : null;
                   setBusinessRes({
-                    cultureIds: cultureIds || [{ id: 0, tech: [] }],
                     dateStart: myBusiness?.dateStart!,
-                    enterpriseId: myBusiness?.enterpriseId!,
                     initialAmount: myBusiness?.initialAmount!,
                     name: myBusiness?.name!,
                     realizationTime: myBusiness?.realizationTime!,
@@ -276,21 +312,8 @@ function BiznesPlanPage() {
               >
                 <MyEditIcon />
               </Td>
-              <Td>
-                {myBusiness?.busCuls?.map((el) => (
-                  <Box key={el.id}>{el?.culture?.name}</Box>
-                ))}
-              </Td>
-              <Td>
-                {myBusiness?.busCuls?.map((el) => (
-                  <Box key={el.id}>{el?.cultivationTechnology?.name}</Box>
-                ))}
-              </Td>
-              <Td>
-                {myBusiness?.busCuls?.map((el) => (
-                  <Box key={el.id}>{el.area}</Box>
-                ))}
-              </Td>
+              <Td>{myBusiness?.name}</Td>
+              <Td>{myBusiness?.topic}</Td>
               <Td>{myBusiness?.dateStart}</Td>
               <Td>{myBusiness?.realizationTime}</Td>
               <Td>{myBusiness?.initialAmount}</Td>
@@ -306,49 +329,24 @@ function BiznesPlanPage() {
         update={true}
         setUpdate={() => {}}
       />
+      <EnterpriseBusTable myBusiness={myBusiness} />
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        Підприємство
+        Спеціалізація
       </Heading>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Td></Td>
-              <Td>Назва підприємства</Td>
-              <Td>Організаційно правова форма</Td>
-              <Td>Група оподаткування</Td>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td
-                onClick={() => {
-                  setResEnterprise({
-                    entId: myEnterprise?.id,
-                    form: myEnterprise?.form!,
-                    name: myEnterprise?.name!,
-                    taxGroup: myEnterprise?.taxGroup!,
-                  });
-                  setOpenEnterprise(true);
-                }}
-              >
-                <MyEditIcon />
-              </Td>
-              <Td>{myEnterprise?.name}</Td>
-              <Td>{myEnterprise?.form}</Td>
-              <Td>{myEnterprise?.taxGroup}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <CreateEnterprise
-        open={openEnterprise}
-        setOpen={setOpenEnterprise}
-        res={resEnterprise}
-        setRes={setResEnterprise}
-        update={true}
-        setUpdate={() => {}}
-      />
+      <Table size={"sm"}>
+        <TableContent columns={specColumns} data={specData} />
+        {specData.length < 5 && (
+          <Tr>
+            <Td colSpan={6}>
+              <MyPlusIcon />
+            </Td>
+          </Tr>
+        )}
+        <Tr>
+          <Td colSpan={4}>Корисна площа</Td>
+          <Td>{specData.reduce((p, c) => p + c.area, 0)}</Td>
+        </Tr>
+      </Table>
       <Heading mt={3} textAlign={"center"} fontSize={"25"}>
         Залучення фінансування
       </Heading>
@@ -385,7 +383,7 @@ function BiznesPlanPage() {
             {map.buyingMachine.map((el) => {
               if (
                 el.businessPlanId == myBusiness?.id &&
-                el.enterpriseId == myEnterprise?.id
+                el.enterpriseId == myBusiness?.enterpriseId
               )
                 return (
                   <BuyingMachineTableBodyRow
@@ -406,7 +404,7 @@ function BiznesPlanPage() {
           setBuyingMachineOpen(true);
           setBuyingMachineRes({
             businessPlanId: myBusiness?.id!,
-            enterpriseId: myEnterprise?.id!,
+            enterpriseId: myBusiness?.enterpriseId!,
             amount: "",
             brand: "",
             cost: "",
@@ -580,10 +578,10 @@ function BiznesPlanPage() {
             cultureSet={cultureSet}
             end={end}
             start={start}
-            form={myEnterprise?.form!}
+            form={myBusiness?.enterprise?.form!}
             myBusiness={myBusiness!}
-            name={myEnterprise?.name!}
-            taxGroup={myEnterprise?.taxGroup!}
+            name={myBusiness?.enterprise?.name!}
+            taxGroup={myBusiness?.enterprise?.taxGroup!}
             thisWorkers={thisWorkers}
             aref={enterpriseRef}
           />
@@ -616,7 +614,7 @@ function BiznesPlanPage() {
           <AdditionBusinessPlan
             start={start}
             end={end}
-            form={myEnterprise?.form!}
+            form={myBusiness?.enterprise?.form!}
             myBusiness={myBusiness!}
             thisMaps={thisMaps}
             thisWorkers={thisWorkers}
