@@ -15,6 +15,7 @@ function GeneralBusTable({
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
+
   return (
     <>
       <Text textAlign={"center"} textTransform={"uppercase"} fontSize={"20px"}>

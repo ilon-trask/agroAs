@@ -198,84 +198,84 @@ export default class MapStore {
     this._businessCarts.push(maps);
   }
   public get maps() {
-    return this._maps;
+    return JSON.parse(JSON.stringify(this._maps));
   }
   public get complex() {
-    return this._complex;
+    return JSON.parse(JSON.stringify(this._complex));
   }
   get opers() {
-    return this._opers;
+    return JSON.parse(JSON.stringify(this._opers));
   }
   get costMaterials() {
-    return this._costMaterials;
+    return JSON.parse(JSON.stringify(this._costMaterials));
   }
   get costServices() {
-    return this._costServices;
+    return JSON.parse(JSON.stringify(this._costServices));
   }
   get costMechanical() {
-    return this._costMechanical;
+    return JSON.parse(JSON.stringify(this._costMechanical));
   }
   get costTransport() {
-    return this._costTransport;
+    return JSON.parse(JSON.stringify(this._costTransport));
   }
   get costHandWork() {
-    return this._costHandWork;
+    return JSON.parse(JSON.stringify(this._costHandWork));
   }
   get section() {
-    return this._section;
+    return JSON.parse(JSON.stringify(this._section));
   }
   get tractor() {
-    return this._tractor;
+    return JSON.parse(JSON.stringify(this._tractor));
   }
   get machine() {
-    return this._machine;
+    return JSON.parse(JSON.stringify(this._machine));
   }
   get grade() {
-    return this._grade;
+    return JSON.parse(JSON.stringify(this._grade));
   }
   get works() {
-    return this._works;
+    return JSON.parse(JSON.stringify(this._works));
   }
   public get copyCarts() {
-    return this._copyCarts;
+    return JSON.parse(JSON.stringify(this._copyCarts));
   }
   public get copyTractors() {
-    return this._copyTractors;
+    return JSON.parse(JSON.stringify(this._copyTractors));
   }
   public get copyMachine() {
-    return this._copyMachine;
+    return JSON.parse(JSON.stringify(this._copyMachine));
   }
   public get cultural() {
-    return this._cultural;
+    return JSON.parse(JSON.stringify(this._cultural));
   }
   public get NoAgreeCarts() {
-    return this._NoAgreeCarts;
+    return JSON.parse(JSON.stringify(this._NoAgreeCarts));
   }
   public get agreeCarts() {
-    return this._agreeCarts;
+    return JSON.parse(JSON.stringify(this._agreeCarts));
   }
   public get purposeMaterial() {
-    return this._purposeMaterial;
+    return JSON.parse(JSON.stringify(this._purposeMaterial));
   }
   public get culture() {
-    return this._culture;
+    return JSON.parse(JSON.stringify(this._culture));
   }
   public get cultivationTechnologies() {
-    return this._cultivationTechnologies;
+    return JSON.parse(JSON.stringify(this._cultivationTechnologies));
   }
   public get outcome() {
-    return this._outcome;
+    return JSON.parse(JSON.stringify(this._outcome));
   }
   public get product() {
-    return this._product;
+    return JSON.parse(JSON.stringify(this._product));
   }
   public get buyingMachine() {
-    return this._buyingMachine;
+    return JSON.parse(JSON.stringify(this._buyingMachine));
   }
   public get administration() {
-    return this._administration;
+    return JSON.parse(JSON.stringify(this._administration));
   }
   public get businessCarts() {
-    return this._businessCarts;
+    return JSON.parse(JSON.stringify(this._businessCarts));
   }
 }

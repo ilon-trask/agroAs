@@ -2,16 +2,15 @@ import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Box, Input, Heading, Text } from "@chakra-ui/react";
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
-import SecondOpen from "./SecondOpen";
 type props = {
   res: CreateBusinessProp;
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
   isEnterprise?: boolean;
 };
 function BusinessInputs({ res, setRes, isEnterprise }: props) {
-  const { map, enterpriseStore } = useContext(Context);
-  const [secondOpen, setSecondOpen] = useState(false);
-  const [culture, setCulture] = useState(0);
+  // const { map, enterpriseStore } = useContext(Context);
+  // const [secondOpen, setSecondOpen] = useState(false);
+  // const [culture, setCulture] = useState(0);
   // function setCulture(id: number) {
   //   if (res.cultureIds.includes(id)) {
   //     let akk = res.cultureIds.filter((el) => el != id);

@@ -8,7 +8,7 @@ const createType = z.object({
   topic: z.string(),
   initialAmount: z.number(),
   enterpriseId: z.number(),
-  cultureIds: z.array(
+  productIds: z.array(
     z.object({
       id: z.number(),
       tech: z.array(
@@ -19,6 +19,7 @@ const createType = z.object({
   dateStart: z.string(),
   realizationTime: z.number(),
 });
+// const productIds
 export type CreateBusinessPlan = z.infer<typeof createType>;
 const patchType = createType.extend({
   planId: z.number(),
@@ -100,5 +101,6 @@ const businessRouter = router({
       let res = await BusinessService.addFinancing(input);
       return res;
     }),
+  // changeProducts: publicProcedure.input().query(() => {}),
 });
 export default businessRouter;

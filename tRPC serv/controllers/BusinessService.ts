@@ -56,7 +56,6 @@ const includes = [
       { model: cultivationTechnologies },
     ],
   },
-  // { model: cultivationTechnologies },
 ];
 function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));

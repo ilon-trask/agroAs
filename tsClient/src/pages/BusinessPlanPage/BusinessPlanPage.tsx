@@ -67,6 +67,7 @@ function BiznesPlanPage() {
     getPublicBusiness(map, business);
   }, []);
   const { id } = useParams();
+
   const myBusiness =
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
