@@ -2,37 +2,37 @@ import React, { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
 
-import OperSection from "../modules/OperSection";
+import OperSection from "src/modules/OperSection";
 
-import { Context } from "../main";
-import CreateCostHandWork from "../modules/CreateCostHandWork";
-import CreateCostMaterials from "../modules/CreateCostMaterials";
-import CreateCostServices from "../modules/CreateCostServices";
-import CreateCostTransport from "../modules/CreateCostTransport";
-import CreateCostMechanical from "../modules/CreateCostMechanical/CreateCostMechanical";
-import CreateCart, { cartProps } from "../modules/CreateCart";
-import GeneralDataTable from "../modules/GeneralDataTable";
-import OpersTable from "../modules/OpersTable";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
+import { Context } from "src/main";
+import CreateCostHandWork from "src/modules/CreateCostHandWork";
+import CreateCostMaterials from "src/modules/CreateCostMaterials";
+import CreateCostServices from "src/modules/CreateCostServices";
+import CreateCostTransport from "src/modules/CreateCostTransport";
+import CreateCostMechanical from "src/modules/CreateCostMechanical/CreateCostMechanical";
+import CreateCart, { cartProps } from "src/modules/CreateCart";
+import GeneralDataTable from "src/modules/GeneralDataTable";
+import OpersTable from "src/modules/OpersTable";
+import { Icell } from "../../../../tRPC serv/controllers/OperService";
 import { Text, Button, Box } from "@chakra-ui/react";
-import NoAuthAlert from "../components/NoAuthAlert";
-import DeleteAlert from "../components/DeleteAlert";
+import NoAuthAlert from "src/components/NoAuthAlert";
+import DeleteAlert from "src/components/DeleteAlert";
 import {
   deleteOper,
   downloaded,
   getCarts,
   getGrades,
   getMachine,
-  getSection,
   getTractor,
-} from "../http/requests";
-import { CALENDAR_ROUTER } from "../utils/consts";
-import ConstructorPopUp from "../modules/ConstructorPopUps/ConstructorPopUp";
+} from "src/http/requests";
+import { CALENDAR_ROUTER } from "src/utils/consts";
+import ConstructorPopUp from "src/modules/ConstructorPopUps/ConstructorPopUp";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import TechnologicalMapPdf from "./pdf/TechnologicalMapPdf";
-import getSectionsOpers from "../store/GetSectionsOpers";
-import Dialog from "../components/Dialog";
-import ComplexChose from "../modules/ComplexChose";
+import TechnologicalMapPdf from "../pdf/TechnologicalMapPdf";
+import getSectionsOpers from "src/store/GetSectionsOpers";
+import ComplexChose from "src/modules/ComplexChose";
+import MyHeading from "src/ui/MyHeading";
+import TechnologicalMapContent from "./TechnologicalMapContent";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -67,19 +67,15 @@ const TechnologicalMap = observer(() => {
   });
   const navigate = useNavigate();
   const pdfContent = useRef<HTMLDivElement>(null);
-  let myMap = map.maps.find((el) => el.id == id);
-  if (!myMap) {
-    myMap = map.complex.find((el) => el.id == id);
-  }
-  if (!myMap) {
-    myMap = map.businessCarts.find((el) => el.id == id);
-  }
-  console.log(myMap);
+
+  let myMap =
+    map.maps.find((el) => el.id == id) ||
+    map.complex.find((el) => el.id == id) ||
+    map.businessCarts.find((el) => el.id == id);
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {
     let a = getSectionsOpers(map, +id!);
-
     return a;
   }, [map.opers, operData]);
   useEffect(() => {
@@ -138,47 +134,21 @@ const TechnologicalMap = observer(() => {
           )}
         </Box>
         <Box ref={pdfContent} className="print-container">
-          <Text textAlign={"center"} fontSize={"25px"}>
-            Технологічна карта
-          </Text>
-          {myMap?.isComplex && (
-            <Text textAlign={"center"} fontSize={"25px"}>
-              Комплекс робіт: {myMap.nameCart}
-            </Text>
-          )}
-          {myMap?.isComplex && (
-            <Text textAlign={"center"} fontSize={"25px"}>
-              Розділ:{" "}
-              {map.section.find((el) => el.id == myMap?.sectionId)?.name}
-            </Text>
-          )}
-          <Box>
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              overflowX={"scroll"}
-            >
-              <GeneralDataTable
-                id={+id!}
-                setMapOpen={setMapOpen}
-                setRes={setRes}
-                setUpdate={setUpdate}
-              />
-            </Box>
-            <OpersTable
+          {myMap ? (
+            <TechnologicalMapContent
+              myMap={myMap}
+              useIcons={user.isAuth}
+              deleteOpen={deleteOpen}
               id={+id!}
+              setCell={setCell}
+              setDeleteOpen={setDeleteOpen}
+              setMapOpen={setMapOpen}
               setRes={setRes}
               setSecondOpen={setSecondOpen}
-              setCell={setCell}
-              setUpdate={setUpdate}
               setShowAlert={setShowAlert}
-              deleteOpen={deleteOpen}
-              setDeleteOpen={setDeleteOpen}
-              //@ts-ignore
-              mapData={myMap!}
+              setUpdate={setUpdate}
             />
-          </Box>
+          ) : null}
         </Box>
         <Box mt={"15px"} ml={"31px"} display={"flex"} gap={"10px"}>
           <Button
@@ -196,13 +166,7 @@ const TechnologicalMap = observer(() => {
             Додати технологічну операцію
           </Button>
           {user.role == "ADMIN" ? (
-            <Button
-              onClick={() => {
-                console.log(CALENDAR_ROUTER + "/" + id);
-
-                navigate(CALENDAR_ROUTER + "/" + id);
-              }}
-            >
+            <Button onClick={() => navigate(CALENDAR_ROUTER + "/" + id)}>
               Створити календар робіт
             </Button>
           ) : (

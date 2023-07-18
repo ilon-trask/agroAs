@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useContext } from "react";
 import { Context } from "../../main";
 import { Icell } from "../../../../tRPC serv/controllers/OperService";
@@ -16,24 +16,12 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import getSectionsOpers from "../../store/GetSectionsOpers";
-import { IUserRole } from "../../../../tRPC serv";
-import { Itech_cart } from "../../../../tRPC serv/models/models";
-type props = {
-  id: number;
-  setRes: (res: any) => void;
-  setSecondOpen: (open: boolean) => void;
-  setCell: (cell: Icell | "") => void;
-  setUpdate: (update: boolean) => void;
-  setShowAlert: (showAlert: boolean) => void;
-  deleteOpen: boolean;
-  setDeleteOpen: (open: boolean) => void;
-  mapData: Itech_cart;
-};
+import { resTechOperation } from "../../../../tRPC serv/controllers/TechCartService";
 
-export function OpersTableHead({ role }: { role: IUserRole }) {
+export function OpersTableHead({ useIcons }: { useIcons: boolean }) {
   return (
     <Tr>
-      {role != "" && <Th></Th>}
+      {useIcons && <Th></Th>}
       <Th>
         Дата <br />
         початку
@@ -79,30 +67,39 @@ export function OpersTableHead({ role }: { role: IUserRole }) {
         Вартість <br />
         послуг
       </Th>
-      {role != "" && <Th></Th>}
+      {useIcons && <Th></Th>}
     </Tr>
   );
 }
+type props = {
+  id: number;
+  area: number;
+  opers?: resTechOperation[];
+} & (
+  | {
+      useIcons: false;
+    }
+  | {
+      useIcons: true;
+      setRes: (res: any) => void;
+      setSecondOpen: (open: boolean) => void;
+      setCell: (cell: Icell | "") => void;
+      setUpdate: (update: boolean) => void;
+      setShowAlert: (showAlert: boolean) => void;
+      deleteOpen: boolean;
+      setDeleteOpen: (open: boolean) => void;
+    }
+);
+function OpersTable(props: props) {
+  const { map } = useContext(Context);
 
-function OpersTable({
-  id,
-  setRes,
-  setSecondOpen,
-  setCell,
-  setUpdate,
-  setShowAlert,
-  deleteOpen,
-  setDeleteOpen,
-  mapData,
-}: props) {
-  const { map, user } = useContext(Context);
-
-  const operData = map.opers.filter((el) => el?.techCartId == id);
+  const operData =
+    props.opers || map.opers.filter((el) => el?.techCartId == props.id);
   operData.sort((a, b) => a.id! - b.id!);
   console.log(operData);
 
   const sections = useMemo(() => {
-    let a = getSectionsOpers(map, id);
+    let a = getSectionsOpers(map, props.id, operData);
 
     return a;
   }, [map.opers, operData]);
@@ -117,7 +114,7 @@ function OpersTable({
   let services = 0;
   operData.forEach((el) => {
     sum +=
-      mapData?.area! *
+      props.area! *
       (el.costMaterials ||
         el.costServices ||
         el.costTransport ||
@@ -127,44 +124,56 @@ function OpersTable({
           +el.costMachineWork! ||
         el.costHandWork ||
         0);
-    technic += mapData?.area! * +(el.costCars || 0);
-    fuel += mapData?.area! * +(el.costFuel || 0);
-    machineWork += mapData?.area! * +(el.costMachineWork || 0);
-    handWork += mapData?.area! * +(el.costHandWork || 0);
-    materials += mapData?.area! * +(el.costMaterials || 0);
-    transport += mapData?.area! * +(el.costTransport || 0);
-    services += mapData?.area! * +(el.costServices || 0);
+    technic += props.area! * +(el.costCars || 0);
+    fuel += props.area! * +(el.costFuel || 0);
+    machineWork += props.area! * +(el.costMachineWork || 0);
+    handWork += props.area! * +(el.costHandWork || 0);
+    materials += props.area! * +(el.costMaterials || 0);
+    transport += props.area! * +(el.costTransport || 0);
+    services += props.area! * +(el.costServices || 0);
   });
 
   return (
     <TableContainer overflowX={"scroll"} as={"div"}>
       <Table size={"sm"}>
         <Thead>
-          <OpersTableHead role={user.role} />
+          <OpersTableHead useIcons={props.useIcons} />
         </Thead>
         <Tbody>
           {map.isLoading ? <Loader /> : <></>}
           {sections.map((el, ind) => (
-            <OperTableSection
-              key={ind}
-              arr={el.arr}
-              title={el.title}
-              id={id}
-              mapData={mapData!}
-              setCell={setCell}
-              setOpen={setSecondOpen}
-              setRes={setRes}
-              setUpdate={setUpdate}
-              sum={sum}
-              setShowAlert={setShowAlert}
-              deleteOpen={deleteOpen}
-              setDeleteOpen={setDeleteOpen}
-            />
+            <React.Fragment key={ind}>
+              {props.useIcons ? (
+                <OperTableSection
+                  useIcons={props.useIcons}
+                  key={ind}
+                  arr={el.arr}
+                  title={el.title}
+                  id={props.id}
+                  area={props.area}
+                  setCell={props.setCell}
+                  setOpen={props.setSecondOpen}
+                  setRes={props.setRes}
+                  setUpdate={props.setUpdate}
+                  setShowAlert={props.setShowAlert}
+                  deleteOpen={props.deleteOpen}
+                  setDeleteOpen={props.setDeleteOpen}
+                />
+              ) : (
+                <OperTableSection
+                  useIcons={props.useIcons}
+                  arr={el.arr}
+                  title={el.title}
+                  id={props.id}
+                  area={props.area}
+                />
+              )}
+            </React.Fragment>
           ))}
         </Tbody>
 
         <Tfoot fontWeight={"bold"}>
-          {user.role != "" && <Td></Td>}
+          {props.useIcons && <Td></Td>}
           <Td></Td>
           <Td fontWeight={"bold"}>Загальні витрати</Td>
           <Td></Td>
@@ -177,7 +186,7 @@ function OpersTable({
           <Td>{materials}</Td>
           <Td>{transport}</Td>
           <Td>{services}</Td>
-          {user.role != "" && <Td></Td>}
+          {props.useIcons && <Td></Td>}
         </Tfoot>
       </Table>
     </TableContainer>

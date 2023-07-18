@@ -1,16 +1,11 @@
 import {
   Box,
-  Checkbox,
   Heading,
   Input,
   ModalFooter,
   Button,
   Select,
-  Table,
-  Tr,
-  Td,
-  Tbody,
-  Thead,
+  Text,
 } from "@chakra-ui/react";
 import React, {
   Dispatch,
@@ -21,62 +16,36 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 import Dialog from "../../../../components/Dialog";
-import { changeBusinessProducts } from "../../../../http/requests";
+import { createBusProd, patchBusProd } from "../../../../http/requests";
 import { Context } from "../../../../main";
-export type productIds = {
-  ownId: number;
+export type productProps = {
+  ownId?: number;
   year: number;
   productId: number;
-  tech: {
-    cultivationTechnologyId: number;
-    techCartId: number;
-    area: string | number;
-  }[];
-}[];
+  cultivationTechnologyId: number;
+  techCartId: number;
+  area: string;
+};
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  data: productIds;
-  setData: Dispatch<SetStateAction<productIds>>;
-  ownId: number | undefined;
+  data: productProps;
+  setData: Dispatch<SetStateAction<productProps>>;
 };
 const obj = {};
-function SecondOpen({ open, setOpen, data, setData, ownId }: props) {
-  const [upd, setUpd] = useState(false);
+function SecondOpen({ open, setOpen, data, setData }: props) {
   const [res, setRes] = useState(data);
-  const { business } = useContext(Context);
+  const { business, map } = useContext(Context);
   const { id } = useParams();
   useEffect(() => {
     setRes(data);
   }, [data]);
-  const [culture, setCulture] = useState(0);
-  let thisProduct = res.find((el) => el.ownId == ownId);
-  function checkIsActive(techId: number) {
-    const data = res.find((el) => el.ownId == thisProduct?.ownId);
-    const e = data?.tech.find((el) => el.cultivationTechnologyId == techId);
-    if (e) return true;
-    return false;
-  }
-  function giveInputValue(techId: number) {
-    for (let j = 0; j < (thisProduct?.tech.length || 0); j++) {
-      const e = thisProduct?.tech[j];
-      if (e?.cultivationTechnologyId == techId) return e.area;
-    }
-  }
-  function onClose() {
-    setData((prev) => {
-      const thisPrev = prev.find((el) => el.ownId == ownId);
-      if (thisPrev?.tech?.length == 0) {
-        return prev.filter((el) => el.ownId != thisPrev.ownId);
-      }
-      return prev;
-    });
-  }
-  const { map } = useContext(Context);
-  console.log("resultamba");
-  console.log(ownId);
 
-  console.log(res);
+  const [cultureId, setCultureId] = useState(
+    map.product.find((el) => el.id == res.productId)?.cultureId! || 0
+  );
+  console.log(map.product.filter((el) => el.cultureId == cultureId));
+  const onClose = () => {};
   return (
     <Dialog
       open={open}
@@ -89,18 +58,18 @@ function SecondOpen({ open, setOpen, data, setData, ownId }: props) {
       props={obj}
       res={obj}
       onClose={onClose}
-      size="4xl"
+      size="3xl"
     >
       <Heading textAlign={"center"} size={"md"}>
         Вибір технології та площі
       </Heading>
       <Box display={"flex"} justifyContent={"space-around"}>
-        <Box width={"40%"}>
+        <Box>
           <label>
             Виберіть культуру
             <Select
-              value={culture}
-              onChange={(e) => setCulture(+e.target.value)}
+              value={cultureId}
+              onChange={(e) => setCultureId(+e.target.value)}
             >
               <option value="" defaultChecked hidden>
                 Виберіть опцію
@@ -113,26 +82,16 @@ function SecondOpen({ open, setOpen, data, setData, ownId }: props) {
             </Select>
           </label>
         </Box>
-        <Box width={"40%"}>
+        <Box>
           <label>
             Виберіть продукт
             <Select
-              value={thisProduct?.productId}
+              value={res?.productId}
               onChange={(e) => {
-                setCulture(
+                setCultureId(
                   map.product.find((el) => el.id == +e.target.value)?.cultureId!
                 );
-                setRes((prev) => {
-                  const thisPrev = prev.find(
-                    (el) => el.ownId == thisProduct?.ownId
-                  );
-                  if (!thisPrev) return prev;
-                  thisPrev.productId = +e.target.value;
-                  console.log(thisPrev);
-                  console.log(e.target.value);
-                  setUpd((prev) => !prev);
-                  return prev;
-                });
+                setRes((prev) => ({ ...prev, productId: +e.target.value }));
               }}
             >
               <option value="" defaultChecked hidden>
@@ -140,9 +99,9 @@ function SecondOpen({ open, setOpen, data, setData, ownId }: props) {
               </option>
               {(() => {
                 let prod =
-                  culture == 0
+                  cultureId == 0
                     ? map.product
-                    : map.product.filter((el) => el.cultureId == culture);
+                    : map.product.filter((el) => el.cultureId == cultureId);
                 return prod.map((el) => (
                   <option key={el.id} value={el.id}>
                     {el.name}
@@ -152,120 +111,88 @@ function SecondOpen({ open, setOpen, data, setData, ownId }: props) {
             </Select>
           </label>
         </Box>
-      </Box>
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Td>Технології</Td>
-            <Td>Карта</Td>
-            <Td>Площа</Td>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {map.cultivationTechnologies.map((el) => (
-            <Tr key={el.id}>
-              <Td>
-                <Checkbox
-                  isChecked={checkIsActive(el.id!)}
-                  onChange={() => {
-                    setRes((prev) => {
-                      if (!thisProduct) return prev;
-                      const thisPrev = prev.find(
-                        (el) => el.ownId == thisProduct?.ownId
-                      );
-                      if (!thisPrev) return prev;
-                      const myTech = thisProduct?.tech.find((ex) => {
-                        return ex.cultivationTechnologyId == el.id;
-                      });
-                      if (myTech) {
-                        thisPrev.tech = thisProduct?.tech.filter(
-                          (elx) => elx.cultivationTechnologyId != el.id
-                        );
-                        setUpd((prev) => !prev);
-                        return prev;
-                      } else {
-                        thisPrev.tech = [
-                          ...thisProduct?.tech,
-                          {
-                            cultivationTechnologyId: el.id!,
-                            area: 0,
-                            techCartId: 0,
-                          },
-                        ];
-                        setUpd((prev) => !prev);
-                        return prev;
-                      }
-                    });
-                  }}
-                >
+        <Box>
+          <label>
+            Виберіть технологію
+            <Select
+              value={res.cultivationTechnologyId}
+              onChange={(e) =>
+                setRes((prev) => ({
+                  ...prev,
+                  cultivationTechnologyId: +e.target.value,
+                }))
+              }
+            >
+              <option value="" hidden defaultChecked>
+                Виберіть опцію
+              </option>
+              {map.cultivationTechnologies.map((el) => (
+                <option value={el.id} key={el.id}>
                   {el.name}
-                </Checkbox>
-              </Td>
-              <Td>
-                <Select
-                  value={
-                    thisProduct?.tech.find(
-                      (e) => e.cultivationTechnologyId == el.id!
-                    )?.techCartId
-                  }
-                  isDisabled={!checkIsActive(el.id!)}
-                  onChange={(e) => {
-                    setRes((prev) => {
-                      const thisPrev = prev.find(
-                        (el) => el.ownId == thisProduct?.ownId
-                      );
-                      if (!thisPrev) return prev;
-                      const thisTech = thisPrev.tech.find(
-                        (e) => e.cultivationTechnologyId == el.id
-                      );
-                      if (!thisTech) return prev;
-                      thisTech.techCartId = +e.target.value;
-                      setUpd((prev) => !prev);
-                      return prev;
-                    });
-                  }}
-                >
-                  <option value="" hidden defaultChecked>
-                    Виберіть опцію
-                  </option>
-                  {map.businessCarts.map((el) => (
-                    <option value={el.id}>{el.nameCart}</option>
-                  ))}
-                </Select>
-              </Td>
-              <Td>
-                <Input
-                  type={"number"}
-                  inputMode={"numeric"}
-                  w={"200px"}
-                  placeholder="Вкажіть площу"
-                  isDisabled={!checkIsActive(el.id!)}
-                  value={giveInputValue(el.id!)}
-                  onChange={(e) => {
-                    setRes((prev) => {
-                      const thisPrev = prev.find(
-                        (el) => el.ownId == thisProduct?.ownId
-                      );
-                      const myTech = thisProduct?.tech.find(
-                        (ex) => ex.cultivationTechnologyId == el.id
-                      );
-                      //@ts-ignore
-                      myTech.area = e.target.value as any;
-                      return prev;
-                    });
-                    setUpd((prev) => !prev);
-                  }}
-                />
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+                </option>
+              ))}
+            </Select>
+          </label>
+        </Box>
+      </Box>
+      <Box display={"flex"} justifyContent={"space-around"}>
+        <Box minW={"max-content"}>
+          <label>
+            Виберіть технологічну карту
+            <Select
+              value={res.techCartId || 0}
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, techCartId: +e.target.value }))
+              }
+            >
+              <option value="" hidden defaultChecked>
+                Виберіть опцію
+              </option>
+              {map.businessCarts.map((el) => (
+                <option value={el.id}>{el.nameCart}</option>
+              ))}
+            </Select>
+          </label>
+        </Box>
+        <Box>
+          <Text>Впишіть площу</Text>
+          <Input
+            type={"number"}
+            inputMode={"numeric"}
+            placeholder="Вкажіть площу"
+            value={res.area}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, area: e.target.value }))
+            }
+          />
+        </Box>
+      </Box>
       <ModalFooter>
         <Button
           onClick={() => {
             setOpen(false);
-            changeBusinessProducts(business, { busId: +id!, productIds: res });
+            if (res.ownId) {
+              patchBusProd(business, {
+                area: +res.area,
+                businessPlanId: +id!,
+                cultivationTechnologyId: res.cultivationTechnologyId,
+                ownId: res.ownId,
+                productId: res.productId,
+                techCartId: res.techCartId,
+                year: res.year,
+              });
+            } else {
+              console.log(res);
+
+              createBusProd(business, {
+                area: +res.area,
+                businessPlanId: +id!,
+                cultivationTechnologyId: res.cultivationTechnologyId,
+                productId: res.productId,
+                techCartId: res.techCartId,
+                year: res.year,
+              });
+            }
           }}
         >
           Внести

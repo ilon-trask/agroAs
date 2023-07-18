@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import React, { RefObject, useContext, useMemo } from "react";
 import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
+import TechnologicalMapContent from "src/pages/TechnologicalMap/TechnologicalMapContent";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import useVegetationYears, {
@@ -10,6 +11,7 @@ import useVegetationYears, {
 } from "src/shared/hook/useVegetationYears";
 import { sectionsOpers } from "src/store/GetSectionsOpers";
 import Description from "src/ui/Description";
+import MyHeading from "src/ui/MyHeading";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
@@ -102,6 +104,7 @@ function AdditionBusinessPlan({
         sumDirect = 0,
         sumTake = 0;
       const thisYear = start + ind;
+      const busProds = myBusiness.busProds.filter((el) => el.year == ind);
       const sumCredit = thisCredit
         ?.filter((el) => getYearFromString(el.date) == thisYear)
         .reduce((p, c) => p + c.cost, 0);
@@ -118,45 +121,49 @@ function AdditionBusinessPlan({
         {
           period: ind,
           year: thisYear,
-          culture: myBusiness.busProds
+          product: busProds
+            .map((el) => el.product?.name.split(" ").join("\u00A0"))
+            .join("\n"),
+          culture: busProds
             .map((el) => el.product?.culture?.name.split(" ").join("\u00A0"))
             .join("\n"),
-          technology: myBusiness.busProds
+          technology: busProds
             .map((el) =>
               el.cultivationTechnology?.name.split(" ").join("\u00A0")
             )
             .join("\n"),
-          map: myBusiness.busProds
+          map: busProds
             .map(
-              (el) =>
-                thisMaps.find(
-                  (e) =>
-                    e.cultureId == el.product?.cultureId &&
-                    e.cultivationTechnologyId == el.cultivationTechnologyId &&
-                    +e.year.split("")[0] == ind
-                )?.nameCart || "Відсутня"
+              (el) => el.tech_cart?.nameCart
+              // thisMaps.find(
+              //   (e) =>
+              //     e.cultureId == el.product?.cultureId &&
+              //     e.cultivationTechnologyId == el.cultivationTechnologyId &&
+              //     +e.year.split("")[0] == ind
+              // )?.nameCart || "Відсутня"
             )
             .join("\n"),
-          area: myBusiness.busProds
+          area: busProds
             .map((el) => {
               sumArea += el.area;
               return el.area;
             })
             .join("\n"),
-          totalCost: myBusiness.busProds
+          totalCost: busProds
             .map((el) => {
-              let res =
-                (thisMaps.find(
-                  (e) =>
-                    e.cultureId == el.product?.cultureId &&
-                    e.cultivationTechnologyId == el.cultivationTechnologyId &&
-                    +e.year.split("")[0] == ind
-                )?.costHectare || 0) * el.area;
+              // let res =
+              //   (thisMaps.find(
+              //     (e) =>
+              //       e.cultureId == el.product?.cultureId &&
+              //       e.cultivationTechnologyId == el.cultivationTechnologyId &&
+              //       +e.year.split("")[0] == ind
+              //   )?.costHectare || 0) * el.area;
+              let res = (el.tech_cart?.costHectare || 0) * el.area;
               sumCost += res;
               return res;
             })
             .join("\n"),
-          OPFund: myBusiness.busProds
+          OPFund: busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
@@ -166,14 +173,14 @@ function AdditionBusinessPlan({
               );
 
               let res =
-                (cart?.totalCostHandWork ||
-                  0 + cart?.totalCostMachineWork! ||
+                (el.tech_cart?.totalCostHandWork ||
+                  0 + el.tech_cart?.totalCostMachineWork! ||
                   0) * el.area;
               sumSalary += res;
               return res;
             })
             .join("\n"),
-          ESV_VZ: myBusiness.busProds
+          ESV_VZ: busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
@@ -182,8 +189,8 @@ function AdditionBusinessPlan({
                   +e.year.split("")[0] == ind
               );
               let res = Math.round(
-                (cart?.totalCostHandWork ||
-                  0 + cart?.totalCostMachineWork! ||
+                (el.tech_cart?.totalCostHandWork ||
+                  0 + el.tech_cart?.totalCostMachineWork! ||
                   0) *
                   el.area *
                   0.235
@@ -192,7 +199,7 @@ function AdditionBusinessPlan({
               return res;
             })
             .join("\n"),
-          direct: myBusiness.busProds
+          direct: busProds
             .map((el) => {
               let cart = thisMaps.find(
                 (e) =>
@@ -202,13 +209,13 @@ function AdditionBusinessPlan({
               );
               let res =
                 Math.round(
-                  (cart?.totalCostHandWork ||
-                    0 + cart?.totalCostMachineWork! ||
+                  (el.tech_cart?.totalCostHandWork ||
+                    0 + el.tech_cart?.totalCostMachineWork! ||
                     0) *
                     el.area *
                     0.235
                 ) +
-                  cart?.costHectare! * el.area || 0;
+                  el.tech_cart?.costHectare! * el.area || 0;
               sumDirect += res;
               return res;
             })
@@ -224,10 +231,8 @@ function AdditionBusinessPlan({
           permanent: "",
           expenses: "",
           income: "",
-          product: myBusiness.busProds
-            .map((el) => el.product?.culture?.product.split(" ").join("\u00A0"))
-            .join("\n"),
-          grossHarvest: myBusiness.busProds
+
+          grossHarvest: busProds
             .map((el) => {
               let myYield = income.yieldPlant.find(
                 (e) => e.cultureId == el.product?.cultureId
@@ -243,11 +248,11 @@ function AdditionBusinessPlan({
               );
             })
             .join("\n"),
-          cost: myBusiness.busProds
+          cost: busProds
             .map((el) => el.product?.culture?.priceBerry! * 1000)
             .join("\n"),
 
-          revenue: myBusiness.busProds
+          revenue: busProds
             .map((el) => {
               let myYield = income.yieldPlant.find(
                 (e) => e.cultureId == el.product?.cultureId
@@ -349,6 +354,7 @@ function AdditionBusinessPlan({
     () => [
       { header: "Період", accessorKey: "period" },
       { header: "Рік", accessorKey: "year" },
+      { header: "Продукт", accessorKey: "product" },
       { header: "Культура", accessorKey: "culture" },
       { header: "Технологія", accessorKey: "technology" },
       { header: "Карта", accessorKey: "map" },
@@ -368,7 +374,6 @@ function AdditionBusinessPlan({
       { header: "Постійні", accessorKey: "permanent" },
       { header: "Витрати", accessorKey: "expenses" },
       { header: "Доходи", accessorKey: "income" },
-      { header: "Продукт", accessorKey: "product" },
       { header: "Валовий збір тон", accessorKey: "grossHarvest" },
       { header: "Ціна", accessorKey: "cost" },
       { header: "Виручка", accessorKey: "revenue" },
@@ -446,74 +451,25 @@ function AdditionBusinessPlan({
         </Tbody>
       </Table>
       <Paragraph>Додаток В. Технологічні карти</Paragraph>
-      <Table size={"sm"}>
-        <Thead>
-          <OpersTableHead role="" />
-        </Thead>
-        <Tbody>
-          {(() => {
-            let res = [];
-            for (let i = start; i < end; i++) {
-              for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
-                const e = myBusiness?.busProds[j];
-
-                res.push(
-                  sections
-                    ?.filter((el) => +el.year.split("")[0] == i - +start + 1)
-                    .map((sec) => {
-                      const el = sec.data;
-                      const mapData = thisMaps
-                        .filter(
-                          (el) => +(+el.year.split("")[0]) == i - +start + 1
-                        )
-                        .find((e) => e.id == el[0]?.arr[0]?.techCartId!);
-
-                      const sum = 0;
-                      return el.map((el) => {
-                        // sum +=
-                        //   mapData?.area! *
-                        //   (e.costMaterials ||
-                        //     e.costServices ||
-                        //     e.costTransport ||
-                        //     +e.costCars! +
-                        //       +e.costFuel! +
-                        //       +e.costHandWork! +
-                        //       +e.costMachineWork! ||
-                        //     e.costHandWork ||
-                        //     0);
-
-                        if (operReady)
-                          return (
-                            <React.Fragment>
-                              {/* <карти></к> */}
-                              <OperTableSection
-                                arr={el.arr}
-                                title={el.title}
-                                //@ts-ignore
-                                mapData={{ area: 3 }}
-                                id={mapData?.id!}
-                                //@ts-ignore
-                                deleteOpen={() => {}}
-                                setCell={() => {}}
-                                setDeleteOpen={() => {}}
-                                setOpen={() => {}}
-                                setRes={() => {}}
-                                setShowAlert={() => {}}
-                                setUpdate={() => {}}
-                                sum={sum}
-                              />
-                            </React.Fragment>
-                          );
-                      });
-                    })
-                );
-              }
-            }
-
-            return res.flat().flat();
-          })()}
-        </Tbody>
-      </Table>
+      {(() => {
+        const res = [];
+        for (let i = start; i < end; i++) {
+          res.push(<MyHeading textAlign={"left"}>{i}</MyHeading>);
+          const busProds = myBusiness.busProds.filter(
+            (el) => el.year == i - start
+          );
+          busProds.map((prod) => {
+            res.push(
+              <TechnologicalMapContent
+                useIcons={false}
+                id={prod.techCartId!}
+                myMap={prod.tech_cart!}
+              />
+            );
+          });
+        }
+        return res;
+      })()}
       <Paragraph>Культури технології</Paragraph>
       <Table size={"sm"}>
         <TableContent

@@ -241,7 +241,9 @@ export async function changeOper(
       if (!costMaterials) return elem;
 
       elem.costMaterials = Math.round(
-        costMaterials.price * costMaterials.consumptionPerHectare
+        //@ts-ignore
+        costMaterials.price *
+          (costMaterials.consumptionPerHectare || costMaterials.consumptionPer)
       );
       return elem;
     } else {

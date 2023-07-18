@@ -62,7 +62,7 @@ let cellNames: {
   costServices: "cost_service",
   costTransport: "cost_transport",
 };
-const cartsIncludes = [
+export const cartsIncludes = [
   {
     model: tech_operation,
     include: [
@@ -74,11 +74,19 @@ const cartsIncludes = [
     ],
   },
 ];
-async function changeCarts(Scarts: resTechCartsWithOpers[]) {
-  Scarts.sort((a, b) => a.id! - b.id!);
-  const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
+export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
+  Scarts.sort((a, b) => {
+    if (a && b) {
+      return a.id! - b.id!;
+    } else {
+      return 0;
+    }
+  });
+  const carts: (resTechCartsWithOpers | null)[] = JSON.parse(
+    JSON.stringify(Scarts)
+  );
 
-  let promises = [];
+  let promises: (resTechCartsWithOpers | null)[] = [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let costHectare = 0,
@@ -86,6 +94,10 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
       costCars = 0,
       costFuel = 0,
       costHandWork = 0;
+    if (!cart) {
+      promises.push(cart);
+      continue;
+    }
     if (!cart.tech_operations) throw new Error("");
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
@@ -110,6 +122,7 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
         costCars += el.costCars || 0;
         costFuel += el.costFuel || 0;
         costHandWork += el.costHandWork || 0;
+
         tech_cart.update(
           {
             costHectare,

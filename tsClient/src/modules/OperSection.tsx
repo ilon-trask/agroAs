@@ -16,6 +16,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 type props = {
+  sectionId: number | null | undefined;
   open: boolean;
   setOpen: (open: boolean) => void;
   setSecondOpen: (open: boolean) => void;
@@ -23,7 +24,6 @@ type props = {
   setCell: (cell: Icell | "") => void;
   section: number | "";
   setSection: (section: number | "") => void;
-  sectionId: number | null | undefined;
 };
 function OperSection({
   open,
@@ -112,18 +112,6 @@ function OperSection({
                 </Select>
               </Box>
             </Box>
-            {/* <Box>
-                <Heading as={"h4"} size="sm">
-                  Одиниці виміру
-                </Heading>
-                <Box>
-                  <Select onChange={(e) => {}} value={cell} defaultValue={""}>
-                    <option disabled hidden value="">
-                      грн/га
-                    </option>
-                  </Select>
-                </Box>
-              </Box> */}
           </Box>
           {isErr ? "Ви не заповнили поля" : ""}
         </ModalBody>

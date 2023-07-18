@@ -8,10 +8,10 @@ import React, { useEffect, useState } from "react";
 import { TableProps } from "./TableComponent";
 
 function TableContent({ data, columns }: TableProps) {
-  const [newData, setData] = useState<any[]>([]);
+  const [newData, setData] = useState<any[]>(data);
   useEffect(() => {
     setData(JSON.parse(JSON.stringify(data)));
-  }, [data?.length]);
+  }, [data, data.length]);
   const { getHeaderGroups, getRowModel } = useReactTable({
     columns: columns,
     data: newData,
@@ -41,8 +41,9 @@ function TableContent({ data, columns }: TableProps) {
             <Tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <Td
+                  whiteSpace={"pre-wrap"}
                   key={cell.id}
-                  style={{ whiteSpace: "pre-wrap" }}
+                  // style={{ whiteSpace: "pre-wrap" }}
                   fontWeight={row.original.bold == true ? "bold" : "normal"}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

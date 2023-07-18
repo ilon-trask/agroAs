@@ -17,15 +17,23 @@ import {
   titlePage,
   Iproduct,
   product,
+  tech_cart,
 } from "../models/models";
 import {
   ChangeProductType,
   CreateBusinessPlan,
+  CreateBusProd,
   DeleteBusinessPlan,
   PatchBusinessPlan,
+  PatchBusProd,
   SetIsAgreeBusinessPlan,
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
+import {
+  cartsIncludes,
+  changeCarts,
+  resTechCartsWithOpers,
+} from "./TechCartService";
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
 }
@@ -39,6 +47,7 @@ export interface resBusProd {
   cultivationTechnology: IcultivationTechnologies | undefined;
   area: number;
   year: number | null;
+  tech_cart: resTechCartsWithOpers | null;
 }
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
@@ -55,12 +64,13 @@ const includes = [
   {
     model: busProd,
     include: [
+      { model: tech_cart, include: cartsIncludes },
       { model: product, include: { model: culture } },
       { model: cultivationTechnologies },
     ],
   },
 ];
-function changeFinancing(res: resBusinessPlan[]) {
+async function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
 
   res.forEach((res) => {
@@ -82,6 +92,19 @@ function changeFinancing(res: resBusinessPlan[]) {
       return el;
     });
   });
+  res = await Promise.all(
+    res.map(async (el) => {
+      el.busProds = await Promise.all(
+        el.busProds.map(async (prod) => {
+          return {
+            ...prod,
+            tech_cart: (await changeCarts([prod.tech_cart]))[0],
+          };
+        })
+      );
+      return el;
+    })
+  );
   return res;
 }
 class BusinessService {
@@ -98,7 +121,7 @@ class BusinessService {
         include: includes,
       });
 
-      plans = changeFinancing(plans);
+      plans = await changeFinancing(plans);
       return plans;
     } else {
       //@ts-ignore
@@ -107,7 +130,7 @@ class BusinessService {
         //@ts-ignore
         include: includes,
       });
-      plans = changeFinancing(plans);
+      plans = await changeFinancing(plans);
       return plans;
     }
   }
@@ -157,7 +180,7 @@ class BusinessService {
       //@ts-ignore
       include: includes,
     });
-    res = changeFinancing([res!])[0];
+    res = (await changeFinancing([res!]))[0];
     return res;
   }
   async delete(user: Principal | undefined, data: DeleteBusinessPlan) {
@@ -238,38 +261,84 @@ class BusinessService {
       //@ts-ignore
       include: includes,
     });
-    res = changeFinancing([res])[0];
+    res = (await changeFinancing([res]))[0];
     return res;
   }
-  async changeProducts(user: Principal | undefined, data: ChangeProductType) {
+  async createBusProd(user: Principal | undefined, data: CreateBusProd) {
     if (!user) return;
-    await busProd.destroy({ where: { businessPlanId: data.busId } });
-    for (let i = 0; i < data.productIds.length; i++) {
-      const el = data.productIds[i];
-      //@ts-ignore
-      for (let j = 0; j < el.tech.length; j++) {
-        const e = el.tech[j];
-        const last = await busProd.findOne({
-          order: [["id", "DESC"]],
-        });
-        await busProd.create({
-          id: last?.id! + 1,
-          businessPlanId: data?.busId,
-          productId: el.productId,
-          cultivationTechnologyId: e.cultivationTechnologyId,
-          area: +e.area,
-          year: el.year,
-        });
-      }
-    }
+    const last = await busProd.findOne({
+      order: [["id", "DESC"]],
+    });
+    await busProd.create({
+      id: last?.id! + 1,
+      area: data.area,
+      year: data.year,
+      businessPlanId: data.businessPlanId,
+      cultivationTechnologyId: data.cultivationTechnologyId,
+      productId: data.productId,
+      techCartId: data.techCartId,
+    });
     //@ts-ignore
-    let res: resBusinessPlan = await businessPlan.findOne({
-      where: { id: data.busId },
+    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
       //@ts-ignore
       include: includes,
     });
-    res = changeFinancing([res])[0];
+    res = (await changeFinancing([res!]))[0];
     return res;
   }
+  async patchBusProd(user: Principal | undefined, data: PatchBusProd) {
+    if (!user) return;
+    await busProd.update(
+      {
+        area: data.area,
+        businessPlanId: data.businessPlanId,
+        cultivationTechnologyId: data.cultivationTechnologyId,
+        productId: data.productId,
+        techCartId: data.techCartId,
+        year: data.year,
+      },
+      { where: { id: data.ownId } }
+    );
+    //@ts-ignore
+    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
+      //@ts-ignore
+      include: includes,
+    });
+    res = (await changeFinancing([res!]))[0];
+    return res;
+  }
+  async deleteBusProd(user: Principal | undefined, data: any) {}
+  //   async changeProducts(user: Principal | undefined, data: ChangeProductType) {
+  //     if (!user) return;
+  //     await busProd.destroy({ where: { businessPlanId: data.busId } });
+  //     for (let i = 0; i < data.productIds.length; i++) {
+  //       const el = data.productIds[i];
+  //       //@ts-ignore
+  //       for (let j = 0; j < el.tech.length; j++) {
+  //         const e = el.tech[j];
+  //         const last = await busProd.findOne({
+  //           order: [["id", "DESC"]],
+  //         });
+  //         await busProd.create({
+  //           id: last?.id! + 1,
+  //           businessPlanId: data?.busId,
+  //           productId: el.productId,
+  //           cultivationTechnologyId: e.cultivationTechnologyId,
+  //           area: +e.area,
+  //           year: el.year,
+  //         });
+  //       }
+  //     }
+  //     //@ts-ignore
+  //     let res: resBusinessPlan = await businessPlan.findOne({
+  //       where: { id: data.busId },
+  //       //@ts-ignore
+  //       include: includes,
+  //     });
+  //     res = changeFinancing([res])[0];
+  //     return res;
+  //   }
 }
 export default new BusinessService();

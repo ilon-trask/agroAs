@@ -351,40 +351,70 @@ function ProductionBusinessPlan({
           {(() => {
             const res = [];
             for (let i = start; i < end; i++) {
-              res.push(
-                <Tr key={i}>
-                  <Td>{i}</Td>
-                </Tr>
+              const busProds = myBusiness.busProds.filter(
+                (el) => el.year == i - start
               );
-              for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
-                const e = myBusiness?.busProds[j];
-                let thisMaps = map.maps.map((m) => ({
-                  ...m,
-                  area: e?.area,
-                }));
-                thisMaps = thisMaps.filter((el) => {
-                  return (
-                    el.cultureId == e?.product?.cultureId &&
-                    el.cultivationTechnologyId == e?.cultivationTechnologyId &&
-                    //@ts-ignore
-                    el.year.split("")[0] == i - +start + 1
-                  );
-                });
-                res.push(
-                  <React.Fragment key={j}>
-                    {thisMaps.map((el) => (
-                      <Tr>
-                        <Td>{el.nameCart}</Td>
-                        <Td>{el.area}</Td>
-                        <Td>
-                          {Math.round(el.area! * el.costHectare! * 100) / 100}
-                        </Td>
-                        <Td>{el.costHectare}</Td>
-                      </Tr>
-                    ))}
-                  </React.Fragment>
-                );
-              }
+              res.push(
+                <React.Fragment key={i}>
+                  <Tr>
+                    <Td>{i}</Td>
+                  </Tr>
+                  {busProds.map((el) => (
+                    <Tr>
+                      <Td>{el.tech_cart?.nameCart}</Td>
+                      <Td>{el.area}</Td>
+                      <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
+                      <Td>{el.tech_cart?.costHectare}</Td>
+                    </Tr>
+                  ))}
+                  {/* <Tr>
+                    <Td>
+                      {busProds.map((el) => el.tech_cart?.nameCart).join("\n")}
+                    </Td>
+                    <Td>{busProds.map((el) => el.area).join("\n")}</Td>
+                    <Td>
+                      {busProds
+                        .map((el) => (el.tech_cart?.costHectare || 0) * el.area)
+                        .join("\n")}
+                    </Td>
+                    <Td>
+                      {busProds
+                        .map((el) => el.tech_cart?.costHectare)
+                        .join("\n")}
+                    </Td>
+                    <Td>{busProds.map(el=>el.)}</Td>
+                  </Tr> */}
+                </React.Fragment>
+              );
+              //   for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
+              //     const e = myBusiness?.busProds[j];
+              //     let thisMaps = map.maps.map((m) => ({
+              //       ...m,
+              //       area: e?.area,
+              //     }));
+              //     thisMaps = thisMaps.filter((el) => {
+              //       return (
+              //         el.cultureId == e?.product?.cultureId &&
+              //         el.cultivationTechnologyId == e?.cultivationTechnologyId &&
+              //         //@ts-ignore
+              //         el.year.split("")[0] == i - +start + 1
+              //       );
+              //     });
+              //     res.push(
+              //       <React.Fragment key={j}>
+              //         {thisMaps.map((el) => (
+              //           <Tr>
+              //             <Td>{el.nameCart}</Td>
+              //             <Td>{el.area}</Td>
+              //             <Td>
+              //               {Math.round(el.area! * el.costHectare! * 100) / 100}
+              //             </Td>
+              //             <Td>{el.costHectare}</Td>
+              //           </Tr>
+              //         ))}
+              //       </React.Fragment>
+              //     );
+              // }
             }
             return res;
           })()}

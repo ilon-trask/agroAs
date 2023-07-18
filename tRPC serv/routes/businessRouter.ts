@@ -21,6 +21,17 @@ const changeProductType = z.object({
   busId: z.number(),
   productIds: productIds,
 });
+const createBusProd = z.object({
+  year: z.number(),
+  productId: z.number(),
+  cultivationTechnologyId: z.number(),
+  techCartId: z.number(),
+  area: z.number(),
+  businessPlanId: z.number(),
+});
+export type CreateBusProd = z.infer<typeof createBusProd>;
+const patchBusProd = createBusProd.extend({ ownId: z.number() });
+export type PatchBusProd = z.infer<typeof patchBusProd>;
 const createType = z.object({
   name: z.string(),
   topic: z.string(),
@@ -110,10 +121,16 @@ const businessRouter = router({
       let res = await BusinessService.addFinancing(input);
       return res;
     }),
-  changeProducts: publicProcedure
-    .input(changeProductType)
+  createBusProd: publicProcedure
+    .input(createBusProd)
     .query(async ({ ctx, input }) => {
-      const res = await BusinessService.changeProducts(ctx.user, input);
+      const res = await BusinessService.createBusProd(ctx.user, input);
+      return res;
+    }),
+  patchBusProd: publicProcedure
+    .input(patchBusProd)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchBusProd(ctx.user, input);
       return res;
     }),
 });

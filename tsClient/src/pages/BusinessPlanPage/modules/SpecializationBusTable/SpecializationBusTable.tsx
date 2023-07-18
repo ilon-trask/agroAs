@@ -6,65 +6,8 @@ import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyHeading from "src/ui/MyHeading";
-import {
-  resBusinessPlan,
-  resBusProd,
-} from "../../../../../../tRPC serv/controllers/BusinessService";
-import SecondOpen, { productIds } from "./SecondOpen";
-
-function getDataFromBusiness(myBusiness: resBusinessPlan): productIds {
-  const result: {
-    ownId: number;
-    year: number;
-    productId: number;
-    tech: {
-      cultivationTechnologyId: number;
-      techCartId: number;
-      area: string | number;
-    }[];
-  }[] = [];
-  myBusiness.busProds.forEach((item) => {
-    const {
-      id,
-      businessPlanId,
-      year,
-      productId,
-      cultivationTechnologyId,
-      techCartId,
-      area,
-    } = item;
-    // Створюємо ідентифікатор групи за допомогою productId та id
-    const groupId = `${productId}-${year}`;
-
-    // Знаходимо чи вже є група з таким ідентифікатором у result
-    const index = result.findIndex((item) => item.ownId === groupId);
-
-    // Якщо групи з таким ідентифікатором не існує, додаємо нову групу в result
-    if (index === -1) {
-      result.push({
-        ownId: groupId,
-        year: year || 0,
-        productId,
-        tech: [
-          {
-            cultivationTechnologyId,
-            techCartId: techCartId || 0,
-            area: area.toString(),
-          },
-        ],
-      });
-    } else {
-      // Якщо група з таким ідентифікатором вже є, додаємо tech відповідного продукту
-      result[index].tech.push({
-        cultivationTechnologyId,
-        techCartId: techCartId || 0,
-        area: area.toString(),
-      });
-    }
-  });
-
-  return result;
-}
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import SecondOpen, { productProps } from "./SecondOpen";
 
 function SpecializationBusTable({
   myBusiness,
@@ -75,29 +18,35 @@ function SpecializationBusTable({
   start: number;
   end: number;
 }) {
-  const [data, setData] = useState<productIds>(
-    getDataFromBusiness(myBusiness!)
-  );
-  console.log(getDataFromBusiness(myBusiness));
+  const [data, setData] = useState<productProps>({
+    area: "",
+    cultivationTechnologyId: 0,
+    productId: 0,
+    techCartId: 0,
+    year: 0,
+  });
 
-  const specData = [];
-  for (let i = start; i <= end; i++) {
-    specData.push(
-      ...(myBusiness?.busProds
-        .filter((el) => el.year == i - start)
-        .map((el) => ({
-          id: `${el.productId}-${el.year - start}`,
-          year: i,
-          product: el.product?.name,
-          culture: el.product?.culture?.name,
-          technology: el.cultivationTechnology?.name,
-          area: el.area,
-          cartId: el.techCartId,
-          productId: el.productId,
-        })) || []),
-      { id: i + " plus", year: i }
-    );
-  }
+  const specData = useMemo(() => {
+    const res = [];
+    for (let i = start; i <= end; i++) {
+      res.push(
+        ...(myBusiness?.busProds
+          .filter((el) => el.year == i - start)
+          .map((el) => ({
+            id: el.id,
+            year: i,
+            product: el.product?.name,
+            culture: el.product?.culture?.name,
+            technology: el.cultivationTechnology?.name,
+            area: el.area,
+            cartId: el.techCartId,
+            productId: el.productId,
+          })) || []),
+        { id: i + " plus", year: i }
+      );
+    }
+    return res;
+  }, [myBusiness?.busProds, myBusiness?.busProds.length]);
 
   const specColumns = useMemo<
     ColumnDef<{
@@ -121,27 +70,12 @@ function SpecializationBusTable({
                 <MyPlusIcon
                   onClick={() => {
                     setOpen(true);
-                    setData((prev) => {
-                      setOpenData(() => {
-                        return {
-                          ownId: original.year,
-                        };
-                      });
-                      if (
-                        !prev.find((el) => el.ownId == original.year)?.ownId
-                      ) {
-                        return [
-                          ...prev,
-                          {
-                            ownId: original.year!,
-                            productId: 0,
-                            tech: [],
-                            year: original.year - start,
-                          },
-                        ];
-                      } else {
-                        return prev;
-                      }
+                    setData({
+                      area: "",
+                      cultivationTechnologyId: 0,
+                      productId: 0,
+                      techCartId: 0,
+                      year: original.year - start,
                     });
                   }}
                 />
@@ -149,8 +83,19 @@ function SpecializationBusTable({
                 <MyEditIcon
                   onClick={() => {
                     setOpen(true);
-                    setOpenData({
-                      ownId: `${original.productId}-${original.year - start}`,
+                    setData(() => {
+                      const myBusProd = myBusiness?.busProds.find(
+                        (el) => el.id == original.id
+                      );
+                      return {
+                        area: myBusProd?.area! + "",
+                        cultivationTechnologyId:
+                          myBusProd?.cultivationTechnologyId!,
+                        ownId: myBusProd?.id!,
+                        productId: myBusProd?.productId!,
+                        techCartId: myBusProd?.techCartId!,
+                        year: myBusProd?.year!,
+                      };
                     });
                   }}
                 />
@@ -159,10 +104,7 @@ function SpecializationBusTable({
           );
         },
       },
-      {
-        header: "Рік",
-        accessorKey: "year",
-      },
+      { header: "Рік", accessorKey: "year" },
       { header: "Продукт", accessorKey: "product" },
       { header: "Культура", accessorKey: "culture" },
       { header: "Технологія", accessorKey: "technology" },
@@ -176,22 +118,20 @@ function SpecializationBusTable({
         ),
       },
     ],
-    []
+    [myBusiness?.busProds]
   );
   const [open, setOpen] = useState(false);
-  const [openData, setOpenData] = useState({ ownId: 0 });
 
   return (
     <>
       <MyHeading>Спеціалізація</MyHeading>
       <TableComponent columns={specColumns} data={specData} />
-      {openData.ownId ? (
+      {open ? (
         <SecondOpen
           open={open}
           setOpen={setOpen}
           data={data}
           setData={setData}
-          ownId={openData.ownId}
         />
       ) : null}
     </>

@@ -24,7 +24,9 @@ import { createClient } from "@supabase/supabase-js";
 import {
   ChangeProductType,
   CreateBusinessPlan,
+  CreateBusProd,
   PatchBusinessPlan,
+  PatchBusProd,
 } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
@@ -1415,16 +1417,19 @@ export function addFinancingToBusinessPlan(
     bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
     //@ts-ignore
     bus.newBusinessPlan = res;
-    //@ts-ignore
-    // sortFinancing(res.financings, income);
   });
 }
-export function changeBusinessProducts(
-  bus: BusinessStore,
-  data: ChangeProductType
-) {
-  client.business.changeProducts.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
+export function createBusProd(bus: BusinessStore, data: CreateBusProd) {
+  client.business.createBusProd.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
+  client.business.patchBusProd.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
     bus.newBusinessPlan = res;
   });
 }

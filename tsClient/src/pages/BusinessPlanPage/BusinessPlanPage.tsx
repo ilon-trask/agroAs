@@ -71,6 +71,8 @@ function BiznesPlanPage() {
   const myBusiness =
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
+  console.log(myBusiness?.busProds);
+
   const [ready, setReady] = useState(false);
   const [cartReady, setCartReady] = useState(false);
   const [operReady, setOperReady] = useState(false);
