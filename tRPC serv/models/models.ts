@@ -595,18 +595,20 @@ businessPlan.init(
 export interface IbusProd {
   id?: number;
   businessPlanId?: number;
-  cultureId?: number;
+  productId?: number;
   cultivationTechnologyId?: number;
   area: number;
   year: number;
+  techCartId?: number;
 }
 export class busProd extends Model<IbusProd> {
   declare id?: number;
   declare businessPlanId?: number;
-  declare cultureId?: number;
+  declare productId?: number;
   declare cultivationTechnologyId?: number;
   declare area: number;
   declare year: number;
+  declare techCartId?: number;
 }
 busProd.init(
   {
@@ -1360,6 +1362,8 @@ product.hasMany(busProd);
 busProd.belongsTo(product);
 cultivationTechnologies.hasMany(busProd);
 busProd.belongsTo(cultivationTechnologies);
+tech_cart.hasMany(busProd);
+busProd.belongsTo(tech_cart);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);

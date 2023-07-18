@@ -22,6 +22,7 @@ import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
 // import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import {
+  ChangeProductType,
   CreateBusinessPlan,
   PatchBusinessPlan,
 } from "../../../tRPC serv/routes/businessRouter";
@@ -1416,5 +1417,14 @@ export function addFinancingToBusinessPlan(
     bus.newBusinessPlan = res;
     //@ts-ignore
     // sortFinancing(res.financings, income);
+  });
+}
+export function changeBusinessProducts(
+  bus: BusinessStore,
+  data: ChangeProductType
+) {
+  client.business.changeProducts.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
+    bus.newBusinessPlan = res;
   });
 }

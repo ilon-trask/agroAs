@@ -3,23 +3,32 @@ import z from "zod";
 import BusinessService, {
   resBusinessPlan,
 } from "../controllers/BusinessService";
+const productIds = z.array(
+  z.object({
+    ownId: z.number().or(z.string()),
+    year: z.number(),
+    productId: z.number(),
+    tech: z.array(
+      z.object({
+        cultivationTechnologyId: z.number(),
+        area: z.string().or(z.number()),
+        techCartId: z.number(),
+      })
+    ),
+  })
+);
+const changeProductType = z.object({
+  busId: z.number(),
+  productIds: productIds,
+});
 const createType = z.object({
   name: z.string(),
   topic: z.string(),
   initialAmount: z.number(),
   enterpriseId: z.number(),
-  productIds: z.array(
-    z.object({
-      id: z.number(),
-      tech: z.array(
-        z.object({ techId: z.number(), area: z.number(), year: z.number() })
-      ),
-    })
-  ),
   dateStart: z.string(),
   realizationTime: z.number(),
 });
-// const productIds
 export type CreateBusinessPlan = z.infer<typeof createType>;
 const patchType = createType.extend({
   planId: z.number(),
@@ -41,7 +50,7 @@ const setIsAgree = z.object({
   description: z.string().optional(),
 });
 export type SetIsAgreeBusinessPlan = z.infer<typeof setIsAgree>;
-
+export type ChangeProductType = z.infer<typeof changeProductType>;
 const businessRouter = router({
   // getCategory: publicProcedure.query(async () => {
   //   const res = await BusinessService.getCategory();
@@ -101,6 +110,11 @@ const businessRouter = router({
       let res = await BusinessService.addFinancing(input);
       return res;
     }),
-  // changeProducts: publicProcedure.input().query(() => {}),
+  changeProducts: publicProcedure
+    .input(changeProductType)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.changeProducts(ctx.user, input);
+      return res;
+    }),
 });
 export default businessRouter;

@@ -19,6 +19,7 @@ import {
   product,
 } from "../models/models";
 import {
+  ChangeProductType,
   CreateBusinessPlan,
   DeleteBusinessPlan,
   PatchBusinessPlan,
@@ -28,21 +29,23 @@ import {
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
 }
+export interface resBusProd {
+  businessPlanId: number;
+  cultivationTechnologyId: number;
+  techCartId: number | null;
+  productId: number;
+  product: includeProduct | undefined;
+  id: number;
+  cultivationTechnology: IcultivationTechnologies | undefined;
+  area: number;
+  year: number | null;
+}
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
   titlePage: ItitlePage;
   enterprise: Ienterprise | undefined;
   financings: Ifinancing[];
-  busProds: {
-    businessPlanId: number;
-    cultivationTechnologyId: number;
-    productId: number;
-    product: includeProduct | undefined;
-    id: number;
-    cultivationTechnology: IcultivationTechnologies | undefined;
-    area: number;
-    year: number | null;
-  }[];
+  busProds: resBusProd[];
 }
 const includes = [
   { model: resume },
@@ -110,7 +113,6 @@ class BusinessService {
   }
   async create(user: Principal | undefined, data: CreateBusinessPlan) {
     if (!user) return;
-    console.log(data);
 
     //@ts-ignore
     const plan: resBusinessPlan = await businessPlan.create(
@@ -126,25 +128,7 @@ class BusinessService {
       //@ts-ignore
       { include: includes }
     );
-    for (let i = 0; i < data.cultureIds.length; i++) {
-      const el = data.cultureIds[i];
-      //@ts-ignore
-      for (let j = 0; j < el.tech.length; j++) {
-        const e = el.tech[j];
-        const last = await busProd.findOne({
-          order: [["id", "DESC"]],
-        });
 
-        await busProd.create({
-          id: last?.id! + 1,
-          businessPlanId: plan?.id,
-          cultureId: el.id,
-          cultivationTechnologyId: e.techId,
-          area: e.area,
-          year: e.year,
-        });
-      }
-    }
     //@ts-ignore
     const res: resBusinessPlan | null = await businessPlan.findOne({
       where: { id: plan.id },
@@ -167,41 +151,12 @@ class BusinessService {
       },
       { where: { id: data.planId } }
     );
-    let res: resBusinessPlan | undefined | null = undefined;
-    if (ind[0] == 1) {
+    //@ts-ignore
+    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.planId },
       //@ts-ignore
-      res = await businessPlan.findOne({
-        where: { id: data.planId },
-        //@ts-ignore
-        include: includes,
-      });
-      //@ts-ignore
-      await busProd.destroy({ where: { businessPlanId: res.id } });
-      for (let i = 0; i < data.cultureIds.length; i++) {
-        const el = data.cultureIds[i];
-        //@ts-ignore
-        for (let j = 0; j < el.tech.length; j++) {
-          const e = el.tech[j];
-          const last = await busProd.findOne({
-            order: [["id", "DESC"]],
-          });
-          await busProd.create({
-            id: last?.id! + 1,
-            businessPlanId: res?.id,
-            cultureId: el.id,
-            cultivationTechnologyId: e.techId,
-            area: e.area,
-            year: e.year,
-          });
-        }
-      }
-      //@ts-ignore
-      res = await businessPlan.findOne({
-        where: { id: data.planId },
-        //@ts-ignore
-        include: includes,
-      });
-    }
+      include: includes,
+    });
     res = changeFinancing([res!])[0];
     return res;
   }
@@ -280,6 +235,36 @@ class BusinessService {
     //@ts-ignore
     let res: resBusinessPlan = await businessPlan.findOne({
       where: { id: data.businessId },
+      //@ts-ignore
+      include: includes,
+    });
+    res = changeFinancing([res])[0];
+    return res;
+  }
+  async changeProducts(user: Principal | undefined, data: ChangeProductType) {
+    if (!user) return;
+    await busProd.destroy({ where: { businessPlanId: data.busId } });
+    for (let i = 0; i < data.productIds.length; i++) {
+      const el = data.productIds[i];
+      //@ts-ignore
+      for (let j = 0; j < el.tech.length; j++) {
+        const e = el.tech[j];
+        const last = await busProd.findOne({
+          order: [["id", "DESC"]],
+        });
+        await busProd.create({
+          id: last?.id! + 1,
+          businessPlanId: data?.busId,
+          productId: el.productId,
+          cultivationTechnologyId: e.cultivationTechnologyId,
+          area: +e.area,
+          year: el.year,
+        });
+      }
+    }
+    //@ts-ignore
+    let res: resBusinessPlan = await businessPlan.findOne({
+      where: { id: data.busId },
       //@ts-ignore
       include: includes,
     });
