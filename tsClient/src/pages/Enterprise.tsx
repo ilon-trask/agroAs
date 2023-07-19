@@ -46,6 +46,7 @@ import CreateBuilding, {
 } from "src/modules/CreateBuilding/CreateBuilding";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyTableContainer from "src/ui/MyTableContainer";
 function Enterprise() {
   const { id } = useParams();
   const { enterpriseStore, income, map } = useContext(Context);
@@ -71,7 +72,6 @@ function Enterprise() {
     isUseCost: false,
     enterpriseId: +id!,
     calculationMethod: "",
-    calculationType: "",
   });
   const credits = sort(income.credit);
   const investments = sort(income.investment);
@@ -224,7 +224,6 @@ function Enterprise() {
                         purpose: el.purpose,
                         enterpriseId: +id!,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                       });
                       setUpdate(true);
@@ -314,7 +313,6 @@ function Enterprise() {
                         enterpriseId: +id!,
                         isUseCost: el.isUseCost,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         type: "credit",
                       });
                       setUpdate(true);
@@ -411,7 +409,6 @@ function Enterprise() {
                         name: el.name,
                         purpose: el.purpose,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                         type: "derj_support",
                       });
@@ -472,7 +469,7 @@ function Enterprise() {
       >
         Грант
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -500,7 +497,6 @@ function Enterprise() {
                         name: el.name,
                         purpose: el.purpose,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                         type: "grant",
                         cultureId: el.cultureId,
@@ -536,7 +532,7 @@ function Enterprise() {
             })}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Button
         onClick={() => {
           setFinancingOpen(true);

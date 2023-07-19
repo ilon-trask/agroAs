@@ -61,6 +61,7 @@ import CreateBuyingMachine, {
 import CreateAdministration from "../modules/CreateAdministration";
 import { CreateAdministrationProp } from "../modules/CreateAdministration/CreateAdministration";
 import BuyingMachineTable from "../modules/BuyingMachineTable";
+import MyTableContainer from "src/ui/MyTableContainer";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -515,12 +516,7 @@ const MapJornal = observer(function () {
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             Спеціалізовані та будівельні роботи
           </Text>
-          <TableContainer
-            maxW="1000px"
-            mx="auto"
-            mt={"20px"}
-            overflowX={"scroll"}
-          >
+          <MyTableContainer>
             <WorkTable
               works={works}
               setRes={setWorkRes}
@@ -530,7 +526,7 @@ const MapJornal = observer(function () {
               deleteOpen={deleteOpen}
               setDeleteOpen={setDeleteOpen}
             ></WorkTable>
-          </TableContainer>
+          </MyTableContainer>
           <Box
             mt={"15px"}
             ml={"auto"}

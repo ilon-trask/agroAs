@@ -18,17 +18,26 @@ import {
   Iproduct,
   product,
   tech_cart,
+  financBus,
+  buying_machine,
+  Ibuying_machine,
 } from "../models/models";
 import {
   ChangeProductType,
   CreateBusinessPlan,
   CreateBusProd,
+  CreateFinancingForBusiness,
   DeleteBusinessPlan,
   PatchBusinessPlan,
   PatchBusProd,
+  PatchFinancingForBusiness,
   SetIsAgreeBusinessPlan,
   SetIsPublicBusinessPlan,
 } from "../routes/businessRouter";
+import {
+  CreateBuyingMachine,
+  PatchBuyingMachine,
+} from "../routes/buyingMachineRouter";
 import {
   cartsIncludes,
   changeCarts,
@@ -49,12 +58,17 @@ export interface resBusProd {
   year: number | null;
   tech_cart: resTechCartsWithOpers | null;
 }
+export interface resFinancing extends Ifinancing {
+  costBP?: number;
+  costHectare?: number;
+}
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
   titlePage: ItitlePage;
   enterprise: Ienterprise | undefined;
-  financings: Ifinancing[];
+  financings: resFinancing[];
   busProds: resBusProd[];
+  buying_machines: Ibuying_machine[];
 }
 const includes = [
   { model: resume },
@@ -69,11 +83,12 @@ const includes = [
       { model: cultivationTechnologies },
     ],
   },
+  { model: buying_machine },
 ];
 async function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
 
-  res.forEach((res) => {
+  res = res.map((res) => {
     res.financings = res.financings.map((el) => {
       let area = 1;
       if (el.cultureId) {
@@ -87,10 +102,15 @@ async function changeFinancing(res: resBusinessPlan[]) {
             : 0;
       }
       if (el.calculationMethod == "На гектар") {
-        el.cost = el.cost * area;
+        el.costBP = el.cost * area;
+        el.costHectare = el.cost;
+      } else if (el.calculationMethod == "На бізнес-план") {
+        el.costBP = el.cost;
+        el.costHectare = el.cost / area;
       }
       return el;
     });
+    return res;
   });
   res = await Promise.all(
     res.map(async (el) => {
@@ -340,5 +360,115 @@ class BusinessService {
   //     res = changeFinancing([res])[0];
   //     return res;
   //   }
+  async createForBusiness(
+    user: Principal | undefined,
+    data: CreateFinancingForBusiness
+  ) {
+    if (!user) return;
+    let res: Ifinancing = await financing.create({
+      cost: data.cost,
+      date: data.date,
+      type: data.type,
+      name: data.name,
+      purpose: data.purpose,
+      calculationMethod: data.calculationMethod,
+      calculationType: null,
+      isUseCost: data.isUseCost,
+      cultureId: data.cultureId,
+      userId: user.sub,
+    });
+    console.log(data.busId);
+
+    await financBus.create({
+      businessPlanId: data.busId,
+      financingId: res.id,
+    });
+    //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.busId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
+  async patchFinancingForBusiness(
+    user: Principal | undefined,
+    data: PatchFinancingForBusiness
+  ) {
+    if (!user) return;
+    await financing.update(
+      {
+        cost: data.cost,
+        date: data.date,
+        name: data.name,
+        type: data.type,
+        isUseCost: data.isUseCost,
+        purpose: data.purpose,
+        calculationMethod: data.calculationMethod,
+        cultureId: data.cultureId,
+      },
+      { where: { id: data.financingId } }
+    );
+    //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.busId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
+  async createBuyingMachineForBusiness(
+    user: Principal | undefined,
+    data: CreateBuyingMachine
+  ) {
+    if (!user) return;
+    const res: Ibuying_machine = await buying_machine.create({
+      amount: data.amount,
+      brand: data.brand,
+      cost: data.cost,
+      date: data.date,
+      name: data.name,
+      purpose: data.purpose,
+      userId: user.sub,
+      businessPlanId: data.businessPlanId,
+      enterpriseId: data.enterpriseId,
+    });
+    //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
+  async patchBuyingMachineForBusiness(
+    user: Principal | undefined,
+    data: PatchBuyingMachine
+  ) {
+    if (!user) return;
+    await buying_machine.update(
+      {
+        amount: data.amount,
+        brand: data.brand,
+        cost: data.cost,
+        date: data.date,
+        name: data.name,
+        purpose: data.purpose,
+        businessPlanId: data.businessPlanId,
+        enterpriseId: data.enterpriseId,
+      },
+      { where: { id: data.buyingId } }
+    ); //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
 }
 export default new BusinessService();

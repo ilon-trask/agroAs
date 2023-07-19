@@ -28,7 +28,7 @@ function FinancingBusinessPlan({
 }) {
   const fundraisingPlanData: {
     name: string | number;
-    date: string;
+    year: number;
     investment: number | "";
     credit: number | "";
     DerjSupport: number | "";
@@ -39,8 +39,8 @@ function FinancingBusinessPlan({
   const investmentPlan = [];
   const fundraisingPlanColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
+      { header: "Рік", accessorKey: "year" },
       { header: "Назва", accessorKey: "name" },
-      { header: "Дата", accessorKey: "date" },
       { header: "Інвестиції", accessorKey: "investment" },
       { header: "Кредит", accessorKey: "credit" },
       { header: "Державна підтримка", accessorKey: "DerjSupport" },
@@ -64,7 +64,7 @@ function FinancingBusinessPlan({
         ?.filter((el) => getYearFromString(el.date) == i)
         .map((el) => ({
           name: el.name,
-          date: el.date,
+          year: getYearFromString(el.date)!,
           credit: el.cost,
           investment: 0,
           DerjSupport: 0,
@@ -75,7 +75,7 @@ function FinancingBusinessPlan({
         ?.filter((el) => getYearFromString(el.date) == i)
         .map((el) => ({
           name: el.name,
-          date: el.date,
+          year: getYearFromString(el.date)!,
           investment: el.cost,
           credit: 0,
           DerjSupport: 0,
@@ -86,7 +86,7 @@ function FinancingBusinessPlan({
         ?.filter((el) => getYearFromString(el.date) == i)
         .map((el) => ({
           name: el.name,
-          date: el.date,
+          year: getYearFromString(el.date)!,
           DerjSupport: el.cost,
           investment: 0,
           credit: 0,
@@ -97,7 +97,7 @@ function FinancingBusinessPlan({
         ?.filter((el) => getYearFromString(el.date) == i)
         .map((el) => ({
           name: el.name,
-          date: el.date,
+          year: getYearFromString(el.date)!,
           grant: el.cost,
           DerjSupport: 0,
           investment: 0,
@@ -122,8 +122,8 @@ function FinancingBusinessPlan({
         ?.filter((el) => getYearFromString(el.date) == i)
         .reduce((p, c) => p + c.cost, 0) || 0;
     fundraisingPlanData.push({
-      name: i,
-      date: "",
+      year: i,
+      name: "Разом:",
       credit: sumCred,
       DerjSupport: sumDerj,
       grant: sumGrand,
@@ -138,6 +138,7 @@ function FinancingBusinessPlan({
       { indicators: "Всього інвестицій" }
     );
   }
+  // fundraisingPlanData.push()
   investmentPlan.push({ indicators: "Вартість проекту", bold: true });
   return (
     <>

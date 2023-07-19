@@ -67,14 +67,30 @@ function BiznesPlanPage() {
     getPublicBusiness(map, business);
   }, []);
   const { id } = useParams();
-
   const myBusiness =
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
-  console.log(myBusiness?.busProds);
+  console.log("myBusiness");
+  console.log(myBusiness);
   myBusiness?.busProds.forEach((el) => {
     if (el.tech_cart) el.tech_cart.area = el.area;
   });
+  if (myBusiness && !myBusiness.financings.find((el) => el.id == 0))
+    myBusiness.financings = [
+      {
+        date: myBusiness?.dateStart!,
+        calculationMethod: "На бізнес-план",
+        calculationType: "Індивідуальний",
+        cost: myBusiness?.initialAmount!,
+        isUseCost: false,
+        name: "Початкові інвестиції",
+        purpose: "Власні",
+        type: "investment",
+        id: 0,
+      },
+      ...(myBusiness?.financings || []),
+    ];
+
   const [ready, setReady] = useState(false);
   const [cartReady, setCartReady] = useState(false);
   const [operReady, setOperReady] = useState(false);
@@ -147,20 +163,9 @@ function BiznesPlanPage() {
     }
   }, [map.opers, cartReady, operReady]);
   const thisCredit = myBusiness?.financings.filter((el) => el.type == "credit");
-  const thisInvestment: Ifinancing[] = [
-    ...(myBusiness?.financings.filter((el) => el.type == "investment") || []),
-    {
-      date: myBusiness?.dateStart!,
-      calculationMethod: "На бізнес-план",
-      calculationType: "Індивідуальний",
-      cost: myBusiness?.initialAmount!,
-      isUseCost: false,
-      name: "Початкові інвестиції",
-      purpose: "Власні",
-      type: "investment",
-      id: 0,
-    },
-  ];
+  const thisInvestment = myBusiness?.financings.filter(
+    (el) => el.type == "investment"
+  );
   const thisDerj = myBusiness?.financings.filter(
     ({ type }) => type == "derj_support"
   );
@@ -177,17 +182,15 @@ function BiznesPlanPage() {
       <MainFinancingBusTable
         myBusiness={myBusiness}
         id={+id!}
-        thisCredit={thisCredit}
-        thisDerj={thisDerj}
-        thisGrand={thisGrand}
-        thisInvestment={thisInvestment}
+        end={end}
+        start={start}
       />
-      <BuyingMachineBusTable myBusiness={myBusiness} />
-      <BuildingBusTable />
+      <BuyingMachineBusTable myBusiness={myBusiness} end={end} start={start} />
+      <BuildingBusTable id={+id!} />
       <MyHeading>Малоцінні та швидкозношувальні прeдмети</MyHeading>
       <Table size={"sm"}>
         <Thead>
-          <BuyingMachineTableHead isPlan={true} />
+          <BuyingMachineTableHead />
         </Thead>
         <Tbody></Tbody>
       </Table>

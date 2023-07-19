@@ -1,21 +1,24 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import getYearFromString from "src/shared/funcs/getYearFromString";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import { Ibuying_machine } from "../../../../tRPC serv/models/models";
-import { CreateBuyingMachine } from "../../../../tRPC serv/routes/buyingMachineRouter";
 import { deleteBuyingMachine } from "../../http/requests";
 import { Context } from "../../main";
 import { CreateBuyingMachineProps } from "../CreateBuyingMachine";
+
 export function BuyingMachineTableHead({ isPlan }: { isPlan?: boolean }) {
   return (
     <Tr>
       <Th></Th>
-      <Th>Дата</Th>
+      <Th>Рік</Th>
       <Th>Назва</Th>
       <Th>Марка</Th>
       <Th>Кількість</Th>
       <Th>Ціна</Th>
       <Th>Сума</Th>
+      <Th>Налаштування</Th>
       {!isPlan && <Th></Th>}
     </Tr>
   );
@@ -56,15 +59,18 @@ export function BuyingMachineTableBodyRow({
             });
         }}
       >
-        <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
+        <MyEditIcon />
       </Td>
 
-      <Td>{el.date}</Td>
+      <Td>{getYearFromString(el.date)}</Td>
       <Td>{el.name}</Td>
       <Td>{el.brand}</Td>
       <Td>{el.amount}</Td>
       <Td>{el.cost}</Td>
       <Td>{el.cost * el.amount}</Td>
+      <Td>
+        <Button size={"sm"}>Додати</Button>
+      </Td>
       {!isPlan && (
         <Td
           onClick={() => {
@@ -80,7 +86,7 @@ export function BuyingMachineTableBodyRow({
               });
           }}
         >
-          <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+          <MyDeleteIcon />
         </Td>
       )}
     </Tr>
@@ -108,6 +114,7 @@ function BuyingMachineTable({
       <Tbody>
         {map.buyingMachine?.map((el) => (
           <BuyingMachineTableBodyRow
+            key={el.id!}
             el={el}
             isPlan={isPlan}
             setOpen={setOpen}

@@ -11,11 +11,13 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import Dialog from "../../components/Dialog";
-import { createBuyingMachine, patchBuyingMachine } from "../../http/requests";
+import {
+  createBuyingMachineForBusiness,
+  patchBuyingMachineForBusiness,
+} from "../../http/requests";
 import { Context } from "../../main";
 import useBuyingMachinePurpose, {
   BuyingMachinePurposeType,
@@ -25,9 +27,7 @@ type props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
-  res?: CreateBuyingMachineProps;
-  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  data?: CreateBuyingMachineProps;
+  data: CreateBuyingMachineProps;
 };
 export type CreateBuyingMachineProps = {
   buyingId?: number;
@@ -46,17 +46,12 @@ function CreateBuyingMachine({
   setOpen,
   update,
   setUpdate,
-  res,
-  setRes,
   data,
 }: props) {
   const purpose = useBuyingMachinePurpose;
-  const { map } = useContext(Context);
+  const { business } = useContext(Context);
 
   let [input, setInput] = useState(data as CreateBuyingMachineProps);
-  if (res && setRes) {
-    (input = res), (setInput = setRes as any);
-  }
 
   useEffect(() => {
     if (data) setInput(data);
@@ -183,21 +178,6 @@ function CreateBuyingMachine({
         >
           <Box>
             <Heading as={"h4"} size="sm">
-              Дата покупки машини <br />
-              або обладнання
-            </Heading>
-            <Input
-              size={"sm"}
-              placeholder="Вкажіть ціку"
-              type="date"
-              value={input?.date}
-              onChange={(e) => {
-                setInput((prev) => ({ ...prev, date: e.target.value }));
-              }}
-            />
-          </Box>
-          <Box>
-            <Heading as={"h4"} size="sm">
               Напрямок машин <br />
               або обладнання
             </Heading>
@@ -244,9 +224,8 @@ function CreateBuyingMachine({
             ) {
               input.cost = +input.cost;
               input.amount = +input.amount;
-
               if (update) {
-                patchBuyingMachine(map, {
+                patchBuyingMachineForBusiness(business, {
                   ...input,
                   cost: +input.cost,
                   amount: +input.amount,
@@ -254,7 +233,7 @@ function CreateBuyingMachine({
                   buyingId: input.buyingId!,
                 });
               } else {
-                createBuyingMachine(map, {
+                createBuyingMachineForBusiness(business, {
                   ...input,
                   cost: +input.cost,
                   amount: +input.amount,
@@ -263,11 +242,6 @@ function CreateBuyingMachine({
               }
               setOpen(false);
               setUpdate(false);
-              //@ts-ignore
-              setRes((prev) => ({
-                businessPlanId: prev.businessPlanId,
-                enterpriseId: prev.enterpriseId,
-              }));
             }
           }}
         >

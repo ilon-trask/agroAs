@@ -16,15 +16,15 @@ import React, {
 import useCreditCalculationMethod, {
   CreditCalculationMethodType,
 } from "src/shared/hook/useCreditCalculationMethod";
-import useCreditCalculationType, {
-  CreditCalculationTypeType,
-} from "src/shared/hook/useCreditCalculationType";
 import { DerjPurposeType } from "src/shared/hook/useDerjPurpose";
 import { FinancingType } from "src/shared/hook/useFinancingType";
 import { GrantPurposeType } from "src/shared/hook/useGrantPurpose";
 import { InvestmentOriginType } from "src/shared/hook/useInvestmentOrigin";
 import Dialog from "../../components/Dialog";
-import { createFinancing, patchFinancing } from "../../http/requests";
+import {
+  createFinancingForBusiness,
+  patchFinancingForBusiness,
+} from "../../http/requests";
 import { Context } from "../../main";
 import useCreditPurpose, {
   CreditPurposeType,
@@ -32,6 +32,8 @@ import useCreditPurpose, {
 import useDerjPurpose from "src/shared/hook/useDerjPurpose";
 import useGrantPurpose from "src/shared/hook/useGrantPurpose";
 import useInvestmentOrigin from "src/shared/hook/useInvestmentOrigin";
+import useFinancingType from "src/shared/hook/useFinancingType";
+import { useParams } from "react-router-dom";
 export type FinancingProps = {
   id?: number;
   name: string;
@@ -44,11 +46,10 @@ export type FinancingProps = {
     | GrantPurposeType
     | "";
   cost: number | "";
-  enterpriseId: number;
+  enterpriseId: number | undefined;
   isUseCost: boolean;
-  calculationType: CreditCalculationTypeType | "";
   calculationMethod: CreditCalculationMethodType | "";
-  cultureId?: number;
+  cultureId?: number | null | "";
 };
 type props = {
   open: boolean;
@@ -56,10 +57,18 @@ type props = {
   data: FinancingProps;
   update: boolean;
   setUpdate: Dispatch<SetStateAction<boolean>>;
+  busId: number;
 };
 const obj = {};
-function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
-  const { income, map } = useContext(Context);
+function CreateFinancing({
+  open,
+  setOpen,
+  data,
+  setUpdate,
+  update,
+  busId,
+}: props) {
+  const { income, business, map } = useContext(Context);
   const [res, setRes] = useState(data);
   const arr =
     res.type == "credit"
@@ -72,7 +81,6 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
       ? useInvestmentOrigin
       : [];
   useEffect(() => setRes(data), [data]);
-
   return (
     <Dialog
       open={open}
@@ -105,7 +113,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
       <Box display={"flex"} justifyContent={"space-around"} mt={3}>
         <Box maxW={"190px"}>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Введіть ім'я
+            Введіть назву
           </Heading>
           <Input
             size={"sm"}
@@ -118,16 +126,27 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
         </Box>
         <Box maxW={"190px"}>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Введіть дату отримання
+            Виберіть тип фінансування
           </Heading>
-          <Input
+          <Select
             size={"sm"}
-            value={res.date}
-            type={"date"}
+            value={res.type}
             onChange={(e) =>
-              setRes((prev) => ({ ...prev, date: e.target.value }))
+              setRes((prev) => ({
+                ...prev,
+                type: e.target.value as FinancingType,
+              }))
             }
-          />
+          >
+            <option value="" defaultChecked hidden>
+              Виберіть опцію
+            </option>
+            {useFinancingType.map((el) => (
+              <option value={el.name} key={el.id}>
+                {el.clientName}
+              </option>
+            ))}
+          </Select>
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} mt={3}>
@@ -152,6 +171,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
           <Select
             size={"sm"}
             value={res.purpose}
+            isDisabled={!res.type}
             onChange={(e) =>
               setRes((prev) => ({
                 ...prev,
@@ -160,7 +180,7 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
             }
           >
             <option value="" hidden defaultChecked>
-              Виберіть опцію
+              {res.type ? "Виберіть опцію" : "Виберіть тип"}
             </option>
             {arr.map((el) => (
               <option value={el.name} key={el.id}>
@@ -171,30 +191,6 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} mt={3}>
-        <Box>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Вид розрахунку
-          </Heading>
-          <Select
-            size={"sm"}
-            value={res.calculationType}
-            onChange={(e) =>
-              setRes((prev) => ({
-                ...prev,
-                calculationType: e.target.value as any,
-              }))
-            }
-          >
-            <option value="" hidden>
-              Виберіть опцію
-            </option>
-            {useCreditCalculationType.map((el) => (
-              <option key={el.id} value={el.name}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
         <Box>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
             Метод розрахунку
@@ -219,29 +215,35 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
             ))}
           </Select>
         </Box>
-        {res.type == "grant" && (
-          <Box maxW={"190px"}>
-            <Heading as={"h4"} size="sm" minW={"max-content"}>
-              Виберіть культури
-            </Heading>
-            <Select
-              value={res.cultureId}
-              size={"sm"}
-              onChange={(e) =>
-                setRes((prev) => ({ ...prev, cultureId: +e.target.value }))
-              }
-            >
-              <option value="" hidden>
-                виберіть опцію
+
+        <Box maxW={"190px"}>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Виберіть культури
+          </Heading>
+          <Select
+            //@ts-ignore
+            value={res.cultureId}
+            size={"sm"}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, cultureId: +e.target.value }))
+            }
+          >
+            <option value="" hidden>
+              виберіть опцію
+            </option>
+            {map.culture.map((el) => (
+              <option key={el.id!} value={el.id}>
+                {el.name}
               </option>
-              {map.culture.map((el) => (
-                <option key={el.id!} value={el.id}>
-                  {el.name}
-                </option>
-              ))}
-            </Select>
-          </Box>
-        )}
+            ))}
+            <option
+              //@ts-ignore
+              value={null}
+            >
+              Без культури
+            </option>
+          </Select>
+        </Box>
       </Box>
       <ModalFooter>
         <Button
@@ -252,13 +254,13 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
               res.date &&
               res.purpose &&
               res.calculationMethod &&
-              res.calculationType &&
-              res.type
+              res.type &&
+              res.cultureId
             ) {
               res.cost = +res.cost;
-
               if (update) {
-                patchFinancing(income, {
+                patchFinancingForBusiness(business, {
+                  busId: busId,
                   financingId: res.id!,
                   cost: res.cost,
                   date: res.date,
@@ -267,12 +269,12 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                   isUseCost: res.isUseCost || false,
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
-                  calculationType: res.calculationType,
                   type: res.type,
                   cultureId: res.cultureId,
                 });
               } else {
-                createFinancing(income, {
+                createFinancingForBusiness(business, {
+                  busId: busId,
                   cost: res.cost,
                   date: res.date,
                   name: res.name,
@@ -280,7 +282,6 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                   isUseCost: res.isUseCost || false,
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
-                  calculationType: res.calculationType,
                   type: res.type,
                   cultureId: res.cultureId,
                 });
@@ -295,7 +296,6 @@ function CreateFinancing({ open, setOpen, data, setUpdate, update }: props) {
                 name: "",
                 purpose: "",
                 calculationMethod: "",
-                calculationType: "",
                 type: prev.type,
                 cultureId: undefined,
               }));

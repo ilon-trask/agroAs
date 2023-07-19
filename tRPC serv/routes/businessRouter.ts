@@ -3,6 +3,8 @@ import z from "zod";
 import BusinessService, {
   resBusinessPlan,
 } from "../controllers/BusinessService";
+import { createFinancing } from "./financingRouter";
+import { createBuyingMachine, patchBuyingMachine } from "./buyingMachineRouter";
 const productIds = z.array(
   z.object({
     ownId: z.number().or(z.string()),
@@ -62,6 +64,18 @@ const setIsAgree = z.object({
 });
 export type SetIsAgreeBusinessPlan = z.infer<typeof setIsAgree>;
 export type ChangeProductType = z.infer<typeof changeProductType>;
+const createFinancingForBusiness = createFinancing.extend({
+  busId: z.number(),
+});
+export type CreateFinancingForBusiness = z.infer<
+  typeof createFinancingForBusiness
+>;
+const patchFinancingForBusiness = createFinancingForBusiness.extend({
+  financingId: z.number(),
+});
+export type PatchFinancingForBusiness = z.infer<
+  typeof patchFinancingForBusiness
+>;
 const businessRouter = router({
   // getCategory: publicProcedure.query(async () => {
   //   const res = await BusinessService.getCategory();
@@ -131,6 +145,39 @@ const businessRouter = router({
     .input(patchBusProd)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.patchBusProd(ctx.user, input);
+      return res;
+    }),
+  createFinancingForBusiness: publicProcedure
+    .input(createFinancingForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createForBusiness(ctx.user, input);
+      return res;
+    }),
+  patchFinancingForBusiness: publicProcedure
+    .input(patchFinancingForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchFinancingForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  createBuyingMachineForBusiness: publicProcedure
+    .input(createBuyingMachine)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createBuyingMachineForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  patchBuyingMachineForBusiness: publicProcedure
+    .input(patchBuyingMachine)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchBuyingMachineForBusiness(
+        ctx.user,
+        input
+      );
       return res;
     }),
 });

@@ -25,8 +25,10 @@ import {
   ChangeProductType,
   CreateBusinessPlan,
   CreateBusProd,
+  CreateFinancingForBusiness,
   PatchBusinessPlan,
   PatchBusProd,
+  PatchFinancingForBusiness,
 } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
@@ -648,6 +650,7 @@ export function sendFeedBack(data: FeedBackProps) {
 export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.getNoAgree.query().then((res) => {
+    //@ts-ignore
     Bus.noAgreeBusinessPlan = res;
     map.isLoading = false;
   });
@@ -655,6 +658,7 @@ export function getNoAgreeBusiness(map: MapStore, Bus: BusinessStore) {
 export function getPublicBusiness(map: MapStore, Bus: BusinessStore) {
   map.isLoading = true;
   client.business.getPublic.query().then((res) => {
+    //@ts-ignore
     Bus.publicBusinessPlan = res;
     map.isLoading = false;
   });
@@ -1428,6 +1432,49 @@ export function createBusProd(bus: BusinessStore, data: CreateBusProd) {
 }
 export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
   client.business.patchBusProd.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function createFinancingForBusiness(
+  bus: BusinessStore,
+  data: CreateFinancingForBusiness
+) {
+  client.business.createFinancingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+export function patchFinancingForBusiness(
+  bus: BusinessStore,
+  data: PatchFinancingForBusiness
+) {
+  client.business.patchFinancingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function createBuyingMachineForBusiness(
+  bus: BusinessStore,
+  data: CreateBuyingMachine
+) {
+  client.business.createBuyingMachineForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function patchBuyingMachineForBusiness(
+  bus: BusinessStore,
+  data: PatchBuyingMachine
+) {
+  client.business.patchBuyingMachineForBusiness.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
     bus.newBusinessPlan = res;

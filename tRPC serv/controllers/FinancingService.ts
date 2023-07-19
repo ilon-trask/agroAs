@@ -27,6 +27,7 @@ class FinancingService {
       cultureId: data.cultureId,
       userId: user.sub,
     });
+
     return res;
   }
   async patch(user: Principal | undefined, data: PatchFinancingType) {

@@ -1,9 +1,7 @@
 import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
-
-import { Imachine } from "../models/models";
 import BuyingMachineService from "../controllers/BuyingMachineService";
-const createBuyingMachine = z.object({
+export const createBuyingMachine = z.object({
   name: z.string(),
   brand: z.string(),
   cost: z.number(),
@@ -14,7 +12,9 @@ const createBuyingMachine = z.object({
   enterpriseId: z.number(),
 });
 export type CreateBuyingMachine = z.infer<typeof createBuyingMachine>;
-const patchBuyingMachine = createBuyingMachine.extend({ buyingId: z.number() });
+export const patchBuyingMachine = createBuyingMachine.extend({
+  buyingId: z.number(),
+});
 export type PatchBuyingMachine = z.infer<typeof patchBuyingMachine>;
 export const buyingMachineRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {

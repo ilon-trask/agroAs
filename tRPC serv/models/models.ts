@@ -1001,8 +1001,8 @@ export interface Ifinancing {
   isUseCost: boolean;
   // businessCost?: number;
   calculationMethod: CreditCalculationMethodType;
-  calculationType: CreditCalculationTypeType;
-  cultureId?: number;
+  calculationType: CreditCalculationTypeType | null;
+  cultureId?: number | null;
   userId?: string;
   createdAt?: Date;
 }
@@ -1304,8 +1304,12 @@ building.init(
   },
   { sequelize }
 );
-export class financBus extends Model<{}> {
-  declare busienssId: number;
+interface IFinancBus {
+  businessPlanId?: number;
+  financingId?: number;
+}
+export class financBus extends Model<IFinancBus> {
+  declare businessPlanId: number;
   declare financingId: number;
 }
 

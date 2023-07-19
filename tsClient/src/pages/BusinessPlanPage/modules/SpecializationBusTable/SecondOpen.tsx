@@ -98,6 +98,10 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
                 Виберіть опцію
               </option>
               {(() => {
+                console.log("cultureId");
+                console.log(cultureId);
+                console.log(map.product);
+
                 let prod =
                   cultureId == 0
                     ? map.product

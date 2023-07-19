@@ -1,167 +1,191 @@
-import { Checkbox, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction, useContext } from "react";
-import { Ifinancing } from "../../../../../../tRPC serv/models/models";
+import { Button } from "@chakra-ui/react";
+import { ColumnDef } from "@tanstack/react-table";
+import React, { useMemo, useState } from "react";
+import TableComponent from "src/components/TableComponent";
+import CreateFinancing from "src/modules/CreateFinancing";
+import MyAddIcon from "src/ui/Icons/MyAddIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import { resFinancing } from "../../../../../../tRPC serv/controllers/BusinessService";
+import { FinancingProps } from "src/modules/CreateFinancing/CreateFinancing";
+import { CreditCalculationMethodType } from "src/shared/hook/useCreditCalculationMethod";
+import { CreditCalculationTypeType } from "src/shared/hook/useCreditCalculationType";
+import { GrantPurposeType } from "src/shared/hook/useGrantPurpose";
+import { DerjPurposeType } from "src/shared/hook/useDerjPurpose";
+import { InvestmentOriginType } from "src/shared/hook/useInvestmentOrigin";
+import { CreditPurposeType } from "src/shared/hook/useCreditPurpose";
+import { FinancingType } from "src/shared/hook/useFinancingType";
 type props = {
-  thisCredit: Ifinancing[];
-  thisInvestment: Ifinancing[];
-  thisDerj: Ifinancing[];
-  thisGrant: Ifinancing[];
-  isPlan?: boolean;
-  res?: number[];
-  setRes?: Dispatch<SetStateAction<number[]>>;
+  financing: resFinancing[] | undefined;
+  start: number;
+  end: number;
+  busId: number;
 };
-function isChecked(arr: number[], id: number) {
-  return arr.includes(id);
-}
-function ThisCheckbox({
-  id,
-  res,
-  setRes,
-}: {
-  res: number[];
-  setRes: Dispatch<SetStateAction<number[]>>;
-  id: number;
-}) {
-  return (
-    <Checkbox
-      isChecked={isChecked(res, id)}
-      onChange={() => {
-        if (setRes) {
-          if (isChecked(res!, id)) {
-            setRes((prev) => prev.filter((e) => e != id));
-          } else {
-            setRes((prev) => [...prev, id]);
-          }
-        }
-      }}
-    />
-  );
-}
 function MainFinancingBusinessPlanTable({
-  thisCredit,
-  thisInvestment,
-  thisDerj,
-  thisGrant,
-  isPlan,
-  res,
-  setRes,
+  financing,
+  end,
+  start,
+  busId,
 }: props) {
-  return (
-    <Table size={"sm"}>
-      <Thead>
-        <Tr>
-          {!isPlan && <Th></Th>}
-          <Th>Назва</Th>
-          {/* <Th></Th> */}
-          <Th>Дата</Th>
-          <Th>Сума</Th>
-          <Th>Призначення</Th>
-          <Th>Метод розрахунку</Th>
-          <Th>Вид розрахунку</Th>
-          <Th></Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr fontWeight={"bold"}>
-          {!isPlan && <Td></Td>}
-          <Td>Кредит</Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
-        {thisCredit?.map((el) => (
-          <Tr key={el.id!}>
-            {!isPlan && (
-              <Td>
-                <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
-              </Td>
+  const [open, setOpen] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [res, setRes] = useState<FinancingProps>();
+  const data = (() => {
+    const result: any[] = [];
+    for (let i = start; i <= end; i++) {
+      const fin = financing?.filter((el) => +el.date.split("-")[0] == i) || [];
+      fin.forEach((el) =>
+        result.push({
+          id: el.id,
+          year: i,
+          typeName:
+            el.type == "credit"
+              ? "Кредит"
+              : el.type == "derj_support"
+              ? "Державна підтримка"
+              : el.type == "grant"
+              ? "Грант"
+              : el.type == "investment"
+              ? "Інвестиції"
+              : null,
+          type: el.type,
+          name: el.name,
+          costBP: el.costBP,
+          costHectare: el.costHectare,
+          purpose: el.purpose,
+          calculationMethod: el.calculationMethod,
+          calculationType: el.calculationType,
+          cost: el.cost,
+          date: el.date,
+          isUseCost: el.isUseCost,
+          cultureId: el.cultureId,
+        })
+      );
+      result.push({
+        isYear: true,
+        bold: true,
+        year: i,
+        costBP: fin.reduce((p, c) => p + (c.costBP || 0), 0),
+        costHectare: fin.reduce((p, c) => p + (c.costHectare || 0), 0),
+      });
+    }
+    return result;
+  })();
+  const columns = useMemo<
+    ColumnDef<{
+      id: number;
+      year: number;
+      type: FinancingType | "";
+      typeName: string;
+      name: string;
+      costBP: number;
+      costHectare: number;
+      cost: number;
+      purpose:
+        | CreditPurposeType
+        | InvestmentOriginType
+        | DerjPurposeType
+        | GrantPurposeType
+        | "";
+      calculationMethod: CreditCalculationMethodType | "";
+      calculationType: CreditCalculationTypeType | "";
+      isYear?: boolean;
+      date: string;
+      isUseCost: boolean;
+      cultureId?: number;
+    }>[]
+  >(
+    () => [
+      {
+        header: "",
+        accessorKey: "date",
+        cell: ({ row: { original } }) => (
+          <>
+            {original.isYear ? (
+              <MyAddIcon
+                onClick={() => {
+                  setOpen(true);
+                  setRes({
+                    calculationMethod: "",
+                    cost: 0,
+                    date: original.year + "-01-01",
+                    enterpriseId: undefined,
+                    isUseCost: false,
+                    name: "",
+                    purpose: "",
+                    type: "",
+                    cultureId: "",
+                  });
+                }}
+              />
+            ) : (
+              <MyEditIcon
+                onClick={() => {
+                  setOpen(true);
+                  setUpdate(true);
+                  setRes({
+                    id: original.id,
+                    calculationMethod: original.calculationMethod,
+                    cost: original.cost,
+                    date: original.date,
+                    enterpriseId: undefined,
+                    isUseCost: original.isUseCost,
+                    name: original.name,
+                    purpose: original.purpose,
+                    type: original.type,
+                    cultureId: original.cultureId,
+                  });
+                }}
+              />
             )}
-            <Td>{el.name}</Td>
-            <Td>{el.date}</Td>
-            <Td>{el.cost}</Td>
-            <Td>{el.purpose}</Td>
-            <Td>{el.calculationMethod}</Td>
-            <Td>{el.calculationType}</Td>
-          </Tr>
-        ))}
-        <Tr fontWeight={"bold"}>
-          {!isPlan && <Td></Td>}
-          <Td>Інвестиції</Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
+          </>
+        ),
+      },
+      { header: "Рік", accessorKey: "year" },
+      { header: "Тип", accessorKey: "typeName" },
+      { header: "Назва", accessorKey: "name" },
+      {
+        header: "Сума на БП",
+        accessorFn: (row) => row.costBP || 0,
+      },
+      { header: "Призначення", accessorKey: "purpose" },
+      { header: "Метод розрахунку", accessorKey: "calculationMethod" },
+      {
+        header: "Сума на гектар",
+        accessorFn: (row) => row.costHectare || 0,
+      },
+      {
+        header: "Графік",
+        accessorKey: "id",
+        cell: ({ row: { original } }) => (
+          <>{!original.isYear && <Button size={"sm"}>Додати</Button>}</>
+        ),
+      },
+      {
+        header: "",
+        accessorKey: "isYear",
+        cell: ({ row: { original } }) => (
+          <>{!original.isYear && <MyDeleteIcon />}</>
+        ),
+      },
+    ],
+    []
+  );
 
-        {thisInvestment?.map((el) => (
-          <Tr key={el.id!}>
-            {!isPlan && (
-              <Td>
-                <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
-              </Td>
-            )}
-            <Td>{el.name}</Td>
-            <Td>{el.date}</Td>
-            <Td>{el.cost}</Td>
-            <Td>{el.purpose}</Td>
-            <Td>{el.calculationMethod}</Td>
-            <Td>{el.calculationType}</Td>
-          </Tr>
-        ))}
-        <Tr fontWeight={"bold"}>
-          {!isPlan && <Td></Td>}
-          <Td>Держ. підтримка</Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
-        {thisDerj?.map((el) => (
-          <Tr key={el.id!}>
-            {!isPlan && (
-              <Td>
-                <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
-              </Td>
-            )}
-            <Td>{el.name}</Td>
-            <Td>{el.date}</Td>
-            <Td>{el.cost}</Td>
-            <Td>{el.purpose}</Td>
-            <Td>{el.calculationMethod}</Td>
-            <Td>{el.calculationType}</Td>
-          </Tr>
-        ))}
-        <Tr fontWeight={"bold"}>
-          {!isPlan && <Td></Td>}
-          <Td>Грант</Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
-        {thisGrant?.map((el) => (
-          <Tr key={el.id!}>
-            {!isPlan && (
-              <Td>
-                <ThisCheckbox id={el.id!} setRes={setRes!} res={res!} />
-              </Td>
-            )}
-            <Td>{el.name}</Td>
-            <Td>{el.date}</Td>
-            <Td>{el.cost}</Td>
-            <Td>{el.purpose}</Td>
-            <Td>{el.calculationMethod}</Td>
-            <Td>{el.calculationType}</Td>
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
+  return (
+    <>
+      <TableComponent columns={columns} data={data} />
+      {open && res && (
+        <CreateFinancing
+          busId={busId}
+          open={open}
+          setOpen={setOpen}
+          data={res}
+          setUpdate={setUpdate}
+          update={update}
+        />
+      )}
+    </>
   );
 }
 
