@@ -29,10 +29,10 @@ function SpecializationBusTable({
   const specData = useMemo(() => {
     const res = [];
     for (let i = start; i <= end; i++) {
-      res.push(
-        ...(myBusiness?.busProds
-          .filter((el) => el.year == i - start)
-          .map((el) => ({
+      const busProd = myBusiness?.busProds.filter((el) => el.year == i - start);
+      if (busProd)
+        res.push(
+          ...(busProd.map((el) => ({
             id: el.id,
             year: i,
             product: el.product?.name,
@@ -42,8 +42,14 @@ function SpecializationBusTable({
             cartId: el.techCartId,
             productId: el.productId,
           })) || []),
-        { id: i + " plus", year: i }
-      );
+          {
+            id: i + " plus",
+            year: i,
+            product: "Разом:",
+            area: busProd?.reduce((p, c) => p + c.area, 0),
+            bold: true,
+          }
+        );
     }
     return res;
   }, [myBusiness?.busProds, myBusiness?.busProds.length]);

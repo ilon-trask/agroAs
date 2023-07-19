@@ -51,17 +51,13 @@ export function CartsTableHeadRow({
   return (
     <Tr>
       {!isPlan && <Th></Th>}
-      {isCul && (
-        <>
-          <Th>Технологія</Th>
-          <Th>Рік</Th>
-        </>
-      )}
+      {isCul && <Th>Технологія</Th>}
+      {(isCul || isPlan) && <Th>Рік</Th>}
       <Th>Назва карти</Th>
       <Th>Площа (га)</Th>
       <Th>Загальна вартість (грн)</Th>
       <Th>Витрати на 1 га (грн)</Th>
-      <Th>ТЕП</Th>
+      {!isPlan && <Th>ТЕП</Th>}
       {!isPlan && <Th></Th>}
       {(role == "ADMIN" || role == "AUTHOR" || role == "service_role") &&
         !isCul &&

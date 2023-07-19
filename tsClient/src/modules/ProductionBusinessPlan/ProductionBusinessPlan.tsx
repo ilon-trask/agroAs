@@ -356,17 +356,32 @@ function ProductionBusinessPlan({
               );
               res.push(
                 <React.Fragment key={i}>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
                   {busProds.map((el) => (
                     <Tr>
+                      <Td>{i}</Td>
                       <Td>{el.tech_cart?.nameCart}</Td>
                       <Td>{el.area}</Td>
                       <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
                       <Td>{el.tech_cart?.costHectare}</Td>
                     </Tr>
                   ))}
+                  <Tr fontWeight={"bold"}>
+                    <Td>{i}</Td>
+                    <Td>Разом:</Td>
+                    <Td>{busProds.reduce((p, c) => p + c.area, 0)}</Td>
+                    <Td>
+                      {busProds.reduce(
+                        (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                        0
+                      )}
+                    </Td>
+                    <Td>
+                      {busProds.reduce(
+                        (p, c) => p + (c.tech_cart?.costHectare || 0),
+                        0
+                      )}
+                    </Td>
+                  </Tr>
                   {/* <Tr>
                     <Td>
                       {busProds.map((el) => el.tech_cart?.nameCart).join("\n")}

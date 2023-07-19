@@ -72,7 +72,9 @@ function BiznesPlanPage() {
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
   console.log(myBusiness?.busProds);
-
+  myBusiness?.busProds.forEach((el) => {
+    if (el.tech_cart) el.tech_cart.area = el.area;
+  });
   const [ready, setReady] = useState(false);
   const [cartReady, setCartReady] = useState(false);
   const [operReady, setOperReady] = useState(false);
@@ -139,7 +141,7 @@ function BiznesPlanPage() {
   let sections = useMemo(() => {
     if (operReady) {
       return thisMaps.map((el) => ({
-        data: getSectionsOpers(map, el.id!),
+        data: getSectionsOpers(map, el.id!, []),
         year: el.year,
       }));
     }

@@ -52,6 +52,7 @@ function MainFinancingBusinessPlanTable({
         <Tr>
           {!isPlan && <Th></Th>}
           <Th>Назва</Th>
+          {/* <Th></Th> */}
           <Th>Дата</Th>
           <Th>Сума</Th>
           <Th>Призначення</Th>
