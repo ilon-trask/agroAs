@@ -582,7 +582,6 @@ const MapJornal = observer(function () {
             <Table size={"sm"}>
               <Thead>
                 <Th></Th>
-
                 <Th>Назва</Th>
                 <Th>Тип витрат</Th>
                 <Th>Група витрат</Th>

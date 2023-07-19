@@ -1480,3 +1480,25 @@ export function patchBuyingMachineForBusiness(
     bus.newBusinessPlan = res;
   });
 }
+
+export function createBuildingForBusiness(
+  bus: BusinessStore,
+  data: CreateBuildingType
+) {
+  client.business.createBuildingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function patchBuildingForBusiness(
+  bus: BusinessStore,
+  data: PatchBuildingType
+) {
+  client.business.patchBuildingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}

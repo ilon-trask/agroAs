@@ -5,6 +5,7 @@ import BusinessService, {
 } from "../controllers/BusinessService";
 import { createFinancing } from "./financingRouter";
 import { createBuyingMachine, patchBuyingMachine } from "./buyingMachineRouter";
+import { createBuilding, patchBuilding } from "./buildingRouter";
 const productIds = z.array(
   z.object({
     ownId: z.number().or(z.string()),
@@ -175,6 +176,24 @@ const businessRouter = router({
     .input(patchBuyingMachine)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.patchBuyingMachineForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  createBuildingForBusiness: publicProcedure
+    .input(createBuilding)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createBuildingForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  patchBuildingForBusiness: publicProcedure
+    .input(patchBuilding)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchBuildingForBusiness(
         ctx.user,
         input
       );

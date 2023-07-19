@@ -186,7 +186,12 @@ function BiznesPlanPage() {
         start={start}
       />
       <BuyingMachineBusTable myBusiness={myBusiness} end={end} start={start} />
-      <BuildingBusTable id={+id!} />
+      <BuildingBusTable
+        id={+id!}
+        end={end}
+        start={start}
+        myBusiness={myBusiness}
+      />
       <MyHeading>Малоцінні та швидкозношувальні прeдмети</MyHeading>
       <Table size={"sm"}>
         <Thead>

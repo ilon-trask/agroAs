@@ -367,7 +367,6 @@ function Enterprise() {
         Додати кредит
       </Button>
       {/* <CreateFinancing
-      
         open={financingOpen}
         setOpen={setFinancingOpen}
         data={financingData}

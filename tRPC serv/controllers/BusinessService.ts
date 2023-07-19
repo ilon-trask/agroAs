@@ -21,7 +21,13 @@ import {
   financBus,
   buying_machine,
   Ibuying_machine,
+  building,
+  Ibuilding,
 } from "../models/models";
+import {
+  CreateBuildingType,
+  PatchBuildingType,
+} from "../routes/buildingRouter";
 import {
   ChangeProductType,
   CreateBusinessPlan,
@@ -69,6 +75,7 @@ export interface resBusinessPlan extends IbusinessPlan {
   financings: resFinancing[];
   busProds: resBusProd[];
   buying_machines: Ibuying_machine[];
+  buildings: Ibuilding[];
 }
 const includes = [
   { model: resume },
@@ -84,6 +91,7 @@ const includes = [
     ],
   },
   { model: buying_machine },
+  { model: building },
 ];
 async function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
@@ -462,6 +470,56 @@ class BusinessService {
       },
       { where: { id: data.buyingId } }
     ); //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
+  async createBuildingForBusiness(
+    user: Principal | undefined,
+    data: CreateBuildingType
+  ) {
+    if (!user) return;
+    const res: Ibuilding = await building.create({
+      name: data.name,
+      depreciationPeriod: data.depreciationPeriod,
+      date: data.date,
+      description: data.description,
+      startPrice: data.startPrice,
+      businessPlanId: data.businessPlanId,
+      enterpriseId: data.enterpriseId,
+      userId: user.sub,
+    });
+    //@ts-ignore
+    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
+      where: { id: data.businessPlanId },
+      //@ts-ignore
+      include: includes,
+    });
+    bus = (await changeFinancing([bus!]))[0];
+    return bus;
+  }
+  async patchBuildingForBusiness(
+    user: Principal | undefined,
+    data: PatchBuildingType
+  ) {
+    if (!user) return;
+    await building.update(
+      {
+        name: data.name,
+        depreciationPeriod: data.depreciationPeriod,
+        startPrice: data.startPrice,
+        date: data.date,
+        description: data.description,
+        businessPlanId: data.businessPlanId,
+        enterpriseId: data.enterpriseId,
+      },
+      { where: { id: data.buildId } }
+    );
+    //@ts-ignore
     let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
       where: { id: data.businessPlanId },
       //@ts-ignore

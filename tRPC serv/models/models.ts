@@ -1283,14 +1283,18 @@ export interface Ibuilding {
   readonly id?: number;
   name: string;
   startPrice: number;
-  depreciationPeriod: string;
+  depreciationPeriod: string | null;
+  date: string;
+  description: string;
   userId: string;
-  readonly enterpriseId?: number;
+  readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null;
 }
 export class building extends Model<Ibuilding> {
   declare id: number;
   declare name: string;
+  declare date: string;
+  declare description: string;
   declare startPrice: number;
   declare depreciationPeriod: string;
   declare userId: string;
@@ -1300,6 +1304,8 @@ building.init(
     name: { type: DataTypes.STRING },
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
     depreciationPeriod: { type: DataTypes.STRING },
+    date: { type: DataTypes.STRING },
+    description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
