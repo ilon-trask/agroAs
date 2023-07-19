@@ -366,13 +366,14 @@ function Enterprise() {
       >
         Додати кредит
       </Button>
-      <CreateFinancing
+      {/* <CreateFinancing
+      
         open={financingOpen}
         setOpen={setFinancingOpen}
         data={financingData}
         update={update}
         setUpdate={setUpdate}
-      />
+      /> */}
 
       <Text
         textAlign={"center"}
