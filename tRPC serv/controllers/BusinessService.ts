@@ -23,13 +23,16 @@ import {
   Ibuying_machine,
   building,
   Ibuilding,
+  Ioutcome,
+  outcome,
+  IyieldPlant,
+  yieldPlant,
 } from "../models/models";
 import {
   CreateBuildingType,
   PatchBuildingType,
 } from "../routes/buildingRouter";
 import {
-  ChangeProductType,
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
@@ -44,6 +47,7 @@ import {
   CreateBuyingMachine,
   PatchBuyingMachine,
 } from "../routes/buyingMachineRouter";
+import { createOutcomeType, patchOutcomeType } from "../routes/outcomeRouter";
 import {
   cartsIncludes,
   changeCarts,
@@ -63,6 +67,7 @@ export interface resBusProd {
   area: number;
   year: number | null;
   tech_cart: resTechCartsWithOpers | null;
+  yield: IyieldPlant | null;
 }
 export interface resFinancing extends Ifinancing {
   costBP?: number;
@@ -76,6 +81,8 @@ export interface resBusinessPlan extends IbusinessPlan {
   busProds: resBusProd[];
   buying_machines: Ibuying_machine[];
   buildings: Ibuilding[];
+  MSHP: Ibuying_machine[];
+  outcomes: Ioutcome[];
 }
 const includes = [
   { model: resume },
@@ -86,17 +93,28 @@ const includes = [
     model: busProd,
     include: [
       { model: tech_cart, include: cartsIncludes },
-      { model: product, include: { model: culture } },
+      {
+        model: product,
+        include: {
+          model: culture,
+          //  include: { model: yieldPlant, where: {} }
+        },
+      },
       { model: cultivationTechnologies },
     ],
   },
   { model: buying_machine },
   { model: building },
+  { model: outcome },
 ];
 async function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
 
   res = res.map((res) => {
+    res.MSHP = res.buying_machines.filter((el) => el.purpose == "МШП");
+    res.buying_machines = res.buying_machines.filter(
+      (el) => el.purpose != "МШП"
+    );
     res.financings = res.financings.map((el) => {
       let area = 1;
       if (el.cultureId) {
@@ -127,12 +145,29 @@ async function changeFinancing(res: resBusinessPlan[]) {
           return {
             ...prod,
             tech_cart: (await changeCarts([prod.tech_cart]))[0],
+            yield: await yieldPlant.findOne({
+              where: {
+                cultureId: prod.product?.cultureId,
+                cultivationTechnologyId: prod.cultivationTechnologyId,
+                userId: el.userId,
+              },
+            }),
           };
         })
       );
       return el;
     })
   );
+  return res;
+}
+async function getBusinessPlan(businessPlanId: number) {
+  //@ts-ignore
+  let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+    where: { id: businessPlanId },
+    //@ts-ignore
+    include: includes,
+  });
+  res = (await changeFinancing([res!]))[0];
   return res;
 }
 class BusinessService {
@@ -179,14 +214,7 @@ class BusinessService {
       //@ts-ignore
       { include: includes }
     );
-
-    //@ts-ignore
-    const res: resBusinessPlan | null = await businessPlan.findOne({
-      where: { id: plan.id },
-      //@ts-ignore
-      include: includes,
-    });
-    return res;
+    return await getBusinessPlan(plan.id!);
   }
   async patch(user: Principal | undefined, data: PatchBusinessPlan) {
     if (!user) return;
@@ -202,14 +230,7 @@ class BusinessService {
       },
       { where: { id: data.planId } }
     );
-    //@ts-ignore
-    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.planId },
-      //@ts-ignore
-      include: includes,
-    });
-    res = (await changeFinancing([res!]))[0];
-    return res;
+    return await getBusinessPlan(data.planId);
   }
   async delete(user: Principal | undefined, data: DeleteBusinessPlan) {
     if (!user) return;
@@ -283,14 +304,7 @@ class BusinessService {
       //@ts-ignore
       await business.addFinancing(el);
     }
-    //@ts-ignore
-    let res: resBusinessPlan = await businessPlan.findOne({
-      where: { id: data.businessId },
-      //@ts-ignore
-      include: includes,
-    });
-    res = (await changeFinancing([res]))[0];
-    return res;
+    return await getBusinessPlan(data.businessId);
   }
   async createBusProd(user: Principal | undefined, data: CreateBusProd) {
     if (!user) return;
@@ -306,14 +320,7 @@ class BusinessService {
       productId: data.productId,
       techCartId: data.techCartId,
     });
-    //@ts-ignore
-    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
-    });
-    res = (await changeFinancing([res!]))[0];
-    return res;
+    return await getBusinessPlan(data.businessPlanId);
   }
   async patchBusProd(user: Principal | undefined, data: PatchBusProd) {
     if (!user) return;
@@ -328,14 +335,7 @@ class BusinessService {
       },
       { where: { id: data.ownId } }
     );
-    //@ts-ignore
-    let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
-    });
-    res = (await changeFinancing([res!]))[0];
-    return res;
+    return await getBusinessPlan(data.businessPlanId);
   }
   async deleteBusProd(user: Principal | undefined, data: any) {}
   //   async changeProducts(user: Principal | undefined, data: ChangeProductType) {
@@ -368,7 +368,7 @@ class BusinessService {
   //     res = changeFinancing([res])[0];
   //     return res;
   //   }
-  async createForBusiness(
+  async createFinancingForBusiness(
     user: Principal | undefined,
     data: CreateFinancingForBusiness
   ) {
@@ -391,14 +391,7 @@ class BusinessService {
       businessPlanId: data.busId,
       financingId: res.id,
     });
-    //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.busId },
-      //@ts-ignore
-      include: includes,
-    });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    return await getBusinessPlan(data.busId);
   }
   async patchFinancingForBusiness(
     user: Principal | undefined,
@@ -418,14 +411,7 @@ class BusinessService {
       },
       { where: { id: data.financingId } }
     );
-    //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.busId },
-      //@ts-ignore
-      include: includes,
-    });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    return await getBusinessPlan(data.busId);
   }
   async createBuyingMachineForBusiness(
     user: Principal | undefined,
@@ -443,14 +429,7 @@ class BusinessService {
       businessPlanId: data.businessPlanId,
       enterpriseId: data.enterpriseId,
     });
-    //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
-    });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    return await getBusinessPlan(data.businessPlanId);
   }
   async patchBuyingMachineForBusiness(
     user: Principal | undefined,
@@ -469,14 +448,8 @@ class BusinessService {
         enterpriseId: data.enterpriseId,
       },
       { where: { id: data.buyingId } }
-    ); //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
-    });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    );
+    return await getBusinessPlan(data.businessPlanId);
   }
   async createBuildingForBusiness(
     user: Principal | undefined,
@@ -493,14 +466,7 @@ class BusinessService {
       enterpriseId: data.enterpriseId,
       userId: user.sub,
     });
-    //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
-    });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    return await getBusinessPlan(data.businessPlanId);
   }
   async patchBuildingForBusiness(
     user: Principal | undefined,
@@ -519,14 +485,40 @@ class BusinessService {
       },
       { where: { id: data.buildId } }
     );
-    //@ts-ignore
-    let bus: resBusinessPlan | undefined | null = await businessPlan.findOne({
-      where: { id: data.businessPlanId },
-      //@ts-ignore
-      include: includes,
+    return await getBusinessPlan(data.businessPlanId);
+  }
+  async createOutcomeForBusiness(
+    user: Principal | undefined,
+    data: createOutcomeType
+  ) {
+    if (!user) return;
+    await outcome.create({
+      name: data.name,
+      costMonth: data.costMonth,
+      date: data.date,
+      group: data.group,
+      userId: user.sub,
+      businessPlanId: data.businessPlanId!,
+      type: data.type,
     });
-    bus = (await changeFinancing([bus!]))[0];
-    return bus;
+    return await getBusinessPlan(data.businessPlanId);
+  }
+  async patchOutcomeForBusiness(
+    user: Principal | undefined,
+    data: patchOutcomeType
+  ) {
+    if (!user) return;
+    await outcome.update(
+      {
+        costMonth: data.costMonth,
+        date: data.date,
+        group: data.group,
+        name: data.name,
+        type: data.type,
+      },
+      { where: { id: data.outcomeId } }
+    );
+    return await getBusinessPlan(data.businessPlanId);
   }
 }
 export default new BusinessService();

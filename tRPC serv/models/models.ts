@@ -1,7 +1,5 @@
 import sequelize from "../db";
 import { DataTypes, Model } from "sequelize";
-import { IncomeType } from "../../tsClient/src/shared/hook/useIncomeTypes";
-import { IncomeGroup } from "../../tsClient/src/shared/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 import { CreditPurposeType } from "../../tsClient/src/shared/hook/useCreditPurpose";
@@ -871,26 +869,34 @@ technologicalEconomicJustification.init(
 export interface Ioutcome {
   id?: number;
   name: string;
+  date: string;
   group: IoutcomeGroup;
-  type: IoutcomeType;
+  type: IoutcomeType | null;
+  costMonth: number;
   userId: string;
   isUsing?: boolean;
   techCartId?: number;
   buyingMachineId?: number;
   administrationId?: number;
+  businessPlanId?: number;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
+  declare date: string;
   declare name: string;
+  declare costMonth: number;
   declare group: IoutcomeGroup;
   declare type: IoutcomeType;
   declare isUsing: boolean;
   declare userId: string;
+  declare businessPlanId: number;
 }
 outcome.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.STRING },
     name: { type: DataTypes.STRING },
+    costMonth: { type: DataTypes.FLOAT(2) },
     group: { type: DataTypes.STRING },
     type: { type: DataTypes.STRING },
     isUsing: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -1051,7 +1057,7 @@ export interface Ibuying_machine {
   date: string;
   cost: number;
   amount: number;
-  purpose: BuyingMachinePurposeType;
+  purpose: BuyingMachinePurposeType | "МШП";
   userId: string;
   businessPlanId?: number;
   enterpriseId?: number;
@@ -1063,7 +1069,7 @@ export class buying_machine extends Model<Ibuying_machine> {
   declare date: string;
   declare cost: number;
   declare amount: number;
-  declare purpose: BuyingMachinePurposeType;
+  declare purpose: BuyingMachinePurposeType | "МШП";
   declare userId: string;
 }
 buying_machine.init(
@@ -1421,6 +1427,9 @@ outcome.belongsTo(buying_machine);
 
 administration.hasOne(outcome);
 outcome.belongsTo(administration);
+
+businessPlan.hasMany(outcome);
+outcome.belongsTo(businessPlan);
 // (async () => {
 //   let a = await culture.findOne({ where: { id: 3 } });
 //   let b = await businessPlan.findOne({ where: { id: 5 } });

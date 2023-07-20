@@ -2,15 +2,15 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
-  TableContainer,
   Table,
+  TableContainer,
+  Th,
   Thead,
-  Tbody,
+  Tr,
 } from "@chakra-ui/react";
 import BusinessConceptTable from "../../modules/TEJConceptTable";
 import { useParams } from "react-router-dom";
 import { Context } from "../../main";
-import { Ifinancing } from "../../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import {
   getBuyingMachine,
@@ -34,7 +34,6 @@ export type iChild =
   | "deduction"
   | "title";
 import getSectionsOpers from "../../store/GetSectionsOpers";
-import { BuyingMachineTableHead } from "../../modules/BuyingMachineTable/BuyingMachineTable";
 import TitleBusinessPlan from "src/pages/BusinessPlanPage/modules/TitleBusinessPlan";
 import ResumeBusinessPlan from "src/pages/BusinessPlanPage/modules/ResumeBusinessPlan";
 import EnterpriseBusinessPlan from "src/modules/EnterpriseBusinessPlan";
@@ -51,6 +50,9 @@ import BuildingBusTable from "./modules/BuildingBusTable";
 import MyHeading from "src/ui/MyHeading";
 import OutcomeBusTable from "./modules/OutcomeBusTable";
 import QuizButton from "./modules/QuizButton";
+import MSHPBusTable from "./modules/MSHPBusTable/MSHPBusTable";
+import MyTableContainer from "src/ui/MyTableContainer";
+import SaleBusTable from "./modules/SaleBusTable";
 function BiznesPlanPage() {
   const { map, enterpriseStore, business, income, TEJ } = useContext(Context);
   useBusiness(business, map);
@@ -171,7 +173,7 @@ function BiznesPlanPage() {
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
 
-  return !ready && !cartReady ? (
+  return !ready && !cartReady && !myBusiness ? (
     <Box></Box>
   ) : (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
@@ -192,15 +194,9 @@ function BiznesPlanPage() {
         start={start}
         myBusiness={myBusiness}
       />
-      <MyHeading>Малоцінні та швидкозношувальні прeдмети</MyHeading>
-      <Table size={"sm"}>
-        <Thead>
-          <BuyingMachineTableHead />
-        </Thead>
-        <Tbody></Tbody>
-      </Table>
-      <Button>Додати нове МШП</Button>
-      <OutcomeBusTable />
+      <MSHPBusTable myBusiness={myBusiness} end={end} start={start} id={+id!} />
+      <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
+      <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
       <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
         <Button>Отримати PDF</Button>
         <QuizButton myBusiness={myBusiness} />

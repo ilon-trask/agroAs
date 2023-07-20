@@ -1,16 +1,5 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Heading,
-  Input,
-  Radio,
-  Select,
-  Text,
-  ModalFooter,
-} from "@chakra-ui/react";
-import { refStructEnhancer } from "mobx/dist/internal";
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Button, ModalFooter } from "@chakra-ui/react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
 import { createBusinessPlan, patchBusinessPlan } from "../../http/requests";
 import { Context } from "../../main";
@@ -38,7 +27,6 @@ const prop = {
   enterpriseId: "",
   initialAmount: "",
   realizationTime: "",
-  cultureIds: [],
 };
 function CreateBusiness({
   open,
@@ -69,18 +57,19 @@ function CreateBusiness({
         <Button
           onClick={() => {
             if (res) {
-              res.initialAmount = +res.initialAmount;
-              res.realizationTime = +res.realizationTime;
-              res.cultureIds.forEach((el) => {
-                el.tech.forEach((e) => {
-                  e.techId = +e.techId;
-                  e.area = +e.area;
-                });
-              });
               if (update) {
-                patchBusinessPlan(map, business, res);
+                patchBusinessPlan(map, business, {
+                  ...res,
+                  initialAmount: +res.initialAmount,
+                  realizationTime: +res.realizationTime,
+                  planId: res.planId!,
+                });
               } else {
-                createBusinessPlan(map, business, res);
+                createBusinessPlan(map, business, {
+                  ...res,
+                  initialAmount: +res.initialAmount,
+                  realizationTime: +res.realizationTime,
+                });
               }
               setOpen(false);
               setUpdate(false);

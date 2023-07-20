@@ -16,7 +16,7 @@ function BuildingBusTable({
   start,
   myBusiness,
 }: {
-  myBusiness: resBusinessPlan | undefined;
+  myBusiness: resBusinessPlan;
   id: number;
   start: number;
   end: number;
@@ -50,7 +50,7 @@ function BuildingBusTable({
             {(() => {
               const res = [];
               for (let i = start; i <= end; i++) {
-                const building = myBusiness?.buildings.filter(
+                const building = myBusiness.buildings.filter(
                   (el) => getYearFromString(el.date) == i
                 );
                 res.push(

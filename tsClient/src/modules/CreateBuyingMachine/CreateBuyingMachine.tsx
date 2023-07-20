@@ -23,6 +23,7 @@ import useBuyingMachinePurpose, {
   BuyingMachinePurposeType,
 } from "../../shared/hook/useBuyingMachinePurpose";
 type props = {
+  isMSHP?: boolean;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   update: boolean;
@@ -34,11 +35,11 @@ export type CreateBuyingMachineProps = {
   name: string;
   brand: string;
   date: string;
-  purpose: BuyingMachinePurposeType | "";
+  purpose: BuyingMachinePurposeType | "" | "МШП";
   amount: number | "";
   cost: number | "";
   businessPlanId: number;
-  enterpriseId: number;
+  enterpriseId?: number;
 };
 const obj = {};
 function CreateBuyingMachine({
@@ -47,6 +48,7 @@ function CreateBuyingMachine({
   update,
   setUpdate,
   data,
+  isMSHP,
 }: props) {
   const purpose = useBuyingMachinePurpose;
   const { business } = useContext(Context);
@@ -95,8 +97,14 @@ function CreateBuyingMachine({
         >
           <Box>
             <Heading as={"h4"} size="sm">
-              Назва машини <br />
-              або обладнання
+              {isMSHP ? (
+                <>Назва предмета</>
+              ) : (
+                <>
+                  Назва машини <br />
+                  або обладнання
+                </>
+              )}
             </Heading>
             <Input
               size={"sm"}
@@ -110,8 +118,14 @@ function CreateBuyingMachine({
           </Box>
           <Box>
             <Heading as={"h4"} size="sm">
-              Марка машини <br />
-              або обладнання
+              {isMSHP ? (
+                <>Марка придмета</>
+              ) : (
+                <>
+                  Марка машини <br />
+                  або обладнання
+                </>
+              )}
             </Heading>
             <Input
               size={"sm"}
@@ -134,8 +148,14 @@ function CreateBuyingMachine({
         >
           <Box>
             <Heading as={"h4"} size="sm">
-              Ціна машини <br />
-              або обладнання
+              {isMSHP ? (
+                <>Ціна придмета</>
+              ) : (
+                <>
+                  Ціна машини <br />
+                  або обладнання
+                </>
+              )}
             </Heading>
             <Input
               size={"sm"}
@@ -150,8 +170,14 @@ function CreateBuyingMachine({
           </Box>
           <Box>
             <Heading as={"h4"} size="sm">
-              Кількість машин <br />
-              або обладнання
+              {isMSHP ? (
+                <>Кількість предметів</>
+              ) : (
+                <>
+                  Кількість машин <br />
+                  або обладнання
+                </>
+              )}
             </Heading>
             <Input
               size={"sm"}
@@ -168,50 +194,52 @@ function CreateBuyingMachine({
             />
           </Box>
         </Box>
-        <Box
-          mt={"15px"}
-          display={"flex"}
-          justifyContent={"space-around"}
-          alignItems={"center"}
-          maxW={"490px"}
-          mx={"auto"}
-        >
-          <Box>
-            <Heading as={"h4"} size="sm">
-              Напрямок машин <br />
-              або обладнання
-            </Heading>
-            <Select
-              size={"sm"}
-              value={input?.purpose}
-              onChange={(e) => {
-                setInput((prev) => ({
-                  ...prev,
-                  purpose: e.target.value as any,
-                }));
-              }}
-            >
-              <option value="" hidden defaultChecked>
-                Виберіть опцію
-              </option>
-              {purpose.map((el) => (
-                <option key={el.id} value={el.name}>
-                  {el.name}
+        {!isMSHP && (
+          <Box
+            mt={"15px"}
+            display={"flex"}
+            justifyContent={"space-around"}
+            alignItems={"center"}
+            maxW={"490px"}
+            mx={"auto"}
+          >
+            <Box>
+              <Heading as={"h4"} size="sm">
+                Напрямок машин <br />
+                або обладнання
+              </Heading>
+              <Select
+                size={"sm"}
+                value={input?.purpose}
+                onChange={(e) => {
+                  setInput((prev) => ({
+                    ...prev,
+                    purpose: e.target.value as any,
+                  }));
+                }}
+              >
+                <option value="" hidden defaultChecked>
+                  Виберіть опцію
                 </option>
-              ))}
-            </Select>
+                {purpose.map((el) => (
+                  <option key={el.id} value={el.name}>
+                    {el.name}
+                  </option>
+                ))}
+              </Select>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
       <ModalFooter>
         <Button
           isDisabled={
-            !input.name &&
-            !input.brand &&
-            !input.amount &&
-            !input.cost &&
-            !input.date &&
-            !input.purpose
+            !input?.name &&
+            !input?.brand &&
+            !input?.amount &&
+            !input?.cost &&
+            !input?.date &&
+            !input?.purpose
           }
           onClick={() => {
             if (

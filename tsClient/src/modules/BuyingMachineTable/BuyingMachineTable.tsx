@@ -8,7 +8,7 @@ import { deleteBuyingMachine } from "../../http/requests";
 import { Context } from "../../main";
 import { CreateBuyingMachineProps } from "../CreateBuyingMachine";
 
-export function BuyingMachineTableHead({ isPlan }: { isPlan?: boolean }) {
+export function BuyingMachineTableHead() {
   return (
     <Tr>
       <Th></Th>
@@ -19,44 +19,41 @@ export function BuyingMachineTableHead({ isPlan }: { isPlan?: boolean }) {
       <Th>Ціна</Th>
       <Th>Сума</Th>
       <Th>Налаштування</Th>
-      {!isPlan && <Th></Th>}
+      <Th></Th>
     </Tr>
   );
 }
 export function BuyingMachineTableBodyRow({
   el,
-  isPlan,
   setDeleteOpen,
   setOpen,
   setRes,
   setUpdate,
 }: {
   el: Ibuying_machine;
-  isPlan?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-  setUpdate?: Dispatch<SetStateAction<boolean>>;
-  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen?: Dispatch<SetStateAction<any>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+  setDeleteOpen: Dispatch<SetStateAction<any>>;
 }) {
   const { map } = useContext(Context);
   return (
     <Tr>
       <Td
         onClick={() => {
-          if (setOpen) setOpen(true);
-          if (setUpdate) setUpdate(true);
-          if (setRes)
-            setRes({
-              buyingId: el.id,
-              amount: el.amount,
-              brand: el.brand,
-              cost: el.cost,
-              date: el.date,
-              name: el.name,
-              purpose: el.purpose,
-              businessPlanId: el.businessPlanId!,
-              enterpriseId: el.enterpriseId!,
-            });
+          setOpen(true);
+          setUpdate(true);
+          setRes({
+            buyingId: el.id,
+            amount: el.amount,
+            brand: el.brand,
+            cost: el.cost,
+            date: el.date,
+            name: el.name,
+            purpose: el.purpose,
+            businessPlanId: el.businessPlanId!,
+            enterpriseId: el.enterpriseId!,
+          });
         }}
       >
         <MyEditIcon />
@@ -71,24 +68,21 @@ export function BuyingMachineTableBodyRow({
       <Td>
         <Button size={"sm"}>Додати</Button>
       </Td>
-      {!isPlan && (
-        <Td
-          onClick={() => {
-            if (setDeleteOpen)
-              setDeleteOpen({
-                isOpen: true,
-                func: () => {
-                  deleteBuyingMachine(map, el.id!);
-                  //@ts-ignore
-                  setDeleteOpen({ isOpen: false });
-                },
-                text: "покупку техніки",
-              });
-          }}
-        >
-          <MyDeleteIcon />
-        </Td>
-      )}
+      <Td
+        onClick={() => {
+          setDeleteOpen({
+            isOpen: true,
+            func: () => {
+              deleteBuyingMachine(map, el.id!);
+              //@ts-ignore
+              setDeleteOpen({ isOpen: false });
+            },
+            text: "покупку техніки",
+          });
+        }}
+      >
+        <MyDeleteIcon />
+      </Td>
     </Tr>
   );
 }
@@ -97,26 +91,23 @@ function BuyingMachineTable({
   setRes,
   setUpdate,
   setDeleteOpen,
-  isPlan,
 }: {
-  isPlan?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-  setUpdate?: Dispatch<SetStateAction<boolean>>;
-  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen?: Dispatch<SetStateAction<any>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+  setDeleteOpen: Dispatch<SetStateAction<any>>;
 }) {
   const { map } = useContext(Context);
   return (
     <Table size={"sm"}>
       <Thead>
-        <BuyingMachineTableHead isPlan={isPlan} />
+        <BuyingMachineTableHead />
       </Thead>
       <Tbody>
         {map.buyingMachine?.map((el) => (
           <BuyingMachineTableBodyRow
             key={el.id!}
             el={el}
-            isPlan={isPlan}
             setOpen={setOpen}
             setRes={setRes}
             setUpdate={setUpdate}

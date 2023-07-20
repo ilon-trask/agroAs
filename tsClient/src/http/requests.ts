@@ -1502,3 +1502,25 @@ export function patchBuildingForBusiness(
     bus.newBusinessPlan = res;
   });
 }
+
+export function createOutcomeForBusiness(
+  bus: BusinessStore,
+  data: createOutcomeType
+) {
+  client.business.createOutcomeForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function patchOutcomeForBusiness(
+  bus: BusinessStore,
+  data: patchOutcomeType
+) {
+  client.business.patchOutcomeForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}

@@ -6,6 +6,7 @@ import BusinessService, {
 import { createFinancing } from "./financingRouter";
 import { createBuyingMachine, patchBuyingMachine } from "./buyingMachineRouter";
 import { createBuilding, patchBuilding } from "./buildingRouter";
+import { createOutcome, patchOutcome } from "./outcomeRouter";
 const productIds = z.array(
   z.object({
     ownId: z.number().or(z.string()),
@@ -39,7 +40,7 @@ const createType = z.object({
   name: z.string(),
   topic: z.string(),
   initialAmount: z.number(),
-  enterpriseId: z.number(),
+  enterpriseId: z.number().nullish().optional(),
   dateStart: z.string(),
   realizationTime: z.number(),
 });
@@ -151,7 +152,10 @@ const businessRouter = router({
   createFinancingForBusiness: publicProcedure
     .input(createFinancingForBusiness)
     .query(async ({ ctx, input }) => {
-      const res = await BusinessService.createForBusiness(ctx.user, input);
+      const res = await BusinessService.createFinancingForBusiness(
+        ctx.user,
+        input
+      );
       return res;
     }),
   patchFinancingForBusiness: publicProcedure
@@ -194,6 +198,24 @@ const businessRouter = router({
     .input(patchBuilding)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.patchBuildingForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  createOutcomeForBusiness: publicProcedure
+    .input(createOutcome)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createOutcomeForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  patchOutcomeForBusiness: publicProcedure
+    .input(patchOutcome)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchOutcomeForBusiness(
         ctx.user,
         input
       );

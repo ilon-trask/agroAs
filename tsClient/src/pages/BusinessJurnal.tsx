@@ -7,7 +7,6 @@ import { observer } from "mobx-react-lite";
 import useBusiness from "../shared/hook/useBusiness";
 import { useNavigate } from "react-router-dom";
 import { BUSINESScATALOG_ROUTER } from "../utils/consts";
-import QuizBusinessPopUp from "../modules/QuizBusinessPopUp";
 import DeleteAlert, { DeleteProps } from "../components/DeleteAlert";
 import useEnterprise from "../shared/hook/useEnterprise";
 import CartsTable from "src/modules/CartsTable";
@@ -15,6 +14,8 @@ import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartSe
 import CreateCart, { cartProps } from "src/modules/CreateCart";
 import NoAuthAlert from "src/components/NoAuthAlert";
 import CartPublicationPopUp from "src/modules/CartPublicationPopUp";
+import MyTableContainer from "src/ui/MyTableContainer";
+import MyHeading from "src/ui/MyHeading";
 
 function BusinessJurnal() {
   const { business, map, user } = useContext(Context);
@@ -33,10 +34,8 @@ function BusinessJurnal() {
   const [res, setRes] = useState<CreateBusinessProp>({
     name: "",
     dateStart: "",
-    enterpriseId: "",
     initialAmount: "",
     realizationTime: "",
-    cultureIds: [],
     topic: "",
   });
   useBusiness(business, map);
@@ -65,10 +64,8 @@ function BusinessJurnal() {
   const [complex, setComplex] = useState(false);
   return (
     <Box maxW="1000px" mx="auto">
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Бізнес-плани
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyHeading>Бізнес-плани</MyHeading>
+      <MyTableContainer>
         <BusinessTable
           businessData={business.businessPlan}
           setOpen={setOpenBusiness}
@@ -76,7 +73,7 @@ function BusinessJurnal() {
           setUpdate={setUpdate}
           setDeleteOpen={setDeleteRes}
         />
-      </TableContainer>
+      </MyTableContainer>
       <Button onClick={() => setOpenBusiness(true)}>
         Створити бізнес-план
       </Button>
@@ -98,7 +95,7 @@ function BusinessJurnal() {
       <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
         Технологічні карти
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <CartsTable
           maps={maps}
           setRes={setMapRes}
@@ -109,7 +106,7 @@ function BusinessJurnal() {
           setDeleteOpen={setDeleteRes}
           setPublicationOpen={setPublicationOpen}
         />
-      </TableContainer>
+      </MyTableContainer>
       <Box
         mt={"15px"}
         ml={"auto"}

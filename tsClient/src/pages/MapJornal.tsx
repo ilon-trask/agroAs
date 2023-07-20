@@ -62,6 +62,8 @@ import CreateAdministration from "../modules/CreateAdministration";
 import { CreateAdministrationProp } from "../modules/CreateAdministration/CreateAdministration";
 import BuyingMachineTable from "../modules/BuyingMachineTable";
 import MyTableContainer from "src/ui/MyTableContainer";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 export interface Icart extends Itech_cart {
   area: any;
   salary: any;
@@ -214,12 +216,7 @@ const MapJornal = observer(function () {
         <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
           Технологічні карти
         </Text>
-        <TableContainer
-          maxW="1000px"
-          mx="auto"
-          mt={"20px"}
-          overflowX={"scroll"}
-        >
+        <MyTableContainer>
           <CartsTable
             maps={maps}
             setRes={setRes}
@@ -230,7 +227,7 @@ const MapJornal = observer(function () {
             setDeleteOpen={setDeleteOpen}
             setPublicationOpen={setPublicationOpen}
           />
-        </TableContainer>
+        </MyTableContainer>
         <Box
           mt={"15px"}
           ml={"auto"}
@@ -426,12 +423,7 @@ const MapJornal = observer(function () {
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             Адміністування
           </Text>
-          <TableContainer
-            maxW="1000px"
-            mx="auto"
-            mt={"20px"}
-            overflowX={"scroll"}
-          >
+          <MyTableContainer>
             <Table size={"sm"}>
               <Thead>
                 <Tr>
@@ -465,12 +457,7 @@ const MapJornal = observer(function () {
                         });
                       }}
                     >
-                      <EditIcon
-                        color={"blue.400"}
-                        w={"20px"}
-                        h={"auto"}
-                        cursor={"pointer"}
-                      />
+                      <MyEditIcon />
                     </Td>
                     <Td>{el.name}</Td>
                     <Td>{el.dateFrom}</Td>
@@ -479,7 +466,6 @@ const MapJornal = observer(function () {
                     <Td>{el.cost}</Td>
                     <Td>{el.periodCalc}</Td>
                     <Td
-                      cursor={"pointer"}
                       onClick={() =>
                         setDeleteOpen({
                           isOpen: true,
@@ -492,13 +478,13 @@ const MapJornal = observer(function () {
                         })
                       }
                     >
-                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                      <MyDeleteIcon />
                     </Td>
                   </Tr>
                 ))}
               </Tbody>
             </Table>
-          </TableContainer>
+          </MyTableContainer>
           <Button onClick={() => setAdministrationOpen(true)}>
             Добавити витрати
           </Button>
@@ -639,7 +625,6 @@ const MapJornal = observer(function () {
                       })()}
                     </Td>
                     <Td
-                      cursor={"pointer"}
                       onClick={() => {
                         setDeleteOpen({
                           isOpen: true,
@@ -652,7 +637,7 @@ const MapJornal = observer(function () {
                         });
                       }}
                     >
-                      <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                      <MyDeleteIcon />
                     </Td>
                     <Td
                       onClick={() => {

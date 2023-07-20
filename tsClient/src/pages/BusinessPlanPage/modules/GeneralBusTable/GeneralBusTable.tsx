@@ -5,7 +5,7 @@ import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import { setPatchBusinessPlan } from "../../../../modules/BusinessTable";
 import { CreateBusinessProp } from "../../../../modules/CreateBusiness";
-import CreateBusiness from "../../../../modules/CreateTEJ/CreateTEJ";
+import CreateBusiness from "../../../../modules/CreateBusiness";
 
 function GeneralBusTable({
   myBusiness,

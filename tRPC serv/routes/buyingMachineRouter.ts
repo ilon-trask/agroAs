@@ -6,10 +6,10 @@ export const createBuyingMachine = z.object({
   brand: z.string(),
   cost: z.number(),
   amount: z.number(),
-  purpose: z.enum(["Трактор", "СГ машина", "Технологічне обладнання"]),
+  purpose: z.enum(["Трактор", "СГ машина", "Технологічне обладнання", "МШП"]),
   date: z.string(),
   businessPlanId: z.number(),
-  enterpriseId: z.number(),
+  enterpriseId: z.number().nullish(),
 });
 export type CreateBuyingMachine = z.infer<typeof createBuyingMachine>;
 export const patchBuyingMachine = createBuyingMachine.extend({

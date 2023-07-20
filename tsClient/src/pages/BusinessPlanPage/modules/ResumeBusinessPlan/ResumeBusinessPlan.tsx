@@ -65,7 +65,7 @@ function ResumeBusinessPlan({
           <Tr></Tr>
           <Tr>
             <Td rowSpan={3}>Термін реалізації проекту</Td>
-            <Td>Проекний період</Td>
+            <Td>Проектний період</Td>
           </Tr>
           <Tr>
             <Td>Початок реалізації</Td>

@@ -1,20 +1,19 @@
 import { publicProcedure, router } from "../trpc";
 import z from "zod";
 import outComeService from "../controllers/outComeService";
-const createOutcome = z.object({
-  type: z.enum(["Інвестиційні", "Операційні", "Не визначено"]),
-  group: z.enum([
-    "Прямі",
-    "Загально виробничі",
-    "Постійні",
-    "Купівля техніки і обладнання",
-    "Будівництво будівель і споруд",
-    "Не визначино",
-  ]),
-  propId: z.number(),
+export const createOutcome = z.object({
+  date: z.string(),
+  name: z.string(),
+  costMonth: z.number(),
+  type: z
+    .enum(["Інвестиційні", "Операційні", "Не визначено"])
+    .nullish()
+    .optional(),
+  group: z.enum(["Прямі", "Загально виробничі", "Постійні", "Не визначино"]),
+  businessPlanId: z.number(),
 });
 export type createOutcomeType = z.infer<typeof createOutcome>;
-const patchOutcome = createOutcome.extend({ outcomeId: z.number() });
+export const patchOutcome = createOutcome.extend({ outcomeId: z.number() });
 
 export type patchOutcomeType = z.infer<typeof patchOutcome>;
 export const outcomeRouter = router({

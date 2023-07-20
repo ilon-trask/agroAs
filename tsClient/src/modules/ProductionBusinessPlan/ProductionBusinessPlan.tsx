@@ -1023,17 +1023,15 @@ function ProductionBusinessPlan({
                 const vegetation = income.vegetationYear?.find(
                   (e) => e.yieldPlantId == myYield?.id && e.year == yearName
                 );
-                const sum =
-                  Math.round(
-                    (myYield?.yieldPerHectare! * vegetation?.allCoeff! || 0) *
-                      100
-                  ) / 100;
+                const sum = (
+                  myYield?.yieldPerHectare! * vegetation?.allCoeff! || 0
+                ).toFixed(2);
                 return (
                   <Tr key={el.id}>
                     <Td>{el.product?.culture?.name}</Td>
                     <Td>{sum}</Td>
                     <Td>{el.area}</Td>
-                    <Td>{Math.round(sum * el.area * 100) / 100}</Td>
+                    <Td>{(sum * el.area).toFixed(2)}</Td>
                   </Tr>
                 );
               });
