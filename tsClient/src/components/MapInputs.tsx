@@ -248,7 +248,7 @@ export default function MapInputs({
       {isCul && (
         <Box>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            рік
+            Рік вегетації
           </Heading>
           <Select
             value={res.year}

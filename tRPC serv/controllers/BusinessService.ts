@@ -66,6 +66,7 @@ export interface resBusProd {
   cultivationTechnology: IcultivationTechnologies | undefined;
   area: number;
   year: number | null;
+  price: number | null;
   tech_cart: resTechCartsWithOpers | null;
   yield: IyieldPlant | null;
 }
@@ -332,6 +333,7 @@ class BusinessService {
         productId: data.productId,
         techCartId: data.techCartId,
         year: data.year,
+        price: data.price,
       },
       { where: { id: data.ownId } }
     );

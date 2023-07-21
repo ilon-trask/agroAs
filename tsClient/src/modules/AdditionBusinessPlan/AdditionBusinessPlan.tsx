@@ -439,7 +439,7 @@ function AdditionBusinessPlan({
               );
             }
             res.push(
-              <Tr fontWeight={"bold"}>
+              <Tr fontWeight={"bold"} key={end + 1}>
                 <Td
                   colSpan={3}
                 >{`Разом фонд оплати праці, років - ${myBusiness?.realizationTime}`}</Td>

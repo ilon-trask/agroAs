@@ -11,13 +11,11 @@ import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 
 function BuildingBusTable({
-  id,
   end,
   start,
   myBusiness,
 }: {
   myBusiness: resBusinessPlan;
-  id: number;
   start: number;
   end: number;
 }) {
@@ -26,7 +24,7 @@ function BuildingBusTable({
     date: "",
     name: "",
     startPrice: "",
-    businessPlanId: id,
+    businessPlanId: myBusiness.id!,
   });
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
@@ -49,6 +47,7 @@ function BuildingBusTable({
           <Tbody>
             {(() => {
               const res = [];
+              let sum = 0;
               for (let i = start; i <= end; i++) {
                 const building = myBusiness.buildings.filter(
                   (el) => getYearFromString(el.date) == i
@@ -85,6 +84,11 @@ function BuildingBusTable({
                     </Tr>
                   ))
                 );
+                const yearCost = building?.reduce(
+                  (p, c) => p + +c.startPrice,
+                  0
+                );
+                sum += yearCost;
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
                     <Td>
@@ -96,20 +100,31 @@ function BuildingBusTable({
                             date: i + "-01-01",
                             name: "",
                             startPrice: "",
-                            businessPlanId: id,
+                            businessPlanId: myBusiness.id!,
                           });
                         }}
                       />
                     </Td>
                     <Td>{i}</Td>
-                    <Td></Td>
-                    <Td>{building?.reduce((p, c) => p + +c.startPrice, 0)}</Td>
+                    <Td>Разом:</Td>
+                    <Td>{yearCost}</Td>
                     <Td></Td>
                     <Td></Td>
                     <Td></Td>
                   </Tr>
                 );
               }
+              res.push(
+                <Tr key={end + 1}>
+                  <Td></Td>
+                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
+
+                  <Td>{sum}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
               return res;
             })()}
           </Tbody>

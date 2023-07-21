@@ -102,9 +102,9 @@ function BuyingMachineBusTable({
                 );
               }
               res.push(
-                <Tr>
-                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
+                <Tr key={end + 1}>
                   <Td></Td>
+                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
                   <Td></Td>
                   <Td>
                     {myBusiness?.buying_machines.reduce(

@@ -39,6 +39,7 @@ function OutcomeBusTable({
           <Tbody>
             {(() => {
               const res = [];
+              let sum = 0;
               for (let i = start; i <= end; i++) {
                 const outcomes = myBusiness.outcomes.filter(
                   (el) =>
@@ -77,6 +78,9 @@ function OutcomeBusTable({
                     </Tr>
                   ))
                 );
+                const yearAmount =
+                  +outcomes.reduce((p, c) => p + c.costMonth, 0) * monthAmount;
+                sum += yearAmount;
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
                     <Td>
@@ -94,17 +98,24 @@ function OutcomeBusTable({
                       />
                     </Td>
                     <Td>{i}</Td>
+                    <Td>Разом:</Td>
                     <Td></Td>
-                    <Td></Td>
-                    <Td>
-                      {+outcomes.reduce((p, c) => p + c.costMonth, 0) *
-                        monthAmount}
-                    </Td>
+                    <Td>{yearAmount}</Td>
                     <Td></Td>
                     <Td></Td>
                   </Tr>
                 );
               }
+              res.push(
+                <Tr key={end + 1}>
+                  <Td></Td>
+                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
+                  <Td></Td>
+                  <Td>{sum}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
               return res;
             })()}
           </Tbody>
@@ -127,6 +138,7 @@ function OutcomeBusTable({
           <Tbody>
             {(() => {
               const res = [];
+              let sum = 0;
               for (let i = start; i <= end; i++) {
                 const outcomes = myBusiness.outcomes.filter(
                   (el) =>
@@ -166,6 +178,9 @@ function OutcomeBusTable({
                     </Tr>
                   ))
                 );
+                const yearAmount =
+                  +outcomes.reduce((p, c) => p + c.costMonth, 0) * monthAmount;
+                sum += yearAmount;
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
                     <Td>
@@ -183,17 +198,24 @@ function OutcomeBusTable({
                       />
                     </Td>
                     <Td>{i}</Td>
+                    <Td>Разом:</Td>
                     <Td></Td>
-                    <Td></Td>
-                    <Td>
-                      {+outcomes.reduce((p, c) => p + c.costMonth, 0) *
-                        monthAmount}
-                    </Td>
+                    <Td>{yearAmount}</Td>
                     <Td></Td>
                     <Td></Td>
                   </Tr>
                 );
               }
+              res.push(
+                <Tr key={end + 1}>
+                  <Td></Td>
+                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
+                  <Td></Td>
+                  <Td>{sum}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
               return res;
             })()}
           </Tbody>

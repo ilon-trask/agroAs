@@ -17,6 +17,8 @@ import {
 import { observer } from "mobx-react-lite";
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
 import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import DeleteAlert, {
   DeleteProps,
@@ -78,10 +80,8 @@ function Goods() {
       >
         Спеціалізація та урожайність
       </Text>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування урожайності
-      </Heading>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyHeading>Планування урожайності</MyHeading>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -132,7 +132,7 @@ function Goods() {
                     />
                   </Td>
                   <Td>
-                    <Link to={YIELD_CALC_ROUTER + "/" + el.id}>
+                    <Link to={YIELD_CALC_ROUTER + "/" + el.productId}>
                       <ViewIcon boxSize={5} /> {el?.culture?.name}
                     </Link>
                   </Td>
@@ -180,7 +180,7 @@ function Goods() {
             })}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Button mt={"15px"} onClick={() => setOpen(true)}>
         Добавити культуру
       </Button>

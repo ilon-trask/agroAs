@@ -4,12 +4,14 @@ import {
   Button,
   Table,
   TableContainer,
+  Tbody,
+  Td,
   Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
 import BusinessConceptTable from "../../modules/TEJConceptTable";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
 import {
@@ -53,6 +55,11 @@ import QuizButton from "./modules/QuizButton";
 import MSHPBusTable from "./modules/MSHPBusTable/MSHPBusTable";
 import MyTableContainer from "src/ui/MyTableContainer";
 import SaleBusTable from "./modules/SaleBusTable";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import { ViewIcon } from "@chakra-ui/icons";
+import { YIELD_CALC_ROUTER } from "src/utils/consts";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
 function BiznesPlanPage() {
   const { map, enterpriseStore, business, income, TEJ } = useContext(Context);
   useBusiness(business, map);
@@ -181,21 +188,98 @@ function BiznesPlanPage() {
       <GeneralBusTable myBusiness={myBusiness} />
       <EnterpriseBusTable myBusiness={myBusiness} />
       <SpecializationBusTable myBusiness={myBusiness} end={end} start={start} />
-      <MainFinancingBusTable
-        myBusiness={myBusiness}
-        id={+id!}
-        end={end}
-        start={start}
-      />
+      <MainFinancingBusTable myBusiness={myBusiness} end={end} start={start} />
       <BuyingMachineBusTable myBusiness={myBusiness} end={end} start={start} />
-      <BuildingBusTable
-        id={+id!}
-        end={end}
-        start={start}
-        myBusiness={myBusiness}
-      />
+      <BuildingBusTable end={end} start={start} myBusiness={myBusiness} />
       <MSHPBusTable myBusiness={myBusiness} end={end} start={start} id={+id!} />
       <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
+      <MyHeading>Планування урожайності (Потенційної)</MyHeading>
+      <MyTableContainer>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th>Рік</Th>
+              <Th>Культура</Th>
+              <Th>Продукти</Th>
+              <Th>Технологія</Th>
+              <Th>
+                Густота <br />
+                насаджень
+              </Th>
+              <Th>
+                Урожайність
+                <br /> з гектару
+              </Th>
+              <Th>
+                Урожайність
+                <br /> з рослини
+              </Th>
+              <Th>
+                Строк <br />
+                посадки
+              </Th>
+              <Th>Налаштування</Th>
+              <Th></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {(() => {
+              const res = [];
+              for (let i = start; i <= end; i++) {
+                res.push(
+                  myBusiness?.busProds
+                    .filter((el) => el.year == i - start)
+                    .map((el) => {
+                      const myYield = income.yieldPlant.find(
+                        (e) => e.productId == el.productId
+                      );
+                      return (
+                        <Tr key={el.id}>
+                          <Td></Td>
+                          <Td>{i}</Td>
+                          <Td>
+                            <Link
+                              to={
+                                YIELD_CALC_ROUTER +
+                                "/" +
+                                myBusiness.id +
+                                "/" +
+                                el.id
+                              }
+                            >
+                              <MyViewIcon /> {el.product?.culture?.name}
+                            </Link>
+                          </Td>
+                          <Td>{el.product?.name}</Td>
+                          <Td>{el.cultivationTechnology?.name}</Td>
+                          <Td>{myYield?.plantingDensity}</Td>
+                          <Td>{myYield?.yieldPerHectare}</Td>
+                          <Td>{myYield?.yieldPerRoll}</Td>
+                        </Tr>
+                      );
+                    })
+                );
+                res.push(
+                  <Tr key={i} fontWeight="bold">
+                    <Td></Td>
+                    <Td>{i}</Td>
+                    <Td>Разом:</Td>
+                  </Tr>
+                );
+              }
+              res.push(
+                <Tr key={end + 1}>
+                  <Td></Td>
+                  <Td>ВСЕ РАЗОМ:</Td>
+                  <Td></Td>
+                </Tr>
+              );
+              return res;
+            })()}
+          </Tbody>
+        </Table>
+      </MyTableContainer>
       <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
       <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
         <Button>Отримати PDF</Button>

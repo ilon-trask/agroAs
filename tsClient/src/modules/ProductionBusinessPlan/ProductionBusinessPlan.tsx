@@ -51,12 +51,7 @@ function ProductionBusinessPlan({
   let costHand = 0;
   let costMech = 0;
   let costMechTot = 0;
-  const generalData = myBusiness?.busProds?.map((el) => ({
-    culture: el.product?.culture?.name,
-    name,
-    technology: el.cultivationTechnology?.name,
-    area: el.area,
-  }));
+
   const laborСostsData = (() => {
     const res: {
       workType: string;
@@ -161,10 +156,24 @@ function ProductionBusinessPlan({
     return res;
   })();
   const plannedStructureData = [];
+  const generalData = [];
   for (let i = start; i < end; i++) {
+    generalData.push(
+      ...myBusiness?.busProds
+        ?.filter((el) => el.year == i - start)
+        .map((el) => ({
+          year: i,
+          culture: el.product?.culture?.name,
+          name,
+          technology: el.cultivationTechnology?.name,
+          area: el.area,
+        }))
+    );
+    generalData.push({ year: i, bold: true });
     const yearName = useVegetationYears[i - start + 1].name;
     plannedStructureData.push({
       year: i + " " + yearName,
+
       ...myBusiness?.busProds.reduce((p, el) => {
         const myYield = income.yieldPlant?.find(
           (e) => e.cultureId == el.product?.cultureId
@@ -186,9 +195,10 @@ function ProductionBusinessPlan({
   }
   const generalColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
+      { header: "Рік", accessorKey: "year" },
       { header: "КУЛЬТУРИ", accessorKey: "culture" },
       { header: "ТЕХНОЛОГІЇ", accessorKey: "technology" },
-      { header: "ВИРОБНИЧІ ПЛОЩІ", accessorKey: "area" },
+      { header: "ПЛОЩА", accessorKey: "area" },
       { header: "Загальна площа", accessorKey: "totalArea" },
     ];
   }, []);
@@ -263,10 +273,10 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
         </Thead>
-        <TableContent
+        {/* <TableContent
           data={plannedStructureData}
           columns={plannedStructureColumns}
-        />
+        /> */}
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -355,51 +365,34 @@ function ProductionBusinessPlan({
                 (el) => el.year == i - start
               );
               res.push(
-                <React.Fragment key={i}>
-                  {busProds.map((el) => (
-                    <Tr>
-                      <Td>{i}</Td>
-                      <Td>{el.tech_cart?.nameCart}</Td>
-                      <Td>{el.area}</Td>
-                      <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
-                      <Td>{el.tech_cart?.costHectare}</Td>
-                    </Tr>
-                  ))}
-                  <Tr fontWeight={"bold"}>
+                ...busProds.map((el) => (
+                  <Tr>
                     <Td>{i}</Td>
-                    <Td>Разом:</Td>
-                    <Td>{busProds.reduce((p, c) => p + c.area, 0)}</Td>
-                    <Td>
-                      {busProds.reduce(
-                        (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
-                        0
-                      )}
-                    </Td>
-                    <Td>
-                      {busProds.reduce(
-                        (p, c) => p + (c.tech_cart?.costHectare || 0),
-                        0
-                      )}
-                    </Td>
+                    <Td>{el.tech_cart?.nameCart}</Td>
+                    <Td>{el.area}</Td>
+                    <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
+                    <Td>{el.tech_cart?.costHectare}</Td>
                   </Tr>
-                  {/* <Tr>
-                    <Td>
-                      {busProds.map((el) => el.tech_cart?.nameCart).join("\n")}
-                    </Td>
-                    <Td>{busProds.map((el) => el.area).join("\n")}</Td>
-                    <Td>
-                      {busProds
-                        .map((el) => (el.tech_cart?.costHectare || 0) * el.area)
-                        .join("\n")}
-                    </Td>
-                    <Td>
-                      {busProds
-                        .map((el) => el.tech_cart?.costHectare)
-                        .join("\n")}
-                    </Td>
-                    <Td>{busProds.map(el=>el.)}</Td>
-                  </Tr> */}
-                </React.Fragment>
+                ))
+              );
+              res.push(
+                <Tr fontWeight={"bold"} key={i}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{busProds.reduce((p, c) => p + c.area, 0)}</Td>
+                  <Td>
+                    {busProds.reduce(
+                      (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                      0
+                    )}
+                  </Td>
+                  <Td>
+                    {busProds.reduce(
+                      (p, c) => p + (c.tech_cart?.costHectare || 0),
+                      0
+                    )}
+                  </Td>
+                </Tr>
               );
               //   for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
               //     const e = myBusiness?.busProds[j];
@@ -617,9 +610,9 @@ function ProductionBusinessPlan({
       >
         Витрати праці
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <TableComponent data={laborСostsData} columns={laborСostsColumns} />
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -628,7 +621,7 @@ function ProductionBusinessPlan({
       >
         Техніка й обладнання
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -784,7 +777,7 @@ function ProductionBusinessPlan({
             </Tr>
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -1014,36 +1007,40 @@ function ProductionBusinessPlan({
             const res = [];
             for (let i = start; i < end; i++) {
               const yearName = useVegetationYears[i - start + 1].name;
-
-              let akk = myBusiness?.busProds.map((el) => {
-                const myYield = income.yieldPlant?.find(
-                  (e) => e.cultureId == el.product?.cultureId
-                );
-
-                const vegetation = income.vegetationYear?.find(
-                  (e) => e.yieldPlantId == myYield?.id && e.year == yearName
-                );
-                const sum = (
-                  myYield?.yieldPerHectare! * vegetation?.allCoeff! || 0
-                ).toFixed(2);
-                return (
-                  <Tr key={el.id}>
-                    <Td>{el.product?.culture?.name}</Td>
-                    <Td>{sum}</Td>
-                    <Td>{el.area}</Td>
-                    <Td>{(sum * el.area).toFixed(2)}</Td>
-                  </Tr>
-                );
-              });
+              const busProds = myBusiness.busProds.filter(
+                (el) => el.year == i - start
+              );
               res.push(
-                <React.Fragment key={i}>
-                  <Tr>
-                    <Td>
-                      <Text fontWeight={"bold"}>{i}</Text>
-                    </Td>
-                  </Tr>
-                  {akk}
-                </React.Fragment>
+                ...busProds.map((el) => {
+                  const vegetation = income.vegetationYear?.find(
+                    (e) => e.busProdId == el.id && e.techCartId == el.techCartId
+                  );
+                  const myYield = income.yieldPlant.find(
+                    (e) => e.productId == el.productId
+                  );
+                  const amount =
+                    +(
+                      el.area *
+                      myYield?.yieldPerHectare! *
+                      (vegetation?.allCoeff || 1)
+                    ).toFixed(2) || 0;
+
+                  return (
+                    <Tr key={el.id}>
+                      <Td>{el.product?.name}</Td>
+                      <Td>{amount}</Td>
+                      <Td>{el.area}</Td>
+                      <Td>{(amount * el.area).toFixed(2)}</Td>
+                    </Tr>
+                  );
+                })
+              );
+              res.push(
+                <Tr key={i}>
+                  <Td>
+                    <Text fontWeight={"bold"}>{i}</Text>
+                  </Td>
+                </Tr>
               );
             }
             return res;
@@ -1053,38 +1050,39 @@ function ProductionBusinessPlan({
       {/* <Heading textAlign={"center"} size={"sm"} mt={5}>
       Продаж продукції
     </Heading> */}
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Th colSpan={7}>
-              <Description>
-                Руалізація продукції панується з глибоким зоморожуванням якід
-                (Додаток 2) згідно графіку.
-              </Description>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableName>Графік збору продукції</TableName>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableNumber></TableNumber>
-            </Th>
-          </Tr>
-          <SaleTableHeadRows isPlan={true} />
-        </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              res.push(
-                <React.Fragment key={i}>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
-                  {myBusiness?.busProds?.map((el) => {
+      <MyTableContainer>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th colSpan={7}>
+                <Description>
+                  Руалізація продукції панується з глибоким зоморожуванням якід
+                  (Додаток 2) згідно графіку.
+                </Description>
+              </Th>
+            </Tr>
+            <Tr>
+              <Th colSpan={7}>
+                <TableName>Графік збору продукції</TableName>
+              </Th>
+            </Tr>
+            <Tr>
+              <Th colSpan={7}>
+                <TableNumber></TableNumber>
+              </Th>
+            </Tr>
+            <SaleTableHeadRows isPlan={true} />
+          </Thead>
+          <Tbody>
+            {(() => {
+              const res = [];
+              for (let i = start; i < end; i++) {
+                const busProds = myBusiness.busProds.filter(
+                  (el) => el.year == i - start
+                );
+
+                res.push(
+                  ...busProds?.map((el) => {
                     const yearName = useVegetationYears[i - start + 1].name;
                     const myYield = income.yieldPlant?.find(
                       (e) => e.cultureId == el.product?.cultureId
@@ -1109,15 +1107,20 @@ function ProductionBusinessPlan({
                         <Td>{sum * el.product?.culture?.priceBerry!}</Td>
                       </Tr>
                     );
-                  })}
-                </React.Fragment>
-              );
-            }
-            return res;
-          })()}
-        </Tbody>
-      </Table>
-      <Box mt={"50px"}>
+                  })
+                );
+                res.push(
+                  <Tr key={i} fontWeight={"bold"}>
+                    <Td>{i}</Td>
+                  </Tr>
+                );
+              }
+              return res;
+            })()}
+          </Tbody>
+        </Table>
+      </MyTableContainer>
+      <MyTableContainer mt={"50px"}>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -1157,7 +1160,7 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </Box>
+      </MyTableContainer>
     </>
   );
 }

@@ -79,7 +79,10 @@ export default function AppRouter() {
       <Route path={BUSINESS_ROUTER} element={<BusinessJurnal />} />
       <Route path={HOW_ROUTER} element={<HowThisWork />} />
       <Route path={INCOME_ROUTER} element={<Income />} />
-      <Route path={YIELD_CALC_ROUTER + "/:id"} element={<YieldСalculation />} />
+      <Route
+        path={YIELD_CALC_ROUTER + "/:busId" + "/:busProdId"}
+        element={<YieldСalculation />}
+      />
       {/* <Route path={TEJ_JORNAL_ROUTER} element={<TEJJornal />} /> */}
       <Route path={TEJ_ROUTER + "/:id"} element={<TEJustification />} />
       <Route path={CASH_FLOW} element={<CashFlow />} />

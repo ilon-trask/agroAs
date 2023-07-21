@@ -34,7 +34,10 @@ const createBusProd = z.object({
   businessPlanId: z.number(),
 });
 export type CreateBusProd = z.infer<typeof createBusProd>;
-const patchBusProd = createBusProd.extend({ ownId: z.number() });
+const patchBusProd = createBusProd.extend({
+  ownId: z.number(),
+  price: z.number(),
+});
 export type PatchBusProd = z.infer<typeof patchBusProd>;
 const createType = z.object({
   name: z.string(),

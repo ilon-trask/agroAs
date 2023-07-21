@@ -26,6 +26,7 @@ import useVegetationYears, {
   VegetationYearsType,
 } from "../shared/hook/useVegetationYears";
 import { createVegetationYear, getVegetationYear } from "../http/requests";
+import MyHeading from "src/ui/MyHeading";
 
 export const plantsHeads: Record<string, string[]> = {
   "Суниця садова": [
@@ -77,10 +78,17 @@ function downloadCSV(data: IyieldCalculation[]) {
 }
 
 function YieldСalculation() {
-  const { id } = useParams();
-  const { income } = useContext(Context);
-  const myYield = income.yieldPlant?.find((el) => el.id == id);
-  const myCalc = income.yieldCalc?.find((el) => el?.yieldPlantId == id);
+  const { busId, busProdId } = useParams();
+  const { income, map, business } = useContext(Context);
+  const busProd = business.businessPlan
+    .find((el) => el.id == busId)
+    ?.busProds.find((el) => el.id == busProdId);
+  const myYield = income.yieldPlant?.find(
+    (el) => el.productId == busProd?.productId
+  );
+  const myCalc = income.yieldCalc?.find(
+    (el) => el?.yieldPlantId == myYield?.id
+  );
   const [open, setOpen] = useState(false);
   useEffect(() => {
     getVegetationYear(income);
@@ -92,7 +100,7 @@ function YieldСalculation() {
       myCalc?.fruitWeight!) /
     1000;
   const [res, setRes] = useState<IvegetationRes>({
-    data: income.vegetationYear.filter((el) => el.yieldPlantId == myYield?.id!),
+    data: income.vegetationYear.filter((el) => el.busProdId == busProd?.id),
   });
   console.log(
     income.vegetationYear.filter((el) => el.yieldPlantId == myYield?.id!)
@@ -122,23 +130,23 @@ function YieldСalculation() {
       }),
     }));
   }
+  const carts = map.businessCarts.filter(
+    (el) =>
+      el.cultureId == myYield?.cultureId &&
+      el.cultivationTechnologyId == myYield?.cultivationTechnologyId
+  );
   return (
     <Container maxW="container.lg" mt={"30px"}>
       <Link to={GOODS_ROUTER}>
         <Button>Повернутиця до культур</Button>
       </Link>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Розрахунок урожайності:
-      </Heading>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Культура: "{myYield?.culture.name}"
-      </Heading>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Технологія: "{myYield?.cultivationTechnology.name}"
-      </Heading>
-      <Heading textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Строк посадки: "{myYield?.landingPeriod}"
-      </Heading>
+      <MyHeading>Розрахунок урожайності:</MyHeading>
+      <MyHeading>Культура: "{myYield?.culture.name}"</MyHeading>
+      <MyHeading>
+        Технологія: "{busProd?.cultivationTechnology?.name}"
+      </MyHeading>
+      <MyHeading>Строк посадки: "{myYield?.landingPeriod}"</MyHeading>
+      <MyHeading>Продукт:"{busProd?.product?.name}"</MyHeading>
       <Table size={"sm"} mt={5}>
         <Thead>
           <Tr>
@@ -183,7 +191,7 @@ function YieldСalculation() {
       <CreateYieldCalc
         open={open}
         setOpen={setOpen}
-        id={+id!}
+        id={myYield?.id!}
         myCalc={myCalc}
       />
       <Table size={"sm"}>
@@ -208,12 +216,14 @@ function YieldСalculation() {
               <br />
               коефіцієнт
             </Th>
+            <Th>Технологічні карти</Th>
           </Tr>
         </Thead>
         <Tbody>
           {useVegetationYears.map((el) => {
             const checked: boolean = isChecked(el.name);
             const value = res.data.find((e) => e.year == el.name);
+            const cart = carts.filter((e) => e.year == el.name);
             return (
               <Tr>
                 <Th>
@@ -296,6 +306,7 @@ function YieldСalculation() {
                       ) / 100}
                   </Text>
                 </Th>
+                <Th>{cart[0]?.nameCart}</Th>
               </Tr>
             );
           })}
@@ -306,10 +317,11 @@ function YieldСalculation() {
           createVegetationYear(income, {
             cultivationTechnologyId: myYield?.cultivationTechnologyId!,
             cultureId: myYield?.cultureId!,
-            techCartId: undefined,
             yieldPlantId: myYield?.id!,
+            busProdId: busProd?.id!,
             data: res.data.map((el) => ({
               ...el,
+              techCartId: busProd?.techCartId,
               seedlingsCoeff: +el.seedlingsCoeff,
               technologyCoeff: +el.technologyCoeff,
               vegetationCoeff: +el.vegetationCoeff,

@@ -193,7 +193,7 @@ export function PlanIncomeProductionTableHeadRow({
   return (
     <Tr>
       {!isPlan && <Th></Th>}
-      <Th>Продукт або послуга</Th>
+      <Th>Продукт </Th>
       <Th>
         Планова <br />
         урожайність (т/га)
@@ -203,10 +203,7 @@ export function PlanIncomeProductionTableHeadRow({
         Плановий <br />
         збір (т)
       </Th>
-      <Th>
-        Собівартість <br />
-        грн/т
-      </Th>
+      <Th>Ціна грн/т</Th>
       <Th>Сума грн</Th>
       {!isPlan && <Th></Th>}
     </Tr>

@@ -69,6 +69,12 @@ function MainFinancingBusinessPlanTable({
         costHectare: fin.reduce((p, c) => p + (c.costHectare || 0), 0),
       });
     }
+    result.push({
+      isAll: true,
+      typeName: "ВСЕ РАЗОМ:",
+      costBP: financing?.reduce((p, c) => p + (c.costBP || 0), 0),
+      costHectare: financing?.reduce((p, c) => p + (c.costHectare || 0), 0),
+    });
     return result;
   })();
   const columns = useMemo<
@@ -93,6 +99,7 @@ function MainFinancingBusinessPlanTable({
       date: string;
       isUseCost: boolean;
       cultureId?: number;
+      isAll?: boolean;
     }>[]
   >(
     () => [
@@ -101,7 +108,9 @@ function MainFinancingBusinessPlanTable({
         accessorKey: "date",
         cell: ({ row: { original } }) => (
           <>
-            {original.isYear ? (
+            {original.isAll ? (
+              <></>
+            ) : original.isYear ? (
               <MyAddIcon
                 onClick={() => {
                   setOpen(true);
@@ -152,20 +161,26 @@ function MainFinancingBusinessPlanTable({
       { header: "Метод розрахунку", accessorKey: "calculationMethod" },
       {
         header: "Сума на гектар",
-        accessorFn: (row) => row.costHectare || 0,
+        accessorFn: (row) => row.costHectare?.toFixed(2) || 0,
       },
       {
         header: "Графік",
         accessorKey: "id",
         cell: ({ row: { original } }) => (
-          <>{!original.isYear && <Button size={"sm"}>Додати</Button>}</>
+          <>
+            {original.isAll ? (
+              <></>
+            ) : (
+              !original.isYear && <Button size={"sm"}>Додати</Button>
+            )}
+          </>
         ),
       },
       {
         header: "",
         accessorKey: "isYear",
         cell: ({ row: { original } }) => (
-          <>{!original.isYear && <MyDeleteIcon />}</>
+          <>{original.isAll ? <></> : !original.isYear && <MyDeleteIcon />}</>
         ),
       },
     ],

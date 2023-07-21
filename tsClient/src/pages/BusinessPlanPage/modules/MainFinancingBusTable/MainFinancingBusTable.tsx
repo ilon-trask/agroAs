@@ -5,12 +5,10 @@ import MainFinancingBusinessPlanTable from "./MainFinancingBusinessPlanTable";
 
 function MainFinancingBusTable({
   myBusiness,
-  id,
   end,
   start,
 }: {
   myBusiness: resBusinessPlan | undefined;
-  id: number;
   start: number;
   end: number;
 }) {
@@ -19,7 +17,7 @@ function MainFinancingBusTable({
       <MyHeading>Залучення фінансування</MyHeading>
       <MainFinancingBusinessPlanTable
         financing={myBusiness?.financings}
-        busId={id}
+        busId={myBusiness?.id!}
         end={end}
         start={start}
       />

@@ -89,7 +89,9 @@ function Enterprise() {
   const lands = sort(enterpriseStore.land);
   const [buildingOpen, setBuildingOpen] = useState(false);
   const [buildingData, setBuildingData] = useState<CreateBuildingProps>({
-    depreciationPeriod: "",
+    description: "",
+    businessPlanId: 0,
+    date: "",
     enterpriseId: +id!,
     name: "",
     startPrice: "",

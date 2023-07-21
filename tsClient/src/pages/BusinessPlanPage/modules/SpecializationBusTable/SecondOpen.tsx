@@ -152,9 +152,17 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
               <option value="" hidden defaultChecked>
                 Виберіть опцію
               </option>
-              {map.businessCarts.map((el) => (
-                <option value={el.id}>{el.nameCart}</option>
-              ))}
+              {(() => {
+                let carts =
+                  cultureId == 0
+                    ? map.businessCarts
+                    : map.businessCarts.filter(
+                        (el) => el.cultureId == cultureId
+                      );
+                return carts.map((el) => (
+                  <option value={el.id}>{el.nameCart}</option>
+                ));
+              })()}
             </Select>
           </label>
         </Box>

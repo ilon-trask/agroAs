@@ -598,6 +598,7 @@ export interface IbusProd {
   area: number;
   year: number;
   techCartId?: number;
+  price?: number;
 }
 export class busProd extends Model<IbusProd> {
   declare id?: number;
@@ -607,12 +608,14 @@ export class busProd extends Model<IbusProd> {
   declare area: number;
   declare year: number;
   declare techCartId?: number;
+  declare price: number;
 }
 busProd.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     area: { type: DataTypes.FLOAT },
     year: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.FLOAT(2) },
   },
   { sequelize, timestamps: false }
 );
@@ -696,6 +699,7 @@ export interface IyieldPlant {
   landingPeriod: YieldPlantLandingPeriodType;
   cultureId?: number;
   cultivationTechnologyId?: number;
+  productId?: number;
 }
 export class yieldPlant extends Model<IyieldPlant> {
   declare id?: number;
@@ -707,6 +711,7 @@ export class yieldPlant extends Model<IyieldPlant> {
   declare landingPeriod: YieldPlantLandingPeriodType;
   declare cultivationTechnologyId?: number;
   declare cultureId?: number;
+  declare productId?: number;
 }
 yieldPlant.init(
   {
@@ -1228,6 +1233,7 @@ export interface IvegetationYears {
   cultivationTechnologyId?: number;
   techCartId?: number | null;
   yieldPlantId?: number | null;
+  busProdId?: number | null;
 }
 
 export class vegetationYears extends Model<IvegetationYears> {
@@ -1236,6 +1242,7 @@ export class vegetationYears extends Model<IvegetationYears> {
   declare vegetationCoeff: number;
   declare technologyCoeff: number;
   declare seedlingsCoeff: number;
+  declare busProdId?: number | null;
 }
 vegetationYears.init(
   {
@@ -1380,12 +1387,17 @@ cultivationTechnologies.hasMany(busProd);
 busProd.belongsTo(cultivationTechnologies);
 tech_cart.hasMany(busProd);
 busProd.belongsTo(tech_cart);
+busProd.hasMany(vegetationYears);
+vegetationYears.belongsTo(busProd);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
 
 culture.hasOne(yieldPlant);
 yieldPlant.belongsTo(culture);
+
+product.hasOne(yieldPlant);
+yieldPlant.belongsTo(product);
 
 purpose_material.hasMany(cost_material);
 cost_material.belongsTo(purpose_material);

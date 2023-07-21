@@ -39,7 +39,7 @@ function SpecializationBusTable({
             culture: el.product?.culture?.name,
             technology: el.cultivationTechnology?.name,
             area: el.area,
-            cartId: el.techCartId,
+            cartName: el.tech_cart?.nameCart + " " + el.tech_cart?.year,
             productId: el.productId,
           })) || []),
           {
@@ -51,6 +51,11 @@ function SpecializationBusTable({
           }
         );
     }
+    res.push({
+      isAll: true,
+      product: "ВСЕ РАЗОМ:",
+      area: myBusiness?.busProds?.reduce((p, c) => p + c.area, 0),
+    });
     return res;
   }, [myBusiness?.busProds, myBusiness?.busProds.length]);
 
@@ -62,6 +67,8 @@ function SpecializationBusTable({
       technology: string;
       area: number;
       year: number;
+      cartName: string;
+      isAll?: boolean;
       // productId?: number;
     }>[]
   >(
@@ -72,7 +79,9 @@ function SpecializationBusTable({
         cell: ({ row: { original } }) => {
           return (
             <Box>
-              {original.id.toString().split(" ")[1] == "plus" ? (
+              {original.isAll ? (
+                <></>
+              ) : original.id.toString().split(" ")[1] == "plus" ? (
                 <MyPlusIcon
                   onClick={() => {
                     setOpen(true);
@@ -115,12 +124,14 @@ function SpecializationBusTable({
       { header: "Культура", accessorKey: "culture" },
       { header: "Технологія", accessorKey: "technology" },
       { header: "Площа", accessorKey: "area" },
-      { header: "Технологічна карта", accessorKey: "cartId" },
+      { header: "Технологічна карта", accessorKey: "cartName" },
       {
         header: "",
         accessorKey: "productId",
         cell: ({ row: { original } }) => (
-          <Box>{original.id != "plus" && <MyDeleteIcon />}</Box>
+          <Box>
+            {original.isAll ? <></> : original.id != "plus" && <MyDeleteIcon />}
+          </Box>
         ),
       },
     ],
