@@ -1,8 +1,11 @@
 import { Table, Tbody, Td, Thead, Tr } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
+import { ENTERPRISE_FORM_ROUTER } from "src/utils/consts";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import CreateEnterprise, {
   CreateEnterpriseProps,
@@ -44,7 +47,20 @@ function EnterpriseBusTable({
                 <MyEditIcon />
               </Td>
               <Td>{myBusiness?.enterprise?.name}</Td>
-              <Td>{myBusiness?.enterprise?.form}</Td>
+              <Td>
+                <Link
+                  to={
+                    ENTERPRISE_FORM_ROUTER +
+                    "/" +
+                    myBusiness?.enterprise?.form +
+                    "/" +
+                    myBusiness?.id
+                  }
+                >
+                  <MyViewIcon />
+                  {myBusiness?.enterprise?.form}
+                </Link>
+              </Td>
               <Td>{myBusiness?.enterprise?.taxGroup}</Td>
             </Tr>
           </Tbody>

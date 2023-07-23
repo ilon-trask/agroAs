@@ -102,7 +102,7 @@ function BuyingMachineBusTable({
                 );
               }
               res.push(
-                <Tr key={end + 1}>
+                <Tr key={end + 1} fontWeight={"bold"}>
                   <Td></Td>
                   <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
                   <Td></Td>

@@ -84,13 +84,13 @@ export default function AppRouter() {
         element={<YieldСalculation />}
       />
       {/* <Route path={TEJ_JORNAL_ROUTER} element={<TEJJornal />} /> */}
-      <Route path={TEJ_ROUTER + "/:id"} element={<TEJustification />} />
+      <Route path={TEJ_ROUTER + "/:cartId"} element={<TEJustification />} />
       <Route path={CASH_FLOW} element={<CashFlow />} />
       <Route path={GOODS_ROUTER} element={<Goods />} />
       <Route path={ENTERPRISE_JOURNAL_ROUTER} element={<EnterpriseJournal />} />
       <Route path={ENTERPRISE_ROUTER + "/:id"} element={<Enterprise />} />
       <Route
-        path={ENTERPRISE_FORM_ROUTER + "/:form" + "/:id"}
+        path={ENTERPRISE_FORM_ROUTER + "/:form" + "/:busId"}
         element={<EnterpriseFormPage />}
       />
       <Route

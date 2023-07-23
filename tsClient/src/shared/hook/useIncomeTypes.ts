@@ -15,7 +15,7 @@ export type IncomeType =
   | "Державна підтримка"
   | "Грант"
   | "Не визначино";
-const res: IncomeTypesType = [
+const useIncomeTypes: IncomeTypesType = [
   { id: 1, name: "Основне виробництво" },
   { id: 2, name: "Допоміжне виробництво" },
   { id: 3, name: "Кредит" },
@@ -25,4 +25,4 @@ const res: IncomeTypesType = [
   { id: 7, name: "Не визначино" },
 ];
 
-export default res;
+export default useIncomeTypes;

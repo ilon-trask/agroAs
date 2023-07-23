@@ -1,4 +1,4 @@
-import { Box, Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";

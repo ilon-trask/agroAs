@@ -55,11 +55,18 @@ import QuizButton from "./modules/QuizButton";
 import MSHPBusTable from "./modules/MSHPBusTable/MSHPBusTable";
 import MyTableContainer from "src/ui/MyTableContainer";
 import SaleBusTable from "./modules/SaleBusTable";
-import MyEditIcon from "src/ui/Icons/MyEditIcon";
-import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
-import { ViewIcon } from "@chakra-ui/icons";
 import { YIELD_CALC_ROUTER } from "src/utils/consts";
 import MyViewIcon from "src/ui/Icons/MyViewIcon";
+import getStartAndEndBusinessPlan from "src/shared/hook/getStartAndEndBusinessPlan";
+import { Ioutcome } from "../../../../tRPC serv/models/models";
+import getYearFromString from "src/shared/funcs/getYearFromString";
+export function getMonthAmountFromBusinessPlan(
+  dateStart: string,
+  i: number,
+  start: number
+) {
+  return i == start ? 13 - +dateStart.split("-")[1] : 12;
+}
 function BiznesPlanPage() {
   const { map, enterpriseStore, business, income, TEJ } = useContext(Context);
   useBusiness(business, map);
@@ -84,6 +91,7 @@ function BiznesPlanPage() {
   myBusiness?.busProds.forEach((el) => {
     if (el.tech_cart) el.tech_cart.area = el.area;
   });
+
   if (myBusiness && !myBusiness.financings.find((el) => el.id == 0))
     myBusiness.financings = [
       {
@@ -103,8 +111,7 @@ function BiznesPlanPage() {
   const [ready, setReady] = useState(false);
   const [cartReady, setCartReady] = useState(false);
   const [operReady, setOperReady] = useState(false);
-  const start = +myBusiness?.dateStart?.split("-")[0]!;
-  const end = +start + +myBusiness?.realizationTime!;
+  const { start, end } = getStartAndEndBusinessPlan(myBusiness!);
   const titleRef = useRef<HTMLTableElement>(null);
   const resumeRef = useRef<HTMLTableElement>(null);
   const enterpriseRef = useRef<HTMLTableElement>(null);
@@ -116,13 +123,110 @@ function BiznesPlanPage() {
   const cultureSet = new Set(
     myBusiness?.busProds?.map((el) => el?.product?.culture?.name!)
   );
+  console.log("ітр");
+
+  useEffect(() => {
+    if (myBusiness)
+      myBusiness.outcomes = (() => {
+        const outcomes: Ioutcome[] = [];
+        for (let i = start; i <= end; i++) {
+          myBusiness.outcomes
+            .filter((el) => getYearFromString(el.date) == i)
+            .forEach((el) => {
+              outcomes.push({
+                ...el,
+                costYear:
+                  el.costMonth *
+                  getMonthAmountFromBusinessPlan(
+                    myBusiness.dateStart,
+                    i,
+                    start
+                  ),
+              });
+            });
+
+          outcomes.push({
+            name: "Оплата праці АП",
+            group: "Постійні",
+            date: i + "-01-01",
+            costYear: myBusiness.workers
+              .filter(
+                (el) => el.year == i - start && el.class == "Адміністративний"
+              )
+              .reduce((p, c) => {
+                const yearSalary =
+                  c.salary *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12) *
+                  c.amount;
+                return p + yearSalary;
+              }, 0),
+          });
+          outcomes.push({
+            name: "Нарахування (ЄСВ+ВЗ)",
+            group: "Постійні",
+            date: i + "-01-01",
+            costYear: myBusiness.workers
+              .filter(
+                (el) => el.year == i - start && el.class == "Адміністративний"
+              )
+              .reduce((p, c) => {
+                const yearSalary =
+                  c.salary *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12) *
+                  c.amount;
+                return p + (yearSalary * 0.015 + yearSalary * 0.22);
+              }, 0),
+          });
+          outcomes.push({
+            name: "Оплата праці ІТР",
+            group: "Загально виробничі",
+            date: i + "-01-01",
+            costYear: myBusiness.workers
+              .filter(
+                (el) =>
+                  el.year == i - start && el.class == "Інженерно технічний"
+              )
+              .reduce((p, c) => {
+                const yearSalary =
+                  c.salary *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12) *
+                  c.amount;
+                return p + yearSalary;
+              }, 0),
+          });
+          outcomes.push({
+            name: "Нарахування (ЄСВ+ВЗ)",
+            group: "Загально виробничі",
+            date: i + "-01-01",
+            costYear: myBusiness.workers
+              .filter(
+                (el) =>
+                  el.year == i - start && el.class == "Інженерно технічний"
+              )
+              .reduce((p, c) => {
+                const yearSalary =
+                  c.salary *
+                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                    12) *
+                  c.amount;
+                return p + (yearSalary * 0.015 + yearSalary * 0.22);
+              }, 0),
+          });
+        }
+        return outcomes;
+      })();
+  }, [myBusiness]);
+  console.log("outcome");
+  console.log(myBusiness?.outcomes);
+
   const productSet = new Set(
     myBusiness?.busProds?.map((el) => el.product?.culture?.product!)
   );
-  let thisWorkers = enterpriseStore.worker?.filter(
-    (e) =>
-      e.enterpriseId == myBusiness?.enterpriseId! &&
-      e.form == myBusiness?.enterprise?.form
+  let thisWorkers = myBusiness?.workers?.filter(
+    (e) => e.form == myBusiness?.enterprise?.form
   );
   const thisMaps =
     myBusiness?.busProds
@@ -171,6 +275,20 @@ function BiznesPlanPage() {
       }));
     }
   }, [map.opers, cartReady, operReady]);
+  if (myBusiness)
+    myBusiness.financings = myBusiness?.financings.map((el) => ({
+      ...el,
+      typeName:
+        el.type == "credit"
+          ? "Кредит"
+          : el.type == "derj_support"
+          ? "Державна підтримка"
+          : el.type == "grant"
+          ? "Грант"
+          : el.type == "investment"
+          ? "Інвестиції"
+          : null,
+    }));
   const thisCredit = myBusiness?.financings.filter((el) => el.type == "credit");
   const thisInvestment = myBusiness?.financings.filter(
     (el) => el.type == "investment"
@@ -269,7 +387,7 @@ function BiznesPlanPage() {
                 );
               }
               res.push(
-                <Tr key={end + 1}>
+                <Tr key={end + 1} fontWeight={"bold"}>
                   <Td></Td>
                   <Td>ВСЕ РАЗОМ:</Td>
                   <Td></Td>
@@ -355,6 +473,7 @@ function BiznesPlanPage() {
           <FinancingBusinessPlan
             start={start}
             end={end}
+            myBusiness={myBusiness}
             thisCredit={thisCredit}
             thisDerj={thisDerj}
             thisGrand={thisGrand}

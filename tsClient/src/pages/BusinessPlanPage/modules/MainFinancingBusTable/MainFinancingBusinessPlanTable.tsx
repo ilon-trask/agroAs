@@ -38,16 +38,7 @@ function MainFinancingBusinessPlanTable({
         result.push({
           id: el.id,
           year: i,
-          typeName:
-            el.type == "credit"
-              ? "Кредит"
-              : el.type == "derj_support"
-              ? "Державна підтримка"
-              : el.type == "grant"
-              ? "Грант"
-              : el.type == "investment"
-              ? "Інвестиції"
-              : null,
+          typeName: el.typeName,
           type: el.type,
           name: el.name,
           costBP: el.costBP,
@@ -70,6 +61,7 @@ function MainFinancingBusinessPlanTable({
       });
     }
     result.push({
+      bold: true,
       isAll: true,
       typeName: "ВСЕ РАЗОМ:",
       costBP: financing?.reduce((p, c) => p + (c.costBP || 0), 0),

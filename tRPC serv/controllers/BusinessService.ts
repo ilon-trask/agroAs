@@ -27,6 +27,8 @@ import {
   outcome,
   IyieldPlant,
   yieldPlant,
+  worker,
+  Iworker,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -84,6 +86,7 @@ export interface resBusinessPlan extends IbusinessPlan {
   buildings: Ibuilding[];
   MSHP: Ibuying_machine[];
   outcomes: Ioutcome[];
+  workers: Iworker[];
 }
 const includes = [
   { model: resume },
@@ -107,6 +110,7 @@ const includes = [
   { model: buying_machine },
   { model: building },
   { model: outcome },
+  { model: worker },
 ];
 async function changeFinancing(res: resBusinessPlan[]) {
   res = JSON.parse(JSON.stringify(res));
@@ -161,7 +165,7 @@ async function changeFinancing(res: resBusinessPlan[]) {
   );
   return res;
 }
-async function getBusinessPlan(businessPlanId: number) {
+export async function getBusinessPlan(businessPlanId: number) {
   //@ts-ignore
   let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
     where: { id: businessPlanId },

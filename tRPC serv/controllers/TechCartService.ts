@@ -98,6 +98,7 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
       promises.push(cart);
       continue;
     }
+
     if (!cart.tech_operations) throw new Error("");
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
@@ -791,33 +792,6 @@ class TechCartService {
     //@ts-ignore
     const res: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { [Op.or]: [{ isBasic: false }, { isBasic: true }] },
-    });
-    return res;
-  }
-  async setIsBasicCart(user: Principal | undefined, data: setIsBasicCartType) {
-    if (!user) return;
-    const prop: Itech_cart | null = await tech_cart.findOne({
-      where: { id: data.cartId },
-    });
-    if (!prop) return;
-    const check = await tech_cart.findOne({
-      where: {
-        cultivationTechnologyId: prop?.cultivationTechnologyId,
-        cultureId: prop.cultureId,
-        year: prop.year,
-        id: {
-          [Op.ne]: prop.id,
-        },
-        isBasic: true,
-      },
-    });
-    if (check) return "присутній";
-    await tech_cart.update(
-      { isBasic: data.isBasic },
-      { where: { id: data.cartId } }
-    );
-    const res: resTechCartsWithOpers | null = await tech_cart.findOne({
-      where: { id: data.cartId },
     });
     return res;
   }

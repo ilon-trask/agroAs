@@ -20,8 +20,8 @@ function EnterpriseBusinessPlan({
   cultureSet,
   thisWorkers,
   end,
-  myBusiness,
   start,
+  myBusiness,
   aref,
 }: {
   name: string;
@@ -39,63 +39,104 @@ function EnterpriseBusinessPlan({
   const wageAnalysisData = [];
   const groundSectionData = [];
   const areasUsageData = [];
-  (() => {
-    thisWorkers = thisWorkers?.map((el) => {
-      if (el.class == "Виробничий")
-        return {
-          ...el,
-          amount: Math.ceil(
-            el.amount *
-              //@ts-ignore
-              myBusiness?.busProds?.reduce((p, c) => p + c.area, 0)
-          ),
-        };
-      else return el;
-    });
 
-    for (let i = start; i < end; i++) {
+  (() => {
+    for (let i = start; i <= end; i++) {
+      const workers = thisWorkers?.filter((el) => el.year == i - start);
+
       let adAmount = 0;
       let adSalary = 0;
-      thisWorkers?.forEach((e) => {
+      let adSalaryYear = 0;
+      workers?.forEach((e) => {
         if (e.class == "Адміністративний") {
           adAmount += e.amount;
           adSalary += e.salary * e.amount;
+          adSalaryYear +=
+            e.salary *
+            e.amount *
+            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
         }
       });
       let vAmount = 0;
       let vSalary = 0;
-      thisWorkers?.forEach((e) => {
+      let vSalaryYear = 0;
+      workers?.forEach((e) => {
         if (e.class == "Виробничий") {
           vAmount += e.amount;
           vSalary += e.salary * e.amount;
+          vSalaryYear +=
+            e.salary *
+            e.amount *
+            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
+        }
+      });
+      let iAmount = 0;
+      let iSalary = 0;
+      let iSalaryYear = 0;
+      workers?.forEach((e) => {
+        if (e.class == "Інженерно технічний") {
+          iAmount += e.amount;
+          iSalary += e.salary * e.amount;
+          iSalaryYear +=
+            e.salary *
+            e.amount *
+            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
         }
       });
       sum +=
-        Math.round(adSalary * 12 * 0.235) +
-        adSalary * 12 +
-        (Math.round(vSalary * 12 * 0.235) + vSalary * 12);
+        Math.round(adSalaryYear * 0.235) +
+        adSalaryYear +
+        (Math.round(vSalaryYear * 0.235) + vSalaryYear) +
+        (Math.round(iSalaryYear * 0.235) + iSalaryYear);
       salaryExpensesData.push(
-        { type: i },
         {
-          type: "Адмін",
+          type: "Адміністративний",
           amount: adAmount,
           averageZP: Math.round(adSalary / adAmount),
-          AnnualSalaryFund: adSalary * 12,
-          tax: Math.round(adSalary * 12 * 0.235),
-          general: Math.round(adSalary * 12 * 0.235) + adSalary * 12,
+          AnnualSalaryFund: adSalaryYear,
+          tax: Math.round(adSalaryYear * 0.235),
+          general: Math.round(adSalaryYear * 0.235) + adSalaryYear,
         },
         {
-          type: "Вироб",
+          type: "ІТП",
+          amount: iAmount,
+          averageZP: Math.round(iSalary / iAmount),
+          AnnualSalaryFund: iSalaryYear,
+          tax: Math.round(iSalaryYear * 0.235),
+          general: Math.round(iSalaryYear * 0.235) + iSalaryYear,
+        },
+        {
+          type: "Виробничий",
           amount: vAmount,
           averageZP: Math.round(vSalary / vAmount),
-          AnnualSalaryFund: vSalary * 12,
-          tax: Math.round(vSalary * 12 * 0.235),
-          general: Math.round(vSalary * 12 * 0.235) + vSalary * 12,
-        }
+          AnnualSalaryFund: vSalaryYear,
+          tax: Math.round(vSalaryYear * 0.235),
+          general: Math.round(vSalaryYear * 0.235) + vSalaryYear,
+        },
+        { type: i }
       );
       wageAnalysisData.push({
+        year: "Адміністративний",
+        amount: Math.round(adSalaryYear * 0.235) + adSalaryYear,
+      });
+      wageAnalysisData.push({
+        year: "ІТР",
+        amount: Math.round(iSalaryYear * 0.235) + iSalaryYear,
+      });
+      wageAnalysisData.push({
+        year: "Виробничий",
+        amount: Math.round(vSalaryYear * 0.235) + vSalaryYear,
+      });
+      wageAnalysisData.push({
+        bold: true,
         year: i,
-        amount: Math.round(vSalary * 12 * 0.235) + vSalary * 12,
+        amount:
+          Math.round(adSalaryYear * 0.235) +
+          adSalaryYear +
+          Math.round(iSalaryYear * 0.235) +
+          iSalaryYear +
+          Math.round(vSalaryYear * 0.235) +
+          vSalaryYear,
       });
       groundSectionData.push(
         { paymentType: i },
@@ -106,15 +147,32 @@ function EnterpriseBusinessPlan({
         year: i,
         ...[...cultureSet].reduce((acc, el) => {
           //@ts-ignore
-          acc[el] = myBusiness?.busProds.reduce(
-            (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
-            0
-          );
+          acc[el] = myBusiness?.busProds
+            .filter((el) => el.year == i - start)
+            .reduce(
+              (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
+              0
+            );
           return acc;
         }, {}),
-        area: myBusiness?.busProds.reduce((p, c) => p + c.area, 0),
+        area: myBusiness?.busProds
+          .filter((el) => el.year == i - start)
+          .reduce((p, c) => p + c.area, 0),
       });
     }
+    areasUsageData.push({
+      bold: true,
+      year: "По БП",
+      ...[...cultureSet].reduce((acc, el) => {
+        //@ts-ignore
+        acc[el] = myBusiness?.busProds.reduce(
+          (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
+          0
+        );
+        return acc;
+      }, {}),
+      area: myBusiness?.busProds.reduce((p, c) => p + c.area, 0),
+    });
   })();
 
   const salaryExpensesColumns = useMemo<ColumnDef<any>[]>(() => {

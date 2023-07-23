@@ -79,7 +79,7 @@ const CartsTableItem = observer(
         <Td>{Math.round(10 * (e.costHectare! * +e.area)) / 10 || "0"}</Td>
         <Td>{e.costHectare || "0"}</Td>
         <Td>
-          <Link to={TEJ_ROUTER + "/" + myTEJ?.id}>
+          <Link to={TEJ_ROUTER + "/" + e.id!}>
             <MyViewIcon /> ТЕП
           </Link>
         </Td>
@@ -105,19 +105,7 @@ const CartsTableItem = observer(
             <MyDeleteIcon />
           </Td>
         )}
-        {isCul && (
-          <Td>
-            <div
-              onClick={() =>
-                setIsBasicCart(map, { cartId: e.id!, isBasic: !e.isBasic })
-              }
-            >
-              <Checkbox size="md" colorScheme="green" isChecked={!!e.isBasic}>
-                до бізнес-плану
-              </Checkbox>
-            </div>
-          </Td>
-        )}
+
         {!isCul && (
           <Td>
             {(user.role == "ADMIN" ||

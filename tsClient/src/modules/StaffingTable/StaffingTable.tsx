@@ -1,19 +1,19 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import { observer } from "mobx-react-lite";
+import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { Iworker } from "../../../../tRPC serv/models/models";
 import { deleteWorker } from "../../http/requests";
 import { Context } from "../../main";
-import { EnterpriseFormType } from "../../shared/hook/useEnterpriseForm";
-import { EnterpriseTaxGroupType } from "../../shared/hook/useEnterpriseTaxGroup";
-import { WorkerClassesType } from "../../shared/hook/useWorkersClasses";
-import EnterpriseStore from "../../store/EnterpriseStore";
+
 import { CreateWorkerProp } from "../CreateWorker/CreateWorker";
 export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
   return (
     <Tr>
       {!isPlan && <Th></Th>}
+      <Th>Рік</Th>
       <Th>Посада</Th>
       <Th>Кількість</Th>
       <Th>Місячний оклад</Th>
@@ -25,6 +25,7 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>Військовий збір 1,5%</Th>
       <Th>Загальний фонд ОП</Th>
       <Th>Вид найму</Th>
+      <Th>Налаштування</Th>
       {!isPlan && <Th></Th>}
     </Tr>
   );
@@ -36,6 +37,7 @@ function StaffingTableRow({
   setOpen,
   setUpdate,
   isPlan,
+  i,
 }: {
   name: string;
   el: Iworker;
@@ -43,6 +45,7 @@ function StaffingTableRow({
   setUpdate?: Dispatch<SetStateAction<boolean>>;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   isPlan?: boolean;
+  i?: number;
 }) {
   const { enterpriseStore } = useContext(Context);
   const yearSalary =
@@ -66,19 +69,17 @@ function StaffingTableRow({
                 dateFrom: el.dateFrom,
                 dateTo: el.dateTo,
                 workerId: el.id!,
+                businessPlanId: el.businessPlanId!,
+                year: el.year,
               });
             if (setUpdate) setUpdate(true);
             if (setOpen) setOpen(true);
           }}
         >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
+          <MyEditIcon />
         </Td>
       )}
+      <Td>{i}</Td>
       <Td>{name}</Td>
       <Td>{el.amount}</Td>
       <Td>{el.salary}</Td>
@@ -95,16 +96,15 @@ function StaffingTableRow({
       </Td>
       <Td>{yearSalary}</Td>
       <Td>{yearSalary * 0.22}</Td>
-      <Td>{yearSalary * 0.15}</Td>
+      <Td>{yearSalary * 0.015}</Td>
       <Td>{yearSalary + yearSalary * 0.22 + yearSalary * 0.015}</Td>
       <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
+      <Td>
+        <Button size="sm">Додати</Button>
+      </Td>
       {!isPlan && (
-        <Td
-          onClick={() => {
-            deleteWorker(enterpriseStore, { workerId: el.id! });
-          }}
-        >
-          <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
+        <Td onClick={() => deleteWorker(enterpriseStore, { workerId: el.id! })}>
+          <MyDeleteIcon />
         </Td>
       )}
     </Tr>
@@ -116,17 +116,21 @@ export function StaffingTableBodyRows({
   setRes,
   setUpdate,
   isPlan,
+  i,
 }: {
   thisWorkers: Iworker[];
   setRes?: Dispatch<SetStateAction<CreateWorkerProp>>;
   setUpdate?: Dispatch<SetStateAction<boolean>>;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   isPlan?: boolean;
+  i?: number;
 }) {
   const { enterpriseStore } = useContext(Context);
   return (
     <>
       <Tr>
+        <Td></Td>
+        <Td></Td>
         <Td colSpan={7}>Адмінісаративний персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
@@ -141,10 +145,13 @@ export function StaffingTableBodyRows({
               setOpen={setOpen}
               setUpdate={setUpdate}
               isPlan={isPlan}
+              i={i}
             />
           );
       })}
       <Tr>
+        <Td></Td>
+        <Td></Td>
         <Td colSpan={7}>Інженерно технічний</Td>
       </Tr>
       {thisWorkers?.map((el) => {
@@ -159,10 +166,13 @@ export function StaffingTableBodyRows({
               setOpen={setOpen}
               setUpdate={setUpdate}
               isPlan={isPlan}
+              i={i}
             />
           );
       })}
       <Tr>
+        <Td></Td>
+        <Td></Td>
         <Td colSpan={7}>Виробничий персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
@@ -177,91 +187,143 @@ export function StaffingTableBodyRows({
               setOpen={setOpen}
               setUpdate={setUpdate}
               isPlan={isPlan}
+              i={i}
             />
           );
       })}
     </>
   );
 }
-function StaffingTable({
-  thisWorkers,
-  setRes,
+export function StaffingTableBody({
   setOpen,
+  setRes,
   setUpdate,
+  thisWorkers,
+  i,
+  start,
+  myBusiness,
 }: {
   thisWorkers: Iworker[];
   setRes: Dispatch<SetStateAction<CreateWorkerProp>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  i: number;
+  start: number;
+  myBusiness: resBusinessPlan;
 }) {
   return (
-    <Table size={"sm"}>
-      <Thead>
-        <StaffingTableHeadRow />
-      </Thead>
-      <Tbody>
-        <StaffingTableBodyRows
-          thisWorkers={thisWorkers}
-          setRes={setRes}
-          setOpen={setOpen}
-          setUpdate={setUpdate}
-        />
-        <Tr fontWeight={"bold"}>
-          <Td></Td>
-          <Td>Разом</Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-          <Td>
-            {thisWorkers.reduce(
-              (p, c) =>
-                p +
-                c.salary *
-                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
-                    12),
-              0
-            )}
-          </Td>
-          <Td>
-            {thisWorkers.reduce(
-              (p, c) =>
-                p +
-                c.salary *
-                  0.22 *
-                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
-                    12),
-              0
-            )}
-          </Td>
-          <Td>
-            {thisWorkers.reduce(
-              (p, c) =>
-                p +
-                c.salary *
-                  0.015 *
-                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
-                    12),
-              0
-            )}
-          </Td>
-          <Td>
-            {thisWorkers.reduce(
-              (p, c) =>
-                p +
-                (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
-                  (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
-                    12),
-              0
-            )}
-          </Td>
-          <Td></Td>
-          <Td></Td>
-          <Td></Td>
-        </Tr>
-      </Tbody>
-    </Table>
+    <Tbody>
+      <StaffingTableBodyRows
+        thisWorkers={thisWorkers}
+        setRes={setRes}
+        setOpen={setOpen}
+        setUpdate={setUpdate}
+        i={i}
+      />
+      <Tr fontWeight={"bold"}>
+        <Td>
+          <MyPlusIcon
+            onClick={() => {
+              setOpen(true);
+              setRes((prev) => ({
+                amount: "",
+                class: "",
+                enterpriseId: myBusiness.enterpriseId!,
+                businessPlanId: myBusiness.id!,
+                year: i - start,
+                isConst: true,
+                form: prev.form,
+                jobId: "",
+                salary: "",
+                dateFrom: null,
+                dateTo: null,
+              }));
+            }}
+          />
+        </Td>
+        <Td>{i}</Td>
+        <Td>Разом</Td>
+        <Td></Td>
+        <Td></Td>
+        <Td></Td>
+        <Td></Td>
+        <Td>
+          {thisWorkers.reduce(
+            (p, c) =>
+              p +
+              c.salary *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount,
+            0
+          )}
+        </Td>
+        <Td>
+          {thisWorkers.reduce(
+            (p, c) =>
+              p +
+              c.salary *
+                0.22 *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount,
+            0
+          )}
+        </Td>
+        <Td>
+          {thisWorkers.reduce(
+            (p, c) =>
+              p +
+              c.salary *
+                0.015 *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount,
+            0
+          )}
+        </Td>
+        <Td>
+          {thisWorkers.reduce(
+            (p, c) =>
+              p +
+              (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount,
+            0
+          )}
+        </Td>
+        <Td></Td>
+        <Td></Td>
+        <Td></Td>
+      </Tr>
+    </Tbody>
   );
 }
+// function StaffingTable({
+//   thisWorkers,
+//   setRes,
+//   setOpen,
+//   setUpdate,
+// }: {
+//   thisWorkers: Iworker[];
+//   setRes: Dispatch<SetStateAction<CreateWorkerProp>>;
+//   setUpdate: Dispatch<SetStateAction<boolean>>;
+//   setOpen: Dispatch<SetStateAction<boolean>>;
+// }) {
+//   return (
+//     <Table size={"sm"}>
+//       <Thead>
+//         <StaffingTableHeadRow />
+//       </Thead>
+//       <StaffingTableBody
+//         setOpen={setOpen}
+//         setRes={setRes}
+//         setUpdate={setUpdate}
+//         thisWorkers={thisWorkers}
+//       />
+//     </Table>
+//   );
+// }
 
-export default observer(StaffingTable);
+// export default observer(StaffingTable);

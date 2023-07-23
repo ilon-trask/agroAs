@@ -22,7 +22,6 @@ import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
 // import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import {
-  ChangeProductType,
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
@@ -32,16 +31,12 @@ import {
 } from "../../../tRPC serv/routes/businessRouter";
 import { FeedBackProps } from "../modules/FeedbackForm/FeedBackForm";
 import IncomeStore from "../store/IncomeStore";
-
 import TEJStore from "../store/TEJStore";
 import {
   createTEJType,
   setIsPublicTEJType,
 } from "../../../tRPC serv/routes/TEJRouter";
-import {
-  CreateCartType,
-  setIsBasicCartType,
-} from "../../../tRPC serv/routes/cartRouter";
+import { CreateCartType } from "../../../tRPC serv/routes/cartRouter";
 import {
   createOutcomeType,
   patchOutcomeType,
@@ -1250,23 +1245,17 @@ export function getWorker(enterprise: EnterpriseStore) {
     enterprise.worker = res;
   });
 }
-export function createWorker(
-  enterprise: EnterpriseStore,
-  data: CreateWorkerType
-) {
+export function createWorker(bus: BusinessStore, data: CreateWorkerType) {
   client.worker.create.query(data).then((res) => {
-    enterprise.newWorker = res;
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    bus.newBusinessPlan = res;
   });
 }
-export function patchWorker(
-  enterprise: EnterpriseStore,
-  data: PatchWorkerType
-) {
+export function patchWorker(bus: BusinessStore, data: PatchWorkerType) {
   client.worker.patch.query(data).then((res) => {
     if (!res) return;
-
-    enterprise.worker = enterprise.worker.filter((el) => el.id != res.id!); //@ts-ignore
-    enterprise.newWorker = res;
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    bus.newBusinessPlan = res;
   });
 }
 export function deleteWorker(
@@ -1395,18 +1384,6 @@ export async function getCartForBusiness(map: MapStore) {
   const res = await client.cart.getForBusiness.query();
   //@ts-ignore
   map.businessCarts = res;
-}
-
-export function setIsBasicCart(map: MapStore, data: setIsBasicCartType) {
-  client.cart.setIsBasicCart.query(data).then((res) => {
-    if (!res) return;
-    if (res == "присутній") {
-    } else {
-      map.businessCarts = map.businessCarts.filter((el) => el.id != res.id!);
-      //@ts-ignore
-      map.newBusinessCarts = res;
-    }
-  });
 }
 
 export function addFinancingToBusinessPlan(

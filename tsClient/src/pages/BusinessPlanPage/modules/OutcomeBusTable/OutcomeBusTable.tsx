@@ -7,6 +7,7 @@ import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import { getMonthAmountFromBusinessPlan } from "../../BusinessPlanPage";
 import CreateOutcome, { CreateOutcomeProps } from "./module/CreateOutcome";
 
 function OutcomeBusTable({
@@ -45,8 +46,11 @@ function OutcomeBusTable({
                   (el) =>
                     getYearFromString(el.date) == i && el.group == "Постійні"
                 );
-                const monthAmount =
-                  i == start ? 13 - +myBusiness.dateStart.split("-")[1] : 12;
+                const monthAmount = getMonthAmountFromBusinessPlan(
+                  myBusiness.dateStart,
+                  i,
+                  start
+                );
                 res.push(
                   outcomes.map((el) => (
                     <Tr key={el.id}>
@@ -68,7 +72,7 @@ function OutcomeBusTable({
                       <Td>{getYearFromString(el.date)}</Td>
                       <Td>{el.name}</Td>
                       <Td>{el.costMonth}</Td>
-                      <Td>{el.costMonth * monthAmount}</Td>
+                      <Td>{el.costYear}</Td>
                       <Td>
                         <Button size="sm">Додати</Button>
                       </Td>
@@ -78,8 +82,10 @@ function OutcomeBusTable({
                     </Tr>
                   ))
                 );
-                const yearAmount =
-                  +outcomes.reduce((p, c) => p + c.costMonth, 0) * monthAmount;
+                const yearAmount = +outcomes.reduce(
+                  (p, c) => p + c.costYear || 0,
+                  0
+                );
                 sum += yearAmount;
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
@@ -107,7 +113,7 @@ function OutcomeBusTable({
                 );
               }
               res.push(
-                <Tr key={end + 1}>
+                <Tr key={end + 1} fontWeight={"bold"}>
                   <Td></Td>
                   <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
                   <Td></Td>
@@ -145,8 +151,11 @@ function OutcomeBusTable({
                     getYearFromString(el.date) == i &&
                     el.group == "Загально виробничі"
                 );
-                const monthAmount =
-                  i == start ? 13 - +myBusiness.dateStart.split("-")[1] : 12;
+                const monthAmount = getMonthAmountFromBusinessPlan(
+                  myBusiness.dateStart,
+                  i,
+                  start
+                );
                 res.push(
                   outcomes.map((el) => (
                     <Tr key={el.id}>
@@ -168,7 +177,7 @@ function OutcomeBusTable({
                       <Td>{getYearFromString(el.date)}</Td>
                       <Td>{el.name}</Td>
                       <Td>{el.costMonth}</Td>
-                      <Td>{el.costMonth * monthAmount}</Td>
+                      <Td>{el.costYear}</Td>
                       <Td>
                         <Button size="sm">Додати</Button>
                       </Td>
@@ -178,8 +187,10 @@ function OutcomeBusTable({
                     </Tr>
                   ))
                 );
-                const yearAmount =
-                  +outcomes.reduce((p, c) => p + c.costMonth, 0) * monthAmount;
+                const yearAmount = +outcomes.reduce(
+                  (p, c) => p + c.costYear || 0,
+                  0
+                );
                 sum += yearAmount;
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
@@ -207,7 +218,7 @@ function OutcomeBusTable({
                 );
               }
               res.push(
-                <Tr key={end + 1}>
+                <Tr key={end + 1} fontWeight={"bold"}>
                   <Td></Td>
                   <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
                   <Td></Td>

@@ -1,13 +1,22 @@
-import { Heading, Table, Th, Thead, Tr } from "@chakra-ui/react";
+import { Heading, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { RefObject, useMemo } from "react";
+import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
+import { Context } from "src/main";
+import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
 import getYearFromString from "src/shared/funcs/getYearFromString";
+import useIncomeTypes from "src/shared/hook/useIncomeTypes";
+import useOutcomeGroup from "src/shared/hook/useOutcomeGroup";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
+import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { Ifinancing } from "../../../../tRPC serv/models/models";
+import {
+  CashFlowTableHead,
+  CashFlowTableHeadBegin,
+} from "../CashFlowTable/CashFlowTable";
 
 function FinancingBusinessPlan({
   start,
@@ -16,10 +25,12 @@ function FinancingBusinessPlan({
   thisDerj,
   thisGrand,
   thisInvestment,
+  myBusiness,
   aref,
 }: {
   start: number;
   end: number;
+  myBusiness: resBusinessPlan;
   thisCredit: Ifinancing[] | undefined;
   thisInvestment: Ifinancing[] | undefined;
   thisDerj: Ifinancing[] | undefined;
@@ -36,6 +47,7 @@ function FinancingBusinessPlan({
     together: number | "";
     bold?: boolean;
   }[] = [];
+  const { income } = useContext(Context);
   const investmentPlan = [];
   const fundraisingPlanColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
@@ -58,7 +70,7 @@ function FinancingBusinessPlan({
       { header: "За рік", accessorKey: "inYear" },
     ];
   }, []);
-  for (let i = start; i < end; i++) {
+  for (let i = start; i <= end; i++) {
     fundraisingPlanData.push(
       ...(thisCredit
         ?.filter((el) => getYearFromString(el.date) == i)
@@ -131,11 +143,47 @@ function FinancingBusinessPlan({
       together: sumCred + sumDerj + sumGrand + sumInv,
       bold: true,
     });
+    // const mshp ;
+    const machinesValue = myBusiness.buying_machines
+      .filter((el) => getYearFromString(el.date) == i)
+      .reduce((p, c) => p + c.cost, 0);
+    const buildingValue = myBusiness.buildings
+      .filter((el) => getYearFromString(el.date) == i)
+      .reduce((p, c) => p + +c.startPrice, 0);
+
+    const mshpValue = myBusiness.MSHP.filter(
+      (el) => getYearFromString(el.date) == i
+    ).reduce((p, c) => p + c.cost * c.amount, 0);
+    const creatingValue = 0;
+    const opersValue = 0;
     investmentPlan.push(
-      { indicators: i },
-      { indicators: "Прям інвестицій" },
-      { indicators: "Всього прямих інвестицій" },
-      { indicators: "Всього інвестицій" }
+      { indicators: "Прям інвестицій", bold: true },
+      {
+        indicators: "Техніка та обладнання",
+        inYear: machinesValue,
+      },
+      {
+        indicators: "Будівлі та споруди",
+        inYear: buildingValue,
+      },
+      { indicators: "МШП", inYear: mshpValue },
+      {
+        indicators: "Всього прямих інвестицій",
+        bold: true,
+        inYear: machinesValue + buildingValue + mshpValue,
+      },
+      { indicators: "Створення біоактиву", inYear: creatingValue },
+      { indicators: "Операційні витрати", inYear: opersValue },
+      {
+        indicators: "Всього інвестицій " + i,
+        extraBold: true,
+        inYear:
+          machinesValue +
+          buildingValue +
+          mshpValue +
+          creatingValue +
+          opersValue,
+      }
     );
   }
   // fundraisingPlanData.push()
@@ -164,6 +212,206 @@ function FinancingBusinessPlan({
           </Tr>
         </Thead>
         <TableContent data={investmentPlan} columns={investmentColumns} />
+      </Table>
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th colSpan={5}>
+              <TableName>Грошовий потік (річний)</TableName>
+            </Th>
+          </Tr>
+          <Tr>
+            <Th colSpan={5}>
+              <TableNumber />
+            </Th>
+          </Tr>
+        </Thead>
+        {(() => {
+          const res = [];
+          let startSum = 0;
+          for (let i = start; i <= end; i++) {
+            const saleValue = myBusiness.busProds
+              .filter((el) => el.year == i - start)
+              .reduce((p, c) => {
+                const vegetation = income.vegetationYear?.find(
+                  (e) => e.busProdId == c.id && e.techCartId == c.techCartId
+                );
+                const myYield = income.yieldPlant.find(
+                  (e) => e.productId == c.productId
+                );
+                const amount =
+                  +(
+                    c.area *
+                    myYield?.yieldPerHectare! *
+                    (vegetation?.allCoeff || 1)
+                  ).toFixed(2) || 0;
+                return p + +(amount * (c.price || 0)).toFixed(2);
+              }, 0);
+            const incomeValue =
+              myBusiness.financings
+                .filter((e) => getYearFromString(e.date) == i)
+                .reduce((p, c) => p + c.cost, 0) + saleValue;
+            const outcome =
+              myBusiness.MSHP.filter(
+                (el) => getYearFromString(el.date) == i
+              ).reduce((p, c) => p + c.amount * c.cost, 0) +
+              myBusiness.buying_machines
+                .filter((el) => getYearFromString(el.date) == i)
+                .reduce((p, c) => p + c.amount * c.cost, 0) +
+              myBusiness.buildings
+                .filter((el) => getYearFromString(el.date) == i)
+                .reduce((p, c) => p + +c.startPrice, 0) +
+              myBusiness.outcomes
+                .filter((e) => getYearFromString(e.date) == i)
+                .reduce(
+                  (p, c) =>
+                    p +
+                    c.costMonth *
+                      getMonthAmountFromBusinessPlan(
+                        myBusiness.dateStart,
+                        i,
+                        start
+                      ),
+                  0
+                ) +
+              myBusiness.busProds
+                .filter((el) => el.year == i - start)
+                .reduce(
+                  (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                  0
+                );
+            res.push(
+              <CashFlowTableHead
+                year={i}
+                startSum={startSum}
+                key={i + "head"}
+              />
+            );
+            res.push(
+              <Tbody key={i + "body"}>
+                {useIncomeTypes.map((el) => {
+                  const value = myBusiness.financings
+                    .filter(
+                      (e) =>
+                        getYearFromString(e.date) == i && e.typeName == el.name
+                    )
+                    .reduce((p, c) => p + c.cost, 0);
+                  return value ? (
+                    <Tr key={el.id}>
+                      <Td>{i}</Td>
+                      <Td>{el.name}</Td>
+                      <Td>
+                        {myBusiness.financings
+                          .filter(
+                            (e) =>
+                              getYearFromString(e.date) == i &&
+                              e.typeName == el.name
+                          )
+                          .reduce((p, c) => p + c.cost, 0)}
+                      </Td>
+                    </Tr>
+                  ) : null;
+                })}
+                <Tr>
+                  <Td>{i}</Td>
+                  <Td>{"Реалізація"}</Td>
+                  <Td>{saleValue}</Td>
+                </Tr>
+                <Tr>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{"МШП"}</Td>
+                  <Td>
+                    {myBusiness.MSHP.filter(
+                      (el) => getYearFromString(el.date) == i
+                    ).reduce((p, c) => p + c.amount * c.cost, 0)}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{"Техніка та обладнання"}</Td>
+                  <Td>
+                    {myBusiness.buying_machines
+                      .filter((el) => getYearFromString(el.date) == i)
+                      .reduce((p, c) => p + c.amount * c.cost, 0)}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{"Будівлі та споруди"}</Td>
+                  <Td>
+                    {myBusiness.buildings
+                      .filter((el) => getYearFromString(el.date) == i)
+                      .reduce((p, c) => p + +c.startPrice, 0)}
+                  </Td>
+                </Tr>
+                {useOutcomeGroup.map((el) => {
+                  const value = myBusiness.outcomes
+                    .filter(
+                      (e) =>
+                        getYearFromString(e.date) == i && e.group == el.name
+                    )
+                    .reduce(
+                      (p, c) =>
+                        p +
+                        c.costMonth *
+                          getMonthAmountFromBusinessPlan(
+                            myBusiness.dateStart,
+                            i,
+                            start
+                          ),
+                      0
+                    );
+                  return value ? (
+                    <Tr key={el.id}>
+                      <Td>{i}</Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td>{el.name}</Td>
+                      <Td>{value}</Td>
+                    </Tr>
+                  ) : null;
+                })}
+                <Tr>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>Прямі</Td>
+                  <Td>
+                    {myBusiness.busProds
+                      .filter((el) => el.year == i - start)
+                      .reduce(
+                        (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                        0
+                      )}
+                  </Td>
+                </Tr>
+                <Tr fontWeight={"extrabold"}>
+                  <Td></Td>
+                  <Td>Оборот:</Td>
+                  <Td>{incomeValue}</Td>
+                  <Td>Оборот:</Td>
+                  <Td>{outcome}</Td>
+                </Tr>
+              </Tbody>
+            );
+            startSum += incomeValue;
+            startSum -= outcome;
+          }
+          res.push(
+            <CashFlowTableHeadBegin
+              startSum={startSum}
+              year={end + 1}
+              key={end + 1}
+            />
+          );
+          return res;
+        })()}
       </Table>
     </>
   );

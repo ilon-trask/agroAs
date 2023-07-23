@@ -1,10 +1,8 @@
-import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { ViewIcon } from "@chakra-ui/icons";
 import {
-  Box,
   Button,
   Container,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Text,
@@ -15,6 +13,8 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { getEnterprise } from "../http/requests";
@@ -82,26 +82,15 @@ function Enterprise() {
                     setOpen(true);
                   }}
                 >
-                  <EditIcon
-                    color={"blue.400"}
-                    w={"20px"}
-                    h={"auto"}
-                    cursor={"pointer"}
-                  />
+                  <MyEditIcon />
                 </Td>
                 <Td>
                   <Link to={ENTERPRISE_ROUTER + "/" + el.id}>
-                    <ViewIcon boxSize={5} color={"blue.400"} /> {el.name}
+                    <MyViewIcon /> {el.name}
                   </Link>
                 </Td>
                 {user.role == "service_role" ? (
-                  <Td>
-                    <Link
-                      to={ENTERPRISE_FORM_ROUTER + "/" + el.form + "/" + el.id}
-                    >
-                      <ViewIcon boxSize={5} color={"blue.400"} /> {el.form}
-                    </Link>
-                  </Td>
+                  <Td>{el.form}</Td>
                 ) : (
                   <Td>{el.form}</Td>
                 )}
@@ -109,7 +98,7 @@ function Enterprise() {
                   <Link
                     to={ENTERPRISE_TAX_GROUP + "/" + el.taxGroup + "/" + el.id}
                   >
-                    <ViewIcon boxSize={5} color={"blue.400"} /> {el.taxGroup}
+                    <MyViewIcon /> {el.taxGroup}
                   </Link>
                 </Td>
                 <Td>

@@ -44,7 +44,13 @@ function TableContent({ data, columns }: TableProps) {
                   whiteSpace={"pre-wrap"}
                   key={cell.id}
                   // style={{ whiteSpace: "pre-wrap" }}
-                  fontWeight={row.original.bold == true ? "bold" : "normal"}
+                  fontWeight={
+                    row.original.bold == true
+                      ? "bold"
+                      : row.original.extraBold == true
+                      ? "extrabold"
+                      : "normal"
+                  }
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Td>

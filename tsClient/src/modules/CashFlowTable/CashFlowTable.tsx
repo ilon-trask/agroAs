@@ -15,10 +15,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { observer } from "mobx-react-lite";
-import React, { useContext } from "react";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
-import { Context } from "../../main";
+
 import useIncomeTypes from "../../shared/hook/useIncomeTypes";
 import useOutcomeTypes from "../../shared/hook/useOutcomeTypes";
 let akk: number[] = [];
@@ -51,8 +48,43 @@ function PopOver({
     </Popover>
   );
 }
-const incomeTypes = useIncomeTypes;
-const outcomeTypes = useOutcomeTypes;
+
+export function CashFlowTableHeadBegin({
+  startSum,
+  year,
+}: {
+  startSum: number | undefined;
+  year: number;
+}) {
+  return (
+    <Tr>
+      <Th></Th>
+      <Th>{startSum ?? 0}</Th>
+      <Th colSpan={3}>Залишок на початок періоду {year || 2222}</Th>
+      <Th></Th>
+    </Tr>
+  );
+}
+export function CashFlowTableHead({
+  startSum,
+  year,
+}: {
+  startSum: number | undefined;
+  year: number;
+}) {
+  return (
+    <Thead>
+      <CashFlowTableHeadBegin startSum={startSum} year={year} />
+      <Tr>
+        <Th>Період</Th>
+        <Th>Назва доходу</Th>
+        <Th>Прихід</Th>
+        <Th>Назва витрат</Th>
+        <Th>Розхід</Th>
+      </Tr>
+    </Thead>
+  );
+}
 function CashFlowTable({
   year,
   startSum,
@@ -111,36 +143,7 @@ function CashFlowTable({
 
   return (
     <Table size={"sm"}>
-      <Thead>
-        <Tr>
-          <Th></Th>
-          <Th></Th>
-          <Th>{startSum || 0}</Th>
-          <Th colSpan={3}>Залишок на початок періоду {year || 2222}</Th>
-          <Th></Th>
-        </Tr>
-        <Tr>
-          <Th>Період</Th>
-          <Th>Назва доходу</Th>
-          <Th>Прихід</Th>
-          <Th cursor={"pointer"}>
-            <PopOver arr={incomeTypes}>
-              <Box>
-                Тип доходу <TriangleDownIcon color={"blue.400"} />
-              </Box>
-            </PopOver>
-          </Th>
-          <Th>Розхід</Th>
-          <Th cursor={"pointer"}>
-            <PopOver arr={outcomeTypes}>
-              <Box>
-                Тип витрат <TriangleDownIcon color={"blue.400"} />
-              </Box>
-            </PopOver>
-          </Th>
-          <Th>Назва витрат</Th>
-        </Tr>
-      </Thead>
+      <CashFlowTableHead startSum={startSum} year={0} />
       <Tbody>
         <Tr>
           <Td>1</Td>

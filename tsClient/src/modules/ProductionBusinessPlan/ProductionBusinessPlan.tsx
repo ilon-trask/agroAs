@@ -15,8 +15,12 @@ import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
+import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
+import TEJustificationContent from "src/pages/TEJustification/TEJustificationContent";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
+import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
@@ -25,6 +29,7 @@ import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
+import { BuyingMachineTableBodyRow } from "../BuyingMachineTable/BuyingMachineTable";
 import { CartsTableHeadRow } from "../CartsTable";
 import { CostProdTableHeadRows } from "../CostProdTable/CostProdTable";
 import { PlanIncomeProductionTableHeadRow } from "../PlanIncomeProductionTable/PlanIncomeProductionTable";
@@ -424,6 +429,20 @@ function ProductionBusinessPlan({
               //     );
               // }
             }
+            res.push(
+              <Tr key={end + 1}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td></Td>
+                <Td>
+                  {myBusiness.busProds.reduce(
+                    (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                    0
+                  )}
+                </Td>
+                <Td></Td>
+              </Tr>
+            );
             return res;
           })()}
         </Tbody>
@@ -449,7 +468,7 @@ function ProductionBusinessPlan({
         <Thead>
           <Tr>
             <Th colSpan={5}>
-              <TableName>Основні засоби</TableName>
+              <TableName>Техніка та обладнання</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -458,13 +477,64 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва основного засобу</Th>
-            <Th>Первісн а вартість</Th>
-            <Th>Термін амортизації</Th>
+            <Th>Кількість</Th>
+            <Th>Первісна вартість</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const machines = myBusiness?.buying_machines?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+              if (machines) {
+                res.push(
+                  machines.map((el) => (
+                    <Tr key={el.id!}>
+                      <Td>{i}</Td>
+                      <Td>{el.name}</Td>
+                      <Td>{el.amount}</Td>
+                      <Td>{el.amount * el.cost}</Td>
+                      <Td></Td>
+                      <Td></Td>
+                    </Tr>
+                  ))
+                );
+              }
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{machines.reduce((p, c) => p + c.amount, 0)}</Td>
+                  <Td>{machines.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>
+                  {myBusiness.buying_machines.reduce((p, c) => p + c.amount, 0)}
+                </Td>
+                <Td>
+                  {myBusiness.buying_machines.reduce(
+                    (p, c) => p + c.amount * c.cost,
+                    0
+                  )}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Description>
         В якості базового методу розрахунку амортизації біологічних активів було
@@ -475,7 +545,7 @@ function ProductionBusinessPlan({
         <Thead>
           <Tr>
             <Th colSpan={5}>
-              <TableName>Біологічні активи</TableName>
+              <TableName>Будівлі та споруди</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -484,13 +554,60 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва біологічного активу</Th>
+            <Th>Кількість</Th>
             <Th>Первісна вартість</Th>
-            <Th>Термін амортизації</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const buildings = myBusiness?.buildings?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+              res.push(
+                buildings.map((el) => (
+                  <Tr key={el.id!}>
+                    <Td>{i}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>1</Td>
+                    <Td>{el.startPrice}</Td>
+                    <Td></Td>
+                    <Td></Td>
+                  </Tr>
+                ))
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{buildings.length}</Td>
+                  <Td>{buildings.reduce((p, c) => p + +c.startPrice, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>{myBusiness?.buildings?.length}</Td>
+                <Td>
+                  {myBusiness?.buildings?.reduce(
+                    (p, c) => p + +c.startPrice,
+                    0
+                  )}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -505,14 +622,59 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва МШП</Th>
+            <Th>Кількість</Th>
             <Th>Первісна вартість</Th>
-            <Th>Термін амортизації</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
-        <Tbody></Tbody>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const MSHP = myBusiness?.MSHP?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+
+              res.push(
+                MSHP.map((el) => (
+                  <Tr key={el.id!}>
+                    <Td>{i}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.amount}</Td>
+                    <Td>{el.amount * el.cost}</Td>
+                    <Td></Td>
+                    <Td></Td>
+                  </Tr>
+                ))
+              );
+
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{MSHP.reduce((p, c) => p + c.amount, 0)}</Td>
+                  <Td>{MSHP.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>{myBusiness?.MSHP?.reduce((p, c) => p + c.amount, 0)}</Td>
+                <Td>
+                  {myBusiness?.MSHP?.reduce((p, c) => p + c.amount * c.cost, 0)}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -524,15 +686,7 @@ function ProductionBusinessPlan({
                   : 6) + 2
               }
             >
-              <TableName>
-                {`План амортизації перших${" "}
-              ${
-                myBusiness?.realizationTime! <= 7
-                  ? myBusiness?.realizationTime!
-                  : 6
-              }
-              років проекту`}
-              </TableName>
+              <TableName>{`План амортизації проекту`}</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -547,13 +701,11 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
-            <Th>
-              Засоби <br />
-              і&nbsp;активи
-            </Th>
-            <Th>Основні засоби</Th>
-            <Th>Біо активи</Th>
+            <Th>Рік</Th>
+            <Th>Техніка і обладнання</Th>
+            <Th>Будівлі і споруди</Th>
             <Th>МШП</Th>
+            <Th>Біо активи</Th>
             <Th>
               Сума <br />
               амортизації
@@ -563,7 +715,7 @@ function ProductionBusinessPlan({
         <Tbody>
           {(() => {
             const res = [];
-            for (let i = start; i < end; i++) {
+            for (let i = start; i <= end; i++) {
               if (i <= start + 6) {
                 res.push(
                   <Tr key={i}>
@@ -591,18 +743,64 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва ресурсу</Th>
             <Th>Кількість</Th>
             <Th>Ціна</Th>
             <Th>Сума</Th>
-            <Th>Призначення</Th>
+            <Th>Під культуру</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              res.push(
+                myBusiness.busProds
+                  .filter((el) => el.year == i - start)
+                  .map((el) => (
+                    <Tr key={el.id}>
+                      <Td>{i}</Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td>{el.product?.culture?.name}</Td>
+                    </Tr>
+                  ))
+              );
+              // res.push(<Tr></Tr>)
+            }
+
+            return res;
+          })()}
+        </Tbody>
       </Table>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування потреби в ресурсах
-      </Text>
-      <Text
+      <MyHeading>Потреби в ресурсах для бізнес-плану</MyHeading>
+      {(() => {
+        const res = [];
+        for (let i = start; i <= end; i++) {
+          res.push(
+            <Text key={i} fontSize={30}>
+              {i}
+            </Text>
+          );
+          res.push(
+            myBusiness.busProds
+              .filter((el) => el.year == i - start)
+              .map((el) => (
+                <TEJustificationContent
+                  key={el.id}
+                  isPlan={true}
+                  myCart={el.tech_cart}
+                  myJustification={{ area: el.area }}
+                />
+              ))
+          );
+        }
+        return res;
+      })()}
+      {/* <Text
         textAlign={"center"}
         fontSize={"14px"}
         mt={"15px"}
@@ -612,8 +810,8 @@ function ProductionBusinessPlan({
       </Text>
       <MyTableContainer>
         <TableComponent data={laborСostsData} columns={laborСostsColumns} />
-      </MyTableContainer>
-      <Text
+      </MyTableContainer> */}
+      {/*  <Text
         textAlign={"center"}
         fontSize={"14px"}
         mt={"15px"}
@@ -959,26 +1157,47 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </MyTableContainer>
+      </MyTableContainer> */}
 
       <Paragraph>4.3. Опис продукту</Paragraph>
       <Table size={"sm"}>
-        {[...productSet].map((el, ind) => {
-          if (ind == 0) {
-            return (
-              <Tr key={el}>
-                <Th rowSpan={productSet.size}>Основний продукт</Th>
-                <Th>{el}</Th>
-              </Tr>
-            );
-          } else {
-            return (
-              <Tr key={el}>
-                <Th>{el}</Th>
-              </Tr>
-            );
-          }
-        })}
+        <Thead>
+          <Tr>
+            <Th>Рік</Th>
+            <Th>Назва продукту</Th>
+            <Th>Упаковка</Th>
+            <Th>Кількість</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const busProd = myBusiness.busProds.filter(
+                (el) => el.year == i - start
+              );
+              res.push(
+                busProd.map((el) => (
+                  <Tr key={el.id}>
+                    <Td>{i}</Td>
+                    <Td>{el.product?.name}</Td>
+                    <Td>{}</Td>
+                    <Td>{}</Td>
+                  </Tr>
+                ))
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size="sm">
         <Thead>
@@ -1006,7 +1225,7 @@ function ProductionBusinessPlan({
           {(() => {
             const res = [];
             for (let i = start; i < end; i++) {
-              const yearName = useVegetationYears[i - start + 1].name;
+              let sum = 0;
               const busProds = myBusiness.busProds.filter(
                 (el) => el.year == i - start
               );
@@ -1020,26 +1239,30 @@ function ProductionBusinessPlan({
                   );
                   const amount =
                     +(
-                      el.area *
-                      myYield?.yieldPerHectare! *
-                      (vegetation?.allCoeff || 1)
+                      myYield?.yieldPerHectare! * (vegetation?.allCoeff || 1)
                     ).toFixed(2) || 0;
-
+                  const gather = (amount * el.area).toFixed(2);
+                  sum += +(el.price * gather).toFixed(2);
                   return (
                     <Tr key={el.id}>
                       <Td>{el.product?.name}</Td>
                       <Td>{amount}</Td>
                       <Td>{el.area}</Td>
-                      <Td>{(amount * el.area).toFixed(2)}</Td>
+                      <Td>{gather}</Td>
+                      <Td>{el.price}</Td>
+                      <Td>{(el.price * gather).toFixed(2)}</Td>
                     </Tr>
                   );
                 })
               );
               res.push(
-                <Tr key={i}>
-                  <Td>
-                    <Text fontWeight={"bold"}>{i}</Text>
-                  </Td>
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{sum}</Td>
                 </Tr>
               );
             }
@@ -1076,35 +1299,34 @@ function ProductionBusinessPlan({
           <Tbody>
             {(() => {
               const res = [];
-              for (let i = start; i < end; i++) {
+              for (let i = start; i <= end; i++) {
                 const busProds = myBusiness.busProds.filter(
                   (el) => el.year == i - start
                 );
 
                 res.push(
                   ...busProds?.map((el) => {
-                    const yearName = useVegetationYears[i - start + 1].name;
-                    const myYield = income.yieldPlant?.find(
-                      (e) => e.cultureId == el.product?.cultureId
-                    );
-
                     const vegetation = income.vegetationYear?.find(
-                      (e) => e.yieldPlantId == myYield?.id && e.year == yearName
+                      (e) =>
+                        e.busProdId == el.id && e.techCartId == el.techCartId
+                    );
+                    const myYield = income.yieldPlant.find(
+                      (e) => e.productId == el.productId
                     );
                     const sum =
-                      Math.round(
-                        (myYield?.yieldPerHectare! *
-                          el.area *
-                          vegetation?.allCoeff! || 0) * 100
-                      ) / 100;
+                      +(
+                        el.area *
+                        myYield?.yieldPerHectare! *
+                        (vegetation?.allCoeff || 1)
+                      ).toFixed(2) || 0;
                     return (
                       <Tr key={el.id}>
                         <Td>{el.product?.culture?.name}</Td>
-                        <Td>{el.product?.culture?.product}</Td>
+                        <Td>{el.product?.name}</Td>
                         <Td>{el.product?.culture?.collectPeriod}</Td>
                         <Td>{sum}</Td>
-                        <Td>{el.product?.culture?.priceBerry}</Td>
-                        <Td>{sum * el.product?.culture?.priceBerry!}</Td>
+                        <Td>{el.price}</Td>
+                        <Td>{(sum * el.price!).toFixed(2)}</Td>
                       </Tr>
                     );
                   })
@@ -1120,23 +1342,19 @@ function ProductionBusinessPlan({
           </Tbody>
         </Table>
       </MyTableContainer>
+      <Description>
+        У структурі собівартості продукції виділено три групи витрат: Прямі –
+        розрахунок на основі технологічної карти Загально-виробничі – розрахунок
+        на основі вимог забезпечення виробництва і збуту продукції Постійні –
+        розрахунок на основі вимог щодо адміністративного управління
+        підприємством
+      </Description>
       <MyTableContainer mt={"50px"}>
         <Table size={"sm"}>
           <Thead>
             <Tr>
               <Th colSpan={9}>
-                <Description>
-                  У структурі собівартості продукції виділено три групи витрат:
-                  Прямі – розрахунок на основі технологічної карти
-                  Загально-виробничі – розрахунок на основі вимог забезпечення
-                  виробництва і збуту продукції Постійні – розрахунок на основі
-                  вимог щодо адміністративного управління підприємством
-                </Description>
-              </Th>
-            </Tr>
-            <Tr>
-              <Th colSpan={9}>
-                <TableName>Собіварість продукції</TableName>
+                <TableName>Собівартість продукції</TableName>
               </Th>
             </Tr>
             <Tr>
@@ -1144,10 +1362,107 @@ function ProductionBusinessPlan({
                 <TableNumber></TableNumber>
               </Th>
             </Tr>
-            <CostProdTableHeadRows />
+            {/* <CostProdTableHeadRows /> */}
           </Thead>
           <Tbody>
             {(() => {
+              const data: {
+                year: number;
+                name: string;
+                permanent: number;
+                general: number;
+                direct: number;
+                outcome: number;
+                amount: number;
+                cost: number;
+                bold?: boolean;
+              }[] = [];
+              for (let i = start; i < end; i++) {
+                const busProd = myBusiness.busProds.filter(
+                  (el) => el.year == i - start
+                );
+                const permanent = myBusiness.outcomes.filter(
+                  (el) =>
+                    getYearFromString(el.date) == i && el.group == "Постійні"
+                );
+                const general = myBusiness.outcomes.filter(
+                  (el) =>
+                    getYearFromString(el.date) == i &&
+                    el.group == "Загально виробничі"
+                );
+                const monthAmount = getMonthAmountFromBusinessPlan(
+                  myBusiness.dateStart,
+                  i,
+                  start
+                );
+                data.push(
+                  ...busProd.map((el) => {
+                    const vegetation = income.vegetationYear?.find(
+                      (e) =>
+                        e.busProdId == el.id && e.techCartId == el.techCartId
+                    );
+                    const myYield = income.yieldPlant.find(
+                      (e) => e.productId == el.productId
+                    );
+                    const amount =
+                      +(
+                        el.area *
+                        myYield?.yieldPerHectare! *
+                        (vegetation?.allCoeff || 1)
+                      ).toFixed(2) || 0;
+                    return {
+                      year: i,
+                      name: el.product?.name,
+                      direct: (el.tech_cart?.costHectare || 0) * el.area,
+                      permanent: 0,
+                      general: 0,
+                      outcome: (el.tech_cart?.costHectare || 0) * el.area,
+                      amount: amount,
+                    };
+                  })
+                );
+                const directValue = busProd.reduce(
+                  (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                  0
+                );
+                const permanentValue = permanent.reduce(
+                  (p, c) => p + c.costYear,
+                  0
+                );
+                const generalValue = general.reduce(
+                  (p, c) => p + c.costYear,
+                  0
+                );
+                data.push({
+                  year: i,
+                  name: "Разом:",
+                  bold: true,
+                  direct: directValue,
+                  permanent: permanentValue,
+                  general: generalValue,
+                  outcome: generalValue + permanentValue + directValue,
+                });
+              }
+              const columns: ColumnDef<{
+                year: number;
+                name: string;
+                permanent: number;
+                general: number;
+                direct: number;
+                outcome: number;
+                amount: number;
+                cost: number;
+              }>[] = [
+                { header: "Рік", accessorKey: "year" },
+                { header: "Назва", accessorKey: "name" },
+                { header: "Постійні", accessorKey: "permanent" },
+                { header: "Заг.Виг.", accessorKey: "general" },
+                { header: "Прямі", accessorKey: "direct" },
+                { header: "Витрати", accessorKey: "outcome" },
+                { header: "К-ть", accessorKey: "amount" },
+                { header: "Собівартість", accessorKey: "cost" },
+              ];
+              return <TableContent data={data} columns={columns} />;
               const res = [];
               for (let i = start; i < end; i++) {
                 res.push(

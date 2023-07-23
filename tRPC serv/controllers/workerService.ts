@@ -1,6 +1,7 @@
 import { Principal } from "..";
 import { worker, Iworker } from "../models/models";
 import { CreateWorkerType, PatchWorkerType } from "../routes/workerRouter";
+import { getBusinessPlan } from "./BusinessService";
 function changeRes(arr: Iworker[]) {
   arr = JSON.parse(JSON.stringify(arr));
 
@@ -34,6 +35,7 @@ class workerService {
       amount: data.amount,
       dateFrom: data.dateFrom!,
       dateTo: data.dateTo!,
+      year: data.year,
       isConst: data.isConst,
       salary: data.salary,
       enterpriseId: data.enterpriseId,
@@ -41,9 +43,10 @@ class workerService {
       jobId: data.jobId,
       class: data.class,
       userId: user.sub,
+      businessPlanId: data.businessPlanId,
     });
 
-    return changeRes([res])[0];
+    return getBusinessPlan(data.businessPlanId);
   }
   async patch(user: Principal | undefined, data: PatchWorkerType) {
     if (!user) return;
@@ -61,11 +64,8 @@ class workerService {
       },
       { where: { id: data.workerId } }
     );
-    const res: Iworker | null = await worker.findOne({
-      where: { id: data.workerId },
-    });
-    if (!res) return;
-    return changeRes([res])[0];
+
+    return getBusinessPlan(data.businessPlanId);
   }
   async delete(user: Principal | undefined, data: { workerId: number }) {
     if (!user) return;

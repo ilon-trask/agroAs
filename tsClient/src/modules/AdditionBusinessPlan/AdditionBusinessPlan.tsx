@@ -422,17 +422,26 @@ function AdditionBusinessPlan({
           {(() => {
             let sum = 0;
             const res = [];
-            for (let i = start; i < end; i++) {
-              thisWorkers.forEach((el) => {
-                sum += el.salary * 12 * el.amount;
-              });
+            for (let i = start; i <= end; i++) {
+              thisWorkers
+                .filter((el) => el.year == i - start)
+                .forEach((el) => {
+                  sum +=
+                    el.salary *
+                    (+el.dateTo?.split("-")[1] -
+                      +el.dateFrom?.split("-")[1] +
+                      1 || 12) *
+                    el.amount;
+                });
               res.push(
                 <React.Fragment key={i}>
                   <Tr>
                     <Td>{i}</Td>
                   </Tr>
                   <StaffingTableBodyRows
-                    thisWorkers={thisWorkers}
+                    thisWorkers={thisWorkers.filter(
+                      (el) => el.year == i - start
+                    )}
                     isPlan={true}
                   />
                 </React.Fragment>
@@ -480,7 +489,7 @@ function AdditionBusinessPlan({
       <Paragraph>Додаток Г. Калькуляція собівартості</Paragraph>
       {(() => {
         const res = [];
-        for (let i = start; i < end; i++) {
+        for (let i = start; i <= end; i++) {
           res.push(
             <Table size={"sm"} mt={"10px"} key={i}>
               <Thead>

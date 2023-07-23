@@ -1,17 +1,9 @@
 import { Table, Th, Thead, Tr, Heading, Td, Text } from "@chakra-ui/react";
-import React, {
-  RefObject,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import { ColumnDef } from "@tanstack/react-table";
 import { Context } from "src/main";
-import getYearFromString from "src/shared/funcs/getYearFromString";
 import useBusinessPlanFinancingData from "src/shared/hook/BusinessPlanFinancingData/useBusinessPlanFinancingData";
-import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
@@ -36,10 +28,6 @@ function PlanedIndicatorsBusinessPlan({
   thisMaps: resTechCartsWithOpers[];
 }) {
   const { income } = useContext(Context);
-  console.log("mapD");
-
-  console.log(thisMaps);
-  console.log(thisWorkers);
 
   const data = useBusinessPlanFinancingData(
     start,

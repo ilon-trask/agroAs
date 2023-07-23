@@ -878,6 +878,7 @@ export interface Ioutcome {
   group: IoutcomeGroup;
   type: IoutcomeType | null;
   costMonth: number;
+  costYear?: number;
   userId: string;
   isUsing?: boolean;
   techCartId?: number;
@@ -1187,12 +1188,14 @@ export interface Iworker {
   form: EnterpriseFormType;
   userId: string;
   amountOfMounths?: number;
+  year: number;
   enterpriseId?: number;
   jobId?: number;
+  businessPlanId?: number;
 }
 
 export class worker extends Model<Iworker> {
-  declare id?: number;
+  declare id: number;
   declare isConst: boolean;
   declare salary: number;
   declare amount: number;
@@ -1200,7 +1203,9 @@ export class worker extends Model<Iworker> {
   declare dateTo: string;
   declare form: EnterpriseFormType;
   declare class: WorkerClassesType;
+  declare year: number;
   declare userId: string;
+  declare businessPlanId: number;
 }
 worker.init(
   {
@@ -1211,6 +1216,7 @@ worker.init(
     dateFrom: { type: DataTypes.DATEONLY },
     dateTo: { type: DataTypes.DATEONLY },
     class: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     form: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING },
   },
@@ -1462,6 +1468,9 @@ worker.belongsTo(enterprise);
 
 job.hasOne(worker);
 worker.belongsTo(job);
+
+businessPlan.hasMany(worker);
+worker.belongsTo(businessPlan);
 
 cultivationTechnologies.hasMany(tech_cart);
 tech_cart.belongsTo(cultivationTechnologies);

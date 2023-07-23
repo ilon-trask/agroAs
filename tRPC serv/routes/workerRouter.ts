@@ -6,6 +6,7 @@ const createWorker = z.object({
   amount: z.number(),
   dateFrom: z.string().optional().nullable().optional(),
   dateTo: z.string().optional().nullable().optional(),
+  year: z.number(),
   isConst: z.boolean(),
   salary: z.number(),
   enterpriseId: z.number(),
@@ -19,6 +20,7 @@ const createWorker = z.object({
     "Юридична особа ФГ",
   ]),
   jobId: z.number(),
+  businessPlanId: z.number(),
 });
 export type CreateWorkerType = z.infer<typeof createWorker>;
 const patchWorker = createWorker.extend({ workerId: z.number() });
