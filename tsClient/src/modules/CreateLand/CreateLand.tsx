@@ -1,4 +1,11 @@
-import { Box, Button, Heading, Input, ModalFooter } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Heading,
+  Input,
+  ModalFooter,
+  Select,
+} from "@chakra-ui/react";
 import React, {
   Dispatch,
   SetStateAction,
@@ -7,7 +14,7 @@ import React, {
   useState,
 } from "react";
 import Dialog from "src/components/Dialog";
-import { createLand, patchLand } from "src/http/requests";
+import { createLandForBusiness, patchLandForBusiness } from "src/http/requests";
 import { Context } from "src/main";
 const obj = {};
 export interface CreateLandProps {
@@ -16,35 +23,39 @@ export interface CreateLandProps {
   area: number | string;
   cadastreNumber: number | string;
   businessPlanId?: number;
-  enterpriseId: number;
+  enterpriseId?: number;
+  date: string;
+  rate: number | string;
+  ownership: "Комунальна" | "Приватна" | "Державна" | "";
+  rightOfUse: "Оренда" | "Власна" | "";
 }
 function CreateLand({
   open,
   setOpen,
-  update,
-  setUpdate,
   data,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  update: boolean;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
   data: CreateLandProps;
 }) {
-  const { enterpriseStore } = useContext(Context);
+  const { business } = useContext(Context);
   const [res, setRes] = useState<CreateLandProps>({
     area: "",
     cadastreNumber: "",
     enterpriseId: 0,
     name: "",
+    date: "",
+    rightOfUse: "",
+    ownership: "",
+    rate: "",
   });
   useEffect(() => setRes(data), [data]);
   return (
     <Dialog
       open={open}
       setOpen={setOpen}
-      update={update}
-      setUpdate={setUpdate}
+      update={false}
+      setUpdate={() => {}}
       isErr={false}
       res={obj}
       props={obj}
@@ -57,6 +68,10 @@ function CreateLand({
           area: "",
           cadastreNumber: "",
           name: "",
+          date: "",
+          rightOfUse: "",
+          ownership: "",
+          rate: "",
         }))
       }
     >
@@ -65,20 +80,24 @@ function CreateLand({
       </Heading>
       <Box display={"flex"} justifyContent={"space-around"} mt={3}>
         <Box maxW={"190px"}>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Введіть назву
+          <Heading as={"h4"} size="sm">
+            Виберіть право користування
           </Heading>
-          <Input
-            size={"sm"}
-            value={res.name}
+          <Select
+            value={res.rightOfUse}
             onChange={(e) =>
-              setRes((prev) => ({ ...prev, name: e.target.value }))
+              setRes((prev) => ({ ...prev, rightOfUse: e.target.value as any }))
             }
-            placeholder="Введіть данні"
-          />
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            <option value="Оренда">Оренда</option>
+            <option value="Власна">Власна</option>
+          </Select>
         </Box>
         <Box maxW={"190px"}>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
+          <Heading as={"h4"} size="sm">
             Введіть площу
           </Heading>
           <Input
@@ -92,7 +111,7 @@ function CreateLand({
           />
         </Box>
         <Box maxW={"190px"}>
-          <Heading as={"h4"} size="sm" minW={"max-content"}>
+          <Heading as={"h4"} size="sm">
             Введіть кадастровий номер
           </Heading>
           <Input
@@ -110,33 +129,78 @@ function CreateLand({
           />
         </Box>
       </Box>
+      <Box display={"flex"} justifyContent={"space-around"}>
+        <Box>
+          <Heading as={"h4"} size="sm">
+            Внесіть ставку
+          </Heading>
+          <Input
+            type={"number"}
+            inputMode="numeric"
+            placeholder="Впишіть данні"
+            value={res.rate}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, rate: e.target.value }))
+            }
+          />
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm">
+            Виберіть власність
+          </Heading>
+          <Select
+            value={res.ownership}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, ownership: e.target.value as any }))
+            }
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            <option value="Приватна">Приватна</option>
+            <option value="Комунальна">Комунальна</option>
+            <option value="Державна">Державна</option>
+          </Select>
+        </Box>
+      </Box>
       <ModalFooter>
         <Button
           isDisabled={
-            !res.area && !res.cadastreNumber && !res.enterpriseId && !res.name
+            !res.area &&
+            !res.cadastreNumber &&
+            !res.enterpriseId &&
+            !res.rightOfUse &&
+            !res.ownership &&
+            !res.rate
           }
           onClick={() => {
             if (
               res.area &&
               res.cadastreNumber &&
-              res.enterpriseId &&
-              res.name
+              res.rightOfUse &&
+              res.ownership &&
+              res.rate
             ) {
-              if (update) {
-                patchLand(enterpriseStore, {
+              if (res.landId) {
+                patchLandForBusiness(business, {
                   ...res,
                   area: +res.area,
                   cadastreNumber: +res.cadastreNumber,
                   landId: res.landId!,
+                  rightOfUse: res.rightOfUse as any,
+                  rate: +res.rate,
+                  ownership: res.ownership as any,
                 });
               } else {
-                createLand(enterpriseStore, {
+                createLandForBusiness(business, {
                   ...res,
                   area: +res.area,
                   cadastreNumber: +res.cadastreNumber,
+                  rightOfUse: res.rightOfUse as any,
+                  rate: +res.rate,
+                  ownership: res.ownership as any,
                 });
               }
-              setUpdate(false);
               setOpen(false);
               setRes((prev) => ({
                 enterpriseId: prev.enterpriseId,
@@ -144,6 +208,10 @@ function CreateLand({
                 area: "",
                 cadastreNumber: "",
                 name: "",
+                date: "",
+                rightOfUse: "",
+                ownership: "",
+                rate: "",
               }));
             }
           }}

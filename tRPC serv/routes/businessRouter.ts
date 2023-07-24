@@ -7,6 +7,7 @@ import { createFinancing } from "./financingRouter";
 import { createBuyingMachine, patchBuyingMachine } from "./buyingMachineRouter";
 import { createBuilding, patchBuilding } from "./buildingRouter";
 import { createOutcome, patchOutcome } from "./outcomeRouter";
+import { createLand, patchLand } from "./landRouter";
 const productIds = z.array(
   z.object({
     ownId: z.number().or(z.string()),
@@ -39,6 +40,8 @@ const patchBusProd = createBusProd.extend({
   price: z.number(),
 });
 export type PatchBusProd = z.infer<typeof patchBusProd>;
+const deleteBusProd = z.object({ id: z.number(), busId: z.number() });
+export type DeleteBusProd = z.infer<typeof deleteBusProd>;
 const createType = z.object({
   name: z.string(),
   topic: z.string(),
@@ -81,6 +84,11 @@ const patchFinancingForBusiness = createFinancingForBusiness.extend({
 export type PatchFinancingForBusiness = z.infer<
   typeof patchFinancingForBusiness
 >;
+const deleteForBusiness = z.object({
+  id: z.number(),
+  busId: z.number(),
+});
+export type DeleteForBusiness = z.infer<typeof deleteForBusiness>;
 const businessRouter = router({
   // getCategory: publicProcedure.query(async () => {
   //   const res = await BusinessService.getCategory();
@@ -152,6 +160,12 @@ const businessRouter = router({
       const res = await BusinessService.patchBusProd(ctx.user, input);
       return res;
     }),
+  deleteBusProd: publicProcedure
+    .input(deleteBusProd)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteBusProd(ctx.user, input);
+      return res;
+    }),
   createFinancingForBusiness: publicProcedure
     .input(createFinancingForBusiness)
     .query(async ({ ctx, input }) => {
@@ -165,6 +179,15 @@ const businessRouter = router({
     .input(patchFinancingForBusiness)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.patchFinancingForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  deleteFinancingForBusiness: publicProcedure
+    .input(deleteForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteFinancingForBusiness(
         ctx.user,
         input
       );
@@ -188,6 +211,15 @@ const businessRouter = router({
       );
       return res;
     }),
+  deleteBuyingMachineForBusiness: publicProcedure
+    .input(deleteForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteBuyingMachineForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
   createBuildingForBusiness: publicProcedure
     .input(createBuilding)
     .query(async ({ ctx, input }) => {
@@ -201,6 +233,15 @@ const businessRouter = router({
     .input(patchBuilding)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.patchBuildingForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  deleteBuildingForBusiness: publicProcedure
+    .input(deleteForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteBuildingForBusiness(
         ctx.user,
         input
       );
@@ -222,6 +263,33 @@ const businessRouter = router({
         ctx.user,
         input
       );
+      return res;
+    }),
+  deleteOutcomeForBusiness: publicProcedure
+    .input(deleteForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteOutcomeForBusiness(
+        ctx.user,
+        input
+      );
+      return res;
+    }),
+  createLandForBusiness: publicProcedure
+    .input(createLand)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createLandForBusiness(ctx.user, input);
+      return res;
+    }),
+  patchLandForBusiness: publicProcedure
+    .input(patchLand)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.patchLandForBusiness(ctx.user, input);
+      return res;
+    }),
+  deleteLandForBusiness: publicProcedure
+    .input(deleteForBusiness)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.deleteLandForBusiness(ctx.user, input);
       return res;
     }),
 });

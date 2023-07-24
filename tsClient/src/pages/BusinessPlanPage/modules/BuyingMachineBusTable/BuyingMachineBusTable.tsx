@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import {
   BuyingMachineTableBodyRow,
   BuyingMachineTableHead,
@@ -43,6 +44,11 @@ function BuyingMachineBusTable({
       enterpriseId: myBusiness?.enterpriseId!,
     });
   const [update, setUpdate] = useState(false);
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "техніку",
+  });
   return (
     <>
       <MyHeading>Купівля техніки та обладнання</MyHeading>
@@ -67,6 +73,8 @@ function BuyingMachineBusTable({
                         setOpen={setBuyingMachineOpen}
                         setRes={setBuyingMachineRes}
                         setUpdate={setUpdate}
+                        setDeleteOpen={setDeleteData}
+                        busId={myBusiness?.id!}
                       />
                     ))
                   );
@@ -128,13 +136,23 @@ function BuyingMachineBusTable({
           </Tbody>
         </Table>
       </TableContainer>
-      <CreateBuyingMachine
-        open={buyingMachineOpen}
-        setOpen={setBuyingMachineOpen}
-        data={buyingMachineRes}
-        update={update}
-        setUpdate={setUpdate}
-      />
+      {buyingMachineOpen ? (
+        <CreateBuyingMachine
+          open={buyingMachineOpen}
+          setOpen={setBuyingMachineOpen}
+          data={buyingMachineRes}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      ) : null}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          func={deleteData.func}
+          isOpen={deleteData.isOpen}
+          setOpen={deleteData}
+          text={deleteData.text}
+        />
+      ) : null}
     </>
   );
 }

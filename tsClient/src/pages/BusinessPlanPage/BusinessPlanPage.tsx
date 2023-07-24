@@ -1,15 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Box, Button, TableContainer } from "@chakra-ui/react";
 import BusinessConceptTable from "../../modules/TEJConceptTable";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../../main";
@@ -53,13 +43,12 @@ import MyHeading from "src/ui/MyHeading";
 import OutcomeBusTable from "./modules/OutcomeBusTable";
 import QuizButton from "./modules/QuizButton";
 import MSHPBusTable from "./modules/MSHPBusTable/MSHPBusTable";
-import MyTableContainer from "src/ui/MyTableContainer";
 import SaleBusTable from "./modules/SaleBusTable";
-import { YIELD_CALC_ROUTER } from "src/utils/consts";
-import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import getStartAndEndBusinessPlan from "src/shared/hook/getStartAndEndBusinessPlan";
 import { Ioutcome } from "../../../../tRPC serv/models/models";
 import getYearFromString from "src/shared/funcs/getYearFromString";
+import LandBusTable from "./modules/LandBusTable";
+import PlanYieldBusTable from "./modules/PlanYieldBusTable";
 export function getMonthAmountFromBusinessPlan(
   dateStart: string,
   i: number,
@@ -67,6 +56,7 @@ export function getMonthAmountFromBusinessPlan(
 ) {
   return i == start ? 13 - +dateStart.split("-")[1] : 12;
 }
+console.time("all");
 function BiznesPlanPage() {
   const { map, enterpriseStore, business, income, TEJ } = useContext(Context);
   useBusiness(business, map);
@@ -123,7 +113,6 @@ function BiznesPlanPage() {
   const cultureSet = new Set(
     myBusiness?.busProds?.map((el) => el?.product?.culture?.name!)
   );
-  console.log("ітр");
 
   useEffect(() => {
     if (myBusiness)
@@ -219,8 +208,6 @@ function BiznesPlanPage() {
         return outcomes;
       })();
   }, [myBusiness]);
-  console.log("outcome");
-  console.log(myBusiness?.outcomes);
 
   const productSet = new Set(
     myBusiness?.busProds?.map((el) => el.product?.culture?.product!)
@@ -245,19 +232,13 @@ function BiznesPlanPage() {
       )
       .flat() || [];
   useEffect(() => {
-    if (myBusiness) {
-      setReady(true);
-    }
+    if (myBusiness) setReady(true);
   }, [myBusiness]);
   useEffect(() => {
-    if (thisMaps[0]) {
-      setCartReady(true);
-    }
+    if (thisMaps[0]) setCartReady(true);
   }, [thisMaps[0]]);
   useEffect(() => {
-    if (map.opers[0]) {
-      setOperReady(true);
-    }
+    if (map.opers[0]) setOperReady(true);
   }, [map.opers[0]?.nameOperation]);
   useEffect(() => {
     if (cartReady) {
@@ -305,99 +286,14 @@ function BiznesPlanPage() {
       <MyHeading>Бізнес-план {myBusiness?.name}</MyHeading>
       <GeneralBusTable myBusiness={myBusiness} />
       <EnterpriseBusTable myBusiness={myBusiness} />
+      <LandBusTable myBusiness={myBusiness} start={start} end={end} />
       <SpecializationBusTable myBusiness={myBusiness} end={end} start={start} />
       <MainFinancingBusTable myBusiness={myBusiness} end={end} start={start} />
       <BuyingMachineBusTable myBusiness={myBusiness} end={end} start={start} />
-      <BuildingBusTable end={end} start={start} myBusiness={myBusiness} />
-      <MSHPBusTable myBusiness={myBusiness} end={end} start={start} id={+id!} />
+      <BuildingBusTable myBusiness={myBusiness} end={end} start={start} />
+      <MSHPBusTable myBusiness={myBusiness} end={end} start={start} />
       <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
-      <MyHeading>Планування урожайності (Потенційної)</MyHeading>
-      <MyTableContainer>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Рік</Th>
-              <Th>Культура</Th>
-              <Th>Продукти</Th>
-              <Th>Технологія</Th>
-              <Th>
-                Густота <br />
-                насаджень
-              </Th>
-              <Th>
-                Урожайність
-                <br /> з гектару
-              </Th>
-              <Th>
-                Урожайність
-                <br /> з рослини
-              </Th>
-              <Th>
-                Строк <br />
-                посадки
-              </Th>
-              <Th>Налаштування</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {(() => {
-              const res = [];
-              for (let i = start; i <= end; i++) {
-                res.push(
-                  myBusiness?.busProds
-                    .filter((el) => el.year == i - start)
-                    .map((el) => {
-                      const myYield = income.yieldPlant.find(
-                        (e) => e.productId == el.productId
-                      );
-                      return (
-                        <Tr key={el.id}>
-                          <Td></Td>
-                          <Td>{i}</Td>
-                          <Td>
-                            <Link
-                              to={
-                                YIELD_CALC_ROUTER +
-                                "/" +
-                                myBusiness.id +
-                                "/" +
-                                el.id
-                              }
-                            >
-                              <MyViewIcon /> {el.product?.culture?.name}
-                            </Link>
-                          </Td>
-                          <Td>{el.product?.name}</Td>
-                          <Td>{el.cultivationTechnology?.name}</Td>
-                          <Td>{myYield?.plantingDensity}</Td>
-                          <Td>{myYield?.yieldPerHectare}</Td>
-                          <Td>{myYield?.yieldPerRoll}</Td>
-                        </Tr>
-                      );
-                    })
-                );
-                res.push(
-                  <Tr key={i} fontWeight="bold">
-                    <Td></Td>
-                    <Td>{i}</Td>
-                    <Td>Разом:</Td>
-                  </Tr>
-                );
-              }
-              res.push(
-                <Tr key={end + 1} fontWeight={"bold"}>
-                  <Td></Td>
-                  <Td>ВСЕ РАЗОМ:</Td>
-                  <Td></Td>
-                </Tr>
-              );
-              return res;
-            })()}
-          </Tbody>
-        </Table>
-      </MyTableContainer>
+      <PlanYieldBusTable myBusiness={myBusiness} end={end} start={start} />
       <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
       <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
         <Button>Отримати PDF</Button>
@@ -510,4 +406,5 @@ function BiznesPlanPage() {
   );
 }
 
+console.timeEnd("all");
 export default observer(BiznesPlanPage);

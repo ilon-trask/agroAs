@@ -25,6 +25,10 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
+  DeleteBusinessPlan,
+  DeleteBusProd,
+  DeleteForBusiness,
+  DeleteLandForBusiness,
   PatchBusinessPlan,
   PatchBusProd,
   PatchFinancingForBusiness,
@@ -1414,6 +1418,13 @@ export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
     bus.newBusinessPlan = res;
   });
 }
+export function deleteBusProd(bus: BusinessStore, data: DeleteBusProd) {
+  client.business.deleteBusProd.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
 
 export function createFinancingForBusiness(
   bus: BusinessStore,
@@ -1435,7 +1446,16 @@ export function patchFinancingForBusiness(
     bus.newBusinessPlan = res;
   });
 }
-
+export function deleteFinancingForBusiness(
+  bus: BusinessStore,
+  data: DeleteForBusiness
+) {
+  client.business.deleteFinancingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
 export function createBuyingMachineForBusiness(
   bus: BusinessStore,
   data: CreateBuyingMachine
@@ -1452,6 +1472,17 @@ export function patchBuyingMachineForBusiness(
   data: PatchBuyingMachine
 ) {
   client.business.patchBuyingMachineForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function deleteBuyingMachineForBusiness(
+  bus: BusinessStore,
+  data: DeleteForBusiness
+) {
+  client.business.deleteBuyingMachineForBusiness.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
     bus.newBusinessPlan = res;
@@ -1480,6 +1511,17 @@ export function patchBuildingForBusiness(
   });
 }
 
+export function deleteBuildingForBusiness(
+  bus: BusinessStore,
+  data: DeleteForBusiness
+) {
+  client.business.deleteBuildingForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
 export function createOutcomeForBusiness(
   bus: BusinessStore,
   data: createOutcomeType
@@ -1496,6 +1538,45 @@ export function patchOutcomeForBusiness(
   data: patchOutcomeType
 ) {
   client.business.patchOutcomeForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function deleteOutcomeForBusiness(
+  bus: BusinessStore,
+  data: DeleteForBusiness
+) {
+  client.business.deleteOutcomeForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+
+export function createLandForBusiness(
+  bus: BusinessStore,
+  data: CreateLandType
+) {
+  client.business.createLandForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+export function patchLandForBusiness(bus: BusinessStore, data: PatchLandType) {
+  client.business.patchLandForBusiness.query(data).then((res) => {
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
+    bus.newBusinessPlan = res;
+  });
+}
+export function deleteLandForBusiness(
+  bus: BusinessStore,
+  data: DeleteLandForBusiness
+) {
+  client.business.deleteLandForBusiness.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
     bus.newBusinessPlan = res;

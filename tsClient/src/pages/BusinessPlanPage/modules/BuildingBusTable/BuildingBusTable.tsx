@@ -1,5 +1,8 @@
 import { Box, Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
+import { deleteBuildingForBusiness } from "src/http/requests";
+import { Context } from "src/main";
 import CreateBuilding from "src/modules/CreateBuilding";
 import { CreateBuildingProps } from "src/modules/CreateBuilding/CreateBuilding";
 import getYearFromString from "src/shared/funcs/getYearFromString";
@@ -28,6 +31,12 @@ function BuildingBusTable({
   });
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
+  const { business } = useContext(Context);
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "будівлю",
+  });
   return (
     <>
       <MyHeading>Будівництво будівель і споруд</MyHeading>
@@ -79,7 +88,24 @@ function BuildingBusTable({
                         <Button size={"sm"}>Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon />
+                        <MyDeleteIcon
+                          onClick={() => {
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                }));
+                                deleteBuildingForBusiness(business, {
+                                  busId: myBusiness.id!,
+                                  id: el.id!,
+                                });
+                              },
+                              isOpen: true,
+                              text: "будівлю",
+                            });
+                          }}
+                        />
                       </Td>
                     </Tr>
                   ))
@@ -130,13 +156,23 @@ function BuildingBusTable({
           </Tbody>
         </Table>
       </MyTableContainer>
-      <CreateBuilding
-        data={res}
-        open={open}
-        setOpen={setOpen}
-        setUpdate={setUpdate}
-        update={update}
-      />
+      {open ? (
+        <CreateBuilding
+          data={res}
+          open={open}
+          setOpen={setOpen}
+          setUpdate={setUpdate}
+          update={update}
+        />
+      ) : null}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          func={deleteData.func}
+          isOpen={deleteData.isOpen}
+          setOpen={setDeleteData}
+          text={deleteData.text}
+        />
+      ) : null}
     </>
   );
 }

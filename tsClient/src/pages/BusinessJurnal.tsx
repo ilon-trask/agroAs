@@ -142,7 +142,7 @@ function BusinessJurnal() {
       )}
       <DeleteAlert
         func={deleteRes.func}
-        open={deleteRes.isOpen}
+        isOpen={deleteRes.isOpen}
         setOpen={setDeleteRes as any}
         text={deleteRes.text}
       />

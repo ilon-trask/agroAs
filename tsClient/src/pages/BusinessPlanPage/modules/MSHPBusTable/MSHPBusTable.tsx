@@ -1,5 +1,11 @@
 import { Button, Table, Tbody, Td, Thead, Tr } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
+import {
+  deleteBuildingForBusiness,
+  deleteBuyingMachineForBusiness,
+} from "src/http/requests";
+import { Context } from "src/main";
 import { BuyingMachineTableHead } from "src/modules/BuyingMachineTable/BuyingMachineTable";
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
@@ -16,9 +22,7 @@ function MSHPBusTable({
   myBusiness,
   end,
   start,
-  id,
 }: {
-  id: number;
   myBusiness: resBusinessPlan;
   start: number;
   end: number;
@@ -27,13 +31,15 @@ function MSHPBusTable({
   const [res, setRes] = useState<CreateBuyingMachineProps>({
     amount: "",
     brand: "",
-    businessPlanId: id,
+    businessPlanId: myBusiness.id!,
     cost: "",
     date: "",
     name: "",
     purpose: "МШП",
   });
   const [update, setUpdate] = useState(false);
+  const [deleteData, setDeleteData] = useState<DeleteProps>({});
+  const { business } = useContext(Context);
   return (
     <>
       <MyHeading>Малоцінні та швидкозношувальні прeдмети</MyHeading>
@@ -67,7 +73,7 @@ function MSHPBusTable({
                               name: el.name,
                               purpose: el.purpose,
                               buyingId: el.id!,
-                              enterpriseId: el.enterpriseId,
+                              enterpriseId: el.enterpriseId!,
                             });
                           }}
                         />
@@ -82,7 +88,24 @@ function MSHPBusTable({
                         <Button size={"sm"}>Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon />
+                        <MyDeleteIcon
+                          onClick={() => {
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                })),
+                                  deleteBuyingMachineForBusiness(business, {
+                                    busId: myBusiness.id!,
+                                    id: el.id!,
+                                  });
+                              },
+                              isOpen: true,
+                              text: "МШП",
+                            });
+                          }}
+                        />
                       </Td>
                     </Tr>
                   ))
@@ -98,7 +121,7 @@ function MSHPBusTable({
                           setRes({
                             amount: "",
                             brand: "",
-                            businessPlanId: id,
+                            businessPlanId: myBusiness.id!,
                             cost: "",
                             date: i + "-01-01",
                             name: "",
@@ -135,14 +158,24 @@ function MSHPBusTable({
           </Tbody>
         </Table>
       </MyTableContainer>
-      <CreateBuyingMachine
-        isMSHP={true}
-        open={open}
-        setOpen={setOpen}
-        update={update}
-        setUpdate={setUpdate}
-        data={res}
-      />
+      {open ? (
+        <CreateBuyingMachine
+          isMSHP={true}
+          open={open}
+          setOpen={setOpen}
+          update={update}
+          setUpdate={setUpdate}
+          data={res}
+        />
+      ) : null}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          isOpen={deleteData.isOpen}
+          func={deleteData.func}
+          setOpen={setDeleteData}
+          text={deleteData.text}
+        />
+      ) : null}
     </>
   );
 }

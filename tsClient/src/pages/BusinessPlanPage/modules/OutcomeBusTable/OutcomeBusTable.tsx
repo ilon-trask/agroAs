@@ -1,5 +1,8 @@
 import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
+import { deleteOutcomeForBusiness } from "src/http/requests";
+import { Context } from "src/main";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
@@ -21,6 +24,12 @@ function OutcomeBusTable({
 }) {
   const [open, setOpen] = useState(false);
   const [res, setRes] = useState<CreateOutcomeProps>();
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "витрату",
+  });
+  const { business } = useContext(Context);
   return (
     <>
       <MyHeading>Витрати постійні</MyHeading>
@@ -77,13 +86,30 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon />
+                        <MyDeleteIcon
+                          onClick={() => {
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                }));
+                                deleteOutcomeForBusiness(business, {
+                                  busId: myBusiness.id!,
+                                  id: el.id!,
+                                });
+                              },
+                              isOpen: true,
+                              text: "витрату",
+                            });
+                          }}
+                        />
                       </Td>
                     </Tr>
                   ))
                 );
                 const yearAmount = +outcomes.reduce(
-                  (p, c) => p + c.costYear || 0,
+                  (p, c) => p + (c.costYear || 0),
                   0
                 );
                 sum += yearAmount;
@@ -182,13 +208,30 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon />
+                        <MyDeleteIcon
+                          onClick={() => {
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                }));
+                                deleteOutcomeForBusiness(business, {
+                                  busId: myBusiness.id!,
+                                  id: el.id!,
+                                });
+                              },
+                              isOpen: true,
+                              text: "витрату",
+                            });
+                          }}
+                        />
                       </Td>
                     </Tr>
                   ))
                 );
                 const yearAmount = +outcomes.reduce(
-                  (p, c) => p + c.costYear || 0,
+                  (p, c) => p + (c.costYear || 0),
                   0
                 );
                 sum += yearAmount;
@@ -233,6 +276,14 @@ function OutcomeBusTable({
         </Table>
       </MyTableContainer>
       {open && <CreateOutcome open={open} setOpen={setOpen} data={res!} />}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          isOpen={deleteData.isOpen}
+          func={deleteData.func}
+          setOpen={setDeleteData}
+          text={deleteData.text}
+        />
+      ) : null}
     </>
   );
 }

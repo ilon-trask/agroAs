@@ -279,7 +279,7 @@ const TechnologicalMap = observer(() => {
       </Box>
       <NoAuthAlert setShowAlert={setShowAlert} showAlert={showAlert} />
       <DeleteAlert
-        open={deleteOpen.isOpen}
+        isOpen={deleteOpen.isOpen}
         setOpen={setDeleteOpen}
         text={"операцію"}
         func={() => {

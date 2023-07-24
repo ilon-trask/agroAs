@@ -1066,7 +1066,7 @@ export interface Ibuying_machine {
   purpose: BuyingMachinePurposeType | "МШП";
   userId: string;
   businessPlanId?: number;
-  enterpriseId?: number;
+  enterpriseId?: number | null;
 }
 export class buying_machine extends Model<Ibuying_machine> {
   declare id?: number;
@@ -1267,7 +1267,11 @@ export interface Iland {
   cadastreNumber: number;
   area: number;
   userId: string;
-  readonly enterpriseId?: number;
+  date: string;
+  rate: number;
+  rightOfUse: "Оренда" | "Власна";
+  ownership: "Комунальна" | "Приватна" | "Державна" | "";
+  readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null | undefined;
   readonly createdAt?: Date;
 }
@@ -1277,6 +1281,10 @@ export class land extends Model<Iland> {
   declare cadastreNumber: number;
   declare area: number;
   declare userId: string;
+  declare date: string;
+  declare rate: number;
+  declare rightOfUse: "Оренда" | "Власна";
+  declare ownership: string;
 }
 land.init(
   {
@@ -1286,9 +1294,13 @@ land.init(
       autoIncrement: true,
     },
     name: { type: DataTypes.STRING },
+    date: { type: DataTypes.STRING },
     cadastreNumber: { type: DataTypes.STRING },
     area: { type: DataTypes.FLOAT },
+    rate: { type: DataTypes.INTEGER },
+    ownership: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
+    rightOfUse: { type: DataTypes.STRING },
   },
   {
     sequelize,

@@ -1,16 +1,12 @@
 import IncomeStore from "src/store/IncomeStore";
 import { resBusinessPlan } from "../../../../../tRPC serv/controllers/BusinessService";
-import { resTechCartsWithOpers } from "../../../../../tRPC serv/controllers/TechCartService";
 import { Iworker } from "../../../../../tRPC serv/models/models";
-import getYearFromString from "../../funcs/getYearFromString";
-import useVegetationYears from "../useVegetationYears";
 import useBusinessPlanData from "./useBusinessPlanData";
 
 function useBusinessPlanFinancingData(
   start: number,
   end: number,
   myBusiness: resBusinessPlan,
-  thisMaps: resTechCartsWithOpers[],
   income: IncomeStore,
   thisWorkers: Iworker[]
 ) {
@@ -23,7 +19,7 @@ function useBusinessPlanFinancingData(
     sumFin = 0,
     sumFinancing = 0,
     res = [];
-  for (let i = start; i < end; i++) {
+  for (let i = start; i <= end; i++) {
     if (i == start) {
       res.push({
         date: i + ".01",
@@ -37,13 +33,27 @@ function useBusinessPlanFinancingData(
         financing: 0,
       });
     }
-    const direct = useBusinessPlanData.direct(myBusiness, thisMaps, i, start);
+    const direct = useBusinessPlanData.direct(myBusiness, i, start);
     const fin = useBusinessPlanData.fin(myBusiness, i, start, income);
     const financing = useBusinessPlanData.financing(myBusiness, i, start);
-    const permanent = useBusinessPlanData.permanent(thisWorkers);
-    const generalProduction = useBusinessPlanData.generalProduct(thisWorkers);
-    const variables = useBusinessPlanData.variables(thisWorkers, sumDirect);
-    const outcome = useBusinessPlanData.outcome(thisWorkers, sumDirect);
+    const permanent = useBusinessPlanData.permanent(thisWorkers, i, start);
+    const generalProduction = useBusinessPlanData.generalProduct(
+      thisWorkers,
+      i,
+      start
+    );
+    const variables = useBusinessPlanData.variables(
+      thisWorkers,
+      sumDirect,
+      i,
+      start
+    );
+    const outcome = useBusinessPlanData.outcome(
+      thisWorkers,
+      sumDirect,
+      i,
+      start
+    );
     console.log(direct);
 
     sumPermanent += permanent;
@@ -61,9 +71,9 @@ function useBusinessPlanFinancingData(
       generalProduction: generalProduction,
       variables: variables,
       outcome: outcome,
-      incomeNum: financing + fin,
-      fin: fin,
-      financing: financing,
+      incomeNum: (financing + fin).toFixed(),
+      fin: fin.toFixed(),
+      financing: financing.toFixed(),
     };
     console.log("akk");
     console.log(akk);
@@ -78,9 +88,9 @@ function useBusinessPlanFinancingData(
     generalProduction: sumGeneralProduction,
     variables: sumVariables,
     outcome: sumOutcome,
-    incomeNum: sumIncome,
-    fin: sumFin,
-    financing: sumFinancing,
+    incomeNum: sumIncome.toFixed(),
+    fin: sumFin.toFixed(),
+    financing: sumFinancing.toFixed(),
   });
   return res;
 }

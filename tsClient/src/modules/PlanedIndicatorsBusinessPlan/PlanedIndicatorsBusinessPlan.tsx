@@ -18,14 +18,12 @@ function PlanedIndicatorsBusinessPlan({
   myBusiness,
   aref,
   thisWorkers,
-  thisMaps,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
   thisWorkers: Iworker[];
   aref: RefObject<HTMLTableElement>;
-  thisMaps: resTechCartsWithOpers[];
 }) {
   const { income } = useContext(Context);
 
@@ -33,7 +31,6 @@ function PlanedIndicatorsBusinessPlan({
     start,
     end,
     myBusiness,
-    thisMaps,
     income,
     thisWorkers
   );
@@ -45,8 +42,20 @@ function PlanedIndicatorsBusinessPlan({
       { header: "Прямі", accessorKey: "direct" },
       { header: "Заг вир", accessorKey: "generalProduction" },
       { header: "Змінні", accessorKey: "variables" },
-      { header: "Витрати", accessorKey: "outcome" },
-      { header: "Дохід", accessorKey: "incomeNum" },
+      {
+        header: "Витрати",
+        accessorKey: "outcome",
+        cell: ({ getValue }) => (
+          <Text fontWeight={"bold"}>{getValue() as string}</Text>
+        ),
+      },
+      {
+        header: "Дохід",
+        accessorKey: "incomeNum",
+        cell: ({ getValue }) => (
+          <Text fontWeight={"bold"}>{getValue() as string}</Text>
+        ),
+      },
       { header: "Виручка", accessorKey: "fin" },
       { header: "Залучення коштів", accessorKey: "financing" },
     ];

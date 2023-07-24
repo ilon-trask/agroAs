@@ -1,7 +1,10 @@
 import { Box } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import TableComponent from "src/components/TableComponent";
+import { deleteBusProd } from "src/http/requests";
+import { Context } from "src/main";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
@@ -18,6 +21,7 @@ function SpecializationBusTable({
   start: number;
   end: number;
 }) {
+  const { business } = useContext(Context);
   const [data, setData] = useState<productProps>({
     area: "",
     cultivationTechnologyId: 0,
@@ -25,7 +29,14 @@ function SpecializationBusTable({
     techCartId: 0,
     year: 0,
   });
-
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {
+      setDeleteData((prev) => ({ ...prev, isOpen: false }));
+      // deleteBusProd(business,{})
+    },
+    isOpen: false,
+    text: "спеціалізацію",
+  });
   const specData = useMemo(() => {
     const res = [];
     for (let i = start; i <= end; i++) {
@@ -131,7 +142,27 @@ function SpecializationBusTable({
         accessorKey: "productId",
         cell: ({ row: { original } }) => (
           <Box>
-            {original.isAll ? <></> : original.id != "plus" && <MyDeleteIcon />}
+            {original.isAll ? (
+              <></>
+            ) : (
+              original.id.toString().split(" ")[1] != "plus" && (
+                <MyDeleteIcon
+                  onClick={() => {
+                    setDeleteData((prev) => ({
+                      ...prev,
+                      isOpen: true,
+                      func: () => {
+                        setDeleteData((prev) => ({ ...prev, isOpen: false }));
+                        deleteBusProd(business, {
+                          id: +original.id!,
+                          busId: myBusiness?.id!,
+                        });
+                      },
+                    }));
+                  }}
+                />
+              )
+            )}
           </Box>
         ),
       },
@@ -150,6 +181,14 @@ function SpecializationBusTable({
           setOpen={setOpen}
           data={data}
           setData={setData}
+        />
+      ) : null}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          func={deleteData.func}
+          isOpen={deleteData.isOpen}
+          text={deleteData.text}
+          setOpen={setDeleteData}
         />
       ) : null}
     </>

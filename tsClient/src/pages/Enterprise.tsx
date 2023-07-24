@@ -16,25 +16,20 @@ import {
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
+import DeleteAlert from "../components/DeleteAlert";
 import {
   deleteFinancing,
   getBuilding,
   getFinancing,
   getLand,
-  getWorker,
 } from "../http/requests";
 import { Context } from "../main";
 import BuyingMachineTable from "../modules/BuyingMachineTable";
 import CreateFinancing, {
   FinancingProps,
 } from "../modules/CreateFinancing/CreateFinancing";
-import CreateWorker from "../modules/CreateWorker";
-import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import LandPlatTable from "../modules/LandPlotTable";
-import StaffingTable from "../modules/StaffingTable";
 import CreateBuyingMachine from "../modules/CreateBuyingMachine";
-import WorkTable from "../modules/WorkTable";
 import sort from "src/shared/funcs/sort";
 import CreateLand from "src/modules/CreateLand";
 import { CreateLandProps } from "src/modules/CreateLand/CreateLand";
@@ -131,7 +126,7 @@ function Enterprise() {
         setOpen={setLandOpen}
         setUpdate={setUpdate}
         setDeleteOpen={setDeleteOpen}
-      ></LandPlatTable>
+      />
       <Button onClick={() => setLandOpen(true)}>Додати ділянку</Button>
       <CreateLand
         open={landOpen}
@@ -553,7 +548,7 @@ function Enterprise() {
         Додати грант
       </Button>
       <DeleteAlert
-        open={deleteOpen.isOpen}
+        isOpen={deleteOpen.isOpen}
         func={deleteOpen.func}
         text={deleteOpen.text}
         setOpen={setDeleteOpen}

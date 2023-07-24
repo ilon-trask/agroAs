@@ -2,7 +2,7 @@ import { Principal } from "..";
 import { worker, Iworker } from "../models/models";
 import { CreateWorkerType, PatchWorkerType } from "../routes/workerRouter";
 import { getBusinessPlan } from "./BusinessService";
-function changeRes(arr: Iworker[]) {
+export function changeWorkerRes(arr: Iworker[]) {
   arr = JSON.parse(JSON.stringify(arr));
 
   for (let i = 0; i < arr.length; i++) {
@@ -27,7 +27,7 @@ class workerService {
 
     if (!res) return;
 
-    return changeRes(res);
+    return changeWorkerRes(res);
   }
   async create(user: Principal | undefined, data: CreateWorkerType) {
     if (!user) return;

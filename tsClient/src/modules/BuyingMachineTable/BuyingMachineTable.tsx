@@ -1,10 +1,14 @@
 import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import { DeleteProps } from "src/components/DeleteAlert";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import { Ibuying_machine } from "../../../../tRPC serv/models/models";
-import { deleteBuyingMachine } from "../../http/requests";
+import {
+  deleteBuyingMachine,
+  deleteBuyingMachineForBusiness,
+} from "../../http/requests";
 import { Context } from "../../main";
 import { CreateBuyingMachineProps } from "../CreateBuyingMachine";
 
@@ -29,14 +33,16 @@ export function BuyingMachineTableBodyRow({
   setOpen,
   setRes,
   setUpdate,
+  busId,
 }: {
   el: Ibuying_machine;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen: Dispatch<SetStateAction<any>>;
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  busId: number;
 }) {
-  const { map } = useContext(Context);
+  const { business } = useContext(Context);
   return (
     <Tr>
       <Td
@@ -73,9 +79,11 @@ export function BuyingMachineTableBodyRow({
           setDeleteOpen({
             isOpen: true,
             func: () => {
-              deleteBuyingMachine(map, el.id!);
-              //@ts-ignore
-              setDeleteOpen({ isOpen: false });
+              deleteBuyingMachineForBusiness(business, {
+                busId: busId,
+                id: el.id!,
+              });
+              setDeleteOpen((prev) => ({ ...prev, isOpen: false }));
             },
             text: "покупку техніки",
           });

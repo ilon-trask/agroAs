@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import TableComponent from "src/components/TableComponent";
 import CreateFinancing from "src/modules/CreateFinancing";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
@@ -15,6 +15,10 @@ import { DerjPurposeType } from "src/shared/hook/useDerjPurpose";
 import { InvestmentOriginType } from "src/shared/hook/useInvestmentOrigin";
 import { CreditPurposeType } from "src/shared/hook/useCreditPurpose";
 import { FinancingType } from "src/shared/hook/useFinancingType";
+import getYearFromString from "src/shared/funcs/getYearFromString";
+import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
+import { deleteFinancingForBusiness } from "src/http/requests";
+import { Context } from "src/main";
 type props = {
   financing: resFinancing[] | undefined;
   start: number;
@@ -30,10 +34,17 @@ function MainFinancingBusinessPlanTable({
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
   const [res, setRes] = useState<FinancingProps>();
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "фінансування",
+  });
+  const { business } = useContext(Context);
   const data = (() => {
     const result: any[] = [];
     for (let i = start; i <= end; i++) {
-      const fin = financing?.filter((el) => +el.date.split("-")[0] == i) || [];
+      const fin =
+        financing?.filter((el) => getYearFromString(el.date) == i) || [];
       fin.forEach((el) =>
         result.push({
           id: el.id,
@@ -172,7 +183,29 @@ function MainFinancingBusinessPlanTable({
         header: "",
         accessorKey: "isYear",
         cell: ({ row: { original } }) => (
-          <>{original.isAll ? <></> : !original.isYear && <MyDeleteIcon />}</>
+          <>
+            {original.isAll ? (
+              <></>
+            ) : (
+              !original.isYear && (
+                <MyDeleteIcon
+                  onClick={() => {
+                    setDeleteData({
+                      func: () => {
+                        setDeleteData((prev) => ({ ...prev, isOpen: false }));
+                        deleteFinancingForBusiness(business, {
+                          busId,
+                          id: original.id!,
+                        });
+                      },
+                      isOpen: true,
+                      text: "фінансування",
+                    });
+                  }}
+                />
+              )
+            )}
+          </>
         ),
       },
     ],
@@ -192,6 +225,14 @@ function MainFinancingBusinessPlanTable({
           update={update}
         />
       )}
+      {deleteData.isOpen ? (
+        <DeleteAlert
+          func={deleteData.func}
+          isOpen={deleteData.isOpen}
+          setOpen={setDeleteData}
+          text={deleteData.text}
+        />
+      ) : null}
     </>
   );
 }

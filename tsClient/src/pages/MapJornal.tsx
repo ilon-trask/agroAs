@@ -699,7 +699,7 @@ const MapJornal = observer(function () {
       )}
       {!!deleteOpen.isOpen && (
         <DeleteAlert
-          open={deleteOpen.isOpen}
+          isOpen={deleteOpen.isOpen}
           setOpen={setDeleteOpen as any}
           text={deleteOpen.text!}
           func={deleteOpen.func}

@@ -39,7 +39,6 @@ function SaleBusTable({
               <Th>Ціна</Th>
               <Th>Сума</Th>
               <Th>Графіки</Th>
-              <Th></Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -82,9 +81,6 @@ function SaleBusTable({
                         <Td>{(amount * (el.price || 0)).toFixed(2)}</Td>
                         <Td>
                           <Button size="sm">Додати</Button>
-                        </Td>
-                        <Td>
-                          <MyDeleteIcon />
                         </Td>
                       </Tr>
                     );

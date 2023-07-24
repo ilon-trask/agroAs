@@ -1377,7 +1377,7 @@ function ProductionBusinessPlan({
                 cost: number;
                 bold?: boolean;
               }[] = [];
-              for (let i = start; i < end; i++) {
+              for (let i = start; i <= end; i++) {
                 const busProd = myBusiness.busProds.filter(
                   (el) => el.year == i - start
                 );

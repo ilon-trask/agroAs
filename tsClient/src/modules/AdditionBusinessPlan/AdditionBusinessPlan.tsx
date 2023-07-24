@@ -20,8 +20,6 @@ import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessServi
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Ifinancing, Iworker } from "../../../../tRPC serv/models/models";
 import CashFlowTable from "../CashFlowTable";
-import OperTableSection from "../OpersTable/components/OperTableSection";
-import { OpersTableHead } from "../OpersTable/OpersTable";
 import {
   StaffingTableBodyRows,
   StaffingTableHeadRow,
@@ -479,13 +477,13 @@ function AdditionBusinessPlan({
         }
         return res;
       })()}
-      <Paragraph>Культури технології</Paragraph>
+      {/* <Paragraph>Культури технології</Paragraph>
       <Table size={"sm"}>
         <TableContent
           data={technologyCultureData}
           columns={technologyCultureColumns}
         />
-      </Table>
+      </Table> */}
       <Paragraph>Додаток Г. Калькуляція собівартості</Paragraph>
       {(() => {
         const res = [];
