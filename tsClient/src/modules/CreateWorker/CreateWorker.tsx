@@ -202,11 +202,28 @@ function CreateWorker({
               res.salary = +res.salary;
               res.form = form;
               if (update) {
-                patchWorker(business, res);
+                patchWorker(business, {
+                  ...res,
+                  form: res.form,
+                  amount: res.amount,
+                  isConst: !!res.isConst,
+                  salary: res.salary,
+                  class: res.class,
+                  jobId: res.jobId,
+                  workerId: res.workerId!,
+                });
               } else {
-                createWorker(business, res);
+                createWorker(business, {
+                  ...res,
+                  form: res.form,
+                  amount: res.amount,
+                  isConst: !!res.isConst,
+                  salary: res.salary,
+                  class: res.class,
+                  jobId: res.jobId,
+                });
               }
-
+              //@ts-ignore
               setRes((prev) => ({
                 businessPlanId: prev.businessPlanId,
                 enterpriseId: prev.enterpriseId,

@@ -1284,7 +1284,7 @@ export class land extends Model<Iland> {
   declare date: string;
   declare rate: number;
   declare rightOfUse: "Оренда" | "Власна";
-  declare ownership: string;
+  declare ownership: "Комунальна" | "Приватна" | "Державна" | "";
 }
 land.init(
   {

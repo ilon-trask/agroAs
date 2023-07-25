@@ -17,6 +17,9 @@ class landService {
       area: data.area,
       cadastreNumber: data.cadastreNumber,
       businessPlanId: data.businessPlanId,
+      ownership: data.ownership,
+      rate: data.rate,
+
       enterpriseId: data.enterpriseId,
       date: data.date,
       rightOfUse: data.rightOfUse,

@@ -1391,20 +1391,6 @@ export async function getCartForBusiness(map: MapStore) {
   map.businessCarts = res;
 }
 
-export function addFinancingToBusinessPlan(
-  income: IncomeStore,
-  bus: BusinessStore,
-  data: {
-    businessId: number;
-    value: number[];
-  }
-) {
-  client.business.addFinancing.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id! != res.id!);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
-  });
-}
 export function createBusProd(bus: BusinessStore, data: CreateBusProd) {
   client.business.createBusProd.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
@@ -1575,7 +1561,7 @@ export function patchLandForBusiness(bus: BusinessStore, data: PatchLandType) {
 }
 export function deleteLandForBusiness(
   bus: BusinessStore,
-  data: DeleteLandForBusiness
+  data: DeleteForBusiness
 ) {
   client.business.deleteLandForBusiness.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);

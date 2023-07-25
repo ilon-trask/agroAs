@@ -16,7 +16,7 @@ function PatchBusProdPrice({
   busProd: resBusProd;
 }) {
   const { business } = useContext(Context);
-  const [price, setPrice] = useState<number | string>(busProd.price);
+  const [price, setPrice] = useState<number | string>(busProd.price!);
   return (
     <Dialog open={open} setOpen={setOpen}>
       <MyHeading>Середня ціна реалізації</MyHeading>

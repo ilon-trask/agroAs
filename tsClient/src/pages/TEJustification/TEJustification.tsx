@@ -1,17 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Heading,
-  Button,
-  TableContainer,
-  Text,
-  Table,
-  Thead,
-  Th,
-  Tbody,
-  Tr,
-  Td,
-} from "@chakra-ui/react";
+import { Box, Heading, Button } from "@chakra-ui/react";
 import CreateResume from "../../modules/CreateResume";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../../main";
@@ -34,17 +22,8 @@ import {
 import useTEJ from "../../shared/hook/useTEJ";
 import UpdateAreaCart from "../../modules/UpdateAreaTEJ";
 import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
-import MyEditIcon from "src/ui/Icons/MyEditIcon";
-import MyHeading from "src/ui/MyHeading";
-import MyTableContainer from "src/ui/MyTableContainer";
 import TEJustificationContent from "./TEJustificationContent";
-export type iName = "resume" | "titlePage" | "";
-export type iChild =
-  | "aboutProject"
-  | "investment"
-  | "finIndicators"
-  | "deduction"
-  | "title";
+import { iChild, iName } from "../BusinessPlanPage";
 function TEJjustification() {
   const [openResume, setOpenResume] = useState<boolean>(false);
   const [openTitle, setOpenTitle] = useState<boolean>(false);
@@ -71,7 +50,8 @@ function TEJjustification() {
     );
   }
   if (!myJustification) {
-    myJustification = { area: myCart?.area };
+    //@ts-ignore
+    myJustification = { area: myCart?.area! };
   }
   const myIncome = income.yieldPlant?.find(
     (el) => el?.culture?.id == myJustification?.culture?.id
@@ -92,7 +72,10 @@ function TEJjustification() {
   const [updCartOpen, setUpdCartOpen] = useState(false);
 
   const [updCartRes, setUpdCartRes] =
-    useState<ItechnologicalEconomicJustification>();
+    useState<ItechnologicalEconomicJustification>({
+      area: 0,
+      comment: "",
+    });
 
   return (
     <Box>
@@ -347,7 +330,7 @@ function TEJjustification() {
           update={true}
           setUpdate={() => {}}
           res={updCartRes!}
-          setRes={setUpdCartRes!}
+          setRes={setUpdCartRes! as any}
         />
       )}
       <CreateResume open={openResume} setOpen={setOpenResume} />

@@ -23,7 +23,8 @@ export type iChild =
   | "investment"
   | "finIndicators"
   | "deduction"
-  | "title";
+  | "title"
+  | "";
 import TitleBusinessPlan from "src/pages/BusinessPlanPage/modules/TitleBusinessPlan";
 import ResumeBusinessPlan from "src/pages/BusinessPlanPage/modules/ResumeBusinessPlan";
 import EnterpriseBusinessPlan from "src/modules/EnterpriseBusinessPlan";

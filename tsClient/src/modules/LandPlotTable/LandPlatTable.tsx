@@ -52,6 +52,10 @@ function LandPlatTable({
                 setData({
                   landId: el.id,
                   area: el.area!,
+                  date: el.date,
+                  ownership: el.ownership,
+                  rate: el.rate,
+                  rightOfUse: el.rightOfUse,
                   cadastreNumber: el.cadastreNumber,
                   enterpriseId: el.enterpriseId!,
                   name: el.name,

@@ -1,2 +1,6 @@
-import StaffingTable from "./StaffingTable";
-export default StaffingTable;
+import {
+  StaffingTableBody,
+  StaffingTableBodyRows,
+  StaffingTableHeadRow,
+} from "./StaffingTable";
+export { StaffingTableBody, StaffingTableBodyRows, StaffingTableHeadRow };

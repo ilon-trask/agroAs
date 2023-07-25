@@ -8,12 +8,12 @@ import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCar
 import { ItechnologicalEconomicJustification } from "../../../../tRPC serv/models/models";
 
 type props = {
-  myCart: resTechCartsWithOpers;
+  myCart: resTechCartsWithOpers | undefined;
 } & (
   | { isPlan: true; myJustification: { area: number } }
   | {
       isPlan: false;
-      myJustification: ItechnologicalEconomicJustification;
+      myJustification: ItechnologicalEconomicJustification | undefined;
       setUpdCartOpen: Dispatch<SetStateAction<boolean>>;
       setUpdCartRes: Dispatch<
         SetStateAction<ItechnologicalEconomicJustification>

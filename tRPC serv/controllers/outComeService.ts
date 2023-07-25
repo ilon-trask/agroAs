@@ -30,30 +30,30 @@ class outcomeService {
   }
   async patch(user: Principal | undefined, data: patchOutcomeType) {
     if (!user) return;
-    const cart = await tech_cart.findOne({ where: { id: data.propId } });
-    const buying = await buying_machine.findOne({
-      where: { id: data.propId },
-    });
-    const adm = await administration.findOne({ where: { id: data.propId } });
+    // const cart = await tech_cart.findOne({ where: { id: data.propId } });
+    // const buying = await buying_machine.findOne({
+    //   where: { id: data.propId },
+    // });
+    // const adm = await administration.findOne({ where: { id: data.propId } });
 
-    let buyingId;
-    let cartId;
-    let admId;
-    let propName = undefined;
-    if (data.group == "Прямі") {
-      cartId = data.propId;
-      propName = cart?.nameCart;
-    } else if (data.group == "Постійні") {
-      admId = data.propId;
-      propName = adm?.name;
-    }
+    // let buyingId;
+    // let cartId;
+    // let admId;
+    // let propName = undefined;
+    // if (data.group == "Прямі") {
+    //   cartId = data.propId;
+    //   propName = cart?.nameCart;
+    // } else if (data.group == "Постійні") {
+    //   admId = data.propId;
+    //   propName = adm?.name;
+    // }
     await outcome.update(
       {
         group: data.group,
-        techCartId: cartId,
-        buyingMachineId: buyingId,
-        administrationId: admId,
-        name: propName,
+        // techCartId: cartId,
+        // buyingMachineId: buyingId,
+        // administrationId: admId,
+        // name: propName,
         type: data.type,
       },
       { where: { id: data.outcomeId } }
