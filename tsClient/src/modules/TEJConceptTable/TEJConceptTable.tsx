@@ -13,21 +13,36 @@ import BusinessTableItem from "./component/BusinessConceptTableItem";
 import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box } from "@chakra-ui/react";
-import { PlusSquareIcon } from "@chakra-ui/icons";
-import { IbusinessPlan } from "../../../../tRPC serv/models/models";
 import { useParams } from "react-router-dom";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { iChild, iName } from "../../pages/BusinessPlanPage";
-
+import { iChild, iName } from "src/pages/BusinessPlanPage/BusinessPlanPage";
 interface props {
   setOpenResume: Dispatch<SetStateAction<boolean>>;
   setOpenTitle: Dispatch<SetStateAction<boolean>>;
   getData: (name: iName, children: iChild, infCartId: number | null) => void;
   indicatorRef: RefObject<HTMLParagraphElement>;
+  resumeRef: RefObject<HTMLParagraphElement>;
+  titleRef: RefObject<HTMLParagraphElement>;
+  enterpriseRef: RefObject<HTMLParagraphElement>;
+  productionRef: RefObject<HTMLParagraphElement>;
+  financingRef: RefObject<HTMLParagraphElement>;
+  additionRef: RefObject<HTMLParagraphElement>;
   buttonsRef: RefObject<HTMLDivElement>;
 }
 const CartsTable = observer(
-  ({ setOpenResume, setOpenTitle, indicatorRef, buttonsRef }: props) => {
+  ({
+    setOpenResume,
+    setOpenTitle,
+    indicatorRef,
+    buttonsRef,
+    additionRef,
+    enterpriseRef,
+    financingRef,
+    getData,
+    productionRef,
+    resumeRef,
+    titleRef,
+  }: props) => {
     const { map, user, business } = useContext(Context);
     const { id } = useParams();
     const Business: resBusinessPlan[] = JSON.parse(
@@ -50,7 +65,7 @@ const CartsTable = observer(
         label: "titlePage",
         setOpen: setOpenTitle,
         children: myBusiness?.titlePage,
-        ref: {} as any,
+        ref: titleRef,
       },
       {
         id: 2,
@@ -58,7 +73,7 @@ const CartsTable = observer(
         label: "resume",
         setOpen: setOpenResume,
         children: myBusiness?.resume,
-        ref: {} as any,
+        ref: resumeRef,
       },
       {
         id: 3,
@@ -66,7 +81,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: enterpriseRef,
       },
       {
         id: 4,
@@ -74,7 +89,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: productionRef,
       },
       {
         id: 5,
@@ -82,7 +97,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: financingRef,
       },
       {
         id: 6,
@@ -98,7 +113,7 @@ const CartsTable = observer(
         label: "",
         setOpen: () => {},
         children: null,
-        ref: {} as any,
+        ref: additionRef,
       },
     ];
     return (
@@ -117,8 +132,6 @@ const CartsTable = observer(
             <></>
           )}
           {data.map((e) => {
-            console.log(e.ref);
-
             return <BusinessTableItem key={e.id} e={e} aref={buttonsRef} />;
           })}
         </Tbody>

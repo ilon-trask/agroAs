@@ -1,4 +1,3 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -17,25 +16,20 @@ import {
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import DeleteAlert, { IdeleteHeading } from "../components/DeleteAlert";
+import DeleteAlert from "../components/DeleteAlert";
 import {
   deleteFinancing,
   getBuilding,
   getFinancing,
   getLand,
-  getWorker,
 } from "../http/requests";
 import { Context } from "../main";
-import BuyingMachineTable from "../modules/BuyingMachineTable";
+// import BuyingMachineTable from "../modules/BuyingMachineTable";
 import CreateFinancing, {
   FinancingProps,
 } from "../modules/CreateFinancing/CreateFinancing";
-import CreateWorker from "../modules/CreateWorker";
-import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import LandPlatTable from "../modules/LandPlotTable";
-import StaffingTable from "../modules/StaffingTable";
 import CreateBuyingMachine from "../modules/CreateBuyingMachine";
-import WorkTable from "../modules/WorkTable";
 import sort from "src/shared/funcs/sort";
 import CreateLand from "src/modules/CreateLand";
 import { CreateLandProps } from "src/modules/CreateLand/CreateLand";
@@ -46,6 +40,7 @@ import CreateBuilding, {
 } from "src/modules/CreateBuilding/CreateBuilding";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyTableContainer from "src/ui/MyTableContainer";
 function Enterprise() {
   const { id } = useParams();
   const { enterpriseStore, income, map } = useContext(Context);
@@ -71,7 +66,6 @@ function Enterprise() {
     isUseCost: false,
     enterpriseId: +id!,
     calculationMethod: "",
-    calculationType: "",
   });
   const credits = sort(income.credit);
   const investments = sort(income.investment);
@@ -85,11 +79,18 @@ function Enterprise() {
     area: "",
     cadastreNumber: "",
     name: "",
+    date: "",
+    ownership: "",
+    rate: "",
+    rightOfUse: "",
+    businessPlanId: 0,
   });
   const lands = sort(enterpriseStore.land);
   const [buildingOpen, setBuildingOpen] = useState(false);
   const [buildingData, setBuildingData] = useState<CreateBuildingProps>({
-    depreciationPeriod: "",
+    description: "",
+    businessPlanId: 0,
+    date: "",
     enterpriseId: +id!,
     name: "",
     startPrice: "",
@@ -130,15 +131,9 @@ function Enterprise() {
         setOpen={setLandOpen}
         setUpdate={setUpdate}
         setDeleteOpen={setDeleteOpen}
-      ></LandPlatTable>
-      <Button onClick={() => setLandOpen(true)}>Додати ділянку</Button>
-      <CreateLand
-        open={landOpen}
-        setOpen={setLandOpen}
-        update={update}
-        setUpdate={setUpdate}
-        data={landData}
       />
+      <Button onClick={() => setLandOpen(true)}>Додати ділянку</Button>
+      <CreateLand open={landOpen} setOpen={setLandOpen} data={landData} />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -147,12 +142,12 @@ function Enterprise() {
       >
         Техніка та обладнання
       </Text>
-      <BuyingMachineTable
+      {/* <BuyingMachineTable
         setOpen={setMachineOpen}
         setDeleteOpen={setDeleteOpen}
         setRes={setMachineData}
         setUpdate={setUpdate}
-      />
+      /> */}
       <CreateBuyingMachine
         open={machineOpen}
         setOpen={setMachineOpen}
@@ -224,7 +219,6 @@ function Enterprise() {
                         purpose: el.purpose,
                         enterpriseId: +id!,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                       });
                       setUpdate(true);
@@ -314,7 +308,6 @@ function Enterprise() {
                         enterpriseId: +id!,
                         isUseCost: el.isUseCost,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         type: "credit",
                       });
                       setUpdate(true);
@@ -368,13 +361,13 @@ function Enterprise() {
       >
         Додати кредит
       </Button>
-      <CreateFinancing
+      {/* <CreateFinancing
         open={financingOpen}
         setOpen={setFinancingOpen}
         data={financingData}
         update={update}
         setUpdate={setUpdate}
-      />
+      /> */}
 
       <Text
         textAlign={"center"}
@@ -411,7 +404,6 @@ function Enterprise() {
                         name: el.name,
                         purpose: el.purpose,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                         type: "derj_support",
                       });
@@ -472,7 +464,7 @@ function Enterprise() {
       >
         Грант
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -500,7 +492,6 @@ function Enterprise() {
                         name: el.name,
                         purpose: el.purpose,
                         calculationMethod: el.calculationMethod,
-                        calculationType: el.calculationType,
                         isUseCost: el.isUseCost,
                         type: "grant",
                         cultureId: el.cultureId,
@@ -536,7 +527,7 @@ function Enterprise() {
             })}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Button
         onClick={() => {
           setFinancingOpen(true);
@@ -556,7 +547,7 @@ function Enterprise() {
         Додати грант
       </Button>
       <DeleteAlert
-        open={deleteOpen.isOpen}
+        isOpen={deleteOpen.isOpen}
         func={deleteOpen.func}
         text={deleteOpen.text}
         setOpen={setDeleteOpen}

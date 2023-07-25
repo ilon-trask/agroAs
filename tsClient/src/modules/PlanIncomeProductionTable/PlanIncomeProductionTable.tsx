@@ -1,4 +1,3 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Checkbox,
   Table,
@@ -10,8 +9,10 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
-import { isPlainObject } from "mobx/dist/internal";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyTableContainer from "src/ui/MyTableContainer";
 import { Iproduction } from "../../../../tRPC serv/models/models";
 import { DeleteProps } from "../../components/DeleteAlert";
 import { deleteProduction, productSetIsPlan } from "../../http/requests";
@@ -62,12 +63,7 @@ function Item({
               });
           }}
         >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
+          <MyEditIcon />
         </Td>
       )}
       <Td>{myProduct?.name}</Td>
@@ -95,7 +91,7 @@ function Item({
             });
           }}
         >
-          <DeleteIcon w={"20px"} h={"auto"} color={"red"} cursor={"pointer"} />
+          <MyDeleteIcon />
         </Td>
       )}
       <Td>
@@ -197,7 +193,7 @@ export function PlanIncomeProductionTableHeadRow({
   return (
     <Tr>
       {!isPlan && <Th></Th>}
-      <Th>Продукт або послуга</Th>
+      <Th>Продукт </Th>
       <Th>
         Планова <br />
         урожайність (т/га)
@@ -207,10 +203,7 @@ export function PlanIncomeProductionTableHeadRow({
         Плановий <br />
         збір (т)
       </Th>
-      <Th>
-        Собівартість <br />
-        грн/т
-      </Th>
+      <Th>Ціна грн/т</Th>
       <Th>Сума грн</Th>
       {!isPlan && <Th></Th>}
     </Tr>
@@ -232,7 +225,7 @@ function PlanIncomeProductionTable({
   const { income, map } = useContext(Context);
 
   return (
-    <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+    <MyTableContainer>
       <Table size={"sm"}>
         <Thead>
           <PlanIncomeProductionTableHeadRow />
@@ -258,7 +251,7 @@ function PlanIncomeProductionTable({
           )}
         </Tbody>
       </Table>
-    </TableContainer>
+    </MyTableContainer>
   );
 }
 

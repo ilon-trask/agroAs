@@ -3,7 +3,7 @@ import * as z from "zod";
 import FinancingService from "../controllers/FinancingService";
 import { Ifinancing } from "../models/models";
 
-const createFinancing = z.object({
+export const createFinancing = z.object({
   cost: z.number(),
   type: z.enum(["investment", "credit", "derj_support", "grant"]),
   name: z.string(),
@@ -20,14 +20,14 @@ const createFinancing = z.object({
     "Державні",
     "Комерційні",
   ]),
-  calculationType: z.enum(["Базовий", "Індивідуальний"]),
   calculationMethod: z.enum(["На бізнес-план", "На гектар"]),
-  enterpriseId: z.number(),
-  cultureId: z.number().optional(),
+  enterpriseId: z.number().nullish(),
+  cultureId: z.number().optional().nullable(),
 });
 export type CreateFinancingType = z.infer<typeof createFinancing>;
 const patchFinancing = createFinancing.extend({ financingId: z.number() });
 export type PatchFinancingType = z.infer<typeof patchFinancing>;
+
 export const financingRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
     const res: Ifinancing[] | undefined = await FinancingService.get(ctx.user);

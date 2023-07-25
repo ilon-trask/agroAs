@@ -62,7 +62,7 @@ export default function CreateCart({
       setOpen={setOpen}
       res={res}
       setRes={setRes}
-      update={update}
+      update={true}
       setUpdate={setUpdate}
       props={obj}
       isErr={isErr}

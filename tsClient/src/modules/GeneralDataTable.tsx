@@ -1,28 +1,28 @@
 import React from "react";
-import { useContext } from "react";
-import { Context } from "../main";
 import { cartProps } from "./CreateCart";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
-import { observer } from "mobx-react-lite";
+import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 type props = {
-  id?: number;
-  setMapOpen?: (open: boolean) => void;
-  setUpdate?: (update: boolean) => void;
-  setRes?: (res: cartProps) => void;
-};
+  myMap: resTechCartsWithOpers | undefined;
+} & (
+  | {
+      useIcons: false;
+    }
+  | {
+      useIcons: true;
+      setMapOpen: (open: boolean) => void;
+      setUpdate: (update: boolean) => void;
+      setRes: (res: cartProps) => void;
+    }
+);
 
-function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
-  const { map, user } = useContext(Context);
-  let myMap = map.maps.find((el) => el.id == id);
-  if (!myMap) {
-    myMap = map.complex.find((el) => el.id == id);
-  }
+function GeneralDataTable(props: props) {
   return (
     <Table my={"15px"} maxW={"3xl"}>
       <Thead>
         <Tr>
-          {user.role != "" && <Th></Th>}
+          {props.useIcons && <Th></Th>}
           <Th>Назва культури</Th>
           <Th>Площа, га</Th>
           <Th>
@@ -38,25 +38,25 @@ function GeneralDataTable({ id, setMapOpen, setUpdate, setRes }: props) {
       </Thead>
       <Tbody>
         <Tr>
-          {user.role != "" && (
+          {props.useIcons && (
             <Td
               onClick={() => {
-                if (setMapOpen) setMapOpen(true);
-                if (setUpdate) setUpdate(true);
+                props.setMapOpen(true);
+                props.setUpdate(true);
                 //@ts-ignore
-                if (setRes) setRes({ ...myMap });
+                props.setRes({ ...myMap });
               }}
             >
               <EditIcon color={"blue.400"} w={"20px"} h={"auto"} />
             </Td>
           )}
-          <Td>{myMap?.nameCart}</Td>
-          <Td>{myMap?.area}</Td>
-          <Td>{myMap?.salary}</Td>
-          <Td>{myMap?.priceDiesel}</Td>
+          <Td>{props.myMap?.nameCart}</Td>
+          <Td>{props.myMap?.area}</Td>
+          <Td>{props.myMap?.salary}</Td>
+          <Td>{props.myMap?.priceDiesel}</Td>
         </Tr>
       </Tbody>
     </Table>
   );
 }
-export default observer(GeneralDataTable);
+export default GeneralDataTable;

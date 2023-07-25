@@ -32,12 +32,12 @@ export default class MapStore {
   private _opers: resTechOperation[] = [];
   private _costMaterials: resMater[] = [];
   private _costServices: Icost_service[] = [];
+  private _costMechanical: Iaggregate[] = [];
   private _costTransport: Icost_transport[] = [];
+  private _costHandWork: Icost_hand_work[] = [];
   private _section: Isection[] = [];
   private _tractor: Itractor[] = [];
   private _machine: Imachine[] = [];
-  private _costMechanical: Iaggregate[] = [];
-  private _costHandWork: Icost_hand_work[] = [];
   private _grade: Igrade[] = [];
   private _copyCarts: Itech_cart[] = [];
   public isLoading: boolean = true;
@@ -198,84 +198,96 @@ export default class MapStore {
     this._businessCarts.push(maps);
   }
   public get maps() {
-    return this._maps;
+    return JSON.parse(JSON.stringify(this._maps)) as resTechCartsWithOpers[];
   }
   public get complex() {
-    return this._complex;
+    return JSON.parse(JSON.stringify(this._complex)) as resTechCartsWithOpers[];
   }
   get opers() {
-    return this._opers;
+    return JSON.parse(JSON.stringify(this._opers)) as resTechOperation[];
   }
   get costMaterials() {
-    return this._costMaterials;
+    return JSON.parse(JSON.stringify(this._costMaterials)) as resMater[];
   }
   get costServices() {
-    return this._costServices;
+    return JSON.parse(JSON.stringify(this._costServices)) as Icost_service[];
   }
   get costMechanical() {
-    return this._costMechanical;
+    return JSON.parse(JSON.stringify(this._costMechanical)) as Iaggregate[];
   }
   get costTransport() {
-    return this._costTransport;
+    return JSON.parse(JSON.stringify(this._costTransport)) as Icost_transport[];
   }
   get costHandWork() {
-    return this._costHandWork;
+    return JSON.parse(JSON.stringify(this._costHandWork)) as Icost_hand_work[];
   }
   get section() {
-    return this._section;
+    return JSON.parse(JSON.stringify(this._section)) as Isection[];
   }
   get tractor() {
-    return this._tractor;
+    return JSON.parse(JSON.stringify(this._tractor)) as Itractor[];
   }
   get machine() {
-    return this._machine;
+    return JSON.parse(JSON.stringify(this._machine)) as Imachine[];
   }
   get grade() {
-    return this._grade;
-  }
-  get works() {
-    return this._works;
+    return JSON.parse(JSON.stringify(this._grade)) as Igrade[];
   }
   public get copyCarts() {
-    return this._copyCarts;
+    return JSON.parse(JSON.stringify(this._copyCarts)) as Itech_cart[];
+  }
+  get works() {
+    return JSON.parse(JSON.stringify(this._works)) as Ispecial_work[];
   }
   public get copyTractors() {
-    return this._copyTractors;
+    return JSON.parse(JSON.stringify(this._copyTractors)) as Itractor[];
   }
   public get copyMachine() {
-    return this._copyMachine;
+    return JSON.parse(JSON.stringify(this._copyMachine)) as Imachine[];
   }
   public get cultural() {
-    return this._cultural;
+    return JSON.parse(JSON.stringify(this._cultural)) as Icultures_types[];
   }
   public get NoAgreeCarts() {
-    return this._NoAgreeCarts;
+    return JSON.parse(
+      JSON.stringify(this._NoAgreeCarts)
+    ) as resTechCartsWithOpers[];
   }
   public get agreeCarts() {
-    return this._agreeCarts;
+    return JSON.parse(
+      JSON.stringify(this._agreeCarts)
+    ) as resTechCartsWithOpers[];
   }
   public get purposeMaterial() {
-    return this._purposeMaterial;
+    return JSON.parse(
+      JSON.stringify(this._purposeMaterial)
+    ) as Ipurpose_material[];
   }
   public get culture() {
-    return this._culture;
+    return JSON.parse(JSON.stringify(this._culture)) as Iculture[];
   }
   public get cultivationTechnologies() {
-    return this._cultivationTechnologies;
+    return JSON.parse(
+      JSON.stringify(this._cultivationTechnologies)
+    ) as IcultivationTechnologies[];
   }
   public get outcome() {
-    return this._outcome;
+    return JSON.parse(JSON.stringify(this._outcome)) as Ioutcome[];
   }
   public get product() {
-    return this._product;
+    return JSON.parse(JSON.stringify(this._product)) as Iproduct[];
   }
   public get buyingMachine() {
-    return this._buyingMachine;
+    return JSON.parse(JSON.stringify(this._buyingMachine)) as Ibuying_machine[];
   }
   public get administration() {
-    return this._administration;
+    return JSON.parse(
+      JSON.stringify(this._administration)
+    ) as Iadministration[];
   }
   public get businessCarts() {
-    return this._businessCarts;
+    return JSON.parse(
+      JSON.stringify(this._businessCarts)
+    ) as resTechCartsWithOpers[];
   }
 }

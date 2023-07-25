@@ -18,6 +18,8 @@ class BuildingService {
     const res: Ibuilding = await building.create({
       name: data.name,
       depreciationPeriod: data.depreciationPeriod,
+      date: data.date,
+      description: data.description,
       startPrice: data.startPrice,
       businessPlanId: data.businessPlanId,
       enterpriseId: data.enterpriseId,
@@ -32,6 +34,8 @@ class BuildingService {
         name: data.name,
         depreciationPeriod: data.depreciationPeriod,
         startPrice: data.startPrice,
+        date: data.date,
+        description: data.description,
         businessPlanId: data.businessPlanId,
         enterpriseId: data.enterpriseId,
       },

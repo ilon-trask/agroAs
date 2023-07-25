@@ -49,7 +49,8 @@ function BuildingTable({
                 setUpdate(true);
                 setData({
                   id: el.id!,
-                  depreciationPeriod: el.depreciationPeriod + "",
+                  date: el.date,
+                  description: el.description,
                   enterpriseId: el.enterpriseId!,
                   name: el.name,
                   startPrice: el.startPrice + "",

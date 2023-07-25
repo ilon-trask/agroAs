@@ -1,27 +1,22 @@
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Box,
-  Text,
-} from "@chakra-ui/react";
-import React, { useContext } from "react";
+import { Table, Tbody, Td, Th, Thead, Tr, Text } from "@chakra-ui/react";
+import { ColumnDef } from "@tanstack/react-table";
+import { observer } from "mobx-react-lite";
+import React, { RefObject, useContext, useMemo } from "react";
+import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
+import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
+import TEJustificationContent from "src/pages/TEJustification/TEJustificationContent";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
+import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
-import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
 import { CartsTableHeadRow } from "../CartsTable";
-import { CostProdTableHeadRows } from "../CostProdTable/CostProdTable";
 import { PlanIncomeProductionTableHeadRow } from "../PlanIncomeProductionTable/PlanIncomeProductionTable";
 import { SaleTableHeadRows } from "../SaleTable/SaleTable";
 
@@ -29,24 +24,204 @@ function ProductionBusinessPlan({
   start,
   end,
   myBusiness,
-  thisMaps,
-  productSet,
-  area,
+  aref,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
-  thisMaps: resTechCartsWithOpers[];
-  productSet: Set<string>;
-  area: number;
+  aref: RefObject<HTMLTableElement>;
 }) {
   const { income, map, TEJ } = useContext(Context);
   let costHand = 0;
   let costMech = 0;
   let costMechTot = 0;
+
+  // const laborСostsData = (() => {
+  //   const res: {
+  //     workType: string;
+  //     operation: string;
+  //     amount: number | string;
+  //     averagePrice: number | string;
+  //     sum: number | string;
+  //     bold?: boolean;
+  //   }[] = [
+  //     {
+  //       workType: "Муханізовані роботи",
+  //       operation: "",
+  //       amount: "Люд/год",
+  //       averagePrice: "Грн/год",
+  //       sum: "",
+  //       bold: true,
+  //     },
+  //   ];
+
+  //   thisMaps.map((e) => {
+  //     let myJustification = TEJ.justification?.find((el) => {
+  //       return el.techCartId! == +e.id!;
+  //     });
+
+  //     return map.opers
+  //       .filter((el) => el.techCartId == e.id)
+  //       .map((el) => {
+  //         const totalCost = el.costMachineWork! * myJustification?.area!;
+
+  //         const peopleHour =
+  //           Math.round(
+  //             (totalCost /
+  //               ((e?.salary! / 176) *
+  //                 map.grade.find(
+  //                   (e) => e?.id! == el?.aggregate?.tractor.gradeId
+  //                 )?.coefficient!)) *
+  //               100
+  //           ) / 100;
+
+  //         const costMech = Math.round(((totalCost / peopleHour) * 100) / 100);
+  //         if (el.cell == "costMechanical")
+  //           res.push({
+  //             workType: "",
+  //             operation: el.nameOperation,
+  //             amount: peopleHour,
+  //             averagePrice: costMech,
+  //             sum: totalCost,
+  //             bold: true,
+  //           });
+  //       });
+  //   });
+  //   res.push({
+  //     workType: "Ручні роботи",
+  //     operation: "",
+  //     amount: "Люд/год",
+  //     averagePrice: "Грн/год",
+  //     sum: "",
+  //     bold: true,
+  //   });
+  //   thisMaps.map((e) => {
+  //     let myJustification: resTechnologicalEconomicJustification | undefined =
+  //       TEJ.justification?.find((el) => {
+  //         return el.techCartId! == +e.id!;
+  //       });
+  //     return map.opers
+  //       .filter((el) => el.techCartId == e.id)
+  //       .map((el) => {
+  //         const totalCost = el.costHandWork! * myJustification?.area!;
+  //         const peopleHour =
+  //           Math.round(
+  //             (totalCost /
+  //               ((e?.salary! / 176) *
+  //                 map.grade.find(
+  //                   (e) =>
+  //                     e.id! == el.cost_hand_work?.gradeId! ||
+  //                     el.aggregate?.agricultural_machine.gradeId
+  //                 )?.coefficient!)) *
+  //               100
+  //           ) / 100;
+  //         const costHand = Math.round(((totalCost / peopleHour) * 100) / 100);
+  //         if (
+  //           el.cell == "costHandWork" ||
+  //           (el.cell == "costMechanical" && el.costHandWork)
+  //         )
+  //           res.push({
+  //             workType: "",
+  //             operation: el.nameOperation,
+  //             amount: peopleHour,
+  //             averagePrice: costHand,
+  //             sum: totalCost,
+  //           });
+  //       });
+  //   });
+  //   res.push({
+  //     workType: "Всього по оплаті праці",
+  //     amount: "",
+  //     averagePrice: "",
+  //     operation: "",
+  //     sum: 0,
+  //     bold: true,
+  //   });
+  //   return res;
+  // })();
+  const plannedStructureData = [];
+  const generalData = [];
+  for (let i = start; i < end; i++) {
+    generalData.push(
+      ...myBusiness?.busProds
+        ?.filter((el) => el.year == i - start)
+        .map((el) => ({
+          year: i,
+          culture: el.product?.culture?.name,
+          name,
+          technology: el.cultivationTechnology?.name,
+          area: el.area,
+        }))
+    );
+    generalData.push({ year: i, bold: true });
+    const yearName = useVegetationYears[i - start + 1].name;
+    plannedStructureData.push({
+      year: i + " " + yearName,
+
+      ...myBusiness?.busProds.reduce((p, el) => {
+        const myYield = income.yieldPlant?.find(
+          (e) => e.cultureId == el.product?.cultureId
+        );
+        const vegetation = income.vegetationYear?.find(
+          (e) => e.yieldPlantId == myYield?.id && e.year == yearName
+        );
+        //@ts-ignore
+        p[el.culture?.name! + el.cultivationTechnology.name! + "coef"] =
+          vegetation?.allCoeff || 0;
+        //@ts-ignore
+        p[el.culture?.name! + el.cultivationTechnology.name! + "yield"] =
+          Math.round(
+            myYield?.yieldPerHectare! * (vegetation?.allCoeff || 0) * 100
+          ) / 100;
+        return p;
+      }, {}),
+    });
+  }
+  const generalColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      { header: "Рік", accessorKey: "year" },
+      { header: "КУЛЬТУРИ", accessorKey: "culture" },
+      { header: "ТЕХНОЛОГІЇ", accessorKey: "technology" },
+      { header: "ПЛОЩА", accessorKey: "area" },
+      { header: "Загальна площа", accessorKey: "totalArea" },
+    ];
+  }, []);
+  const plannedStructureColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      { header: "Вегетація", accessorKey: "year" },
+      ...myBusiness?.busProds.map((el) => ({
+        header: el?.product?.culture?.name! + el.cultivationTechnology?.name!,
+        columns: [
+          {
+            header: "Коеф.",
+            accessorKey:
+              el?.product?.culture?.name! +
+              el.cultivationTechnology?.name! +
+              "coef",
+          },
+          {
+            header: "Урожайн.",
+            accessorKey:
+              el?.product?.culture?.name! +
+              el.cultivationTechnology?.name! +
+              "yield",
+          },
+        ],
+      })),
+    ];
+  }, []);
+  const laborСostsColumns = useMemo<ColumnDef<any>[]>(() => {
+    return [
+      { header: "Види робіт", accessorKey: "workType" },
+      { header: "Операція", accessorKey: "operation" },
+      { header: "Кількість", accessorKey: "amount" },
+      { header: "Середня ціна", accessorKey: "averagePrice" },
+      { header: "Сума", accessorKey: "sum" },
+    ];
+  }, []);
   return (
     <>
-      <SectionTitle>Виробництво</SectionTitle>
+      <SectionTitle aref={aref}>Виробництво</SectionTitle>
       <Paragraph>
         4.1. Загальна інформація про виробництво та технології.
       </Paragraph>
@@ -62,27 +237,8 @@ function ProductionBusinessPlan({
               <TableNumber></TableNumber>
             </Th>
           </Tr>
-          <Tr>
-            <Th>Культури</Th>
-            <Th>Технології</Th>
-            <Th>
-              Виробничі
-              <br /> площі
-            </Th>
-            <Th>
-              Загальна <br />
-              площа
-            </Th>
-          </Tr>
-          {myBusiness?.busCuls?.map((el) => (
-            <Tr>
-              <Td>{el?.culture?.name}</Td>
-              <Td>{el?.cultivationTechnology?.name}</Td>
-              <Td>{el.area}</Td>
-              {/* <Td>{}</Td> */}
-            </Tr>
-          ))}
         </Thead>
+        <TableContent data={generalData} columns={generalColumns} />
       </Table>
       <Description>
         Урожайність розрахована з врахуванням якості посадкового матеріалу та
@@ -91,72 +247,20 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
+            <Th colSpan={1 + myBusiness?.busProds.length! * 2}>
               <TableName>Планова структура урожайності</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={1 + myBusiness?.busCuls.length! * 2}>
+            <Th colSpan={1 + myBusiness?.busProds.length! * 2}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
-          <Tr>
-            <Th rowSpan={2}>Вегетація</Th>
-            {myBusiness?.busCuls.map((el) => (
-              <Th colSpan={2}>
-                {el.culture?.name}
-                <br />
-                {el.cultivationTechnology?.name}
-              </Th>
-            ))}
-          </Tr>
-          <Tr>
-            {myBusiness?.busCuls.map(() => (
-              <>
-                <Th>Коеф.</Th>
-                <Th>Урожайн.</Th>
-              </>
-            ))}
-          </Tr>
         </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              const yearName = useVegetationYears[i - start + 1].name;
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i + " " + yearName}</Td>
-                    {myBusiness?.busCuls.map((el) => {
-                      const myYield = income.yieldPlant.find(
-                        (e) => e.cultureId == el.cultureId
-                      );
-                      const vegetation = income.vegetationYear.find(
-                        (e) =>
-                          e.yieldPlantId == myYield?.id && e.year == yearName
-                      );
-
-                      return (
-                        <>
-                          <Th>{vegetation?.allCoeff || 0}</Th>
-                          <Th>
-                            {Math.round(
-                              myYield?.yieldPerHectare! *
-                                (vegetation?.allCoeff || 0) *
-                                100
-                            ) / 100}
-                          </Th>
-                        </>
-                      );
-                    })}
-                  </Tr>
-                </>
-              );
-            }
-            return res;
-          })()}
-        </Tbody>
+        {/* <TableContent
+          data={plannedStructureData}
+          columns={plannedStructureColumns}
+        /> */}
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -241,41 +345,54 @@ function ProductionBusinessPlan({
           {(() => {
             const res = [];
             for (let i = start; i < end; i++) {
+              const busProds = myBusiness.busProds.filter(
+                (el) => el.year == i - start
+              );
               res.push(
-                <Tr>
+                ...busProds.map((el) => (
+                  <Tr>
+                    <Td>{i}</Td>
+                    <Td>{el.tech_cart?.nameCart}</Td>
+                    <Td>{el.area}</Td>
+                    <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
+                    <Td>{el.tech_cart?.costHectare}</Td>
+                  </Tr>
+                ))
+              );
+              res.push(
+                <Tr fontWeight={"bold"} key={i}>
                   <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{busProds.reduce((p, c) => p + c.area, 0)}</Td>
+                  <Td>
+                    {busProds.reduce(
+                      (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                      0
+                    )}
+                  </Td>
+                  <Td>
+                    {busProds.reduce(
+                      (p, c) => p + (c.tech_cart?.costHectare || 0),
+                      0
+                    )}
+                  </Td>
                 </Tr>
               );
-              for (let j = 0; j < myBusiness?.busCuls?.length!; j++) {
-                const e = myBusiness?.busCuls[j];
-                let thisMaps = map.maps.map((m) => ({
-                  ...m,
-                  area: e?.area,
-                }));
-                thisMaps = thisMaps.filter((el) => {
-                  return (
-                    el.cultureId == e?.cultureId &&
-                    el.cultivationTechnologyId == e?.cultivationTechnologyId &&
-                    //@ts-ignore
-                    el.year.split("")[0] == i - +start + 1
-                  );
-                });
-                res.push(
-                  <>
-                    {thisMaps.map((el) => (
-                      <Tr>
-                        <Td>{el.nameCart}</Td>
-                        <Td>{el.area}</Td>
-                        <Td>
-                          {Math.round(el.area! * el.costHectare! * 100) / 100}
-                        </Td>
-                        <Td>{el.costHectare}</Td>
-                      </Tr>
-                    ))}
-                  </>
-                );
-              }
             }
+            res.push(
+              <Tr key={end + 1}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td></Td>
+                <Td>
+                  {myBusiness.busProds.reduce(
+                    (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                    0
+                  )}
+                </Td>
+                <Td></Td>
+              </Tr>
+            );
             return res;
           })()}
         </Tbody>
@@ -301,7 +418,7 @@ function ProductionBusinessPlan({
         <Thead>
           <Tr>
             <Th colSpan={5}>
-              <TableName>Основні засоби</TableName>
+              <TableName>Техніка та обладнання</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -310,13 +427,64 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва основного засобу</Th>
-            <Th>Первісн а вартість</Th>
-            <Th>Термін амортизації</Th>
+            <Th>Кількість</Th>
+            <Th>Первісна вартість</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const machines = myBusiness?.buying_machines?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+              if (machines) {
+                res.push(
+                  machines.map((el) => (
+                    <Tr key={el.id!}>
+                      <Td>{i}</Td>
+                      <Td>{el.name}</Td>
+                      <Td>{el.amount}</Td>
+                      <Td>{el.amount * el.cost}</Td>
+                      <Td></Td>
+                      <Td></Td>
+                    </Tr>
+                  ))
+                );
+              }
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{machines.reduce((p, c) => p + c.amount, 0)}</Td>
+                  <Td>{machines.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>
+                  {myBusiness.buying_machines.reduce((p, c) => p + c.amount, 0)}
+                </Td>
+                <Td>
+                  {myBusiness.buying_machines.reduce(
+                    (p, c) => p + c.amount * c.cost,
+                    0
+                  )}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Description>
         В якості базового методу розрахунку амортизації біологічних активів було
@@ -327,7 +495,7 @@ function ProductionBusinessPlan({
         <Thead>
           <Tr>
             <Th colSpan={5}>
-              <TableName>Біологічні активи</TableName>
+              <TableName>Будівлі та споруди</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -336,13 +504,60 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва біологічного активу</Th>
+            <Th>Кількість</Th>
             <Th>Первісна вартість</Th>
-            <Th>Термін амортизації</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const buildings = myBusiness?.buildings?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+              res.push(
+                buildings.map((el) => (
+                  <Tr key={el.id!}>
+                    <Td>{i}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>1</Td>
+                    <Td>{el.startPrice}</Td>
+                    <Td></Td>
+                    <Td></Td>
+                  </Tr>
+                ))
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{buildings.length}</Td>
+                  <Td>{buildings.reduce((p, c) => p + +c.startPrice, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>{myBusiness?.buildings?.length}</Td>
+                <Td>
+                  {myBusiness?.buildings?.reduce(
+                    (p, c) => p + +c.startPrice,
+                    0
+                  )}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -357,14 +572,59 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва МШП</Th>
+            <Th>Кількість</Th>
             <Th>Первісна вартість</Th>
-            <Th>Термін амортизації</Th>
             <Th>Амортизація (місяць)</Th>
             <Th>Початок амортизації</Th>
           </Tr>
         </Thead>
-        <Tbody></Tbody>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const MSHP = myBusiness?.MSHP?.filter(
+                (el) => getYearFromString(el.date) == i
+              );
+
+              res.push(
+                MSHP.map((el) => (
+                  <Tr key={el.id!}>
+                    <Td>{i}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.amount}</Td>
+                    <Td>{el.amount * el.cost}</Td>
+                    <Td></Td>
+                    <Td></Td>
+                  </Tr>
+                ))
+              );
+
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td>{MSHP.reduce((p, c) => p + c.amount, 0)}</Td>
+                  <Td>{MSHP.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={end + 1} fontWeight={"bold"}>
+                <Td></Td>
+                <Td>ВСЕ РАЗОМ:</Td>
+                <Td>{myBusiness?.MSHP?.reduce((p, c) => p + c.amount, 0)}</Td>
+                <Td>
+                  {myBusiness?.MSHP?.reduce((p, c) => p + c.amount * c.cost, 0)}
+                </Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -376,15 +636,7 @@ function ProductionBusinessPlan({
                   : 6) + 2
               }
             >
-              <TableName>
-                {`План амортизації перших${" "}
-              ${
-                myBusiness?.realizationTime! <= 7
-                  ? myBusiness?.realizationTime!
-                  : 6
-              }
-              років проекту`}
-              </TableName>
+              <TableName>{`План амортизації проекту`}</TableName>
             </Th>
           </Tr>
           <Tr>
@@ -399,13 +651,11 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
-            <Th>
-              Засоби <br />
-              і&nbsp;активи
-            </Th>
-            <Th>Основні засоби</Th>
-            <Th>Біо активи</Th>
+            <Th>Рік</Th>
+            <Th>Техніка і обладнання</Th>
+            <Th>Будівлі і споруди</Th>
             <Th>МШП</Th>
+            <Th>Біо активи</Th>
             <Th>
               Сума <br />
               амортизації
@@ -415,10 +665,10 @@ function ProductionBusinessPlan({
         <Tbody>
           {(() => {
             const res = [];
-            for (let i = start; i < end; i++) {
+            for (let i = start; i <= end; i++) {
               if (i <= start + 6) {
                 res.push(
-                  <Tr>
+                  <Tr key={i}>
                     <Td>{i}</Td>
                   </Tr>
                 );
@@ -443,18 +693,64 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
           <Tr>
+            <Th>Рік</Th>
             <Th>Назва ресурсу</Th>
             <Th>Кількість</Th>
             <Th>Ціна</Th>
             <Th>Сума</Th>
-            <Th>Призначення</Th>
+            <Th>Під культуру</Th>
           </Tr>
         </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              res.push(
+                myBusiness.busProds
+                  .filter((el) => el.year == i - start)
+                  .map((el) => (
+                    <Tr key={el.id}>
+                      <Td>{i}</Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td></Td>
+                      <Td>{el.product?.culture?.name}</Td>
+                    </Tr>
+                  ))
+              );
+              // res.push(<Tr></Tr>)
+            }
+
+            return res;
+          })()}
+        </Tbody>
       </Table>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Планування потреби в ресурсах
-      </Text>
-      <Text
+      <MyHeading>Потреби в ресурсах для бізнес-плану</MyHeading>
+      {(() => {
+        const res = [];
+        for (let i = start; i <= end; i++) {
+          res.push(
+            <Text key={i} fontSize={30}>
+              {i}
+            </Text>
+          );
+          res.push(
+            myBusiness.busProds
+              .filter((el) => el.year == i - start)
+              .map((el) => (
+                <TEJustificationContent
+                  key={el.id}
+                  isPlan={true}
+                  myCart={el.tech_cart!}
+                  myJustification={{ area: el.area }}
+                />
+              ))
+          );
+        }
+        return res;
+      })()}
+      {/* <Text
         textAlign={"center"}
         fontSize={"14px"}
         mt={"15px"}
@@ -462,123 +758,10 @@ function ProductionBusinessPlan({
       >
         Витрати праці
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th>Види робіт</Th>
-              <Th>Операція</Th>
-              <Th>Кількість</Th>
-              <Th>Середня ціна</Th>
-              <Th>Сума</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr fontWeight={"bold"}>
-              <Td>Механізовані роботи</Td>
-              <Td></Td>
-              <Td>Люд/год</Td>
-              <Td>Грн/год</Td>
-              <Td></Td>
-            </Tr>
-            {thisMaps.map((e) => {
-              let myJustification = TEJ.justification?.find((el) => {
-                return el.techCartId! == +e.id!;
-              });
-
-              return map.opers
-                .filter((el) => el.techCartId == e.id)
-                .map((el) => {
-                  const totalCost =
-                    el.costMachineWork! * myJustification?.area!;
-                  console.log(totalCost);
-                  console.log(el.costMachineWork!);
-                  console.log(myJustification?.area);
-
-                  const peopleHour =
-                    Math.round(
-                      (totalCost /
-                        ((e?.salary! / 176) *
-                          map.grade.find(
-                            (e) => e?.id! == el?.aggregate?.tractor.gradeId
-                          )?.coefficient!)) *
-                        100
-                    ) / 100;
-                  console.log(peopleHour);
-
-                  const costMech = Math.round(
-                    ((totalCost / peopleHour) * 100) / 100
-                  );
-                  console.log(costMech);
-                  if (el.cell == "costMechanical")
-                    return (
-                      <Tr key={el.id}>
-                        <Td>{}</Td>
-                        <Td>{el.nameOperation}</Td>
-                        <Td>{peopleHour}</Td>
-                        <Td>{costMech}</Td>
-                        <Td>{el.costMachineWork! * myJustification?.area!}</Td>
-                      </Tr>
-                    );
-                });
-            })}
-            <Tr fontWeight={"bold"}>
-              <Td>Ручні роботи</Td>
-              <Td></Td>
-              <Td>Люд/год</Td>
-              <Td>Грн/год</Td>
-              <Td></Td>
-            </Tr>
-            {thisMaps.map((e) => {
-              let myJustification:
-                | resTechnologicalEconomicJustification
-                | undefined = TEJ.justification?.find((el) => {
-                return el.techCartId! == +e.id!;
-              });
-              return map.opers
-                .filter((el) => el.techCartId == e.id)
-                .map((el) => {
-                  const totalCost = el.costHandWork! * myJustification?.area!;
-                  const peopleHour =
-                    Math.round(
-                      (totalCost /
-                        ((e?.salary! / 176) *
-                          map.grade.find(
-                            (e) =>
-                              e.id! == el.cost_hand_work?.gradeId! ||
-                              el.aggregate?.agricultural_machine.gradeId
-                          )?.coefficient!)) *
-                        100
-                    ) / 100;
-                  const costHand = Math.round(
-                    ((totalCost / peopleHour) * 100) / 100
-                  );
-                  if (
-                    el.cell == "costHandWork" ||
-                    (el.cell == "costMechanical" && el.costHandWork)
-                  )
-                    return (
-                      <Tr key={el.id}>
-                        <Td>{}</Td>
-                        <Td>{el.nameOperation}</Td>
-                        <Td>{peopleHour}</Td>
-                        <Td>{costHand}</Td>
-                        <Td>{totalCost}</Td>
-                      </Tr>
-                    );
-                });
-            })}
-            <Tr fontWeight={"bold"}>
-              <Td>Всього по оплаті праці</Td>
-              <Td></Td>
-              <Td></Td>
-              <Td></Td>
-              <Td>{costHand + costMech}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <Text
+      <MyTableContainer>
+        <TableComponent data={laborСostsData} columns={laborСostsColumns} />
+      </MyTableContainer> */}
+      {/*  <Text
         textAlign={"center"}
         fontSize={"14px"}
         mt={"15px"}
@@ -586,7 +769,7 @@ function ProductionBusinessPlan({
       >
         Техніка й обладнання
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -742,7 +925,7 @@ function ProductionBusinessPlan({
             </Tr>
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -751,7 +934,7 @@ function ProductionBusinessPlan({
       >
         Матеріальні витрати
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -773,15 +956,15 @@ function ProductionBusinessPlan({
                 });
                 let cost = 0;
                 return (
-                  <>
+                  <React.Fragment key={e.id!}>
                     {map.purposeMaterial.map((el) => {
                       const mat = map.costMaterials.filter(
                         (e) => e?.purpose_material?.id == el?.id
                       );
                       if (mat[0])
                         return (
-                          <>
-                            <Tr key={el.id}>
+                          <React.Fragment key={el.id}>
+                            <Tr>
                               <Td fontWeight={"bold"}>{el.purpose}</Td>
                               <Td></Td>
                               <Td></Td>
@@ -806,7 +989,7 @@ function ProductionBusinessPlan({
                                 </Tr>
                               );
                             })}
-                          </>
+                          </React.Fragment>
                         );
                     })}
                     <Tr>
@@ -817,13 +1000,13 @@ function ProductionBusinessPlan({
                       <Td></Td>
                       <Td fontWeight={"bold"}>{cost}</Td>
                     </Tr>
-                  </>
+                  </React.Fragment>
                 );
               });
             })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -831,8 +1014,8 @@ function ProductionBusinessPlan({
         fontWeight={"bold"}
       >
         Витрати на послуги
-      </Text>{" "}
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      </Text>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -873,7 +1056,7 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -882,7 +1065,7 @@ function ProductionBusinessPlan({
       >
         Витрати на транспорт
       </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -894,55 +1077,77 @@ function ProductionBusinessPlan({
             </Tr>
           </Thead>
           <Tbody>
-            {/* {(() => {
-          
-          let cost = 0;
-          const trans = map.costTransport;
-          return (
-            <>
-              {trans.map((elem) => {
-                cost += myJustification?.area! * elem.price;
-                return (
-                  <Tr key={elem.id}>
-                    <Td>{elem.nameTransport}</Td>
-                    <Td>{elem.unitsOfCost}</Td>
-                    <Td>{myJustification?.area}</Td>
-                    <Td>{elem.price}</Td>
-                    <Td>{myJustification?.area! * elem.price}</Td>
-                  </Tr>
-                );
-              })}
-              <Tr>
-                <Td fontWeight={"bold"}>Всього за транспорт</Td>
-                <Td></Td>
-                <Td></Td>
-                <Td></Td>
-                <Td fontWeight={"bold"}>{cost}</Td>
-              </Tr>
-            </>
-          );
-        })()} */}
+            {(() => {
+              return null;
+              // let cost = 0;
+              // const trans = map.costTransport;
+              // return (
+              //   <>
+              //     {trans.map((elem) => {
+              //       cost += myJustification?.area! * elem.price;
+              //       return (
+              //         <Tr key={elem.id}>
+              //           <Td>{elem.nameTransport}</Td>
+              //           <Td>{elem.unitsOfCost}</Td>
+              //           <Td>{myJustification?.area}</Td>
+              //           <Td>{elem.price}</Td>
+              //           <Td>{myJustification?.area! * elem.price}</Td>
+              //         </Tr>
+              //       );
+              //     })}
+              //     <Tr>
+              //       <Td fontWeight={"bold"}>Всього за транспорт</Td>
+              //       <Td></Td>
+              //       <Td></Td>
+              //       <Td></Td>
+              //       <Td fontWeight={"bold"}>{cost}</Td>
+              //     </Tr>
+              //   </>
+              // );
+            })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer> */}
+
       <Paragraph>4.3. Опис продукту</Paragraph>
       <Table size={"sm"}>
-        {[...productSet].map((el, ind) => {
-          if (ind == 0) {
-            return (
-              <Tr>
-                <Th rowSpan={productSet.size}>Основний продукт</Th>
-                <Th>{el}</Th>
-              </Tr>
-            );
-          } else {
-            return (
-              <Tr>
-                <Th>{el}</Th>
-              </Tr>
-            );
-          }
-        })}
+        <Thead>
+          <Tr>
+            <Th>Рік</Th>
+            <Th>Назва продукту</Th>
+            <Th>Упаковка</Th>
+            <Th>Кількість</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(() => {
+            const res = [];
+            for (let i = start; i <= end; i++) {
+              const busProd = myBusiness.busProds.filter(
+                (el) => el.year == i - start
+              );
+              res.push(
+                busProd.map((el) => (
+                  <Tr key={el.id}>
+                    <Td>{i}</Td>
+                    <Td>{el.product?.name}</Td>
+                    <Td>{}</Td>
+                    <Td>{}</Td>
+                  </Tr>
+                ))
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            return res;
+          })()}
+        </Tbody>
       </Table>
       <Table size="sm">
         <Thead>
@@ -970,39 +1175,45 @@ function ProductionBusinessPlan({
           {(() => {
             const res = [];
             for (let i = start; i < end; i++) {
-              const yearName = useVegetationYears[i - start + 1].name;
-
-              let akk = myBusiness?.busCuls.map((el) => {
-                const myYield = income.yieldPlant.find(
-                  (e) => e.cultureId == el.cultureId
-                );
-
-                const vegetation = income.vegetationYear.find(
-                  (e) => e.yieldPlantId == myYield?.id && e.year == yearName
-                );
-                const sum =
-                  Math.round(
-                    (myYield?.yieldPerHectare! * vegetation?.allCoeff! || 0) *
-                      100
-                  ) / 100;
-                return (
-                  <Tr>
-                    <Td>{el.culture?.name}</Td>
-                    <Td>{sum}</Td>
-                    <Td>{el.area}</Td>
-                    <Td>{Math.round(sum * el.area * 100) / 100}</Td>
-                  </Tr>
-                );
-              });
+              let sum = 0;
+              const busProds = myBusiness.busProds.filter(
+                (el) => el.year == i - start
+              );
               res.push(
-                <>
-                  <Tr>
-                    <Td>
-                      <Text fontWeight={"bold"}>{i}</Text>
-                    </Td>
-                  </Tr>
-                  {akk}
-                </>
+                ...busProds.map((el) => {
+                  const vegetation = income.vegetationYear?.find(
+                    (e) => e.busProdId == el.id && e.techCartId == el.techCartId
+                  );
+                  const myYield = income.yieldPlant.find(
+                    (e) => e.productId == el.productId
+                  );
+                  const amount =
+                    +(
+                      myYield?.yieldPerHectare! * (vegetation?.allCoeff || 1)
+                    ).toFixed(2) || 0;
+                  const gather = (amount * el.area).toFixed(2);
+                  sum += +((el.price || 0) * +gather).toFixed(2);
+                  return (
+                    <Tr key={el.id}>
+                      <Td>{el.product?.name}</Td>
+                      <Td>{amount}</Td>
+                      <Td>{el.area}</Td>
+                      <Td>{gather}</Td>
+                      <Td>{el.price}</Td>
+                      <Td>{((el.price || 0) * +gather).toFixed(2)}</Td>
+                    </Tr>
+                  );
+                })
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td>Разом:</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{sum}</Td>
+                </Tr>
               );
             }
             return res;
@@ -1012,102 +1223,66 @@ function ProductionBusinessPlan({
       {/* <Heading textAlign={"center"} size={"sm"} mt={5}>
       Продаж продукції
     </Heading> */}
-      <Table size={"sm"}>
-        <Thead>
-          <Tr>
-            <Th colSpan={7}>
-              <Description>
-                Руалізація продукції панується з глибоким зоморожуванням якід
-                (Додаток 2) згідно графіку.
-              </Description>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableName>Графік збору продукції</TableName>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableNumber></TableNumber>
-            </Th>
-          </Tr>
-          <SaleTableHeadRows isPlan={true} />
-        </Thead>
-        <Tbody>
-          {(() => {
-            const res = [];
-            for (let i = start; i < end; i++) {
-              res.push(
-                <>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
-                  {myBusiness?.busCuls?.map((el) => {
-                    const yearName = useVegetationYears[i - start + 1].name;
-                    const myYield = income.yieldPlant.find(
-                      (e) => e.cultureId == el.cultureId
-                    );
-
-                    const vegetation = income.vegetationYear.find(
-                      (e) => e.yieldPlantId == myYield?.id && e.year == yearName
-                    );
-                    const sum =
-                      Math.round(
-                        (myYield?.yieldPerHectare! *
-                          el.area *
-                          vegetation?.allCoeff! || 0) * 100
-                      ) / 100;
-                    return (
-                      <Tr>
-                        <Td>{el.culture?.name}</Td>
-                        <Td>{el.culture?.product}</Td>
-                        <Td>{el.culture?.collectPeriod}</Td>
-                        <Td>{sum}</Td>
-                        <Td>{el.culture?.priceBerry}</Td>
-                        <Td>{sum * el.culture?.priceBerry!}</Td>
-                      </Tr>
-                    );
-                  })}
-                </>
-              );
-            }
-            return res;
-          })()}
-        </Tbody>
-      </Table>
-      <Box mt={"50px"}>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
-              <Th colSpan={9}>
+              <Th colSpan={7}>
                 <Description>
-                  У структурі собівартості продукції виділено три групи витрат:
-                  Прямі – розрахунок на основі технологічної карти
-                  Загально-виробничі – розрахунок на основі вимог забезпечення
-                  виробництва і збуту продукції Постійні – розрахунок на основі
-                  вимог щодо адміністративного управління підприємством
+                  Руалізація продукції панується з глибоким зоморожуванням якід
+                  (Додаток 2) згідно графіку.
                 </Description>
               </Th>
             </Tr>
             <Tr>
-              <Th colSpan={9}>
-                <TableName>Собіварість продукції</TableName>
+              <Th colSpan={7}>
+                <TableName>Графік збору продукції</TableName>
               </Th>
             </Tr>
             <Tr>
-              <Th colSpan={9}>
+              <Th colSpan={7}>
                 <TableNumber></TableNumber>
               </Th>
             </Tr>
-            <CostProdTableHeadRows />
+            <SaleTableHeadRows isPlan={true} />
           </Thead>
           <Tbody>
             {(() => {
               const res = [];
-              for (let i = start; i < end; i++) {
+              for (let i = start; i <= end; i++) {
+                const busProds = myBusiness.busProds.filter(
+                  (el) => el.year == i - start
+                );
+
                 res.push(
-                  <Tr>
+                  ...busProds?.map((el) => {
+                    const vegetation = income.vegetationYear?.find(
+                      (e) =>
+                        e.busProdId == el.id && e.techCartId == el.techCartId
+                    );
+                    const myYield = income.yieldPlant.find(
+                      (e) => e.productId == el.productId
+                    );
+                    const sum =
+                      +(
+                        el.area *
+                        myYield?.yieldPerHectare! *
+                        (vegetation?.allCoeff || 1)
+                      ).toFixed(2) || 0;
+                    return (
+                      <Tr key={el.id}>
+                        <Td>{el.product?.culture?.name}</Td>
+                        <Td>{el.product?.name}</Td>
+                        <Td>{el.product?.culture?.collectPeriod}</Td>
+                        <Td>{sum}</Td>
+                        <Td>{el.price}</Td>
+                        <Td>{(sum * el.price!).toFixed(2)}</Td>
+                      </Tr>
+                    );
+                  })
+                );
+                res.push(
+                  <Tr key={i} fontWeight={"bold"}>
                     <Td>{i}</Td>
                   </Tr>
                 );
@@ -1116,9 +1291,143 @@ function ProductionBusinessPlan({
             })()}
           </Tbody>
         </Table>
-      </Box>
+      </MyTableContainer>
+      <Description>
+        У структурі собівартості продукції виділено три групи витрат: Прямі –
+        розрахунок на основі технологічної карти Загально-виробничі – розрахунок
+        на основі вимог забезпечення виробництва і збуту продукції Постійні –
+        розрахунок на основі вимог щодо адміністративного управління
+        підприємством
+      </Description>
+      <MyTableContainer mt={"50px"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th colSpan={9}>
+                <TableName>Собівартість продукції</TableName>
+              </Th>
+            </Tr>
+            <Tr>
+              <Th colSpan={9}>
+                <TableNumber></TableNumber>
+              </Th>
+            </Tr>
+            {/* <CostProdTableHeadRows /> */}
+          </Thead>
+          <Tbody>
+            {(() => {
+              const data: {
+                year: number;
+                name: string;
+                permanent: number;
+                general: number;
+                direct: number;
+                outcome: number;
+                amount?: number;
+                cost?: number;
+                bold?: boolean;
+              }[] = [];
+              for (let i = start; i <= end; i++) {
+                const busProd = myBusiness.busProds.filter(
+                  (el) => el.year == i - start
+                );
+                const permanent = myBusiness.outcomes.filter(
+                  (el) =>
+                    getYearFromString(el.date) == i && el.group == "Постійні"
+                );
+                const general = myBusiness.outcomes.filter(
+                  (el) =>
+                    getYearFromString(el.date) == i &&
+                    el.group == "Загально виробничі"
+                );
+                const monthAmount = getMonthAmountFromBusinessPlan(
+                  myBusiness.dateStart,
+                  i,
+                  start
+                );
+                data.push(
+                  ...busProd.map((el) => {
+                    const vegetation = income.vegetationYear?.find(
+                      (e) =>
+                        e.busProdId == el.id && e.techCartId == el.techCartId
+                    );
+                    const myYield = income.yieldPlant.find(
+                      (e) => e.productId == el.productId
+                    );
+                    const amount =
+                      +(
+                        el.area *
+                        myYield?.yieldPerHectare! *
+                        (vegetation?.allCoeff || 1)
+                      ).toFixed(2) || 0;
+                    return {
+                      year: i,
+                      name: el.product?.name!,
+                      direct: (el.tech_cart?.costHectare || 0) * el.area,
+                      permanent: 0,
+                      general: 0,
+                      outcome: (el.tech_cart?.costHectare || 0) * el.area,
+                      amount: amount,
+                    };
+                  })
+                );
+                const directValue = busProd.reduce(
+                  (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                  0
+                );
+                const permanentValue = permanent.reduce(
+                  (p, c) => p + (c.costYear || 0),
+                  0
+                );
+                const generalValue = general.reduce(
+                  (p, c) => p + (c.costYear || 0),
+                  0
+                );
+                data.push({
+                  year: i,
+                  name: "Разом:",
+                  bold: true,
+                  direct: directValue,
+                  permanent: permanentValue,
+                  general: generalValue,
+                  outcome: generalValue + permanentValue + directValue,
+                });
+              }
+              const columns: ColumnDef<{
+                year: number;
+                name: string;
+                permanent: number;
+                general: number;
+                direct: number;
+                outcome: number;
+                amount: number;
+                cost: number;
+              }>[] = [
+                { header: "Рік", accessorKey: "year" },
+                { header: "Назва", accessorKey: "name" },
+                { header: "Постійні", accessorKey: "permanent" },
+                { header: "Заг.Виг.", accessorKey: "general" },
+                { header: "Прямі", accessorKey: "direct" },
+                { header: "Витрати", accessorKey: "outcome" },
+                { header: "К-ть", accessorKey: "amount" },
+                { header: "Собівартість", accessorKey: "cost" },
+              ];
+              return <TableContent data={data} columns={columns} />;
+              const res = [];
+              for (let i = start; i < end; i++) {
+                res.push(
+                  <Tr key={i}>
+                    <Td>{i}</Td>
+                  </Tr>
+                );
+              }
+              return res;
+            })()}
+          </Tbody>
+        </Table>
+      </MyTableContainer>
     </>
   );
 }
 
-export default ProductionBusinessPlan;
+export default observer(ProductionBusinessPlan);

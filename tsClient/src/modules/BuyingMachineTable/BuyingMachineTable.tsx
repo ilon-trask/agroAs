@@ -1,124 +1,130 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import { DeleteProps } from "src/components/DeleteAlert";
+import getYearFromString from "src/shared/funcs/getYearFromString";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import { Ibuying_machine } from "../../../../tRPC serv/models/models";
-import { CreateBuyingMachine } from "../../../../tRPC serv/routes/buyingMachineRouter";
-import { deleteBuyingMachine } from "../../http/requests";
+import {
+  deleteBuyingMachine,
+  deleteBuyingMachineForBusiness,
+} from "../../http/requests";
 import { Context } from "../../main";
 import { CreateBuyingMachineProps } from "../CreateBuyingMachine";
-export function BuyingMachineTableHead({ isPlan }: { isPlan?: boolean }) {
+
+export function BuyingMachineTableHead() {
   return (
     <Tr>
       <Th></Th>
-      <Th>Дата</Th>
+      <Th>Рік</Th>
       <Th>Назва</Th>
       <Th>Марка</Th>
       <Th>Кількість</Th>
       <Th>Ціна</Th>
       <Th>Сума</Th>
-      {!isPlan && <Th></Th>}
+      <Th>Налаштування</Th>
+      <Th></Th>
     </Tr>
   );
 }
 export function BuyingMachineTableBodyRow({
   el,
-  isPlan,
   setDeleteOpen,
   setOpen,
   setRes,
   setUpdate,
+  busId,
 }: {
   el: Ibuying_machine;
-  isPlan?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-  setUpdate?: Dispatch<SetStateAction<boolean>>;
-  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen?: Dispatch<SetStateAction<any>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+  setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
+  busId: number;
 }) {
-  const { map } = useContext(Context);
+  const { business } = useContext(Context);
   return (
     <Tr>
       <Td
         onClick={() => {
-          if (setOpen) setOpen(true);
-          if (setUpdate) setUpdate(true);
-          if (setRes)
-            setRes({
-              buyingId: el.id,
-              amount: el.amount,
-              brand: el.brand,
-              cost: el.cost,
-              date: el.date,
-              name: el.name,
-              purpose: el.purpose,
-              businessPlanId: el.businessPlanId!,
-              enterpriseId: el.enterpriseId!,
-            });
+          setOpen(true);
+          setUpdate(true);
+          setRes({
+            buyingId: el.id,
+            amount: el.amount,
+            brand: el.brand,
+            cost: el.cost,
+            date: el.date,
+            name: el.name,
+            purpose: el.purpose,
+            businessPlanId: el.businessPlanId!,
+            enterpriseId: el.enterpriseId!,
+          });
         }}
       >
-        <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
+        <MyEditIcon />
       </Td>
 
-      <Td>{el.date}</Td>
+      <Td>{getYearFromString(el.date)}</Td>
       <Td>{el.name}</Td>
       <Td>{el.brand}</Td>
       <Td>{el.amount}</Td>
       <Td>{el.cost}</Td>
       <Td>{el.cost * el.amount}</Td>
-      {!isPlan && (
-        <Td
-          onClick={() => {
-            if (setDeleteOpen)
-              setDeleteOpen({
-                isOpen: true,
-                func: () => {
-                  deleteBuyingMachine(map, el.id!);
-                  //@ts-ignore
-                  setDeleteOpen({ isOpen: false });
-                },
-                text: "покупку техніки",
+      <Td>
+        <Button size={"sm"}>Додати</Button>
+      </Td>
+      <Td
+        onClick={() => {
+          setDeleteOpen({
+            isOpen: true,
+            func: () => {
+              deleteBuyingMachineForBusiness(business, {
+                busId: busId,
+                id: el.id!,
               });
-          }}
-        >
-          <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
-        </Td>
-      )}
+              setDeleteOpen((prev) => ({ ...prev, isOpen: false }));
+            },
+            text: "покупку техніки",
+          });
+        }}
+      >
+        <MyDeleteIcon />
+      </Td>
     </Tr>
   );
 }
-function BuyingMachineTable({
-  setOpen,
-  setRes,
-  setUpdate,
-  setDeleteOpen,
-  isPlan,
-}: {
-  isPlan?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-  setUpdate?: Dispatch<SetStateAction<boolean>>;
-  setRes?: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen?: Dispatch<SetStateAction<any>>;
-}) {
-  const { map } = useContext(Context);
-  return (
-    <Table size={"sm"}>
-      <Thead>
-        <BuyingMachineTableHead isPlan={isPlan} />
-      </Thead>
-      <Tbody>
-        {map.buyingMachine.map((el) => (
-          <BuyingMachineTableBodyRow
-            el={el}
-            isPlan={isPlan}
-            setOpen={setOpen}
-            setRes={setRes}
-            setUpdate={setUpdate}
-            setDeleteOpen={setDeleteOpen}
-          />
-        ))}
-      </Tbody>
-    </Table>
-  );
-}
+// function BuyingMachineTable({
+//   setOpen,
+//   setRes,
+//   setUpdate,
+//   setDeleteOpen,
+// }: {
+//   setOpen: Dispatch<SetStateAction<boolean>>;
+//   setUpdate: Dispatch<SetStateAction<boolean>>;
+//   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+//   setDeleteOpen: Dispatch<SetStateAction<any>>;
+// }) {
+//   const { map } = useContext(Context);
+//   return (
+//     <Table size={"sm"}>
+//       <Thead>
+//         <BuyingMachineTableHead />
+//       </Thead>
+//       <Tbody>
+//         {map.buyingMachine?.map((el) => (
+//           <BuyingMachineTableBodyRow
+//             key={el.id!}
+//             el={el}
+//             setOpen={setOpen}
+//             setRes={setRes}
+//             setUpdate={setUpdate}
+//             setDeleteOpen={setDeleteOpen}
+//           />
+//         ))}
+//       </Tbody>
+//     </Table>
+//   );
+// }
 
-export default BuyingMachineTable;
+// export default BuyingMachineTable;

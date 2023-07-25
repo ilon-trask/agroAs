@@ -22,11 +22,12 @@ class FinancingService {
       name: data.name,
       purpose: data.purpose,
       calculationMethod: data.calculationMethod,
-      calculationType: data.calculationType,
+
       isUseCost: data.isUseCost,
       cultureId: data.cultureId,
       userId: user.sub,
     });
+
     return res;
   }
   async patch(user: Principal | undefined, data: PatchFinancingType) {
@@ -39,7 +40,7 @@ class FinancingService {
         isUseCost: data.isUseCost,
         purpose: data.purpose,
         calculationMethod: data.calculationMethod,
-        calculationType: data.calculationType,
+
         cultureId: data.cultureId,
       },
       { where: { id: data.financingId } }

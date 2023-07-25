@@ -57,14 +57,14 @@ export type resType =
 interface props {
   open: boolean;
   setOpen: (open: boolean) => void;
-  res: resType;
-  setRes: (res: any | ((res: any) => any)) => void;
-  update: boolean;
-  setUpdate: (update: boolean) => void;
+  res?: resType;
+  setRes?: (res: any | ((res: any) => any)) => void;
+  update?: boolean;
+  setUpdate?: (update: boolean) => void;
   children: ReactChild | ReactNode;
-  props: resType;
-  isErr: boolean;
-  setIsErr: (isErr: boolean) => void;
+  props?: resType;
+  isErr?: boolean;
+  setIsErr?: (isErr: boolean) => void;
   setComplex?: Dispatch<SetStateAction<boolean>>;
   size?:
     | "2xl"
@@ -102,7 +102,7 @@ const Dialog: FC<props> = observer(
     // }, [res]);
     useEffect(() => {
       if (!update) {
-        setRes(props);
+        if (setRes) setRes(props);
       }
     }, [props]);
     return (
@@ -111,9 +111,9 @@ const Dialog: FC<props> = observer(
         isOpen={open}
         onClose={() => {
           setOpen(false);
-          setIsErr(false);
-          setUpdate(false);
-          setRes(props);
+          if (setIsErr) setIsErr(false);
+          if (setUpdate) setUpdate(false);
+          if (setRes) setRes(props);
           if (setComplex) setComplex(false);
           if (onClose) onClose();
         }}

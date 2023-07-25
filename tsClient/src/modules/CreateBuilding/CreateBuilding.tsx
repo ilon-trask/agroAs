@@ -7,16 +7,20 @@ import React, {
   useState,
 } from "react";
 import Dialog from "src/components/Dialog";
-import { createBuilding, patchBuilding } from "src/http/requests";
+import {
+  createBuildingForBusiness,
+  patchBuildingForBusiness,
+} from "src/http/requests";
 import { Context } from "src/main";
 const obj = {};
 export interface CreateBuildingProps {
   id?: number;
   name: string;
-  depreciationPeriod: string;
-  startPrice: string;
-  businessPlanId?: number;
-  enterpriseId: number;
+  date: string;
+  description: string;
+  startPrice: string | number;
+  businessPlanId: number | null | undefined;
+  enterpriseId?: number;
 }
 function CreateBuilding({
   open,
@@ -31,13 +35,8 @@ function CreateBuilding({
   setUpdate: Dispatch<SetStateAction<boolean>>;
   data: CreateBuildingProps;
 }) {
-  const { enterpriseStore } = useContext(Context);
-  const [res, setRes] = useState<CreateBuildingProps>({
-    depreciationPeriod: "",
-    name: "",
-    startPrice: "",
-    enterpriseId: 0,
-  });
+  const { business } = useContext(Context);
+  const [res, setRes] = useState<CreateBuildingProps>(data);
   useEffect(() => setRes(data), [data]);
   return (
     <Dialog
@@ -54,7 +53,8 @@ function CreateBuilding({
         setRes((prev) => ({
           enterpriseId: prev.enterpriseId,
           businessPlanId: prev.businessPlanId,
-          depreciationPeriod: "",
+          description: "",
+          date: "",
           name: "",
           startPrice: "",
         }))
@@ -79,18 +79,15 @@ function CreateBuilding({
         </Box>
         <Box maxW={"190px"}>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
-            Введіть <br />
-            амортизаційний період
+            Введіть опис
           </Heading>
           <Input
             size={"sm"}
-            value={res.depreciationPeriod}
-            type={"number"}
-            inputMode="numeric"
+            value={res.description}
             onChange={(e) =>
               setRes((prev) => ({
                 ...prev,
-                depreciationPeriod: e.target.value,
+                description: e.target.value,
               }))
             }
           />
@@ -112,29 +109,21 @@ function CreateBuilding({
       </Box>
       <ModalFooter>
         <Button
-          isDisabled={
-            !res.depreciationPeriod &&
-            !res.enterpriseId &&
-            !res.name &&
-            !res.startPrice
-          }
+          isDisabled={!res.description && !res.name && !res.startPrice}
           onClick={() => {
-            if (
-              res.depreciationPeriod &&
-              res.enterpriseId &&
-              res.name &&
-              res.startPrice
-            ) {
+            if (res.description && res.name && res.startPrice) {
               if (update) {
-                patchBuilding(enterpriseStore, {
+                patchBuildingForBusiness(business, {
                   ...res,
+                  businessPlanId: res.businessPlanId!,
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
                   buildId: res.id!,
                 });
               } else {
-                createBuilding(enterpriseStore, {
+                createBuildingForBusiness(business, {
                   ...res,
+                  businessPlanId: res.businessPlanId!,
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
                 });
@@ -144,7 +133,8 @@ function CreateBuilding({
               setRes((prev) => ({
                 enterpriseId: prev.enterpriseId,
                 businessPlanId: prev.businessPlanId,
-                depreciationPeriod: "",
+                description: "",
+                date: "",
                 name: "",
                 startPrice: "",
               }));

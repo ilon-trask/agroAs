@@ -1,28 +1,11 @@
 import React, { useContext } from "react";
 import { Icell } from "../../../../../tRPC serv/controllers/OperService";
-import {
-  Itech_cart,
-  Itech_operation,
-} from "../../../../../tRPC serv/models/models";
-import { deleteOper } from "../../../http/requests";
+import { Itech_operation } from "../../../../../tRPC serv/models/models";
 import MapStore from "../../../store/MapStore";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Text,
-  Button,
-  Box,
-  Container,
-} from "@chakra-ui/react";
-import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { Tr, Td } from "@chakra-ui/react";
 import { Context } from "../../../main";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 type funcProps = (
   map: MapStore,
   el: Itech_operation,
@@ -109,84 +92,80 @@ const patch: funcProps = function (
 type props = {
   id: number;
   el: Itech_operation;
-  setRes: (res: any) => void;
-  setSecondOpen: (open: boolean) => void;
-  setCell: (cell: Icell | "") => void;
-  setUpdate: (update: boolean) => void;
-  mapData: Itech_cart;
-  setShowAlert: (showAlert: boolean) => void;
-  deleteOpen: boolean;
-  setDeleteOpen: (deleteOpen: any) => void;
-};
+  area: number;
+} & (
+  | { useIcons: false }
+  | {
+      useIcons: true;
+      setRes: (res: any) => void;
+      setSecondOpen: (open: boolean) => void;
+      setCell: (cell: Icell | "") => void;
+      setUpdate: (update: boolean) => void;
+      setShowAlert: (showAlert: boolean) => void;
+      setDeleteOpen: (deleteOpen: any) => void;
+    }
+);
 
-export default function OpersTableItem({
-  id,
-  el,
-  setRes,
-  setSecondOpen,
-  setCell,
-  setUpdate,
-  mapData,
-  setShowAlert,
-  deleteOpen,
-  setDeleteOpen,
-}: props) {
-  const { map, user } = useContext(Context);
+export default function OpersTableItem(props: props) {
+  const { map } = useContext(Context);
 
   return (
-    <Tr key={el.id!}>
-      {user.role != "" && (
+    <Tr key={props.el.id!}>
+      {props.useIcons && (
         <Td
           onClick={() =>
-            patch(map, el, setRes, setSecondOpen, setCell, setUpdate)
+            patch(
+              map,
+              props.el,
+              props.setRes,
+              props.setSecondOpen,
+              props.setCell,
+              props.setUpdate
+            )
           }
         >
-          <EditIcon
-            color={"blue.400"}
-            w={"20px"}
-            h={"auto"}
-            cursor={"pointer"}
-          />
+          <MyEditIcon />
         </Td>
       )}
-      <Td>{el.date || 0}</Td>
-      <Td>{el.nameOperation}</Td>
-      <Td>{mapData.area}</Td>
+      <Td>{props.el.date || 0}</Td>
+      <Td>{props.el.nameOperation}</Td>
+      <Td>{props.area}</Td>
       <Td>{"га"}</Td>
       <Td>
-        {+mapData.area *
-          (el.costMaterials ||
-            el.costServices ||
-            el.costTransport ||
-            +el.costCars! +
-              +el.costFuel! +
-              +el.costHandWork! +
-              +el.costMachineWork! ||
-            el.costHandWork!)}
+        {props.area *
+          (props.el.costMaterials ||
+            props.el.costServices ||
+            props.el.costTransport ||
+            +props.el.costCars! +
+              +props.el.costFuel! +
+              +props.el.costHandWork! +
+              +props.el.costMachineWork! ||
+            props.el.costHandWork!)}
       </Td>
-      <Td>{el.costCars! * mapData.area || "0"}</Td>
-      <Td>{el.costFuel! * mapData.area || "0"}</Td>
-      <Td>{el.costMachineWork! * mapData.area || "0"}</Td>
-      <Td>{el.costHandWork! * mapData.area || "0"}</Td>
-      <Td>{el.costMaterials! * mapData.area || "0"}</Td>
-      <Td>{el.costTransport! * mapData.area || "0"}</Td>
-      <Td>{el.costServices! * mapData.area || "0"}</Td>
+      <Td>{props.el.costCars! * props.area || "0"}</Td>
+      <Td>{props.el.costFuel! * props.area || "0"}</Td>
+      <Td>{props.el.costMachineWork! * props.area || "0"}</Td>
+      <Td>{props.el.costHandWork! * props.area || "0"}</Td>
+      <Td>{props.el.costMaterials! * props.area || "0"}</Td>
+      <Td>{props.el.costTransport! * props.area || "0"}</Td>
+      <Td>{props.el.costServices! * props.area || "0"}</Td>
 
-      {user.role != "" && (
+      {props.useIcons && (
         <Td
-          textAlign={"center"}
-          cursor={"pointer"}
-          color={"red"}
           onClick={
             // user.role == ""
             //   ? () => setShowAlert(true)
             //   :
             () => {
-              setDeleteOpen({ isOpen: true, operId: el.id, cartId: id });
+              props.setDeleteOpen({
+                isOpen: true,
+                operId: props.el.id,
+                cartId: props.id,
+              });
             }
           }
         >
-          <DeleteIcon w={"20px"} h={"auto"} />
+          <MyDeleteIcon />
         </Td>
       )}
     </Tr>

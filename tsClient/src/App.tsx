@@ -35,36 +35,38 @@ function App() {
 
   const [ind, setInd] = useState(0);
   useEffect(() => {
-    if (ind > 0) {
-      // getWorks(map);
-      getYieldPlants(income);
-      getCultural(map);
-      getPurposesMaterial(map);
-      getCultureTEJMap(map);
-      getCultivationTechnologiesMap(map);
-      getSection(map);
-      getOutcome(map);
-      getProductTEJMap(map);
-      getProduction(income);
-      getAdministration(map);
-      getCartForBusiness(map);
-      if (user.role != "") getOnlyCart(map);
+    (async () => {
+      if (ind > 0) {
+        // getWorks(map);
+        getYieldPlants(income);
+        getCultural(map);
+        getPurposesMaterial(map);
+        getCultureTEJMap(map);
+        getCultivationTechnologiesMap(map);
+        getSection(map);
+        getOutcome(map);
+        getProductTEJMap(map);
+        getProduction(income);
+        getAdministration(map);
+        await getCartForBusiness(map);
+        if (user.role != "") getOnlyCart(map);
 
-      console.log(123);
-      if (user.role == "ADMIN" || user.role == "service_role") {
-        getNoAgreeBusiness(map, business);
-        getIsAgreeCarts(map);
+        console.log(123);
+        if (user.role == "ADMIN" || user.role == "service_role") {
+          getNoAgreeBusiness(map, business);
+          getIsAgreeCarts(map);
+        }
+        if (
+          // user.role == "ADMIN" ||
+          // user.role == "service_role" ||
+          user.role == ""
+        ) {
+          agreeCarts(map);
+          getAgreeTEJ(TEJ);
+          getTechnologiesTEJ(TEJ);
+        }
       }
-      if (
-        // user.role == "ADMIN" ||
-        // user.role == "service_role" ||
-        user.role == ""
-      ) {
-        agreeCarts(map);
-        getAgreeTEJ(TEJ);
-        getTechnologiesTEJ(TEJ);
-      }
-    }
+    })();
   }, [user.isAuth, ind]);
 
   useEffect(() => {

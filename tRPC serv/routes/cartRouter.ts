@@ -268,10 +268,4 @@ export const cartRouter = router({
     const res: resTechCartsWithOpers[] = await TechCartService.getForBusiness();
     return res;
   }),
-  setIsBasicCart: publicProcedure
-    .input(setIsBasicCart)
-    .query(async ({ ctx, input }) => {
-      const res = await TechCartService.setIsBasicCart(ctx.user, input);
-      return res;
-    }),
 });

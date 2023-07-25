@@ -10,17 +10,18 @@ class vegetationYearService {
     res = JSON.parse(JSON.stringify(res));
     res = res?.map((el) => ({
       ...el,
-      allCoeff:
-        Math.round(
-          el.seedlingsCoeff * el.technologyCoeff * el.vegetationCoeff * 100
-        ) / 100,
+      allCoeff: +(
+        el.seedlingsCoeff *
+        el.technologyCoeff *
+        el.vegetationCoeff
+      ).toFixed(2),
     }));
     return res;
   }
   async create(user: Principal | undefined, data: CreateVegetationType) {
     if (!user) return;
     await vegetationYears.destroy({
-      where: { yieldPlantId: data.yieldPlantId! },
+      where: { busProdId: data.busProdId },
     });
     const acc: IvegetationYears[] = [];
     for (let i = 0; i < data.data.length; i++) {
@@ -39,14 +40,16 @@ class vegetationYearService {
         technologyCoeff: el.technologyCoeff,
         vegetationCoeff: el.vegetationCoeff,
         year: el.year,
-        techCartId: cart?.id ? cart.id : null,
+        techCartId: el.techCartId,
         yieldPlantId: data.yieldPlantId ? data.yieldPlantId : null,
+        busProdId: data.busProdId,
       });
       res = JSON.parse(JSON.stringify(res));
-      res.allCoeff =
-        Math.round(
-          res.seedlingsCoeff * res.technologyCoeff * res.vegetationCoeff * 100
-        ) / 100;
+      res.allCoeff = +(
+        res.seedlingsCoeff *
+        res.technologyCoeff *
+        res.vegetationCoeff
+      ).toFixed(2);
       acc.push(res);
     }
     return acc;

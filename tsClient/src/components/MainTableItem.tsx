@@ -107,7 +107,7 @@ function MainTable({ e }: props) {
             До карти
           </Button>
           {!!myTEJ ? (
-            <ButtonTEJ id={myTEJ.id!} navigate={navigate} />
+            <ButtonTEJ id={e?.id!} navigate={navigate} />
           ) : (
             <Tooltip
               label="Рекомендації в розробці"

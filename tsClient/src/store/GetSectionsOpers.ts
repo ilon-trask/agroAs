@@ -1,14 +1,20 @@
-import { IIsObservableObject } from "mobx/dist/internal";
+import { resTechOperation } from "../../../tRPC serv/controllers/TechCartService";
 import { Itech_operation } from "../../../tRPC serv/models/models";
 import MapStore from "./MapStore";
 export type sectionsOpers = {
   arr: Itech_operation[];
   title: string;
 }[];
-export default function getSections(map: MapStore, id: number): sectionsOpers {
-  const operData = map.opers.filter((el) => {
-    return el?.techCartId == id;
-  });
+export default function getSections(
+  map: MapStore,
+  id: number,
+  opers?: resTechOperation[] | null
+): sectionsOpers {
+  const operData =
+    opers ||
+    map.opers.filter((el) => {
+      return el?.techCartId == id;
+    });
 
   operData.sort((a, b) => a.id! - b.id!);
   const soilPreparation = operData.filter((el) => el.sectionId == 1);

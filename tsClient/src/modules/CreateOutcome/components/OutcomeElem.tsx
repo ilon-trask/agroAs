@@ -33,9 +33,10 @@ function OutcomeElem({
 }: props) {
   const { map } = useContext(Context);
   let prop: Itech_cart[] | Ibuying_machine[] | Iadministration[] = [];
-  if (res.group == "Купівля техніки і обладнання") {
-    prop = map.buyingMachine;
-  } else if (res.group == "Прямі") {
+  // if (res.group == "Купівля техніки і обладнання") {
+  //   prop = map.buyingMachine;
+  // } else
+  if (res.group == "Прямі") {
     prop = map.maps;
   } else if (res.group == "Постійні") {
     prop = map.administration;
@@ -71,21 +72,21 @@ function OutcomeElem({
           isDisabled={!res.id}
           onClick={() => {
             if (res.group && res.type) {
-              if (update) {
-                patchOutcome(map, {
-                  type: res.type,
-                  propId: res.id,
-                  group: res.group,
-                  outcomeId: res.outId!,
-                });
-                setUpdate(false);
-              } else {
-                createOutcome(map, {
-                  propId: res.id,
-                  group: res.group,
-                  type: res.type,
-                });
-              }
+              // if (update) {
+              //   patchOutcome(map, {
+              //     type: res.type,
+              //     propId: res.id,
+              //     group: res.group,
+              //     outcomeId: res.outId!,
+              //   });
+              //   setUpdate(false);
+              // } else {
+              //   createOutcome(map, {
+              //     propId: res.id,
+              //     group: res.group,
+              //     type: res.type,
+              //   });
+              // }
               setOpen(false);
             }
           }}

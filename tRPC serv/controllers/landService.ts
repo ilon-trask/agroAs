@@ -17,7 +17,12 @@ class landService {
       area: data.area,
       cadastreNumber: data.cadastreNumber,
       businessPlanId: data.businessPlanId,
+      ownership: data.ownership,
+      rate: data.rate,
+
       enterpriseId: data.enterpriseId,
+      date: data.date,
+      rightOfUse: data.rightOfUse,
       userId: user.sub,
     });
     return res;
@@ -30,6 +35,7 @@ class landService {
         area: data.area,
         cadastreNumber: data.cadastreNumber,
         businessPlanId: data.businessPlanId,
+        rightOfUse: data.rightOfUse,
         enterpriseId: data.enterpriseId,
       },
       { where: { id: data.landId } }

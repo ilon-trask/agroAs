@@ -1,9 +1,12 @@
-import { EditIcon } from "@chakra-ui/icons";
-import React from "react";
-
-function MyEditIcon() {
+import { EditIcon, IconProps } from "@chakra-ui/icons";
+function MyEditIcon(prop: IconProps) {
   return (
-    <EditIcon color={"blue.400"} w={"20px"} h={"auto"} cursor={"pointer"} />
+    <EditIcon
+      {...prop}
+      color={"blue.400"}
+      boxSize={"22px"}
+      cursor={"pointer"}
+    />
   );
 }
 

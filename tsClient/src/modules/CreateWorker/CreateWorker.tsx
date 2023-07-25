@@ -48,7 +48,9 @@ export type CreateWorkerProp = {
   dateFrom: string | null;
   dateTo: string | null;
   isConst: boolean | "";
+  year: number;
   enterpriseId: number;
+  businessPlanId: number;
 };
 function CreateWorker({
   open,
@@ -67,7 +69,7 @@ function CreateWorker({
     isQO: false,
     name: "",
   });
-  const { enterpriseStore } = useContext(Context);
+  const { enterpriseStore, business } = useContext(Context);
   useEffect(() => {
     getJob(enterpriseStore);
   }, []);
@@ -200,14 +202,30 @@ function CreateWorker({
               res.salary = +res.salary;
               res.form = form;
               if (update) {
-                //@ts-ignore
-                patchWorker(enterpriseStore, res);
+                patchWorker(business, {
+                  ...res,
+                  form: res.form,
+                  amount: res.amount,
+                  isConst: !!res.isConst,
+                  salary: res.salary,
+                  class: res.class,
+                  jobId: res.jobId,
+                  workerId: res.workerId!,
+                });
               } else {
-                //@ts-ignore
-                createWorker(enterpriseStore, res);
+                createWorker(business, {
+                  ...res,
+                  form: res.form,
+                  amount: res.amount,
+                  isConst: !!res.isConst,
+                  salary: res.salary,
+                  class: res.class,
+                  jobId: res.jobId,
+                });
               }
               //@ts-ignore
               setRes((prev) => ({
+                businessPlanId: prev.businessPlanId,
                 enterpriseId: prev.enterpriseId,
                 isConst: true,
                 form: form,

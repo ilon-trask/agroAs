@@ -1,30 +1,27 @@
-import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import {
-  Box,
   Button,
   Container,
   Table,
-  TableContainer,
   Tbody,
   Td,
-  Text,
   Thead,
   Tr,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
+import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
 import { getEnterprise } from "../http/requests";
 import { Context } from "../main";
 import CartsTable from "../modules/CartsTable";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import CreateEnterprise from "../modules/CreateEnterprise";
 import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
-import {
-  ENTERPRISE_FORM_ROUTER,
-  ENTERPRISE_ROUTER,
-  ENTERPRISE_TAX_GROUP,
-} from "../utils/consts";
+import { ENTERPRISE_ROUTER, ENTERPRISE_TAX_GROUP } from "../utils/consts";
 
 function Enterprise() {
   const [open, setOpen] = useState(false);
@@ -52,10 +49,8 @@ function Enterprise() {
   }, []);
   return (
     <Container maxW="container.lg">
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Підприємство
-      </Text>
-      <TableContainer maxW="1000px" mx="auto" mt={"20px"} overflowX={"scroll"}>
+      <MyHeading>Підприємство</MyHeading>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
@@ -81,44 +76,29 @@ function Enterprise() {
                     setOpen(true);
                   }}
                 >
-                  <EditIcon
-                    color={"blue.400"}
-                    w={"20px"}
-                    h={"auto"}
-                    cursor={"pointer"}
-                  />
+                  <MyEditIcon />
                 </Td>
                 <Td>
                   <Link to={ENTERPRISE_ROUTER + "/" + el.id}>
-                    <ViewIcon boxSize={5} color={"blue.400"} /> {el.name}
+                    <MyViewIcon /> {el.name}
                   </Link>
                 </Td>
-                {user.role == "service_role" ? (
-                  <Td>
-                    <Link
-                      to={ENTERPRISE_FORM_ROUTER + "/" + el.form + "/" + el.id}
-                    >
-                      <ViewIcon boxSize={5} color={"blue.400"} /> {el.form}
-                    </Link>
-                  </Td>
-                ) : (
-                  <Td>{el.form}</Td>
-                )}
+                <Td>{el.form}</Td>
                 <Td>
                   <Link
                     to={ENTERPRISE_TAX_GROUP + "/" + el.taxGroup + "/" + el.id}
                   >
-                    <ViewIcon boxSize={5} color={"blue.400"} /> {el.taxGroup}
+                    <MyViewIcon /> {el.taxGroup}
                   </Link>
                 </Td>
                 <Td>
-                  <DeleteIcon w={"20px"} h={"auto"} color={"red"} />
+                  <MyDeleteIcon />
                 </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       <Button onClick={() => setOpen(true)}>Створити підприємство</Button>
       <CreateEnterprise
         open={open}
@@ -128,9 +108,7 @@ function Enterprise() {
         res={res}
         setRes={setRes}
       />
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Культури та технології
-      </Text>
+      <MyHeading>Культури та технології</MyHeading>
       <CartsTable
         setUpdate={setCartUpdate}
         setDeleteOpen={() => {}}
@@ -142,7 +120,21 @@ function Enterprise() {
         setShowAlert={() => {}}
         isCul={true}
       />
-      <Button onClick={() => setCartOpen(true)}>Створити нову</Button>
+      <Button
+        onClick={() => {
+          setCartOpen(true);
+          setCartRes({
+            area: "",
+            isBasic: true,
+            nameCart: "",
+            priceDiesel: "",
+            salary: "",
+            year: "",
+          });
+        }}
+      >
+        Створити нову
+      </Button>
       <CreateCart
         open={cartOpen}
         res={cartRes}

@@ -1,6 +1,6 @@
 import Dialog from "../../components/Dialog";
 import MechanicalWork from "./components/MechanicalWork";
-import { createOperProps } from "../../pages/TechnologicalMap";
+import { createOperProps } from "src/pages/TechnologicalMap/TechnologicalMap";
 export type MechanicalWorkProps = {
   nameOper: string;
   date: string;

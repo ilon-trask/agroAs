@@ -1,7 +1,5 @@
 import sequelize from "../db";
 import { DataTypes, Model } from "sequelize";
-import { IncomeType } from "../../tsClient/src/shared/hook/useIncomeTypes";
-import { IncomeGroup } from "../../tsClient/src/shared/hook/useIncomeGroup";
 import { Icell } from "../controllers/OperService";
 import { IoutcomeGroup, IoutcomeType } from "../controllers/outComeService";
 import { CreditPurposeType } from "../../tsClient/src/shared/hook/useCreditPurpose";
@@ -552,7 +550,7 @@ export interface IbusinessPlan {
   isPublic?: boolean;
   isAgree?: boolean;
   description?: string;
-  enterpriseId?: number;
+  enterpriseId?: number | null;
   userId: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -592,24 +590,32 @@ businessPlan.init(
   { sequelize }
 );
 
-export interface IbusCul {
+export interface IbusProd {
   id?: number;
   businessPlanId?: number;
-  cultureId?: number;
+  productId?: number;
   cultivationTechnologyId?: number;
   area: number;
+  year: number;
+  techCartId?: number;
+  price?: number | null;
 }
-export class busCul extends Model<IbusCul> {
+export class busProd extends Model<IbusProd> {
   declare id?: number;
   declare businessPlanId?: number;
-  declare cultureId?: number;
+  declare productId?: number;
   declare cultivationTechnologyId?: number;
   declare area: number;
+  declare year: number;
+  declare techCartId?: number;
+  declare price: number;
 }
-busCul.init(
+busProd.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     area: { type: DataTypes.FLOAT },
+    year: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.FLOAT(2) },
   },
   { sequelize, timestamps: false }
 );
@@ -693,6 +699,7 @@ export interface IyieldPlant {
   landingPeriod: YieldPlantLandingPeriodType;
   cultureId?: number;
   cultivationTechnologyId?: number;
+  productId?: number;
 }
 export class yieldPlant extends Model<IyieldPlant> {
   declare id?: number;
@@ -704,6 +711,7 @@ export class yieldPlant extends Model<IyieldPlant> {
   declare landingPeriod: YieldPlantLandingPeriodType;
   declare cultivationTechnologyId?: number;
   declare cultureId?: number;
+  declare productId?: number;
 }
 yieldPlant.init(
   {
@@ -866,26 +874,35 @@ technologicalEconomicJustification.init(
 export interface Ioutcome {
   id?: number;
   name: string;
+  date: string;
   group: IoutcomeGroup;
-  type: IoutcomeType;
+  type: IoutcomeType | null;
+  costMonth: number;
+  costYear?: number;
   userId: string;
   isUsing?: boolean;
   techCartId?: number;
   buyingMachineId?: number;
   administrationId?: number;
+  businessPlanId?: number;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
+  declare date: string;
   declare name: string;
+  declare costMonth: number;
   declare group: IoutcomeGroup;
   declare type: IoutcomeType;
   declare isUsing: boolean;
   declare userId: string;
+  declare businessPlanId: number;
 }
 outcome.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    date: { type: DataTypes.STRING },
     name: { type: DataTypes.STRING },
+    costMonth: { type: DataTypes.FLOAT(2) },
     group: { type: DataTypes.STRING },
     type: { type: DataTypes.STRING },
     isUsing: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -994,10 +1011,10 @@ export interface Ifinancing {
     | DerjPurposeType
     | GrantPurposeType;
   isUseCost: boolean;
-  // businessCost?: number;
+  typeName?: "Кредит" | "Державна підтримка" | "Грант" | "Інвестиції" | null;
   calculationMethod: CreditCalculationMethodType;
-  calculationType: CreditCalculationTypeType;
-  cultureId?: number;
+  calculationType: CreditCalculationTypeType | null;
+  cultureId?: number | null;
   userId?: string;
   createdAt?: Date;
 }
@@ -1046,10 +1063,10 @@ export interface Ibuying_machine {
   date: string;
   cost: number;
   amount: number;
-  purpose: BuyingMachinePurposeType;
+  purpose: BuyingMachinePurposeType | "МШП";
   userId: string;
   businessPlanId?: number;
-  enterpriseId?: number;
+  enterpriseId?: number | null;
 }
 export class buying_machine extends Model<Ibuying_machine> {
   declare id?: number;
@@ -1058,7 +1075,7 @@ export class buying_machine extends Model<Ibuying_machine> {
   declare date: string;
   declare cost: number;
   declare amount: number;
-  declare purpose: BuyingMachinePurposeType;
+  declare purpose: BuyingMachinePurposeType | "МШП";
   declare userId: string;
 }
 buying_machine.init(
@@ -1171,12 +1188,14 @@ export interface Iworker {
   form: EnterpriseFormType;
   userId: string;
   amountOfMounths?: number;
+  year: number;
   enterpriseId?: number;
   jobId?: number;
+  businessPlanId?: number;
 }
 
 export class worker extends Model<Iworker> {
-  declare id?: number;
+  declare id: number;
   declare isConst: boolean;
   declare salary: number;
   declare amount: number;
@@ -1184,7 +1203,9 @@ export class worker extends Model<Iworker> {
   declare dateTo: string;
   declare form: EnterpriseFormType;
   declare class: WorkerClassesType;
+  declare year: number;
   declare userId: string;
+  declare businessPlanId: number;
 }
 worker.init(
   {
@@ -1195,6 +1216,7 @@ worker.init(
     dateFrom: { type: DataTypes.DATEONLY },
     dateTo: { type: DataTypes.DATEONLY },
     class: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     form: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING },
   },
@@ -1217,6 +1239,7 @@ export interface IvegetationYears {
   cultivationTechnologyId?: number;
   techCartId?: number | null;
   yieldPlantId?: number | null;
+  busProdId?: number | null;
 }
 
 export class vegetationYears extends Model<IvegetationYears> {
@@ -1225,6 +1248,7 @@ export class vegetationYears extends Model<IvegetationYears> {
   declare vegetationCoeff: number;
   declare technologyCoeff: number;
   declare seedlingsCoeff: number;
+  declare busProdId?: number | null;
 }
 vegetationYears.init(
   {
@@ -1240,10 +1264,14 @@ vegetationYears.init(
 export interface Iland {
   readonly id?: number;
   name: string;
-  cadastreNumber: number;
+  cadastreNumber: number | null;
   area: number;
   userId: string;
-  readonly enterpriseId?: number;
+  date: string;
+  rate: number;
+  rightOfUse: "Оренда" | "Власна";
+  ownership: "Комунальна" | "Приватна" | "Державна" | "";
+  readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null | undefined;
   readonly createdAt?: Date;
 }
@@ -1253,6 +1281,10 @@ export class land extends Model<Iland> {
   declare cadastreNumber: number;
   declare area: number;
   declare userId: string;
+  declare date: string;
+  declare rate: number;
+  declare rightOfUse: "Оренда" | "Власна";
+  declare ownership: "Комунальна" | "Приватна" | "Державна" | "";
 }
 land.init(
   {
@@ -1262,9 +1294,13 @@ land.init(
       autoIncrement: true,
     },
     name: { type: DataTypes.STRING },
+    date: { type: DataTypes.STRING },
     cadastreNumber: { type: DataTypes.STRING },
     area: { type: DataTypes.FLOAT },
+    rate: { type: DataTypes.INTEGER },
+    ownership: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
+    rightOfUse: { type: DataTypes.STRING },
   },
   {
     sequelize,
@@ -1278,14 +1314,18 @@ export interface Ibuilding {
   readonly id?: number;
   name: string;
   startPrice: number;
-  depreciationPeriod: string;
+  depreciationPeriod: string | null;
+  date: string;
+  description: string;
   userId: string;
-  readonly enterpriseId?: number;
+  readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null;
 }
 export class building extends Model<Ibuilding> {
   declare id: number;
   declare name: string;
+  declare date: string;
+  declare description: string;
   declare startPrice: number;
   declare depreciationPeriod: string;
   declare userId: string;
@@ -1295,12 +1335,18 @@ building.init(
     name: { type: DataTypes.STRING },
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
     depreciationPeriod: { type: DataTypes.STRING },
+    date: { type: DataTypes.STRING },
+    description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
 );
-export class financBus extends Model<{}> {
-  declare busienssId: number;
+interface IFinancBus {
+  businessPlanId?: number;
+  financingId?: number;
+}
+export class financBus extends Model<IFinancBus> {
+  declare businessPlanId: number;
   declare financingId: number;
 }
 
@@ -1345,24 +1391,31 @@ businessPlan.hasOne(resume);
 
 businessPlan.hasOne(titlePage);
 
-cultivationTechnologies.hasMany(busCul);
+cultivationTechnologies.hasMany(busProd);
 
-businessPlan.belongsToMany(culture, { through: busCul });
-culture.belongsToMany(businessPlan, { through: busCul });
-cultivationTechnologies.belongsToMany(culture, { through: busCul });
-businessPlan.belongsToMany(cultivationTechnologies, { through: busCul });
-businessPlan.hasMany(busCul);
-busCul.belongsTo(businessPlan);
-culture.hasMany(busCul);
-busCul.belongsTo(culture);
-cultivationTechnologies.hasMany(busCul);
-busCul.belongsTo(cultivationTechnologies);
+// businessPlan.belongsToMany(product, { through: busProd });
+// product.belongsToMany(businessPlan, { through: busProd });
+// cultivationTechnologies.belongsToMany(product, { through: busProd });
+// businessPlan.belongsToMany(cultivationTechnologies, { through: busProd });
+businessPlan.hasMany(busProd);
+busProd.belongsTo(businessPlan);
+product.hasMany(busProd);
+busProd.belongsTo(product);
+cultivationTechnologies.hasMany(busProd);
+busProd.belongsTo(cultivationTechnologies);
+tech_cart.hasMany(busProd);
+busProd.belongsTo(tech_cart);
+busProd.hasMany(vegetationYears);
+vegetationYears.belongsTo(busProd);
 
 yieldPlant.hasOne(yieldCalculation);
 yieldCalculation.belongsTo(yieldPlant);
 
 culture.hasOne(yieldPlant);
 yieldPlant.belongsTo(culture);
+
+product.hasOne(yieldPlant);
+yieldPlant.belongsTo(product);
 
 purpose_material.hasMany(cost_material);
 cost_material.belongsTo(purpose_material);
@@ -1404,6 +1457,9 @@ outcome.belongsTo(buying_machine);
 
 administration.hasOne(outcome);
 outcome.belongsTo(administration);
+
+businessPlan.hasMany(outcome);
+outcome.belongsTo(businessPlan);
 // (async () => {
 //   let a = await culture.findOne({ where: { id: 3 } });
 //   let b = await businessPlan.findOne({ where: { id: 5 } });
@@ -1424,6 +1480,9 @@ worker.belongsTo(enterprise);
 
 job.hasOne(worker);
 worker.belongsTo(job);
+
+businessPlan.hasMany(worker);
+worker.belongsTo(businessPlan);
 
 cultivationTechnologies.hasMany(tech_cart);
 tech_cart.belongsTo(cultivationTechnologies);

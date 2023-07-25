@@ -172,9 +172,7 @@ class incomeService {
 
   async getProduct(user: Principal | undefined) {
     if (!user) return;
-    const res: Iproduct[] | null = await product.findAll({
-      where: { userId: user.sub },
-    });
+    const res: Iproduct[] | null = await product.findAll({});
     return res;
   }
 

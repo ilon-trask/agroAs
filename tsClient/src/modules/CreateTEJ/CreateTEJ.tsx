@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Dialog from "../../components/Dialog";
 import TEJ from "./components/TEJ";
-import { createOperProps } from "../../pages/TechnologicalMap";
 
 export type TEJProps = {
   TEJId?: number;

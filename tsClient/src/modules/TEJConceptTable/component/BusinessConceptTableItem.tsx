@@ -1,10 +1,9 @@
 import { observer } from "mobx-react-lite";
 import React, { Dispatch, SetStateAction, RefObject } from "react";
 
-import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
+import { Tr, Td } from "@chakra-ui/react";
 // import { BusinessProps } from "../../CreateTEJ/CreateTEJ";
-import { iChild, iName } from "../../../pages/BusinessPlanPage";
+import { iName } from "src/pages/BusinessPlanPage";
 
 interface props {
   e: {
@@ -37,6 +36,7 @@ function CartsTableItem({ e, aref }: props) {
             // );
           }
         }}
+        cursor={"pointer"}
       >
         <Td fontWeight={"600"}>{e.name}</Td>
       </Tr>

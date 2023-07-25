@@ -62,7 +62,7 @@ let cellNames: {
   costServices: "cost_service",
   costTransport: "cost_transport",
 };
-const cartsIncludes = [
+export const cartsIncludes = [
   {
     model: tech_operation,
     include: [
@@ -74,11 +74,20 @@ const cartsIncludes = [
     ],
   },
 ];
-async function changeCarts(Scarts: resTechCartsWithOpers[]) {
-  Scarts.sort((a, b) => a.id! - b.id!);
-  const carts: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(Scarts));
+export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
+  Scarts.sort((a, b) => {
+    if (a && b) {
+      return a.id! - b.id!;
+    } else {
+      return 0;
+    }
+  });
+  const carts: (resTechCartsWithOpers | null)[] = JSON.parse(
+    JSON.stringify(Scarts)
+  );
 
-  let promises = [];
+  let promises: (Promise<resTechCartsWithOpers | resTechOperation> | null)[] =
+    [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let costHectare = 0,
@@ -86,12 +95,19 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
       costCars = 0,
       costFuel = 0,
       costHandWork = 0;
+    if (!cart) {
+      promises.push(cart);
+      continue;
+    }
+
     if (!cart.tech_operations) throw new Error("");
     for (let j = 0; j < cart.tech_operations.length; j++) {
       let oper: resTechOperation = cart.tech_operations[j];
       let promise = changeOper(oper, oper.techCartId!);
       promises.push(promise);
+
       promise.then((el) => {
+        if (!cart) throw new Error("");
         if (!cart.tech_operations) throw new Error("");
         if (!el) throw new Error("");
         if (cart.costHectare == undefined) throw new Error("");
@@ -110,6 +126,7 @@ async function changeCarts(Scarts: resTechCartsWithOpers[]) {
         costCars += el.costCars || 0;
         costFuel += el.costFuel || 0;
         costHandWork += el.costHandWork || 0;
+
         tech_cart.update(
           {
             costHectare,
@@ -360,7 +377,7 @@ class TechCartService {
         costFuel = 0,
         costHandWork = 0;
       res.forEach((cart) => {
-        cart.tech_operations?.forEach((el) => {
+        cart?.tech_operations?.forEach((el) => {
           costHectare +=
             el.costMachineWork! +
               el.costCars! +
@@ -387,7 +404,7 @@ class TechCartService {
         },
         { where: { id: id } }
       );
-      res[0].costHectare = costHectare;
+      if (res[0]) res[0].costHectare = costHectare;
 
       return res;
     } else {
@@ -778,33 +795,6 @@ class TechCartService {
     //@ts-ignore
     const res: resTechCartsWithOpers[] = await tech_cart.findAll({
       where: { [Op.or]: [{ isBasic: false }, { isBasic: true }] },
-    });
-    return res;
-  }
-  async setIsBasicCart(user: Principal | undefined, data: setIsBasicCartType) {
-    if (!user) return;
-    const prop: Itech_cart | null = await tech_cart.findOne({
-      where: { id: data.cartId },
-    });
-    if (!prop) return;
-    const check = await tech_cart.findOne({
-      where: {
-        cultivationTechnologyId: prop?.cultivationTechnologyId,
-        cultureId: prop.cultureId,
-        year: prop.year,
-        id: {
-          [Op.ne]: prop.id,
-        },
-        isBasic: true,
-      },
-    });
-    if (check) return "присутній";
-    await tech_cart.update(
-      { isBasic: data.isBasic },
-      { where: { id: data.cartId } }
-    );
-    const res: resTechCartsWithOpers | null = await tech_cart.findOne({
-      where: { id: data.cartId },
     });
     return res;
   }

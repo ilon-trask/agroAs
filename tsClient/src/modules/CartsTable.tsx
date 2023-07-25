@@ -51,16 +51,13 @@ export function CartsTableHeadRow({
   return (
     <Tr>
       {!isPlan && <Th></Th>}
-      {isCul && (
-        <>
-          <Th>Технологія</Th>
-          <Th>Рік</Th>
-        </>
-      )}
+      {isCul && <Th>Технологія</Th>}
+      {(isCul || isPlan) && <Th>Рік</Th>}
       <Th>Назва карти</Th>
       <Th>Площа (га)</Th>
       <Th>Загальна вартість (грн)</Th>
       <Th>Витрати на 1 га (грн)</Th>
+      {!isPlan && <Th>ТЕП</Th>}
       {!isPlan && <Th></Th>}
       {(role == "ADMIN" || role == "AUTHOR" || role == "service_role") &&
         !isCul &&
@@ -82,15 +79,17 @@ const CartsTable = observer(
   }: props) => {
     const { map, user } = useContext(Context);
     return (
-      <Table variant="simple" size={"sm"}>
+      <Table size={"sm"}>
         <Thead>
           <CartsTableHeadRow role={user.role} isCul={isCul} />
         </Thead>
         <Tbody>
           {map.isLoading ? (
-            <Box mx={"auto"}>
-              <Loader />
-            </Box>
+            <Tr mx={"auto"}>
+              <Td colSpan={10}>
+                <Loader />
+              </Td>
+            </Tr>
           ) : (
             <></>
           )}

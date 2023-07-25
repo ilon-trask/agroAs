@@ -1,15 +1,18 @@
 import { Heading } from "@chakra-ui/react";
-import React from "react";
+import React, { RefObject } from "react";
 
 function SectionTitle({
   children,
   mt,
+  aref,
 }: {
   children: string;
   mt?: string | number;
+  aref?: RefObject<HTMLTableElement>;
 }) {
   return (
     <Heading
+      ref={aref}
       fontSize={"24px"}
       textAlign={"left"}
       textTransform={"none"}

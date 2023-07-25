@@ -2,15 +2,17 @@ import { publicProcedure, router } from "../trpc";
 import * as z from "zod";
 import buildingService from "../controllers/buildingService";
 
-const createBuilding = z.object({
+export const createBuilding = z.object({
   name: z.string(),
   startPrice: z.number(),
-  depreciationPeriod: z.string(),
-  businessPlanId: z.number().optional().nullable(),
-  enterpriseId: z.number(),
+  depreciationPeriod: z.string().nullish(),
+  date: z.string(),
+  description: z.string(),
+  businessPlanId: z.number(),
+  enterpriseId: z.number().nullish(),
 });
 export type CreateBuildingType = z.infer<typeof createBuilding>;
-const patchBuilding = createBuilding.extend({ buildId: z.number() });
+export const patchBuilding = createBuilding.extend({ buildId: z.number() });
 export type PatchBuildingType = z.infer<typeof patchBuilding>;
 export const buildingRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
