@@ -1,11 +1,9 @@
-import { ViewIcon } from "@chakra-ui/icons";
 import {
   Button,
   Container,
   Table,
   Tbody,
   Td,
-  Text,
   Thead,
   Tr,
 } from "@chakra-ui/react";
@@ -23,11 +21,7 @@ import CartsTable from "../modules/CartsTable";
 import CreateCart, { cartProps } from "../modules/CreateCart";
 import CreateEnterprise from "../modules/CreateEnterprise";
 import { CreateEnterpriseProps } from "../modules/CreateEnterprise/CreateEnterprise";
-import {
-  ENTERPRISE_FORM_ROUTER,
-  ENTERPRISE_ROUTER,
-  ENTERPRISE_TAX_GROUP,
-} from "../utils/consts";
+import { ENTERPRISE_ROUTER, ENTERPRISE_TAX_GROUP } from "../utils/consts";
 
 function Enterprise() {
   const [open, setOpen] = useState(false);
@@ -89,11 +83,7 @@ function Enterprise() {
                     <MyViewIcon /> {el.name}
                   </Link>
                 </Td>
-                {user.role == "service_role" ? (
-                  <Td>{el.form}</Td>
-                ) : (
-                  <Td>{el.form}</Td>
-                )}
+                <Td>{el.form}</Td>
                 <Td>
                   <Link
                     to={ENTERPRISE_TAX_GROUP + "/" + el.taxGroup + "/" + el.id}

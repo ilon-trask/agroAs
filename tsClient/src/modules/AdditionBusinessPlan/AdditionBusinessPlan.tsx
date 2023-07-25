@@ -1,15 +1,11 @@
-import { Table, Tbody, Td, Th, Thead, Tr, Box, Text } from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr, Box } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { RefObject, useContext, useMemo } from "react";
-import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
 import TechnologicalMapContent from "src/pages/TechnologicalMap/TechnologicalMapContent";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
-import useVegetationYears, {
-  VegetationYearsType,
-} from "src/shared/hook/useVegetationYears";
-import { sectionsOpers } from "src/store/GetSectionsOpers";
+import useVegetationYears from "src/shared/hook/useVegetationYears";
 import Description from "src/ui/Description";
 import MyHeading from "src/ui/MyHeading";
 import Paragraph from "src/ui/Paragraph";
@@ -17,7 +13,6 @@ import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Ifinancing, Iworker } from "../../../../tRPC serv/models/models";
 import CashFlowTable from "../CashFlowTable";
 import {
@@ -31,10 +26,7 @@ function AdditionBusinessPlan({
   end,
   myBusiness,
   thisWorkers,
-  thisMaps,
   cultureSet,
-  sections,
-  operReady,
   thisCredit,
   thisDerj,
   thisGrand,
@@ -46,10 +38,7 @@ function AdditionBusinessPlan({
   end: number;
   myBusiness: resBusinessPlan;
   thisWorkers: Iworker[];
-  thisMaps: resTechCartsWithOpers[];
   cultureSet: Set<string>;
-  sections: { data: sectionsOpers; year: VegetationYearsType }[];
-  operReady: boolean;
   thisCredit: Ifinancing[] | undefined;
   thisInvestment: Ifinancing[] | undefined;
   thisDerj: Ifinancing[] | undefined;
@@ -130,17 +119,7 @@ function AdditionBusinessPlan({
               el.cultivationTechnology?.name.split(" ").join("\u00A0")
             )
             .join("\n"),
-          map: busProds
-            .map(
-              (el) => el.tech_cart?.nameCart
-              // thisMaps.find(
-              //   (e) =>
-              //     e.cultureId == el.product?.cultureId &&
-              //     e.cultivationTechnologyId == el.cultivationTechnologyId &&
-              //     +e.year.split("")[0] == ind
-              // )?.nameCart || "Відсутня"
-            )
-            .join("\n"),
+          map: busProds.map((el) => el.tech_cart?.nameCart).join("\n"),
           area: busProds
             .map((el) => {
               sumArea += el.area;
@@ -149,13 +128,6 @@ function AdditionBusinessPlan({
             .join("\n"),
           totalCost: busProds
             .map((el) => {
-              // let res =
-              //   (thisMaps.find(
-              //     (e) =>
-              //       e.cultureId == el.product?.cultureId &&
-              //       e.cultivationTechnologyId == el.cultivationTechnologyId &&
-              //       +e.year.split("")[0] == ind
-              //   )?.costHectare || 0) * el.area;
               let res = (el.tech_cart?.costHectare || 0) * el.area;
               sumCost += res;
               return res;
@@ -163,13 +135,6 @@ function AdditionBusinessPlan({
             .join("\n"),
           OPFund: busProds
             .map((el) => {
-              let cart = thisMaps.find(
-                (e) =>
-                  e.cultureId == el.product?.cultureId &&
-                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
-                  +e.year.split("")[0] == ind
-              );
-
               let res =
                 (el.tech_cart?.totalCostHandWork ||
                   0 + el.tech_cart?.totalCostMachineWork! ||
@@ -180,12 +145,6 @@ function AdditionBusinessPlan({
             .join("\n"),
           ESV_VZ: busProds
             .map((el) => {
-              let cart = thisMaps.find(
-                (e) =>
-                  e.cultureId == el.product?.cultureId &&
-                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
-                  +e.year.split("")[0] == ind
-              );
               let res = Math.round(
                 (el.tech_cart?.totalCostHandWork ||
                   0 + el.tech_cart?.totalCostMachineWork! ||
@@ -199,12 +158,6 @@ function AdditionBusinessPlan({
             .join("\n"),
           direct: busProds
             .map((el) => {
-              let cart = thisMaps.find(
-                (e) =>
-                  e.cultureId == el.product?.cultureId &&
-                  e.cultivationTechnologyId == el.cultivationTechnologyId &&
-                  +e.year.split("")[0] == ind
-              );
               let res =
                 Math.round(
                   (el.tech_cart?.totalCostHandWork ||

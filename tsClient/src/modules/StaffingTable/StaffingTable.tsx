@@ -118,7 +118,7 @@ export function StaffingTableBodyRows({
   isPlan,
   i,
 }: {
-  thisWorkers: Iworker[];
+  thisWorkers: Iworker[] | undefined;
   setRes?: Dispatch<SetStateAction<CreateWorkerProp>>;
   setUpdate?: Dispatch<SetStateAction<boolean>>;
   setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -203,13 +203,13 @@ export function StaffingTableBody({
   start,
   myBusiness,
 }: {
-  thisWorkers: Iworker[];
+  thisWorkers: Iworker[] | undefined;
   setRes: Dispatch<SetStateAction<CreateWorkerProp>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
   i: number;
   start: number;
-  myBusiness: resBusinessPlan;
+  myBusiness: resBusinessPlan | undefined;
 }) {
   return (
     <Tbody>
@@ -228,8 +228,8 @@ export function StaffingTableBody({
               setRes((prev) => ({
                 amount: "",
                 class: "",
-                enterpriseId: myBusiness.enterpriseId!,
-                businessPlanId: myBusiness.id!,
+                enterpriseId: myBusiness?.enterpriseId!,
+                businessPlanId: myBusiness?.id!,
                 year: i - start,
                 isConst: true,
                 form: prev.form,
@@ -248,7 +248,7 @@ export function StaffingTableBody({
         <Td></Td>
         <Td></Td>
         <Td>
-          {thisWorkers.reduce(
+          {thisWorkers?.reduce(
             (p, c) =>
               p +
               c.salary *
@@ -259,7 +259,7 @@ export function StaffingTableBody({
           )}
         </Td>
         <Td>
-          {thisWorkers.reduce(
+          {thisWorkers?.reduce(
             (p, c) =>
               p +
               c.salary *
@@ -271,7 +271,7 @@ export function StaffingTableBody({
           )}
         </Td>
         <Td>
-          {thisWorkers.reduce(
+          {thisWorkers?.reduce(
             (p, c) =>
               p +
               c.salary *
@@ -283,7 +283,7 @@ export function StaffingTableBody({
           )}
         </Td>
         <Td>
-          {thisWorkers.reduce(
+          {thisWorkers?.reduce(
             (p, c) =>
               p +
               (c.salary * 0.015 + c.salary * 0.22 + c.salary) *

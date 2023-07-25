@@ -1,18 +1,7 @@
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Box,
-  Text,
-} from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr, Text } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import { observer } from "mobx-react-lite";
 import React, { RefObject, useContext, useMemo } from "react";
-import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
 import { Context } from "src/main";
 import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
@@ -27,11 +16,7 @@ import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
-import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
-import { BuyingMachineTableBodyRow } from "../BuyingMachineTable/BuyingMachineTable";
 import { CartsTableHeadRow } from "../CartsTable";
-import { CostProdTableHeadRows } from "../CostProdTable/CostProdTable";
 import { PlanIncomeProductionTableHeadRow } from "../PlanIncomeProductionTable/PlanIncomeProductionTable";
 import { SaleTableHeadRows } from "../SaleTable/SaleTable";
 
@@ -39,17 +24,11 @@ function ProductionBusinessPlan({
   start,
   end,
   myBusiness,
-  thisMaps,
-  productSet,
-  area,
   aref,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
-  thisMaps: resTechCartsWithOpers[];
-  productSet: Set<string>;
-  area: number;
   aref: RefObject<HTMLTableElement>;
 }) {
   const { income, map, TEJ } = useContext(Context);
@@ -57,109 +36,109 @@ function ProductionBusinessPlan({
   let costMech = 0;
   let costMechTot = 0;
 
-  const laborСostsData = (() => {
-    const res: {
-      workType: string;
-      operation: string;
-      amount: number | string;
-      averagePrice: number | string;
-      sum: number | string;
-      bold?: boolean;
-    }[] = [
-      {
-        workType: "Муханізовані роботи",
-        operation: "",
-        amount: "Люд/год",
-        averagePrice: "Грн/год",
-        sum: "",
-        bold: true,
-      },
-    ];
+  // const laborСostsData = (() => {
+  //   const res: {
+  //     workType: string;
+  //     operation: string;
+  //     amount: number | string;
+  //     averagePrice: number | string;
+  //     sum: number | string;
+  //     bold?: boolean;
+  //   }[] = [
+  //     {
+  //       workType: "Муханізовані роботи",
+  //       operation: "",
+  //       amount: "Люд/год",
+  //       averagePrice: "Грн/год",
+  //       sum: "",
+  //       bold: true,
+  //     },
+  //   ];
 
-    thisMaps.map((e) => {
-      let myJustification = TEJ.justification?.find((el) => {
-        return el.techCartId! == +e.id!;
-      });
+  //   thisMaps.map((e) => {
+  //     let myJustification = TEJ.justification?.find((el) => {
+  //       return el.techCartId! == +e.id!;
+  //     });
 
-      return map.opers
-        .filter((el) => el.techCartId == e.id)
-        .map((el) => {
-          const totalCost = el.costMachineWork! * myJustification?.area!;
+  //     return map.opers
+  //       .filter((el) => el.techCartId == e.id)
+  //       .map((el) => {
+  //         const totalCost = el.costMachineWork! * myJustification?.area!;
 
-          const peopleHour =
-            Math.round(
-              (totalCost /
-                ((e?.salary! / 176) *
-                  map.grade.find(
-                    (e) => e?.id! == el?.aggregate?.tractor.gradeId
-                  )?.coefficient!)) *
-                100
-            ) / 100;
+  //         const peopleHour =
+  //           Math.round(
+  //             (totalCost /
+  //               ((e?.salary! / 176) *
+  //                 map.grade.find(
+  //                   (e) => e?.id! == el?.aggregate?.tractor.gradeId
+  //                 )?.coefficient!)) *
+  //               100
+  //           ) / 100;
 
-          const costMech = Math.round(((totalCost / peopleHour) * 100) / 100);
-          if (el.cell == "costMechanical")
-            res.push({
-              workType: "",
-              operation: el.nameOperation,
-              amount: peopleHour,
-              averagePrice: costMech,
-              sum: totalCost,
-              bold: true,
-            });
-        });
-    });
-    res.push({
-      workType: "Ручні роботи",
-      operation: "",
-      amount: "Люд/год",
-      averagePrice: "Грн/год",
-      sum: "",
-      bold: true,
-    });
-    thisMaps.map((e) => {
-      let myJustification: resTechnologicalEconomicJustification | undefined =
-        TEJ.justification?.find((el) => {
-          return el.techCartId! == +e.id!;
-        });
-      return map.opers
-        .filter((el) => el.techCartId == e.id)
-        .map((el) => {
-          const totalCost = el.costHandWork! * myJustification?.area!;
-          const peopleHour =
-            Math.round(
-              (totalCost /
-                ((e?.salary! / 176) *
-                  map.grade.find(
-                    (e) =>
-                      e.id! == el.cost_hand_work?.gradeId! ||
-                      el.aggregate?.agricultural_machine.gradeId
-                  )?.coefficient!)) *
-                100
-            ) / 100;
-          const costHand = Math.round(((totalCost / peopleHour) * 100) / 100);
-          if (
-            el.cell == "costHandWork" ||
-            (el.cell == "costMechanical" && el.costHandWork)
-          )
-            res.push({
-              workType: "",
-              operation: el.nameOperation,
-              amount: peopleHour,
-              averagePrice: costHand,
-              sum: totalCost,
-            });
-        });
-    });
-    res.push({
-      workType: "Всього по оплаті праці",
-      amount: "",
-      averagePrice: "",
-      operation: "",
-      sum: 0,
-      bold: true,
-    });
-    return res;
-  })();
+  //         const costMech = Math.round(((totalCost / peopleHour) * 100) / 100);
+  //         if (el.cell == "costMechanical")
+  //           res.push({
+  //             workType: "",
+  //             operation: el.nameOperation,
+  //             amount: peopleHour,
+  //             averagePrice: costMech,
+  //             sum: totalCost,
+  //             bold: true,
+  //           });
+  //       });
+  //   });
+  //   res.push({
+  //     workType: "Ручні роботи",
+  //     operation: "",
+  //     amount: "Люд/год",
+  //     averagePrice: "Грн/год",
+  //     sum: "",
+  //     bold: true,
+  //   });
+  //   thisMaps.map((e) => {
+  //     let myJustification: resTechnologicalEconomicJustification | undefined =
+  //       TEJ.justification?.find((el) => {
+  //         return el.techCartId! == +e.id!;
+  //       });
+  //     return map.opers
+  //       .filter((el) => el.techCartId == e.id)
+  //       .map((el) => {
+  //         const totalCost = el.costHandWork! * myJustification?.area!;
+  //         const peopleHour =
+  //           Math.round(
+  //             (totalCost /
+  //               ((e?.salary! / 176) *
+  //                 map.grade.find(
+  //                   (e) =>
+  //                     e.id! == el.cost_hand_work?.gradeId! ||
+  //                     el.aggregate?.agricultural_machine.gradeId
+  //                 )?.coefficient!)) *
+  //               100
+  //           ) / 100;
+  //         const costHand = Math.round(((totalCost / peopleHour) * 100) / 100);
+  //         if (
+  //           el.cell == "costHandWork" ||
+  //           (el.cell == "costMechanical" && el.costHandWork)
+  //         )
+  //           res.push({
+  //             workType: "",
+  //             operation: el.nameOperation,
+  //             amount: peopleHour,
+  //             averagePrice: costHand,
+  //             sum: totalCost,
+  //           });
+  //       });
+  //   });
+  //   res.push({
+  //     workType: "Всього по оплаті праці",
+  //     amount: "",
+  //     averagePrice: "",
+  //     operation: "",
+  //     sum: 0,
+  //     bold: true,
+  //   });
+  //   return res;
+  // })();
   const plannedStructureData = [];
   const generalData = [];
   for (let i = start; i < end; i++) {
@@ -399,35 +378,6 @@ function ProductionBusinessPlan({
                   </Td>
                 </Tr>
               );
-              //   for (let j = 0; j < myBusiness?.busProds?.length!; j++) {
-              //     const e = myBusiness?.busProds[j];
-              //     let thisMaps = map.maps.map((m) => ({
-              //       ...m,
-              //       area: e?.area,
-              //     }));
-              //     thisMaps = thisMaps.filter((el) => {
-              //       return (
-              //         el.cultureId == e?.product?.cultureId &&
-              //         el.cultivationTechnologyId == e?.cultivationTechnologyId &&
-              //         //@ts-ignore
-              //         el.year.split("")[0] == i - +start + 1
-              //       );
-              //     });
-              //     res.push(
-              //       <React.Fragment key={j}>
-              //         {thisMaps.map((el) => (
-              //           <Tr>
-              //             <Td>{el.nameCart}</Td>
-              //             <Td>{el.area}</Td>
-              //             <Td>
-              //               {Math.round(el.area! * el.costHectare! * 100) / 100}
-              //             </Td>
-              //             <Td>{el.costHectare}</Td>
-              //           </Tr>
-              //         ))}
-              //       </React.Fragment>
-              //     );
-              // }
             }
             res.push(
               <Tr key={end + 1}>
@@ -792,7 +742,7 @@ function ProductionBusinessPlan({
                 <TEJustificationContent
                   key={el.id}
                   isPlan={true}
-                  myCart={el.tech_cart}
+                  myCart={el.tech_cart!}
                   myJustification={{ area: el.area }}
                 />
               ))
@@ -1242,7 +1192,7 @@ function ProductionBusinessPlan({
                       myYield?.yieldPerHectare! * (vegetation?.allCoeff || 1)
                     ).toFixed(2) || 0;
                   const gather = (amount * el.area).toFixed(2);
-                  sum += +(el.price * gather).toFixed(2);
+                  sum += +((el.price || 0) * +gather).toFixed(2);
                   return (
                     <Tr key={el.id}>
                       <Td>{el.product?.name}</Td>
@@ -1250,7 +1200,7 @@ function ProductionBusinessPlan({
                       <Td>{el.area}</Td>
                       <Td>{gather}</Td>
                       <Td>{el.price}</Td>
-                      <Td>{(el.price * gather).toFixed(2)}</Td>
+                      <Td>{((el.price || 0) * +gather).toFixed(2)}</Td>
                     </Tr>
                   );
                 })
@@ -1373,8 +1323,8 @@ function ProductionBusinessPlan({
                 general: number;
                 direct: number;
                 outcome: number;
-                amount: number;
-                cost: number;
+                amount?: number;
+                cost?: number;
                 bold?: boolean;
               }[] = [];
               for (let i = start; i <= end; i++) {
@@ -1412,7 +1362,7 @@ function ProductionBusinessPlan({
                       ).toFixed(2) || 0;
                     return {
                       year: i,
-                      name: el.product?.name,
+                      name: el.product?.name!,
                       direct: (el.tech_cart?.costHectare || 0) * el.area,
                       permanent: 0,
                       general: 0,
@@ -1426,11 +1376,11 @@ function ProductionBusinessPlan({
                   0
                 );
                 const permanentValue = permanent.reduce(
-                  (p, c) => p + c.costYear,
+                  (p, c) => p + (c.costYear || 0),
                   0
                 );
                 const generalValue = general.reduce(
-                  (p, c) => p + c.costYear,
+                  (p, c) => p + (c.costYear || 0),
                   0
                 );
                 data.push({

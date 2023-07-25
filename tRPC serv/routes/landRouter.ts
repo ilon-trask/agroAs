@@ -5,7 +5,7 @@ import landService from "../controllers/landService";
 export const createLand = z.object({
   name: z.string(),
   area: z.number(),
-  cadastreNumber: z.number(),
+  cadastreNumber: z.number().nullish().optional(),
   date: z.string(),
   rightOfUse: z.enum(["Оренда", "Власна"]),
   businessPlanId: z.number().optional().nullable(),

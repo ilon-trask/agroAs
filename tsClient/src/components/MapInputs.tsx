@@ -102,7 +102,7 @@ const Name = ({
       type="text"
       value={res?.nameCart}
       onChange={(e) => {
-        setRes({ ...res, nameCart: e.target.value });
+        setRes((prev) => ({ ...prev, nameCart: e.target.value }));
       }}
     />
   </>
@@ -146,7 +146,9 @@ export default function MapInputs({
             </Heading>
             <Select
               value={res.sectionId}
-              onChange={(e) => setRes({ ...res, sectionId: +e.target.value })}
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, sectionId: +e.target.value }))
+              }
             >
               <option disabled hidden value="">
                 Виберіть розділ
@@ -166,7 +168,10 @@ export default function MapInputs({
                 <Select
                   value={res?.cultureId}
                   onChange={(e) =>
-                    setRes({ ...res, cultureId: e.target.value as any })
+                    setRes((prev) => ({
+                      ...prev,
+                      cultureId: e.target.value as any,
+                    }))
                   }
                 >
                   <option value="" hidden defaultChecked>
@@ -186,7 +191,10 @@ export default function MapInputs({
                 <Select
                   value={res.cultivationTechnologyId}
                   onChange={(e) =>
-                    setRes({ ...res, cultivationTechnologyId: +e.target.value })
+                    setRes((prev) => ({
+                      ...prev,
+                      cultivationTechnologyId: +e.target.value,
+                    }))
                   }
                 >
                   <option hidden defaultChecked value="">
@@ -212,7 +220,7 @@ export default function MapInputs({
             placeholder="Вкажіть площу"
             type="number"
             onChange={(e) => {
-              setRes({ ...res, area: e.target.value });
+              setRes((prev) => ({ ...prev, area: e.target.value }));
             }}
             value={res?.area}
           />
@@ -225,7 +233,7 @@ export default function MapInputs({
             placeholder="Вкажіть ЗП"
             type="number"
             onChange={(e) => {
-              setRes({ ...res, salary: e.target.value });
+              setRes((prev) => ({ ...prev, salary: e.target.value }));
             }}
             value={res?.salary}
           />
@@ -239,7 +247,7 @@ export default function MapInputs({
             placeholder="Вкажіть ціну ДП"
             type="number"
             onChange={(e) => {
-              setRes({ ...res, priceDiesel: e.target.value });
+              setRes((prev) => ({ ...res, priceDiesel: e.target.value }));
             }}
             value={res?.priceDiesel}
           />

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { deleteCart, setIsBasicCart, setIsPublic } from "../http/requests";
+import { deleteCart, setIsPublic } from "../http/requests";
 import { Context } from "../main";
 import { cartProps } from "../modules/CreateCart";
 import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";

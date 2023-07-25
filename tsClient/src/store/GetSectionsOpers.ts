@@ -8,7 +8,7 @@ export type sectionsOpers = {
 export default function getSections(
   map: MapStore,
   id: number,
-  opers: resTechOperation[] | null
+  opers?: resTechOperation[] | null
 ): sectionsOpers {
   const operData =
     opers ||

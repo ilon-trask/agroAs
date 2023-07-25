@@ -9,6 +9,7 @@ import { cartProps } from "src/modules/CreateCart";
 import useBusiness from "src/shared/hook/useBusiness";
 import { agreeCarts, getPublicBusiness } from "src/http/requests";
 import MyTableContainer from "src/ui/MyTableContainer";
+import MyHeading from "src/ui/MyHeading";
 
 function DataBasePage() {
   const { business, map } = useContext(Context);
@@ -19,7 +20,6 @@ function DataBasePage() {
   }, []);
   const [openBusiness, setOpenBusiness] = useState(false);
   const [res, setRes] = useState<CreateBusinessProp>({
-    cultureIds: [{ id: 0, tech: [{ techId: 0, area: 0 }] }],
     dateStart: "",
     enterpriseId: "",
     initialAmount: "",
@@ -49,9 +49,7 @@ function DataBasePage() {
   const maps = [...map.agreeCarts];
   return (
     <Container maxW="container.lg">
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Бізнес-плани
-      </Text>
+      <MyHeading mt={"15px"}>Бізнес-плани</MyHeading>
       <MyTableContainer>
         <BusinessTable
           businessData={bus}
@@ -61,9 +59,7 @@ function DataBasePage() {
           setDeleteOpen={setDeleteRes as any}
         />
       </MyTableContainer>
-      <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
-        Технологічні карти
-      </Text>
+      <MyHeading mt={"15px"}>Технологічні карти</MyHeading>
       <MyTableContainer>
         <CartsTable
           maps={maps}

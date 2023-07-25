@@ -38,7 +38,11 @@ function MSHPBusTable({
     purpose: "МШП",
   });
   const [update, setUpdate] = useState(false);
-  const [deleteData, setDeleteData] = useState<DeleteProps>({});
+  const [deleteData, setDeleteData] = useState<DeleteProps>({
+    func: () => {},
+    isOpen: false,
+    text: "МШП",
+  });
   const { business } = useContext(Context);
   return (
     <>

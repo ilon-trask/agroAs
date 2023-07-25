@@ -28,7 +28,6 @@ import {
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
-  DeleteLandForBusiness,
   PatchBusinessPlan,
   PatchBusProd,
   PatchFinancingForBusiness,
@@ -105,7 +104,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1252,6 +1251,7 @@ export function getWorker(enterprise: EnterpriseStore) {
 export function createWorker(bus: BusinessStore, data: CreateWorkerType) {
   client.worker.create.query(data).then((res) => {
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
     bus.newBusinessPlan = res;
   });
 }
@@ -1259,6 +1259,7 @@ export function patchWorker(bus: BusinessStore, data: PatchWorkerType) {
   client.worker.patch.query(data).then((res) => {
     if (!res) return;
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+    //@ts-ignore
     bus.newBusinessPlan = res;
   });
 }

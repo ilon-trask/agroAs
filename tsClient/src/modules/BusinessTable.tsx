@@ -56,7 +56,7 @@ function BusinessTable({
   setDeleteOpen,
   businessData,
 }: props) {
-  const { map, business } = useContext(Context);
+  const { map, business, user } = useContext(Context);
   const [publicOpen, setPublicOpen] = useState(false);
   const [publicRes, setPublicRes] = useState<{
     BusinessId: number;
@@ -74,10 +74,11 @@ function BusinessTable({
       realizationTime: original.realizationTime,
       planId: original.id,
       topic: original.topic,
+      enterpriseId: original.enterpriseId!,
     });
   };
-  const columns = useMemo<ColumnDef<resBusinessPlan>[]>(
-    () => [
+  const columns = useMemo<ColumnDef<resBusinessPlan>[]>(() => {
+    const res: ColumnDef<resBusinessPlan>[] = [
       {
         header: "",
         accessorKey: "id",
@@ -85,15 +86,6 @@ function BusinessTable({
           <Box onClick={() => onEditClick(original)}>
             <MyEditIcon />
           </Box>
-        ),
-      },
-      {
-        header: "Назва підприємства",
-        accessorKey: "enterprise.name",
-        cell: ({ row: { original } }) => (
-          <Link to={ENTERPRISE_ROUTER + "/" + original.enterpriseId}>
-            <MyViewIcon /> {original.enterprise?.name}
-          </Link>
         ),
       },
       {
@@ -106,6 +98,11 @@ function BusinessTable({
             </Link>
           </Box>
         ),
+      },
+      {
+        header: "Підприємство",
+        accessorKey: "enterprise.name",
+        cell: ({ row: { original } }) => <Box>{original.enterprise?.name}</Box>,
       },
       {
         header: "Культура",
@@ -122,8 +119,8 @@ function BusinessTable({
         },
       },
       { header: "Дата початку", accessorKey: "dateStart" },
-      { header: "Термін реалізації", accessorKey: "realizationTime" },
-      { header: "Початкова сума", accessorKey: "initialAmount" },
+      { header: "Термін", accessorKey: "realizationTime" },
+      { header: "Cума", accessorKey: "initialAmount" },
       {
         header: "",
         accessorKey: "createdAt",
@@ -145,7 +142,9 @@ function BusinessTable({
           </Box>
         ),
       },
-      {
+    ];
+    if (user.role == "service_role")
+      res.push({
         header: "",
         accessorKey: "updatedAt",
         cell: ({ row: { original } }) => (
@@ -171,10 +170,9 @@ function BusinessTable({
             Опублікувати
           </Checkbox>
         ),
-      },
-    ],
-    []
-  );
+      });
+    return res;
+  }, []);
   const data = businessData;
 
   return (

@@ -37,7 +37,7 @@ const createBusProd = z.object({
 export type CreateBusProd = z.infer<typeof createBusProd>;
 const patchBusProd = createBusProd.extend({
   ownId: z.number(),
-  price: z.number(),
+  price: z.number().nullish().optional(),
 });
 export type PatchBusProd = z.infer<typeof patchBusProd>;
 const deleteBusProd = z.object({ id: z.number(), busId: z.number() });

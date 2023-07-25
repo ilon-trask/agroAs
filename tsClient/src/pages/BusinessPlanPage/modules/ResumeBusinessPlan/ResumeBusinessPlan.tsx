@@ -86,7 +86,7 @@ function ResumeBusinessPlan({
                   </Tr>
                 </React.Fragment>
               ) : (
-                <Tr key={el}>
+                <Tr key={el as string}>
                   <Td>{el}, охолоджені для реалізації (т)</Td>
                 </Tr>
               )

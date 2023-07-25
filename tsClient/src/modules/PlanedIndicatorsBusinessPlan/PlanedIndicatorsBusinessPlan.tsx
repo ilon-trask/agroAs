@@ -9,7 +9,6 @@ import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Iworker } from "../../../../tRPC serv/models/models";
 
 function PlanedIndicatorsBusinessPlan({
@@ -95,7 +94,7 @@ function PlanedIndicatorsBusinessPlan({
       <TableComponent data={data} columns={columns} />
       <Text fontWeight={"bold"} fontSize={"20px"}>
         Результат: період років - {end - start}; Прибуток:
-        {data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
+        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
       </Text>
       <Heading textAlign={"center"} size={"sm"} mt={5}>
         Розрахунок собівартості продукції

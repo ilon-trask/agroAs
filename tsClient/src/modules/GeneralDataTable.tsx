@@ -4,7 +4,7 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
 type props = {
-  myMap: resTechCartsWithOpers;
+  myMap: resTechCartsWithOpers | undefined;
 } & (
   | {
       useIcons: false;

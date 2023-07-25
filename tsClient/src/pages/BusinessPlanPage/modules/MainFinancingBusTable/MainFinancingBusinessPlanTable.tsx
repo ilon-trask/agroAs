@@ -184,7 +184,7 @@ function MainFinancingBusinessPlanTable({
         accessorKey: "isYear",
         cell: ({ row: { original } }) => (
           <>
-            {original.isAll ? (
+            {original.isAll || original.name == "Початкові інвестиції" ? (
               <></>
             ) : (
               !original.isYear && (

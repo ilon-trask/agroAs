@@ -60,7 +60,7 @@ import CreateBuyingMachine, {
 } from "../modules/CreateBuyingMachine";
 import CreateAdministration from "../modules/CreateAdministration";
 import { CreateAdministrationProp } from "../modules/CreateAdministration/CreateAdministration";
-import BuyingMachineTable from "../modules/BuyingMachineTable";
+// import BuyingMachineTable from "../modules/BuyingMachineTable";
 import MyTableContainer from "src/ui/MyTableContainer";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
@@ -158,55 +158,6 @@ const MapJornal = observer(function () {
   }, []);
   return (
     <Container maxW="container.lg">
-      {user.role == "service_role" && (
-        <Tabs>
-          <TabList>
-            <Box display={"flex"} h={"fit-content"}>
-              <NumberInput
-                defaultValue={year}
-                onChange={(e) => setYear(+e)}
-                width={"200px"}
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-              <Select width={"fit-content"}>
-                <option value="">Січель</option>
-                <option value="">Лютий</option>
-                <option value="">Березень</option>
-                <option value="">I квартал</option>
-                <option value="">Квітень</option>
-                <option value="">Травень</option>
-                <option value="">Червень</option>
-                <option value="">II квартал</option>
-                <option value="">Липень</option>
-                <option value="">Серпень</option>
-                <option value="">Вересень</option>
-                <option value="">III квартал</option>
-                <option value="">Жовтень</option>
-                <option value="">Листопад</option>
-                <option value="">Грудень</option>
-                <option value="">IV квартал</option>
-                <option value="">Рік</option>
-              </Select>
-            </Box>
-            <Tab ml={"15px"}>Всі витрат</Tab>
-            {/* <Tab>Прямі</Tab>
-          <Tab>Загально виробничі</Tab>
-          <Tab>Постійні</Tab>
-          <Tab>Будівництво будівель і споруд</Tab>
-          <Tab>Купівля техніки та обладнання</Tab> */}
-            <Tab>Інвестиційні</Tab>
-            <Tab>Операційні</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel></TabPanel>
-          </TabPanels>
-        </Tabs>
-      )}
       <Box>
         {user.role == "service_role" && (
           <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
@@ -539,7 +490,7 @@ const MapJornal = observer(function () {
       )}
       {user.role == "service_role" && (
         <Box>
-          <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
+          {/* <Text textAlign={"center"} fontSize={"25px"} mt={"15px"}>
             КУПІВЛЯ ТЕХНІКИ ТА ОБЛАДНАННЯ
           </Text>
           <TableContainer>
@@ -560,8 +511,8 @@ const MapJornal = observer(function () {
             setRes={setBuyingMachineRes}
             update={buyingMachineUpdate}
             setUpdate={setBuyingMachineUpdate}
-          />
-          <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
+          /> */}
+          {/* <Text textAlign={"center"} fontSize={"25px"} mt={"25px"}>
             Розрахунок грошового потоку (витрати)
           </Text>
           <TableContainer>
@@ -584,7 +535,7 @@ const MapJornal = observer(function () {
                           outId: el.id,
                           group: el.group,
                           id: el.techCartId!,
-                          type: el.type,
+                          type: el.type!,
                         });
                         setOutcomeOpen(true);
                         setOutcomeUpd(true);
@@ -616,7 +567,7 @@ const MapJornal = observer(function () {
                             (e) => e.id == el.administrationId
                           );
                           return adm?.cost;
-                        } else if (el.group == "Купівля техніки і обладнання") {
+                        } else if (el.group == "") {
                           const buying = map.buyingMachine.find(
                             (e) => e.id == el.buyingMachineId
                           );
@@ -659,7 +610,7 @@ const MapJornal = observer(function () {
                 ))}
               </Tbody>
             </Table>
-          </TableContainer>
+          </TableContainer> */}
           <Button
             onClick={
               //@ts-ignore

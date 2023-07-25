@@ -25,7 +25,6 @@ function LandBusTable({
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<CreateLandProps>({
     area: "",
-    cadastreNumber: "",
     enterpriseId: 0,
     name: "",
     date: "",
@@ -88,7 +87,7 @@ function LandBusTable({
                         </Td>
                         <Td>{i}</Td>
                         <Td>{el.rightOfUse}</Td>
-                        <Td>{el.cadastreNumber}</Td>
+                        <Td>{+el.cadastreNumber! || "Не вказано"}</Td>
                         <Td>{el.area}</Td>
                         <Td>{el.rate}</Td>
                         <Td>{el.area * el.rate}</Td>

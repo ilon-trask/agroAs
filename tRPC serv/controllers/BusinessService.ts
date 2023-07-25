@@ -120,40 +120,173 @@ const includes = [
   { model: worker },
   { model: land },
 ];
-async function changeFinancing(res: resBusinessPlan[]) {
-  res = JSON.parse(JSON.stringify(res));
+async function changeFinancing(plans: resBusinessPlan[]) {
+  plans = JSON.parse(JSON.stringify(plans));
 
-  res = res.map((res) => {
-    res.MSHP = res.buying_machines.filter((el) => el.purpose == "МШП");
-    res.buying_machines = res.buying_machines.filter(
+  plans = plans.map((plan) => {
+    plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП");
+    if (!plan.MSHP) plan.MSHP = [];
+    plan.buying_machines = plan.buying_machines.filter(
       (el) => el.purpose != "МШП"
     );
-    res.workers = changeWorkerRes(res.workers);
-    res.financings = res.financings.map((el) => {
-      let area = 1;
-      if (el.cultureId) {
-        area = res.busProds
-          .filter((e) => e.product?.cultureId == el.cultureId)
-          .reduce((p, c) => p + c.area, 0);
-      } else {
-        area =
-          res.busProds.length > 0
-            ? res.busProds.reduce((p, c) => p + c.area, 0)
-            : 0;
+    plan.workers = changeWorkerRes(plan.workers);
+
+    plan.financings = [
+      ...plan.financings.map((el) => {
+        let area = 1;
+        if (el.cultureId) {
+          area = plan.busProds
+            .filter((e) => e.product?.cultureId == el.cultureId)
+            .reduce((p, c) => p + c.area, 0);
+        } else {
+          area =
+            plan.busProds.length > 0
+              ? plan.busProds.reduce((p, c) => p + c.area, 0)
+              : 0;
+        }
+        if (el.calculationMethod == "На гектар") {
+          el.costBP = el.cost * area;
+          el.costHectare = el.cost;
+        } else if (el.calculationMethod == "На бізнес-план") {
+          el.costBP = el.cost;
+          el.costHectare = el.cost / area;
+        }
+        el.typeName =
+          el.type == "credit"
+            ? "Кредит"
+            : el.type == "derj_support"
+            ? "Державна підтримка"
+            : el.type == "grant"
+            ? "Грант"
+            : el.type == "investment"
+            ? "Інвестиції"
+            : null;
+
+        return el;
+      }),
+      {
+        date: plan?.dateStart!,
+        typeName: "Інвестиції",
+        calculationMethod: "На бізнес-план",
+        calculationType: "Індивідуальний",
+        costBP: plan?.initialAmount!,
+        cost: plan.initialAmount,
+        costHectare:
+          plan.initialAmount / plan.busProds.reduce((p, c) => p + c.area, 0),
+        isUseCost: false,
+        name: "Початкові інвестиції",
+        purpose: "Власні",
+        type: "investment",
+        id: 0,
+      },
+    ];
+
+    const start = +plan?.dateStart?.split("-")[0]!;
+    const end = +start + +plan?.realizationTime!;
+    plan.outcomes = (() => {
+      const outcomes: Ioutcome[] = [];
+      for (let i = start; i <= end; i++) {
+        plan.outcomes
+          .filter((el) => +el.date.split("-")[0] == i)
+          .forEach((el) => {
+            outcomes.push({
+              ...el,
+              costYear:
+                el.costMonth *
+                (i == start ? 13 - +plan.dateStart.split("-")[1] : 12),
+            });
+          });
+        outcomes.push({
+          //@ts-ignore
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Оплата праці АП",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: plan.workers
+            .filter(
+              (el) => el.year == i - start && el.class == "Адміністративний"
+            )
+            .reduce((p, c) => {
+              const yearSalary: number =
+                c.salary *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount;
+              return p + yearSalary;
+            }, 0),
+        });
+        outcomes.push({
+          //@ts-ignore
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Нарахування (ЄСВ+ВЗ)",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: plan.workers
+            .filter(
+              (el) => el.year == i - start && el.class == "Адміністративний"
+            )
+            .reduce((p, c) => {
+              const yearSalary =
+                c.salary *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount;
+              return p + (yearSalary * 0.015 + yearSalary * 0.22);
+            }, 0),
+        });
+        outcomes.push({
+          //@ts-ignore
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Оплата праці ІТР",
+          group: "Загально виробничі",
+          date: i + "-01-01",
+          costYear: plan.workers
+            .filter(
+              (el) => el.year == i - start && el.class == "Інженерно технічний"
+            )
+            .reduce((p, c) => {
+              const yearSalary =
+                c.salary *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount;
+              return p + yearSalary;
+            }, 0),
+        });
+        outcomes.push({
+          //@ts-ignore
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Нарахування (ЄСВ+ВЗ)",
+          group: "Загально виробничі",
+          date: i + "-01-01",
+          costYear: plan.workers
+            .filter(
+              (el) => el.year == i - start && el.class == "Інженерно технічний"
+            )
+            .reduce((p, c) => {
+              const yearSalary =
+                c.salary *
+                (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                  12) *
+                c.amount;
+              return p + (yearSalary * 0.015 + yearSalary * 0.22);
+            }, 0),
+        });
       }
-      if (el.calculationMethod == "На гектар") {
-        el.costBP = el.cost * area;
-        el.costHectare = el.cost;
-      } else if (el.calculationMethod == "На бізнес-план") {
-        el.costBP = el.cost;
-        el.costHectare = el.cost / area;
-      }
-      return el;
-    });
-    return res;
+      return outcomes;
+    })();
+    return plan;
   });
-  res = await Promise.all(
-    res.map(async (el) => {
+  plans = await Promise.all(
+    plans.map(async (el) => {
       el.busProds = await Promise.all(
         el.busProds.map(async (prod) => {
           return {
@@ -172,7 +305,7 @@ async function changeFinancing(res: resBusinessPlan[]) {
       return el;
     })
   );
-  return res;
+  return plans;
 }
 export async function getBusinessPlan(businessPlanId: number) {
   //@ts-ignore
@@ -197,7 +330,7 @@ class BusinessService {
         //@ts-ignore
         include: includes,
       });
-      plans = await changeFinancing(plans);
+      return await changeFinancing(plans);
 
       return plans;
     } else {
@@ -293,7 +426,7 @@ class BusinessService {
       //@ts-ignore
       include: includes,
     });
-    return res;
+    return await changeFinancing(res);
   }
   async setIsAgree(user: Principal | undefined, data: SetIsAgreeBusinessPlan) {
     if (!user) return;

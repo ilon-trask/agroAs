@@ -20,6 +20,7 @@ import CreateBuyingMachine, {
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 
 function BuyingMachineBusTable({
@@ -52,7 +53,7 @@ function BuyingMachineBusTable({
   return (
     <>
       <MyHeading>Купівля техніки та обладнання</MyHeading>
-      <TableContainer>
+      <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <BuyingMachineTableHead />
@@ -135,7 +136,7 @@ function BuyingMachineBusTable({
             })()}
           </Tbody>
         </Table>
-      </TableContainer>
+      </MyTableContainer>
       {buyingMachineOpen ? (
         <CreateBuyingMachine
           open={buyingMachineOpen}

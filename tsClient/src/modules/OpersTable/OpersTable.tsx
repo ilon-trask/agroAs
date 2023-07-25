@@ -74,7 +74,7 @@ export function OpersTableHead({ useIcons }: { useIcons: boolean }) {
 type props = {
   id: number;
   area: number;
-  opers?: resTechOperation[];
+  opers?: resTechOperation[] | undefined;
 } & (
   | {
       useIcons: false;

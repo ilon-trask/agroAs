@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
-import { Box, Input, Heading, Text } from "@chakra-ui/react";
+import { Box, Input, Heading, Text, Select } from "@chakra-ui/react";
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
 type props = {
@@ -8,7 +8,7 @@ type props = {
   isEnterprise?: boolean;
 };
 function BusinessInputs({ res, setRes, isEnterprise }: props) {
-  // const { map, enterpriseStore } = useContext(Context);
+  const { enterpriseStore } = useContext(Context);
   // const [secondOpen, setSecondOpen] = useState(false);
   // const [culture, setCulture] = useState(0);
   // function setCulture(id: number) {
@@ -90,20 +90,41 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
           />
         </Box>
       </Box>
-      <Box>
-        <Text fontWeight={"bold"}>Вкажіть початкову суму</Text>
-        <Input
-          value={res.initialAmount}
-          onChange={(e) =>
-            setRes((prev) => ({
-              ...prev,
-              initialAmount: e.target.value as any,
-            }))
-          }
-          placeholder="Впишіть термін"
-          type={"number"}
-          inputMode={"numeric"}
-        />
+      <Box display={"flex"} justifyContent={"space-around"}>
+        <Box width={"40%"}>
+          <Text fontWeight={"bold"}>Вкажіть початкову суму</Text>
+          <Input
+            value={res.initialAmount}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                initialAmount: e.target.value as any,
+              }))
+            }
+            placeholder="Впишіть термін"
+            type={"number"}
+            inputMode={"numeric"}
+          />
+        </Box>
+        <Box width={"40%"}>
+          <Text fontWeight={"bold"}>Виберіть підприємство</Text>
+          <Select
+            value={res.enterpriseId!}
+            onChange={(e) =>
+              setRes((prev) => ({
+                ...prev,
+                enterpriseId: e.target.value,
+              }))
+            }
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            {enterpriseStore.enterprise.map((el) => (
+              <option value={el.id!}>{el.name}</option>
+            ))}
+          </Select>
+        </Box>
       </Box>
     </Box>
   );

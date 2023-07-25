@@ -20,13 +20,18 @@ import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import CreateYieldCalc from "../modules/CreateYIeldCalculation";
-import { GOODS_ROUTER, INCOME_ROUTER } from "../utils/consts";
 import { IyieldCalculation } from "../../../tRPC serv/models/models";
 import useVegetationYears, {
   VegetationYearsType,
 } from "../shared/hook/useVegetationYears";
-import { createVegetationYear, getVegetationYear } from "../http/requests";
+import {
+  createVegetationYear,
+  getBusinessPlans,
+  getVegetationYear,
+} from "../http/requests";
 import MyHeading from "src/ui/MyHeading";
+import { BUSINESSpLAN_ROUTER } from "src/utils/consts";
+import { getBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 
 export const plantsHeads: Record<string, string[]> = {
   "Суниця садова": [
@@ -82,7 +87,7 @@ function YieldСalculation() {
   const { income, map, business } = useContext(Context);
   const busProd = business.businessPlan
     .find((el) => el.id == busId)
-    ?.busProds.find((el) => el.id == busProdId);
+    ?.busProds.find((el) => el.id == +busProdId!);
   const myYield = income.yieldPlant?.find(
     (el) => el.productId == busProd?.productId
   );
@@ -92,6 +97,7 @@ function YieldСalculation() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     getVegetationYear(income);
+    getBusinessPlans(map, business);
   }, []);
   const yieldPerRoll =
     (myCalc?.numberSocket! *
@@ -137,15 +143,14 @@ function YieldСalculation() {
   );
   return (
     <Container maxW="container.lg" mt={"30px"}>
-      <Link to={GOODS_ROUTER}>
-        <Button>Повернутиця до культур</Button>
+      <Link to={BUSINESSpLAN_ROUTER + "/" + busProd?.businessPlanId}>
+        <Button>Повернутиця до бізнес-плану</Button>
       </Link>
       <MyHeading>Розрахунок урожайності:</MyHeading>
       <MyHeading>Культура: "{myYield?.culture.name}"</MyHeading>
       <MyHeading>
         Технологія: "{busProd?.cultivationTechnology?.name}"
       </MyHeading>
-      <MyHeading>Строк посадки: "{myYield?.landingPeriod}"</MyHeading>
       <MyHeading>Продукт:"{busProd?.product?.name}"</MyHeading>
       <Table size={"sm"} mt={5}>
         <Thead>
@@ -321,10 +326,11 @@ function YieldСalculation() {
             busProdId: busProd?.id!,
             data: res.data.map((el) => ({
               ...el,
-              techCartId: busProd?.techCartId,
+              techCartId: busProd?.techCartId!,
               seedlingsCoeff: +el.seedlingsCoeff,
               technologyCoeff: +el.technologyCoeff,
               vegetationCoeff: +el.vegetationCoeff,
+              year: el.year,
             })),
           });
         }}

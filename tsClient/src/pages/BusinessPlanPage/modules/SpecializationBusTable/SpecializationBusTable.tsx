@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useContext, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import TableComponent from "src/components/TableComponent";
 import { deleteBusProd } from "src/http/requests";
@@ -8,7 +9,10 @@ import { Context } from "src/main";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
+import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
+import { TEHMAP_ROUTER } from "src/utils/consts";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import SecondOpen, { productProps } from "./SecondOpen";
 
@@ -51,6 +55,7 @@ function SpecializationBusTable({
             technology: el.cultivationTechnology?.name,
             area: el.area,
             cartName: el.tech_cart?.nameCart + " " + el.tech_cart?.year,
+            cartId: el.techCartId,
             productId: el.productId,
           })) || []),
           {
@@ -80,6 +85,7 @@ function SpecializationBusTable({
       area: number;
       year: number;
       cartName: string;
+      cartId: number;
       isAll?: boolean;
       // productId?: number;
     }>[]
@@ -102,6 +108,7 @@ function SpecializationBusTable({
                       cultivationTechnologyId: 0,
                       productId: 0,
                       techCartId: 0,
+
                       year: original.year - start,
                     });
                   }}
@@ -121,6 +128,7 @@ function SpecializationBusTable({
                         ownId: myBusProd?.id!,
                         productId: myBusProd?.productId!,
                         techCartId: myBusProd?.techCartId!,
+                        price: myBusProd?.price!,
                         year: myBusProd?.year!,
                       };
                     });
@@ -136,7 +144,25 @@ function SpecializationBusTable({
       { header: "Культура", accessorKey: "culture" },
       { header: "Технологія", accessorKey: "technology" },
       { header: "Площа", accessorKey: "area" },
-      { header: "Технологічна карта", accessorKey: "cartName" },
+      {
+        header: "Технологічна карта",
+        accessorKey: "cartName",
+        cell: ({ row: { original } }) => {
+          return (
+            <Box>
+              {original.isAll ? (
+                <></>
+              ) : (
+                original.id.toString().split(" ")[1] != "plus" && (
+                  <Link to={TEHMAP_ROUTER + `/${original.cartId}`}>
+                    <MyViewIcon /> {original.cartName}
+                  </Link>
+                )
+              )}
+            </Box>
+          );
+        },
+      },
       {
         header: "",
         accessorKey: "productId",
@@ -174,7 +200,9 @@ function SpecializationBusTable({
   return (
     <>
       <MyHeading>Спеціалізація</MyHeading>
-      <TableComponent columns={specColumns} data={specData} />
+      <MyTableContainer>
+        <TableComponent columns={specColumns} data={specData} />
+      </MyTableContainer>
       {open ? (
         <SecondOpen
           open={open}

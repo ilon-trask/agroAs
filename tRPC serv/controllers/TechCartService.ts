@@ -86,7 +86,8 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
     JSON.stringify(Scarts)
   );
 
-  let promises: (resTechCartsWithOpers | null)[] = [];
+  let promises: (Promise<resTechCartsWithOpers | resTechOperation> | null)[] =
+    [];
   for (let i = 0; i < carts.length; i++) {
     let cart = carts[i];
     let costHectare = 0,
@@ -104,7 +105,9 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
       let oper: resTechOperation = cart.tech_operations[j];
       let promise = changeOper(oper, oper.techCartId!);
       promises.push(promise);
+
       promise.then((el) => {
+        if (!cart) throw new Error("");
         if (!cart.tech_operations) throw new Error("");
         if (!el) throw new Error("");
         if (cart.costHectare == undefined) throw new Error("");
@@ -374,7 +377,7 @@ class TechCartService {
         costFuel = 0,
         costHandWork = 0;
       res.forEach((cart) => {
-        cart.tech_operations?.forEach((el) => {
+        cart?.tech_operations?.forEach((el) => {
           costHectare +=
             el.costMachineWork! +
               el.costCars! +
@@ -401,7 +404,7 @@ class TechCartService {
         },
         { where: { id: id } }
       );
-      res[0].costHectare = costHectare;
+      if (res[0]) res[0].costHectare = costHectare;
 
       return res;
     } else {

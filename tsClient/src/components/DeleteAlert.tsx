@@ -30,7 +30,8 @@ export type IdeleteHeading =
   | "техніку"
   | "будівлю"
   | "витрату"
-  | "МШП";
+  | "МШП"
+  | "підприємство";
 export type DeleteProps = {
   isOpen: boolean;
   text: IdeleteHeading;

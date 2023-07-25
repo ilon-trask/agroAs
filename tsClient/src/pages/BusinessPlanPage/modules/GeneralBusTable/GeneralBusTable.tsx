@@ -48,6 +48,7 @@ function GeneralBusTable({
                     realizationTime: myBusiness?.realizationTime!,
                     planId: myBusiness?.id,
                     topic: myBusiness?.topic!,
+                    enterpriseId: myBusiness?.enterpriseId!,
                   });
                 }}
               >
@@ -62,14 +63,16 @@ function GeneralBusTable({
           </Tbody>
         </Table>
       </MyTableContainer>
-      <CreateBusiness
-        open={businessOpen}
-        setOpen={setBusinessOpen}
-        res={businessRes}
-        setRes={setBusinessRes}
-        update={true}
-        setUpdate={() => {}}
-      />
+      {businessOpen ? (
+        <CreateBusiness
+          open={businessOpen}
+          setOpen={setBusinessOpen}
+          res={businessRes}
+          setRes={setBusinessRes}
+          update={true}
+          setUpdate={() => {}}
+        />
+      ) : null}
     </>
   );
 }

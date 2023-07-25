@@ -22,6 +22,7 @@ function EnterpriseFormPage() {
   const myBusiness =
     business.businessPlan.find((el) => el.id == +busId!) ||
     business.publicBusinessPlan.find((el) => el.id == +busId!);
+  //@ts-ignore
   const { start, end } = getStartAndEndBusinessPlan(myBusiness);
   const [res, setRes] = useState<CreateWorkerProp>({
     amount: "",
@@ -29,7 +30,7 @@ function EnterpriseFormPage() {
     enterpriseId: myBusiness?.enterpriseId!,
     isConst: true,
     businessPlanId: myBusiness?.id!,
-    data: 0,
+    year: 0,
     form: form as EnterpriseFormType,
     jobId: "",
     salary: "",

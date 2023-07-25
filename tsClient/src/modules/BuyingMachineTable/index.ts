@@ -1,2 +1,5 @@
-import BuyingMachineTable from "./BuyingMachineTable";
-export default BuyingMachineTable;
+import {
+  BuyingMachineTableBodyRow,
+  BuyingMachineTableHead,
+} from "./BuyingMachineTable";
+export { BuyingMachineTableBodyRow, BuyingMachineTableHead };

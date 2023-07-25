@@ -24,6 +24,7 @@ export type productProps = {
   productId: number;
   cultivationTechnologyId: number;
   techCartId: number;
+  price?: number;
   area: string;
 };
 type props = {
@@ -35,7 +36,7 @@ type props = {
 const obj = {};
 function SecondOpen({ open, setOpen, data, setData }: props) {
   const [res, setRes] = useState(data);
-  const { business, map } = useContext(Context);
+  const { business, map, user } = useContext(Context);
   const { id } = useParams();
   useEffect(() => {
     setRes(data);
@@ -153,12 +154,14 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
                 Виберіть опцію
               </option>
               {(() => {
+                const maps =
+                  user.role == "service_role"
+                    ? [...map.businessCarts, ...map.maps]
+                    : map.maps;
                 let carts =
                   cultureId == 0
-                    ? map.businessCarts
-                    : map.businessCarts.filter(
-                        (el) => el.cultureId == cultureId
-                      );
+                    ? maps
+                    : maps.filter((el) => el.cultureId == cultureId);
                 return carts.map((el) => (
                   <option value={el.id}>{el.nameCart}</option>
                 ));
@@ -189,6 +192,7 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
                 businessPlanId: +id!,
                 cultivationTechnologyId: res.cultivationTechnologyId,
                 ownId: res.ownId,
+                price: res.price!,
                 productId: res.productId,
                 techCartId: res.techCartId,
                 year: res.year,

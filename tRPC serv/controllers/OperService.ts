@@ -241,8 +241,8 @@ export async function changeOper(
       if (!costMaterials) return elem;
 
       elem.costMaterials = Math.round(
-        //@ts-ignore
         costMaterials.price *
+          //@ts-ignore
           (costMaterials.consumptionPerHectare || costMaterials.consumptionPer)
       );
       return elem;
@@ -255,7 +255,7 @@ export async function changeOper(
   } else if (elem.cell == "costTransport") {
     if (!CostTransport) {
       let costTransport = elem.cost_transport;
-      if (!costTransport) return;
+      if (!costTransport) return elem;
 
       elem.costTransport = costTransport.price;
       return elem;
@@ -266,7 +266,7 @@ export async function changeOper(
   } else if (elem.cell == "costServices") {
     if (!CostServices) {
       let costServices = elem.cost_service;
-      if (!costServices) return;
+      if (!costServices) return elem;
       elem.costServices = costServices.price;
       return elem;
     } else {
@@ -400,7 +400,7 @@ export async function changeOper(
     if (!CostHandWork) {
       const handWork = elem.cost_hand_work;
       let costHandWork;
-      if (!handWork) return;
+      if (!handWork) throw new Error();
       const Grade = await grade.findOne({ where: { id: handWork.gradeId } });
       const cart = await tech_cart.findOne({ where: { id: cartId } });
       if (!Grade || !cart) throw new Error("нема карти або типу роботи");
@@ -470,6 +470,8 @@ export async function changeOper(
       elem.costHandWork = costHandWork;
       return elem;
     }
+  } else {
+    return elem;
   }
 }
 

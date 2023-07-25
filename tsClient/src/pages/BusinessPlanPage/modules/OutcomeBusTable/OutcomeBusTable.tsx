@@ -86,24 +86,27 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon
-                          onClick={() => {
-                            setDeleteData({
-                              func: () => {
-                                setDeleteData((prev) => ({
-                                  ...prev,
-                                  isOpen: false,
-                                }));
-                                deleteOutcomeForBusiness(business, {
-                                  busId: myBusiness.id!,
-                                  id: el.id!,
-                                });
-                              },
-                              isOpen: true,
-                              text: "витрату",
-                            });
-                          }}
-                        />
+                        {el.name != "Нарахування (ЄСВ+ВЗ)" &&
+                        el.name != "Оплата праці АП" ? (
+                          <MyDeleteIcon
+                            onClick={() => {
+                              setDeleteData({
+                                func: () => {
+                                  setDeleteData((prev) => ({
+                                    ...prev,
+                                    isOpen: false,
+                                  }));
+                                  deleteOutcomeForBusiness(business, {
+                                    busId: myBusiness.id!,
+                                    id: el.id!,
+                                  });
+                                },
+                                isOpen: true,
+                                text: "витрату",
+                              });
+                            }}
+                          />
+                        ) : null}
                       </Td>
                     </Tr>
                   ))
@@ -208,24 +211,27 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        <MyDeleteIcon
-                          onClick={() => {
-                            setDeleteData({
-                              func: () => {
-                                setDeleteData((prev) => ({
-                                  ...prev,
-                                  isOpen: false,
-                                }));
-                                deleteOutcomeForBusiness(business, {
-                                  busId: myBusiness.id!,
-                                  id: el.id!,
-                                });
-                              },
-                              isOpen: true,
-                              text: "витрату",
-                            });
-                          }}
-                        />
+                        {el.name != "Нарахування (ЄСВ+ВЗ)" &&
+                        el.name != "Оплата праці ІТР" ? (
+                          <MyDeleteIcon
+                            onClick={() => {
+                              setDeleteData({
+                                func: () => {
+                                  setDeleteData((prev) => ({
+                                    ...prev,
+                                    isOpen: false,
+                                  }));
+                                  deleteOutcomeForBusiness(business, {
+                                    busId: myBusiness.id!,
+                                    id: el.id!,
+                                  });
+                                },
+                                isOpen: true,
+                                text: "витрату",
+                              });
+                            }}
+                          />
+                        ) : null}
                       </Td>
                     </Tr>
                   ))

@@ -21,7 +21,7 @@ export interface CreateLandProps {
   landId?: number;
   name: string;
   area: number | string;
-  cadastreNumber: number | string;
+  cadastreNumber?: number | string | null;
   businessPlanId?: number;
   enterpriseId?: number;
   date: string;
@@ -41,7 +41,6 @@ function CreateLand({
   const { business } = useContext(Context);
   const [res, setRes] = useState<CreateLandProps>({
     area: "",
-    cadastreNumber: "",
     enterpriseId: 0,
     name: "",
     date: "",
@@ -116,7 +115,7 @@ function CreateLand({
           </Heading>
           <Input
             size={"sm"}
-            value={res.cadastreNumber}
+            value={res.cadastreNumber as any}
             type={"number"}
             inputMode="numeric"
             onChange={(e) =>
@@ -167,25 +166,20 @@ function CreateLand({
         <Button
           isDisabled={
             !res.area &&
-            !res.cadastreNumber &&
             !res.enterpriseId &&
             !res.rightOfUse &&
             !res.ownership &&
             !res.rate
           }
           onClick={() => {
-            if (
-              res.area &&
-              res.cadastreNumber &&
-              res.rightOfUse &&
-              res.ownership &&
-              res.rate
-            ) {
+            if (res.area && res.rightOfUse && res.ownership && res.rate) {
               if (res.landId) {
                 patchLandForBusiness(business, {
                   ...res,
                   area: +res.area,
-                  cadastreNumber: +res.cadastreNumber,
+                  cadastreNumber: res.cadastreNumber
+                    ? +res.cadastreNumber
+                    : null,
                   landId: res.landId!,
                   rightOfUse: res.rightOfUse as any,
                   rate: +res.rate,
@@ -195,7 +189,9 @@ function CreateLand({
                 createLandForBusiness(business, {
                   ...res,
                   area: +res.area,
-                  cadastreNumber: +res.cadastreNumber,
+                  cadastreNumber: res.cadastreNumber
+                    ? +res.cadastreNumber
+                    : null,
                   rightOfUse: res.rightOfUse as any,
                   rate: +res.rate,
                   ownership: res.ownership as any,

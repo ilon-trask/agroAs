@@ -8,7 +8,7 @@ import { Icell } from "../../../../tRPC serv/controllers/OperService";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 
 type props = {
-  myMap: resTechCartsWithOpers;
+  myMap: resTechCartsWithOpers | undefined;
   id: number;
 } & (
   | {
@@ -31,7 +31,7 @@ function TechnologicalMapContent(props: props) {
     <>
       <MyHeading>Технологічна карта</MyHeading>
       {props.myMap?.isComplex && (
-        <MyHeading>Комплекс робіт: {props.myMap.nameCart}</MyHeading>
+        <MyHeading>Комплекс робіт: {props.myMap?.nameCart}</MyHeading>
       )}
       {props.myMap?.isComplex && (
         <MyHeading>
@@ -52,7 +52,7 @@ function TechnologicalMapContent(props: props) {
           </Box>
           <OpersTable
             useIcons={props.useIcons}
-            opers={props.myMap.tech_operations!}
+            opers={props.myMap?.tech_operations || []}
             id={props.id}
             setRes={props.setRes}
             setSecondOpen={props.setSecondOpen}
@@ -61,7 +61,7 @@ function TechnologicalMapContent(props: props) {
             setShowAlert={props.setShowAlert}
             deleteOpen={props.deleteOpen}
             setDeleteOpen={props.setDeleteOpen}
-            area={props.myMap.area}
+            area={props.myMap?.area || 0}
           />
         </Box>
       ) : (
@@ -70,10 +70,10 @@ function TechnologicalMapContent(props: props) {
             <GeneralDataTable useIcons={props.useIcons} myMap={props.myMap} />
           </Box>
           <OpersTable
-            opers={props.myMap.tech_operations!}
+            opers={props.myMap?.tech_operations!}
             useIcons={props.useIcons}
             id={props.id}
-            area={props.myMap.area}
+            area={props.myMap?.area || 0}
           />
         </Box>
       )}

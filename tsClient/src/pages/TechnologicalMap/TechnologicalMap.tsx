@@ -101,7 +101,7 @@ const TechnologicalMap = observer(() => {
           alignItems={"center"}
           style={{ fontSize: "20px" }}
         >
-          <Button onClick={() => navigate("/")}>{"НА ГОЛОВНУ"}</Button>
+          <Button onClick={() => navigate(-2)}>{"ПОВЕРНУТИСЯ"}</Button>
           {user.role == "" && (
             <Box
               display={"flex"}

@@ -24,7 +24,7 @@ import {
   getLand,
 } from "../http/requests";
 import { Context } from "../main";
-import BuyingMachineTable from "../modules/BuyingMachineTable";
+// import BuyingMachineTable from "../modules/BuyingMachineTable";
 import CreateFinancing, {
   FinancingProps,
 } from "../modules/CreateFinancing/CreateFinancing";
@@ -79,6 +79,11 @@ function Enterprise() {
     area: "",
     cadastreNumber: "",
     name: "",
+    date: "",
+    ownership: "",
+    rate: "",
+    rightOfUse: "",
+    businessPlanId: 0,
   });
   const lands = sort(enterpriseStore.land);
   const [buildingOpen, setBuildingOpen] = useState(false);
@@ -128,13 +133,7 @@ function Enterprise() {
         setDeleteOpen={setDeleteOpen}
       />
       <Button onClick={() => setLandOpen(true)}>Додати ділянку</Button>
-      <CreateLand
-        open={landOpen}
-        setOpen={setLandOpen}
-        update={update}
-        setUpdate={setUpdate}
-        data={landData}
-      />
+      <CreateLand open={landOpen} setOpen={setLandOpen} data={landData} />
       <Text
         textAlign={"center"}
         fontSize={"25px"}
@@ -143,12 +142,12 @@ function Enterprise() {
       >
         Техніка та обладнання
       </Text>
-      <BuyingMachineTable
+      {/* <BuyingMachineTable
         setOpen={setMachineOpen}
         setDeleteOpen={setDeleteOpen}
         setRes={setMachineData}
         setUpdate={setUpdate}
-      />
+      /> */}
       <CreateBuyingMachine
         open={machineOpen}
         setOpen={setMachineOpen}

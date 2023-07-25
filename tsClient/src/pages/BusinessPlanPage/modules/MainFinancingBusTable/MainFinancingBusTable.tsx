@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import MyHeading from "src/ui/MyHeading";
+import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import MainFinancingBusinessPlanTable from "./MainFinancingBusinessPlanTable";
 
@@ -15,12 +16,14 @@ function MainFinancingBusTable({
   return (
     <>
       <MyHeading>Залучення фінансування</MyHeading>
-      <MainFinancingBusinessPlanTable
-        financing={myBusiness?.financings}
-        busId={myBusiness?.id!}
-        end={end}
-        start={start}
-      />
+      <MyTableContainer>
+        <MainFinancingBusinessPlanTable
+          financing={myBusiness?.financings}
+          busId={myBusiness?.id!}
+          end={end}
+          start={start}
+        />
+      </MyTableContainer>
     </>
   );
 }

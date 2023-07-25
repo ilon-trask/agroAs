@@ -550,7 +550,7 @@ export interface IbusinessPlan {
   isPublic?: boolean;
   isAgree?: boolean;
   description?: string;
-  enterpriseId?: number;
+  enterpriseId?: number | null;
   userId: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -598,7 +598,7 @@ export interface IbusProd {
   area: number;
   year: number;
   techCartId?: number;
-  price?: number;
+  price?: number | null;
 }
 export class busProd extends Model<IbusProd> {
   declare id?: number;
@@ -1011,7 +1011,7 @@ export interface Ifinancing {
     | DerjPurposeType
     | GrantPurposeType;
   isUseCost: boolean;
-  // businessCost?: number;
+  typeName?: "Кредит" | "Державна підтримка" | "Грант" | "Інвестиції" | null;
   calculationMethod: CreditCalculationMethodType;
   calculationType: CreditCalculationTypeType | null;
   cultureId?: number | null;
@@ -1264,7 +1264,7 @@ vegetationYears.init(
 export interface Iland {
   readonly id?: number;
   name: string;
-  cadastreNumber: number;
+  cadastreNumber: number | null;
   area: number;
   userId: string;
   date: string;

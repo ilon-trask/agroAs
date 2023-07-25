@@ -11,6 +11,7 @@ export type CreateBusinessProp = {
   dateStart: string;
   realizationTime: number | "";
   topic: string;
+  enterpriseId?: number | string;
 };
 type props = {
   open: boolean;
@@ -63,12 +64,14 @@ function CreateBusiness({
                   initialAmount: +res.initialAmount,
                   realizationTime: +res.realizationTime,
                   planId: res.planId!,
+                  enterpriseId: res.enterpriseId ? +res.enterpriseId : null,
                 });
               } else {
                 createBusinessPlan(map, business, {
                   ...res,
                   initialAmount: +res.initialAmount,
                   realizationTime: +res.realizationTime,
+                  enterpriseId: res.enterpriseId ? +res.enterpriseId : null,
                 });
               }
               setOpen(false);

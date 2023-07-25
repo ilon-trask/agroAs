@@ -94,37 +94,37 @@ export function BuyingMachineTableBodyRow({
     </Tr>
   );
 }
-function BuyingMachineTable({
-  setOpen,
-  setRes,
-  setUpdate,
-  setDeleteOpen,
-}: {
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>;
-  setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
-  setDeleteOpen: Dispatch<SetStateAction<any>>;
-}) {
-  const { map } = useContext(Context);
-  return (
-    <Table size={"sm"}>
-      <Thead>
-        <BuyingMachineTableHead />
-      </Thead>
-      <Tbody>
-        {map.buyingMachine?.map((el) => (
-          <BuyingMachineTableBodyRow
-            key={el.id!}
-            el={el}
-            setOpen={setOpen}
-            setRes={setRes}
-            setUpdate={setUpdate}
-            setDeleteOpen={setDeleteOpen}
-          />
-        ))}
-      </Tbody>
-    </Table>
-  );
-}
+// function BuyingMachineTable({
+//   setOpen,
+//   setRes,
+//   setUpdate,
+//   setDeleteOpen,
+// }: {
+//   setOpen: Dispatch<SetStateAction<boolean>>;
+//   setUpdate: Dispatch<SetStateAction<boolean>>;
+//   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
+//   setDeleteOpen: Dispatch<SetStateAction<any>>;
+// }) {
+//   const { map } = useContext(Context);
+//   return (
+//     <Table size={"sm"}>
+//       <Thead>
+//         <BuyingMachineTableHead />
+//       </Thead>
+//       <Tbody>
+//         {map.buyingMachine?.map((el) => (
+//           <BuyingMachineTableBodyRow
+//             key={el.id!}
+//             el={el}
+//             setOpen={setOpen}
+//             setRes={setRes}
+//             setUpdate={setUpdate}
+//             setDeleteOpen={setDeleteOpen}
+//           />
+//         ))}
+//       </Tbody>
+//     </Table>
+//   );
+// }
 
-export default BuyingMachineTable;
+// export default BuyingMachineTable;
