@@ -1,6 +1,7 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Checkbox, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import { DeleteProps } from "../../components/DeleteAlert";
 import { deleteSale, saleSetIsPlan } from "../../http/requests";
 import { Context } from "../../main";
@@ -67,9 +68,9 @@ function SaleTable({
             const product = map.product.find(
               (e) => e.id == production?.productId
             );
-            const myYield = income.yieldPlant.find(
-              (e) => e.cultureId == product?.cultureId
-            );
+            // const myYield = income.yieldPlant.find(
+            //   (e) => e.cultureId == product?.cultureId
+            // );
             const cart = map.maps.find((e) => e.id == production?.techCartId);
             return (
               <Tr key={el.id}>
@@ -88,12 +89,7 @@ function SaleTable({
                         });
                     }}
                   >
-                    <EditIcon
-                      color={"blue.400"}
-                      w={"20px"}
-                      h={"auto"}
-                      cursor={"pointer"}
-                    />
+                    <MyEditIcon />
                   </Td>
                 )}
                 <Td>
@@ -102,8 +98,8 @@ function SaleTable({
                 <Td>{product?.name}</Td>
                 <Td>{el.date}</Td>
                 <Td>
-                  {Math.round(myYield?.yieldPerHectare! * cart?.area! * 100) /
-                    100}
+                  {/* {Math.round(myYield?.yieldPerHectare! * cart?.area! * 100) /
+                    100} */}
                 </Td>
                 <Td>{el.amount}</Td>
                 <Td>{el.price}</Td>
