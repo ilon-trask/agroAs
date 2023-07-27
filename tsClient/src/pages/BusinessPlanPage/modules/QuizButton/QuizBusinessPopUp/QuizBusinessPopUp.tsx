@@ -96,7 +96,7 @@ function QuizBusinessPopUp({
   useEffect(() => setPeriod(startYear), [startYear]);
   const { income, map, enterpriseStore } = useContext(Context);
   const sales = income.sale.filter((el) => el.isPlan);
-  const thisWorkers = enterpriseStore.worker?.filter(
+  const thisWorkers = myBusiness.worker?.filter(
     (el) => el.enterpriseId == enterpriseId
   );
   function Footer() {
@@ -123,7 +123,7 @@ function QuizBusinessPopUp({
     >
       {screen == 1 ? (
         <Box>
-          <BusinessInputs res={res} setRes={setRes} />
+          <BusinessInputs res={res} setRes={setRes} isWOEnterprise={true} />
           <ModalFooter>
             <Button onClick={() => setScreen((prev) => prev + 1)}>Далі</Button>
           </ModalFooter>
@@ -274,9 +274,7 @@ function QuizBusinessPopUp({
                 (e) => e.id == production?.productId
               );
               const cart = map.maps.find((e) => e.id == production?.techCartId);
-              const myYield = income.yieldPlant.find(
-                (e) => e.cultureId == product?.cultureId
-              );
+
               return (
                 <Box display={"flex"} gap={5}>
                   <Input value={product?.name} isDisabled={true} />

@@ -1,18 +1,16 @@
 import { makeAutoObservable } from "mobx";
-import { resYieldPlant } from "../../../tRPC serv/controllers/incomeService";
 import {
   Ifinancing,
   Iculture,
   Iproduction,
   Isale,
   IvegetationYears,
-  IyieldCalculation,
 } from "../../../tRPC serv/models/models";
 
 export default class IncomeStore {
-  private _yieldPlant: resYieldPlant[] = [];
+  // private _yieldPlant: resYieldPlant[] = [];
   private _cultural: Iculture[] = [];
-  private _yieldCalc: IyieldCalculation[] = [];
+  // private _yieldCalc: IyieldCalculation[] = [];
   private _income: any[] = [];
   private _production: Iproduction[] = [];
   private _sale: Isale[] = [];
@@ -25,15 +23,15 @@ export default class IncomeStore {
     makeAutoObservable(this);
   }
 
-  public set yieldPlant(data: resYieldPlant[]) {
-    this._yieldPlant = data;
-  }
-  public set newYieldPlant(data: resYieldPlant) {
-    if (!Array.isArray(this._yieldPlant)) {
-      this._yieldPlant = [];
-    }
-    this._yieldPlant = [...this._yieldPlant, data];
-  }
+  // public set yieldPlant(data: resYieldPlant[]) {
+  //   this._yieldPlant = data;
+  // }
+  // public set newYieldPlant(data: resYieldPlant) {
+  //   if (!Array.isArray(this._yieldPlant)) {
+  //     this._yieldPlant = [];
+  //   }
+  //   this._yieldPlant = [...this._yieldPlant, data];
+  // }
 
   public set cultural(data: Iculture[]) {
     this._cultural = data;
@@ -41,12 +39,12 @@ export default class IncomeStore {
   public set newCultural(data: Iculture) {
     this._cultural.push(data);
   }
-  public set yieldCalc(data: IyieldCalculation[]) {
-    this._yieldCalc = data;
-  }
-  public set newYieldCalc(data: IyieldCalculation) {
-    this._yieldCalc.push(data);
-  }
+  // public set yieldCalc(data: IyieldCalculation[]) {
+  //   this._yieldCalc = data;
+  // }
+  // public set newYieldCalc(data: IyieldCalculation) {
+  //   this._yieldCalc.push(data);
+  // }
   public set income(data: any[]) {
     this._income = data;
   }
@@ -95,15 +93,15 @@ export default class IncomeStore {
   public set newVegetationYear(vegetationYear: IvegetationYears) {
     this._vegetationYear.push(vegetationYear);
   }
-  public get yieldPlant() {
-    return this._yieldPlant;
-  }
+  // public get yieldPlant() {
+  //   return this._yieldPlant;
+  // }
   public get cultural() {
     return this._cultural;
   }
-  public get yieldCalc() {
-    return this._yieldCalc;
-  }
+  // public get yieldCalc() {
+  //   return this._yieldCalc;
+  // }
   public get income() {
     return this._income;
   }

@@ -5,9 +5,9 @@ import { Context } from "../../../main";
 type props = {
   res: CreateBusinessProp;
   setRes: Dispatch<SetStateAction<CreateBusinessProp>>;
-  isEnterprise?: boolean;
+  isWOEnterprise?: boolean;
 };
-function BusinessInputs({ res, setRes, isEnterprise }: props) {
+function BusinessInputs({ res, setRes, isWOEnterprise }: props) {
   const { enterpriseStore } = useContext(Context);
   // const [secondOpen, setSecondOpen] = useState(false);
   // const [culture, setCulture] = useState(0);
@@ -106,25 +106,27 @@ function BusinessInputs({ res, setRes, isEnterprise }: props) {
             inputMode={"numeric"}
           />
         </Box>
-        <Box width={"40%"}>
-          <Text fontWeight={"bold"}>Виберіть підприємство</Text>
-          <Select
-            value={res.enterpriseId!}
-            onChange={(e) =>
-              setRes((prev) => ({
-                ...prev,
-                enterpriseId: e.target.value,
-              }))
-            }
-          >
-            <option value="" hidden defaultChecked>
-              Виберіть опцію
-            </option>
-            {enterpriseStore.enterprise.map((el) => (
-              <option value={el.id!}>{el.name}</option>
-            ))}
-          </Select>
-        </Box>
+        {!isWOEnterprise ? (
+          <Box width={"40%"}>
+            <Text fontWeight={"bold"}>Виберіть підприємство</Text>
+            <Select
+              value={res.enterpriseId!}
+              onChange={(e) =>
+                setRes((prev) => ({
+                  ...prev,
+                  enterpriseId: e.target.value,
+                }))
+              }
+            >
+              <option value="" hidden defaultChecked>
+                Виберіть опцію
+              </option>
+              {enterpriseStore.enterprise.map((el) => (
+                <option value={el.id!}>{el.name}</option>
+              ))}
+            </Select>
+          </Box>
+        ) : null}
       </Box>
     </Box>
   );

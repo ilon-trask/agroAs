@@ -51,12 +51,12 @@ function SaleBusTable({
 
                 res.push(
                   busProds.map((el) => {
-                    const vegetationYear = income.vegetationYear?.find(
+                    const vegetationYear = myBusiness.vegetationYears?.find(
                       (e) => e.techCartId == el.techCartId
                     );
                     const amount =
                       +(
-                        (vegetationYear?.potentialYield || 0) *
+                        (vegetationYear?.potentialYieldPerHectare || 0) *
                         (vegetationYear?.allCoeff || 0) *
                         el.area
                       ).toFixed(2) || 0;
@@ -91,12 +91,12 @@ function SaleBusTable({
                     <Td></Td>
                     <Td>
                       {busProds.reduce((p, c) => {
-                        const vegetationYear = income.vegetationYear?.find(
+                        const vegetationYear = myBusiness.vegetationYears?.find(
                           (e) => e.techCartId == c.techCartId
                         );
                         const amount =
                           +(
-                            (vegetationYear?.potentialYield || 0) *
+                            (vegetationYear?.potentialYieldPerHectare || 0) *
                             (vegetationYear?.allCoeff || 0) *
                             c.area
                           ).toFixed(2) || 0;
@@ -115,12 +115,12 @@ function SaleBusTable({
                   <Td></Td>
                   <Td>
                     {myBusiness.busProds.reduce((p, c) => {
-                      const vegetationYear = income.vegetationYear?.find(
+                      const vegetationYear = myBusiness.vegetationYears?.find(
                         (e) => e.techCartId == c.techCartId
                       );
                       const amount =
                         +(
-                          (vegetationYear?.potentialYield || 0) *
+                          (vegetationYear?.potentialYieldPerHectare || 0) *
                           (vegetationYear?.allCoeff || 0) *
                           c.area
                         ).toFixed(2) || 0;

@@ -46,6 +46,9 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
     map.product.find((el) => el.id == res.productId)?.cultureId! || 0
   );
   const onClose = () => {};
+  console.log("culture");
+  console.log(map.product);
+
   return (
     <Dialog
       open={open}
@@ -232,4 +235,4 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
   );
 }
 
-export default React.memo(SecondOpen);
+export default SecondOpen;

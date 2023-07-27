@@ -142,6 +142,8 @@ function LandBusTable({
                     <Td>Разом:</Td>
                     <Td></Td>
                     <Td>{lands.reduce((p, c) => p + c.area, 0)}</Td>
+                    <Td></Td>
+                    <Td>{lands.reduce((p, c) => p + c.area * c.rate, 0)}</Td>
                   </Tr>
                 );
               }

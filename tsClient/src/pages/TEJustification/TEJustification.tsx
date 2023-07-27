@@ -11,7 +11,6 @@ import {
   getGrades,
   getMachine,
   getTractor,
-  getYieldPlant,
 } from "../../http/requests";
 import CreateTitlePage from "../../modules/CreateTitlePage";
 import {
@@ -53,9 +52,7 @@ function TEJjustification() {
     //@ts-ignore
     myJustification = { area: myCart?.area! };
   }
-  const myIncome = income.yieldPlant?.find(
-    (el) => el?.culture?.id == myJustification?.culture?.id
-  );
+
   useEffect(() => {
     console.log("try2");
     getCarts(map, +cartId!);
@@ -63,10 +60,10 @@ function TEJjustification() {
     getTractor(map);
     getMachine(map);
   }, [cartId]);
-  useEffect(() => {
-    if (user.role == "" && myJustification?.culture?.id)
-      getYieldPlant(income, myJustification?.culture?.id!);
-  }, [myJustification?.culture?.id]);
+  // useEffect(() => {
+  //   if (user.role == "" && myJustification?.culture?.id)
+  //     getYieldPlant(income, myJustification?.culture?.id!);
+  // }, [myJustification?.culture?.id]);
   console.log(myCart);
 
   const [updCartOpen, setUpdCartOpen] = useState(false);

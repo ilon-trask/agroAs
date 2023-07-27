@@ -19,7 +19,7 @@ import {
   getProduction,
   getAdministration,
   getCartForBusiness,
-  getYieldPlants,
+  // getYieldPlants,
   getCultureTEJMap,
   getProductTEJMap,
 } from "./http/requests";
@@ -38,7 +38,7 @@ function App() {
     (async () => {
       if (ind > 0) {
         // getWorks(map);
-        getYieldPlants(income);
+        // getYieldPlants(income);
         getCultural(map);
         getPurposesMaterial(map);
         getCultureTEJMap(map);

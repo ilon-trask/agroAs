@@ -168,7 +168,7 @@ function ProductionBusinessPlan({
     });
     plannedStructureData.push(
       ...busProds.map((el) => {
-        const vegetationYear = income.vegetationYear?.find(
+        const vegetationYear = myBusiness.vegetationYears?.find(
           (e) => e.techCartId == el.techCartId
         );
         return {
@@ -177,10 +177,10 @@ function ProductionBusinessPlan({
           product: el.product?.name,
           density: vegetationYear?.numberPlantsPerHectare,
           yieldHectare:
-            (vegetationYear?.potentialYield || 0) *
+            (vegetationYear?.potentialYieldPerHectare || 0) *
             (vegetationYear?.allCoeff || 0),
           yield:
-            (vegetationYear?.potentialYield || 0) *
+            (vegetationYear?.potentialYieldPerHectare || 0) *
             (vegetationYear?.allCoeff || 0) *
             el.area,
         };
@@ -700,16 +700,17 @@ function ProductionBusinessPlan({
         Для планування необхідних ресурсів використано нормативний метод та дані
         про потребу основних ресурсів записано у табличному вигляді.
       </Description>
-      <Table size={"sm"}>
+      {/* <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={7}>
               <TableName>Основні ресурси</TableName>
             </Th>
           </Tr>
           <Tr>
             <Th>Рік</Th>
             <Th>Назва ресурсу</Th>
+            <Th>Одиниця виміру</Th>
             <Th>Кількість</Th>
             <Th>Ціна</Th>
             <Th>Сума</Th>
@@ -730,6 +731,7 @@ function ProductionBusinessPlan({
                       <Td></Td>
                       <Td></Td>
                       <Td></Td>
+                      <Td></Td>
                       <Td>{el.product?.culture?.name}</Td>
                     </Tr>
                   ))
@@ -740,13 +742,24 @@ function ProductionBusinessPlan({
             return res;
           })()}
         </Tbody>
+      </Table> */}
+      <Table size={"sm"}>
+        <Thead>
+          <Th>
+            <TableName>Потреби в ресурсах для бізнес-плану</TableName>
+          </Th>
+        </Thead>
       </Table>
-      <MyHeading>Потреби в ресурсах для бізнес-плану</MyHeading>
       {(() => {
         const res = [];
         for (let i = start; i <= end; i++) {
           res.push(
-            <Text key={i} fontSize={30}>
+            <Text
+              key={i}
+              fontWeight={"bold"}
+              fontSize={"16px"}
+              textAlign={"center"}
+            >
               {i}
             </Text>
           );
@@ -1196,12 +1209,12 @@ function ProductionBusinessPlan({
               );
               res.push(
                 ...busProds.map((el) => {
-                  const vegetationYear = income.vegetationYear?.find(
+                  const vegetationYear = myBusiness.vegetationYears?.find(
                     (e) => e.techCartId == el.techCartId
                   );
                   const amount =
                     +(
-                      (vegetationYear?.potentialYield || 0) *
+                      (vegetationYear?.potentialYieldPerHectare || 0) *
                       (vegetationYear?.allCoeff || 0)
                     ) || 0;
                   const gather = (amount * el.area).toFixed(2);
@@ -1269,18 +1282,14 @@ function ProductionBusinessPlan({
 
                 res.push(
                   ...busProds?.map((el) => {
-                    const vegetation = income.vegetationYear?.find(
-                      (e) =>
-                        e.busProdId == el.id && e.techCartId == el.techCartId
-                    );
-                    const myYield = income.yieldPlant.find(
-                      (e) => e.productId == el.productId
+                    const vegetationYear = myBusiness.vegetationYears?.find(
+                      (e) => e.techCartId == el.techCartId
                     );
                     const sum =
                       +(
                         el.area *
-                        myYield?.yieldPerHectare! *
-                        (vegetation?.allCoeff || 1)
+                        vegetationYear?.potentialYieldPerHectare! *
+                        (vegetationYear?.allCoeff || 1)
                       ).toFixed(2) || 0;
                     return (
                       <Tr key={el.id}>
@@ -1360,18 +1369,14 @@ function ProductionBusinessPlan({
                 );
                 data.push(
                   ...busProd.map((el) => {
-                    const vegetation = income.vegetationYear?.find(
-                      (e) =>
-                        e.busProdId == el.id && e.techCartId == el.techCartId
-                    );
-                    const myYield = income.yieldPlant.find(
-                      (e) => e.productId == el.productId
+                    const vegetationYear = myBusiness.vegetationYears?.find(
+                      (e) => e.techCartId == el.techCartId
                     );
                     const amount =
                       +(
                         el.area *
-                        myYield?.yieldPerHectare! *
-                        (vegetation?.allCoeff || 1)
+                        vegetationYear?.potentialYieldPerHectare! *
+                        (vegetationYear?.allCoeff || 1)
                       ).toFixed(2) || 0;
                     return {
                       year: i,

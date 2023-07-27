@@ -67,12 +67,7 @@ function SpecializationBusTable({
           }
         );
     }
-    res.push({
-      bold: true,
-      isAll: true,
-      product: "ВСЕ РАЗОМ:",
-      area: myBusiness?.busProds?.reduce((p, c) => p + c.area, 0),
-    });
+
     return res;
   }, [myBusiness?.busProds, myBusiness?.busProds.length]);
 

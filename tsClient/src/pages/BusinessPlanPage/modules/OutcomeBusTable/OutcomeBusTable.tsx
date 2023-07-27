@@ -64,19 +64,21 @@ function OutcomeBusTable({
                   outcomes.map((el) => (
                     <Tr key={el.id}>
                       <Td>
-                        <MyEditIcon
-                          onClick={() => {
-                            setOpen(true);
-                            setRes({
-                              id: el.id!,
-                              costMonth: el.costMonth,
-                              date: el.date,
-                              group: el.group,
-                              name: el.name,
-                              businessPlanId: el.businessPlanId,
-                            });
-                          }}
-                        />
+                        {!el.isDefault ? (
+                          <MyEditIcon
+                            onClick={() => {
+                              setOpen(true);
+                              setRes({
+                                id: el.id!,
+                                costMonth: el.costMonth,
+                                date: el.date,
+                                group: el.group,
+                                name: el.name,
+                                businessPlanId: el.businessPlanId,
+                              });
+                            }}
+                          />
+                        ) : null}
                       </Td>
                       <Td>{getYearFromString(el.date)}</Td>
                       <Td>{el.name}</Td>
@@ -86,8 +88,7 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        {el.name != "Нарахування (ЄСВ+ВЗ)" &&
-                        el.name != "Оплата праці АП" ? (
+                        {!el.isDefault ? (
                           <MyDeleteIcon
                             onClick={() => {
                               setDeleteData({
@@ -189,19 +190,21 @@ function OutcomeBusTable({
                   outcomes.map((el) => (
                     <Tr key={el.id}>
                       <Td>
-                        <MyEditIcon
-                          onClick={() => {
-                            setOpen(true);
-                            setRes({
-                              id: el.id!,
-                              costMonth: el.costMonth,
-                              date: el.date,
-                              group: el.group,
-                              name: el.name,
-                              businessPlanId: el.businessPlanId,
-                            });
-                          }}
-                        />
+                        {!el.isDefault ? (
+                          <MyEditIcon
+                            onClick={() => {
+                              setOpen(true);
+                              setRes({
+                                id: el.id!,
+                                costMonth: el.costMonth,
+                                date: el.date,
+                                group: el.group,
+                                name: el.name,
+                                businessPlanId: el.businessPlanId,
+                              });
+                            }}
+                          />
+                        ) : null}
                       </Td>
                       <Td>{getYearFromString(el.date)}</Td>
                       <Td>{el.name}</Td>
@@ -211,8 +214,7 @@ function OutcomeBusTable({
                         <Button size="sm">Додати</Button>
                       </Td>
                       <Td>
-                        {el.name != "Нарахування (ЄСВ+ВЗ)" &&
-                        el.name != "Оплата праці ІТР" ? (
+                        {!el.isDefault ? (
                           <MyDeleteIcon
                             onClick={() => {
                               setDeleteData({

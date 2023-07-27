@@ -185,16 +185,14 @@ function AdditionBusinessPlan({
 
           grossHarvest: busProds
             .map((el) => {
-              let myYield = income.yieldPlant.find(
-                (e) => e.cultureId == el.product?.cultureId
-              );
-              const vegetation = income.vegetationYear.find(
-                (e) =>
-                  e.yieldPlantId == myYield?.id && +e.year.split("")[0] == ind
+              const vegetationYear = myBusiness.vegetationYears?.find(
+                (e) => e.techCartId == el.techCartId
               );
               return (
                 Math.round(
-                  myYield?.yieldPerHectare! * vegetation?.allCoeff! * el.area
+                  vegetationYear?.potentialYieldPerHectare! *
+                    vegetationYear?.allCoeff! *
+                    el.area
                 ) || 0
               );
             })
@@ -205,16 +203,14 @@ function AdditionBusinessPlan({
 
           revenue: busProds
             .map((el) => {
-              let myYield = income.yieldPlant.find(
-                (e) => e.cultureId == el.product?.cultureId
-              );
-              const vegetation = income.vegetationYear.find(
-                (e) =>
-                  e.yieldPlantId == myYield?.id && +e.year.split("")[0] == ind
+              const vegetationYear = myBusiness.vegetationYears?.find(
+                (e) => e.techCartId == el.techCartId
               );
               let res =
                 Math.round(
-                  myYield?.yieldPerHectare! * vegetation?.allCoeff! * el.area
+                  vegetationYear?.potentialYieldPerHectare! *
+                    vegetationYear?.allCoeff! *
+                    el.area
                 ) *
                   el.product?.culture?.priceBerry! *
                   1000 || 0;
@@ -564,19 +560,15 @@ function AdditionBusinessPlan({
           myBusiness?.busProds?.forEach((el) => {
             const yearName = useVegetationYears[i - start + 1].name;
 
-            const myYield = income.yieldPlant.find(
-              (e) => e.cultureId == el.product?.cultureId
-            );
-
-            const vegetation = income.vegetationYear.find(
-              (e) => e.yieldPlantId == myYield?.id && e.year == yearName
+            const vegetationYear = myBusiness.vegetationYears?.find(
+              (e) => e.techCartId == el.techCartId
             );
             const sum =
               Math.round(
-                (myYield?.yieldPerHectare! *
+                (vegetationYear?.potentialYieldPerHectare! *
                   el.area *
                   el.product?.culture?.priceBerry! *
-                  vegetation?.allCoeff! || 0) * 100
+                  vegetationYear?.allCoeff! || 0) * 100
               ) / 100;
             endSum += sum;
             endSum = Math.round(endSum * 1000) / 1000;

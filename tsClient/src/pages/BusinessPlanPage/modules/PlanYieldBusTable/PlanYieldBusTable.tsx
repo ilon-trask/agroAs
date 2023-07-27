@@ -58,7 +58,7 @@ function PlanYieldBusTable({
                   myBusiness?.busProds
                     .filter((el) => el.year == i - start)
                     .map((el) => {
-                      const vegetationYear = income.vegetationYear.find(
+                      const vegetationYear = myBusiness.vegetationYears.find(
                         (e) => e.techCartId == el.techCartId!
                       );
                       console.log("vegetationYear");
@@ -84,11 +84,13 @@ function PlanYieldBusTable({
                           <Td>{el.cultivationTechnology?.name}</Td>
                           <Td>{vegetationYear?.numberPlantsPerHectare}</Td>
                           <Td>{vegetationYear?.numberPerRoll}</Td>
-                          <Td>{vegetationYear?.potentialYield}</Td>
+                          <Td>{vegetationYear?.potentialYieldPerHectare}</Td>
                           <Td>
-                            {(vegetationYear?.potentialYield || 0) *
+                            {(
+                              (vegetationYear?.potentialYieldPerHectare || 0) *
                               (vegetationYear?.allCoeff || 0) *
-                              el.area}
+                              el.area
+                            ).toFixed(2)}
                           </Td>
                           <Td>
                             <Button size="sm">Додати</Button>

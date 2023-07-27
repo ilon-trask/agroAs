@@ -19,8 +19,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import CreateYieldCalc from "../modules/CreateYIeldCalculation";
-import { IyieldCalculation } from "../../../tRPC serv/models/models";
+// import { IyieldCalculation } from "../../../tRPC serv/models/models";
 import useVegetationYears, {
   VegetationYearsType,
 } from "../shared/hook/useVegetationYears";
@@ -67,22 +66,22 @@ interface IvegetationRes {
   techCartId?: number;
   yieldPlantId?: number;
 }
-function convertToCSV(data: IyieldCalculation[]) {
-  const headers = Object.keys(data[0]).join(",");
-  const rows = data.map((obj) => Object.values(obj).join(","));
-  return `${headers}\n${rows.join("\n")}`;
-}
-function downloadCSV(data: IyieldCalculation[]) {
-  const csv = convertToCSV(data);
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "data.csv";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+// function convertToCSV(data: IyieldCalculation[]) {
+//   const headers = Object.keys(data[0]).join(",");
+//   const rows = data.map((obj) => Object.values(obj).join(","));
+//   return `${headers}\n${rows.join("\n")}`;
+// }
+// function downloadCSV(data: IyieldCalculation[]) {
+//   const csv = convertToCSV(data);
+//   const blob = new Blob([csv], { type: "text/csv" });
+//   const url = URL.createObjectURL(blob);
+//   const link = document.createElement("a");
+//   link.href = url;
+//   link.download = "data.csv";
+//   document.body.appendChild(link);
+//   link.click();
+//   document.body.removeChild(link);
+// }
 
 function YieldСalculation() {
   const { busId, busProdId } = useParams();
@@ -377,7 +376,7 @@ function YieldСalculation() {
           createVegetationYear(income, {
             cultivationTechnologyId: busProd?.cultivationTechnologyId!,
             cultureId: busProd?.product?.cultureId!,
-
+            businessPlanId: +busId!,
             busProdId: busProd?.id!,
             data: res.data.map((el) => ({
               ...el,

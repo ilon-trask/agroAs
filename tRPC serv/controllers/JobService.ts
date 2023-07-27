@@ -5,7 +5,6 @@ import { CreateJobType, PatchJobType } from "../routes/jobRouter";
 
 class JobService {
   async get(user: Principal | undefined) {
-    if (!user) return;
     const res: Ijob[] | null = await job.findAll({
       //@ts-ignore
       where: { [Op.or]: { userId: user.sub, userId: null } },

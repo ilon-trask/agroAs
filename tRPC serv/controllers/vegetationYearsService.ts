@@ -15,7 +15,8 @@ class vegetationYearService {
         el.technologyCoeff *
         el.vegetationCoeff
       ).toFixed(2),
-      potentialYield: (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
+      potentialYieldPerHectare:
+        (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
     }));
     return res;
   }
@@ -40,7 +41,7 @@ class vegetationYearService {
         res.technologyCoeff *
         res.vegetationCoeff
       ).toFixed(2);
-      res.potentialYield =
+      res.potentialYieldPerHectare =
         (res.numberPerRoll * res.numberPlantsPerHectare) / 1000;
       acc.push(res);
     }

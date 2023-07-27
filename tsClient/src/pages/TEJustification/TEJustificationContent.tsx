@@ -34,7 +34,6 @@ function TEJustificationContent(props: props) {
     costHand += (el?.costHandWork || 0) * myJustification?.area!;
     costMech += (el?.costMachineWork || 0) * myJustification?.area!;
   });
-
   return (
     <>
       <MyTableContainer>
@@ -42,8 +41,8 @@ function TEJustificationContent(props: props) {
           <Thead>
             <Tr>
               {!isPlan && <Th></Th>}
-              <Th>Культура</Th>
-              <Th>Вид витрат</Th>
+              <Th>Назва карти</Th>
+
               <Th>Кількість га</Th>
               <Th>Ціна грн/га</Th>
               <Th>Сума грн</Th>
@@ -64,7 +63,7 @@ function TEJustificationContent(props: props) {
                 </Td>
               )}
               <Td>{myCart?.nameCart}</Td>
-              <Td></Td>
+
               <Td>{myJustification?.area}</Td>
               <Td>{myCart?.costHectare}</Td>
               <Td>{myCart?.costHectare! * myJustification?.area!}</Td>
@@ -72,7 +71,7 @@ function TEJustificationContent(props: props) {
           </Tbody>
         </Table>
       </MyTableContainer>
-      <MyHeading>Планування потреби в ресурсах</MyHeading>
+
       <Text
         textAlign={"center"}
         fontSize={"14px"}

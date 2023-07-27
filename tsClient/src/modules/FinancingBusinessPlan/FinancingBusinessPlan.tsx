@@ -233,17 +233,14 @@ function FinancingBusinessPlan({
             const saleValue = myBusiness.busProds
               .filter((el) => el.year == i - start)
               .reduce((p, c) => {
-                const vegetation = income.vegetationYear?.find(
-                  (e) => e.busProdId == c.id && e.techCartId == c.techCartId
-                );
-                const myYield = income.yieldPlant.find(
-                  (e) => e.productId == c.productId
+                const vegetationYear = myBusiness.vegetationYears?.find(
+                  (e) => e.techCartId == c.techCartId
                 );
                 const amount =
                   +(
                     c.area *
-                    myYield?.yieldPerHectare! *
-                    (vegetation?.allCoeff || 1)
+                    vegetationYear?.potentialYieldPerHectare! *
+                    (vegetationYear?.allCoeff || 1)
                   ).toFixed(2) || 0;
                 return p + +(amount * (c.price || 0)).toFixed(2);
               }, 0);
@@ -266,7 +263,7 @@ function FinancingBusinessPlan({
                 .reduce(
                   (p, c) =>
                     p +
-                    c.costMonth *
+                    c.costMonth! *
                       getMonthAmountFromBusinessPlan(
                         myBusiness.dateStart,
                         i,
@@ -359,7 +356,7 @@ function FinancingBusinessPlan({
                     .reduce(
                       (p, c) =>
                         p +
-                        c.costMonth *
+                        c.costMonth! *
                           getMonthAmountFromBusinessPlan(
                             myBusiness.dateStart,
                             i,
