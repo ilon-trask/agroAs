@@ -101,10 +101,12 @@ function YieldСalculation() {
     (el) => el.busProdId == busProd?.id
   );
   const [res, setRes] = useState<IvegetationRes>({
+    //@ts-ignore
     data: income.vegetationYear.filter((el) => el.busProdId == busProd?.id),
   });
   console.log(vegetationYear);
   useEffect(() => {
+    //@ts-ignore
     setRes({ data: vegetationYear });
   }, [JSON.stringify(vegetationYear)]);
 

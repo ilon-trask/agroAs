@@ -96,7 +96,7 @@ function QuizBusinessPopUp({
   useEffect(() => setPeriod(startYear), [startYear]);
   const { income, map, enterpriseStore } = useContext(Context);
   const sales = income.sale.filter((el) => el.isPlan);
-  const thisWorkers = myBusiness.worker?.filter(
+  const thisWorkers = myBusiness.workers?.filter(
     (el) => el.enterpriseId == enterpriseId
   );
   function Footer() {
@@ -279,11 +279,11 @@ function QuizBusinessPopUp({
                 <Box display={"flex"} gap={5}>
                   <Input value={product?.name} isDisabled={true} />
                   <Input
-                    value={
-                      Math.round(
-                        myYield?.yieldPerHectare! * cart?.area! * 100
-                      ) / 100
-                    }
+                    // value={
+                    //   Math.round(
+                    //     myYield?.yieldPerHectare! * cart?.area! * 100
+                    //   ) / 100
+                    // }
                     isDisabled={true}
                   />
                   <Input value={el?.price} autoFocus={true} />

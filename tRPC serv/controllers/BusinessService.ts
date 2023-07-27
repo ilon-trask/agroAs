@@ -140,12 +140,25 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           })
         )
       );
-      plan.vegetationYears = JSON.parse(
+      let vegeAcc = JSON.parse(
         JSON.stringify(
-          await vegetationYears.findAll({ where: { businessPlanId: plan.id! } })
+          await vegetationYears.findAll({
+            where: { businessPlanId: plan.id! },
+          })
         )
       );
-
+      plan.vegetationYears = (() => {
+        return vegeAcc.map((el: IvegetationYears) => ({
+          ...el,
+          allCoeff: +(
+            el.seedlingsCoeff *
+            el.technologyCoeff *
+            el.vegetationCoeff
+          ).toFixed(2),
+          potentialYieldPerHectare:
+            (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
+        }));
+      })();
       return plan;
     })
   );

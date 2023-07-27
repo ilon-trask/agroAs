@@ -1,12 +1,12 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { IyieldCalculation } from "../../../../tRPC serv/models/models";
+// import { IyieldCalculation } from "../../../../tRPC serv/models/models";
 import Dialog from "../../components/Dialog";
 import YieldCalc from "./components/YieldCalc";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   id: number;
-  myCalc: IyieldCalculation | undefined;
+  myCalc: any | undefined;
 };
 export type yieldCalcProp = {
   numberFruit: number | string;

@@ -70,7 +70,7 @@ function OutcomeBusTable({
                               setOpen(true);
                               setRes({
                                 id: el.id!,
-                                costMonth: el.costMonth,
+                                costMonth: el.costMonth!,
                                 date: el.date,
                                 group: el.group,
                                 name: el.name,
@@ -196,7 +196,7 @@ function OutcomeBusTable({
                               setOpen(true);
                               setRes({
                                 id: el.id!,
-                                costMonth: el.costMonth,
+                                costMonth: el.costMonth!,
                                 date: el.date,
                                 group: el.group,
                                 name: el.name,

@@ -114,20 +114,20 @@ function YieldPlant({ res, setRes, setOpen, update, plantId }: props) {
         <Button
           isDisabled={!res.cultureId}
           onClick={() => {
-            if (!update) {
-              createYieldPlant(income, {
-                cultureId: +res.cultureId,
-                cultivationTechnologyId: +res.cultivationTechnologyId,
-                landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
-              });
-            } else {
-              updateYieldPlant(income, {
-                cultureId: +res.cultureId,
-                cultivationTechnologyId: +res.cultivationTechnologyId,
-                yieldPlantId: plantId,
-                landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
-              });
-            }
+            // if (!update) {
+            //   createYieldPlant(income, {
+            //     cultureId: +res.cultureId,
+            //     cultivationTechnologyId: +res.cultivationTechnologyId,
+            //     landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
+            //   });
+            // } else {
+            //   updateYieldPlant(income, {
+            //     cultureId: +res.cultureId,
+            //     cultivationTechnologyId: +res.cultivationTechnologyId,
+            //     yieldPlantId: plantId,
+            //     landingPeriod: res.landingPeriod as YieldPlantLandingPeriodType,
+            //   });
+            // }
             setOpen(false);
           }}
         >

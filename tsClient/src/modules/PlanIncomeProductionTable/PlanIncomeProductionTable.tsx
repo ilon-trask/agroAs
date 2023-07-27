@@ -43,7 +43,7 @@ function Item({
   const vegetationYear = income.vegetationYear?.find(
     (e) => e.techCartId == el.techCartId
   );
-  const planYield = (
+  const planYield = +(
     vegetationYear?.potentialYieldPerHectare! * myCart?.area!
   ).toFixed(2);
   return (

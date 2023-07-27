@@ -53,7 +53,7 @@ function CreateBusiness({
       setUpdate={setUpdate}
       update={update}
     >
-      <BusinessInputs res={res} setRes={setRes} isEnterprise={true} />
+      <BusinessInputs res={res} setRes={setRes} />
       <ModalFooter>
         <Button
           onClick={() => {
