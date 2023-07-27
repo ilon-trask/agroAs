@@ -6,7 +6,6 @@ import vegetationYearsService from "../controllers/vegetationYearsService";
 const createVegetation = z.object({
   cultivationTechnologyId: z.number(),
   cultureId: z.number(),
-  yieldPlantId: z.number().optional(),
   busProdId: z.number(),
   data: z.array(
     z.object({
@@ -27,6 +26,8 @@ const createVegetation = z.object({
       technologyCoeff: z.number(),
       seedlingsCoeff: z.number(),
       techCartId: z.number().optional(),
+      numberPlantsPerHectare: z.number(),
+      numberPerRoll: z.number(),
     })
   ),
 });

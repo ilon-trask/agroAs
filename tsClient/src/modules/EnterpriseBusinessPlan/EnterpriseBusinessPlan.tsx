@@ -160,19 +160,6 @@ function EnterpriseBusinessPlan({
           .reduce((p, c) => p + c.area, 0),
       });
     }
-    areasUsageData.push({
-      bold: true,
-      year: "По БП",
-      ...[...cultureSet].reduce((acc, el) => {
-        //@ts-ignore
-        acc[el] = myBusiness?.busProds.reduce(
-          (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
-          0
-        );
-        return acc;
-      }, {}),
-      area: myBusiness?.busProds.reduce((p, c) => p + c.area, 0),
-    });
   })();
 
   const salaryExpensesColumns = useMemo<ColumnDef<any>[]>(() => {

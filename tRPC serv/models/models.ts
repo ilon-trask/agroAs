@@ -692,9 +692,6 @@ titlePage.init(
 export interface IyieldPlant {
   id?: number;
   userId?: string;
-  plantingDensity: number;
-  yieldPerHectare: number;
-  yieldPerRoll: number;
   timesDow: number;
   landingPeriod: YieldPlantLandingPeriodType;
   cultureId?: number;
@@ -704,9 +701,6 @@ export interface IyieldPlant {
 export class yieldPlant extends Model<IyieldPlant> {
   declare id?: number;
   declare userId?: string;
-  declare plantingDensity: number;
-  declare yieldPerHectare: number;
-  declare yieldPerRoll: number;
   declare timesDow: number;
   declare landingPeriod: YieldPlantLandingPeriodType;
   declare cultivationTechnologyId?: number;
@@ -717,9 +711,6 @@ yieldPlant.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     userId: { type: DataTypes.STRING, allowNull: false },
-    plantingDensity: { type: DataTypes.FLOAT },
-    yieldPerHectare: { type: DataTypes.FLOAT },
-    yieldPerRoll: { type: DataTypes.FLOAT },
     timesDow: { type: DataTypes.INTEGER },
     landingPeriod: { type: DataTypes.STRING },
   },
@@ -731,8 +722,8 @@ export interface IyieldCalculation {
   fruitWeight: number;
   numberFlower: number;
   numberSocket: number;
-  numberPlantsPerHectare: number;
-  yieldPlantId?: number;
+  cultureId?: number;
+  yieldRoll: number;
 }
 export class yieldCalculation extends Model<IyieldCalculation> {
   declare id?: number;
@@ -740,8 +731,8 @@ export class yieldCalculation extends Model<IyieldCalculation> {
   declare fruitWeight: number;
   declare numberFlower: number;
   declare numberSocket: number;
-  declare numberPlantsPerHectare: number;
   declare yieldPlantId?: number;
+  declare yieldRoll: number;
 }
 yieldCalculation.init(
   {
@@ -750,7 +741,7 @@ yieldCalculation.init(
     fruitWeight: { type: DataTypes.FLOAT },
     numberSocket: { type: DataTypes.FLOAT },
     numberFlower: { type: DataTypes.FLOAT },
-    numberPlantsPerHectare: { type: DataTypes.FLOAT },
+    yieldRoll: { type: DataTypes.FLOAT },
   },
   { sequelize }
 );
@@ -1238,8 +1229,10 @@ export interface IvegetationYears {
   cultureId?: number;
   cultivationTechnologyId?: number;
   techCartId?: number | null;
-  yieldPlantId?: number | null;
   busProdId?: number | null;
+  numberPlantsPerHectare: number;
+  numberPerRoll: number;
+  potentialYield?: number;
 }
 
 export class vegetationYears extends Model<IvegetationYears> {
@@ -1249,6 +1242,8 @@ export class vegetationYears extends Model<IvegetationYears> {
   declare technologyCoeff: number;
   declare seedlingsCoeff: number;
   declare busProdId?: number | null;
+  declare numberPlantsPerHectare: number;
+  declare numberPerRoll: number;
 }
 vegetationYears.init(
   {
@@ -1257,6 +1252,8 @@ vegetationYears.init(
     seedlingsCoeff: { type: DataTypes.FLOAT },
     technologyCoeff: { type: DataTypes.FLOAT },
     year: { type: DataTypes.STRING },
+    numberPlantsPerHectare: { type: DataTypes.FLOAT },
+    numberPerRoll: { type: DataTypes.FLOAT },
   },
 
   { sequelize }
@@ -1496,9 +1493,6 @@ vegetationYears.belongsTo(cultivationTechnologies);
 tech_cart.hasMany(vegetationYears);
 vegetationYears.belongsTo(tech_cart);
 
-yieldPlant.hasMany(vegetationYears);
-vegetationYears.belongsTo(yieldPlant);
-
 businessPlan.hasMany(buying_machine);
 buying_machine.belongsTo(businessPlan);
 
@@ -1522,3 +1516,6 @@ financing.belongsTo(culture);
 
 financing.belongsToMany(businessPlan, { through: financBus });
 businessPlan.belongsToMany(financing, { through: financBus });
+
+culture.hasMany(yieldCalculation);
+yieldCalculation.belongsTo(culture);

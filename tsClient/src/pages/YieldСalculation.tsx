@@ -31,27 +31,26 @@ import {
 } from "../http/requests";
 import MyHeading from "src/ui/MyHeading";
 import { BUSINESSpLAN_ROUTER } from "src/utils/consts";
-import { getBusinessPlan } from "../../../tRPC serv/controllers/BusinessService";
 
 export const plantsHeads: Record<string, string[]> = {
   "Суниця садова": [
-    "Кількість розеток",
-    "Кількість квітконосів",
-    "Кількість ягід",
-    "Вага ягоди",
+    "Кількість розеток (шт)",
+    "Кількість квітконосів (шт)",
+    "Кількість ягід (шт)",
+    "Вага ягоди (грам)",
   ],
 
   Малина: [
-    "Кількість пагонів",
-    "Кількість суцвіть",
-    "Кількість ягід",
-    "Вага ягоди",
+    "Кількість пагонів (шт)",
+    "Кількість суцвіть (шт)",
+    "Кількість ягід (шт)",
+    "Вага ягоди (грам)",
   ],
   Лохина: [
-    "Кількість пагонів",
-    "Кількість суцвіть",
-    "Кількість ягід",
-    "Вага ягоди",
+    "Кількість пагонів (шт)",
+    "Кількість суцвіть (шт)",
+    "Кількість ягід (шт)",
+    "Вага ягоди (грам)",
   ],
 };
 interface IvegetationRes {
@@ -61,6 +60,9 @@ interface IvegetationRes {
     vegetationCoeff: number | "";
     technologyCoeff: number | "";
     seedlingsCoeff: number | "";
+    numberPlantsPerHectare: number | "";
+    numberPerRoll: number | "";
+    techCartId: number | null;
   }[];
   techCartId?: number;
   yieldPlantId?: number;
@@ -88,29 +90,24 @@ function YieldСalculation() {
   const busProd = business.businessPlan
     .find((el) => el.id == busId)
     ?.busProds.find((el) => el.id == +busProdId!);
-  const myYield = income.yieldPlant?.find(
-    (el) => el.productId == busProd?.productId
-  );
-  const myCalc = income.yieldCalc?.find(
-    (el) => el?.yieldPlantId == myYield?.id
-  );
+  console.log(income.vegetationYear);
+
   const [open, setOpen] = useState(false);
   useEffect(() => {
     getVegetationYear(income);
     getBusinessPlans(map, business);
   }, []);
-  const yieldPerRoll =
-    (myCalc?.numberSocket! *
-      myCalc?.numberFlower! *
-      myCalc?.numberFruit! *
-      myCalc?.fruitWeight!) /
-    1000;
+
+  const vegetationYear = income.vegetationYear.filter(
+    (el) => el.busProdId == busProd?.id
+  );
   const [res, setRes] = useState<IvegetationRes>({
     data: income.vegetationYear.filter((el) => el.busProdId == busProd?.id),
   });
-  console.log(
-    income.vegetationYear.filter((el) => el.yieldPlantId == myYield?.id!)
-  );
+  console.log(vegetationYear);
+  useEffect(() => {
+    setRes({ data: vegetationYear });
+  }, [JSON.stringify(vegetationYear)]);
 
   function isChecked(name: string) {
     let akk: boolean = false;
@@ -123,7 +120,12 @@ function YieldСalculation() {
   }
   function changeCoeff(
     event: string,
-    coeff: "vegetationCoeff" | "technologyCoeff" | "seedlingsCoeff",
+    coeff:
+      | "vegetationCoeff"
+      | "technologyCoeff"
+      | "seedlingsCoeff"
+      | "numberPerRoll"
+      | "numberPlantsPerHectare",
     name: string
   ) {
     setRes((prev) => ({
@@ -138,8 +140,8 @@ function YieldСalculation() {
   }
   const carts = map.businessCarts.filter(
     (el) =>
-      el.cultureId == myYield?.cultureId &&
-      el.cultivationTechnologyId == myYield?.cultivationTechnologyId
+      el.cultureId == busProd?.product?.cultureId &&
+      el.cultivationTechnologyId == busProd?.cultivationTechnologyId
   );
   return (
     <Container maxW="container.lg" mt={"30px"}>
@@ -147,21 +149,21 @@ function YieldСalculation() {
         <Button>Повернутиця до бізнес-плану</Button>
       </Link>
       <MyHeading>Розрахунок урожайності:</MyHeading>
-      <MyHeading>Культура: "{myYield?.culture.name}"</MyHeading>
+      <MyHeading>Культура: "{busProd?.product?.culture?.name}"</MyHeading>
       <MyHeading>
         Технологія: "{busProd?.cultivationTechnology?.name}"
       </MyHeading>
       <MyHeading>Продукт:"{busProd?.product?.name}"</MyHeading>
-      <Table size={"sm"} mt={5}>
+      {/* <Table size={"sm"} mt={5}>
         <Thead>
           <Tr>
             <Th>Культура</Th>
-            <Th>Густота</Th>
-            <Th>Урожайність 1га</Th>
-            <Th>Урожайність куща</Th>
+            <Th>Густота (шт/га)</Th>
+            <Th>Урожайність 1га (т)</Th>
+            <Th>Урожайність куща (кг)</Th>
             {
               //@ts-ignore
-              plantsHeads[myYield?.culture.name]?.map((el) => (
+              plantsHeads[busProd?.product?.culture.name]?.map((el) => (
                 <Th key={el}>{el}</Th>
               ))
             }
@@ -191,17 +193,21 @@ function YieldСalculation() {
         }}
       >
         Внести/редагувати дані
-      </Button>
+      </Button> */}
       {/* <Button onClick={() => downloadCSV([myCalc!])}>csv</Button> */}
-      <CreateYieldCalc
+      {/* <CreateYieldCalc
         open={open}
         setOpen={setOpen}
         id={myYield?.id!}
         myCalc={myCalc}
-      />
+      /> */}
       <Table size={"sm"}>
         <Thead>
           <Tr>
+            <Th>
+              Назва
+              <br /> карти
+            </Th>
             <Th></Th>
             <Th>Рік вегетації</Th>
             <Th>
@@ -221,16 +227,23 @@ function YieldСalculation() {
               <br />
               коефіцієнт
             </Th>
-            <Th>Технологічні карти</Th>
+            <Th>
+              Густота <br /> насаджень
+            </Th>
+            <Th>Урожайність куща</Th>
+            <Th>
+              Потенційна <br /> урожайність (т)
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
           {useVegetationYears.map((el) => {
             const checked: boolean = isChecked(el.name);
             const value = res.data.find((e) => e.year == el.name);
-            const cart = carts.filter((e) => e.year == el.name);
+            const cart = carts.find((e) => e.year == el.name);
             return (
               <Tr>
+                <Th>{cart?.nameCart}</Th>
                 <Th>
                   <Checkbox
                     isChecked={checked}
@@ -250,6 +263,9 @@ function YieldСalculation() {
                               seedlingsCoeff: 0,
                               technologyCoeff: 0,
                               vegetationCoeff: 0,
+                              numberPerRoll: 0,
+                              numberPlantsPerHectare: 0,
+                              techCartId: cart?.id!,
                             },
                           ],
                         }));
@@ -265,6 +281,7 @@ function YieldСalculation() {
                   >
                     <EditablePreview h={"15px"} w={"50px"} />
                     <EditableInput
+                      type={"number"}
                       maxW={"fit-content"}
                       h={"15px"}
                       w={"50px"}
@@ -279,6 +296,7 @@ function YieldСalculation() {
                   >
                     <EditablePreview h={"15px"} w={"50px"} />
                     <EditableInput
+                      type={"number"}
                       maxW={"fit-content"}
                       h={"15px"}
                       w={"50px"}
@@ -293,6 +311,7 @@ function YieldСalculation() {
                   >
                     <EditablePreview h={"15px"} w={"50px"} />
                     <EditableInput
+                      type={"number"}
                       maxW={"fit-content"}
                       h={"15px"}
                       w={"50px"}
@@ -311,7 +330,43 @@ function YieldСalculation() {
                       ) / 100}
                   </Text>
                 </Th>
-                <Th>{cart[0]?.nameCart}</Th>
+                <Th>
+                  <Editable
+                    value={(value?.numberPlantsPerHectare ?? "") + ""}
+                    onChange={(e) =>
+                      changeCoeff(e, "numberPlantsPerHectare", el.name)
+                    }
+                  >
+                    <EditablePreview h={"15px"} w={"50px"} />
+                    <EditableInput
+                      type={"number"}
+                      maxW={"fit-content"}
+                      h={"15px"}
+                      w={"50px"}
+                      borderRadius={3}
+                    />
+                  </Editable>
+                </Th>
+                <Th>
+                  <Editable
+                    value={(value?.numberPerRoll ?? "") + ""}
+                    onChange={(e) => changeCoeff(e, "numberPerRoll", el.name)}
+                  >
+                    <EditablePreview h={"15px"} w={"50px"} />
+                    <EditableInput
+                      type={"number"}
+                      maxW={"fit-content"}
+                      h={"15px"}
+                      w={"50px"}
+                      borderRadius={3}
+                    />
+                  </Editable>
+                </Th>
+                <Th>
+                  {((value?.numberPerRoll || 0) *
+                    (value?.numberPlantsPerHectare || 0)) /
+                    1000}
+                </Th>
               </Tr>
             );
           })}
@@ -320,17 +375,19 @@ function YieldСalculation() {
       <Button
         onClick={() => {
           createVegetationYear(income, {
-            cultivationTechnologyId: myYield?.cultivationTechnologyId!,
-            cultureId: myYield?.cultureId!,
-            yieldPlantId: myYield?.id!,
+            cultivationTechnologyId: busProd?.cultivationTechnologyId!,
+            cultureId: busProd?.product?.cultureId!,
+
             busProdId: busProd?.id!,
             data: res.data.map((el) => ({
               ...el,
-              techCartId: busProd?.techCartId!,
+              techCartId: el?.techCartId!,
               seedlingsCoeff: +el.seedlingsCoeff,
               technologyCoeff: +el.technologyCoeff,
               vegetationCoeff: +el.vegetationCoeff,
               year: el.year,
+              numberPerRoll: +el.numberPerRoll,
+              numberPlantsPerHectare: +el.numberPlantsPerHectare,
             })),
           });
         }}

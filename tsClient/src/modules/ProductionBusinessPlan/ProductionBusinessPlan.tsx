@@ -142,72 +142,87 @@ function ProductionBusinessPlan({
   const plannedStructureData = [];
   const generalData = [];
   for (let i = start; i < end; i++) {
+    const busProds = myBusiness?.busProds?.filter((el) => el.year == i - start);
+    const lands = myBusiness?.lands?.filter(
+      (el) => getYearFromString(el.date) == i
+    );
+
     generalData.push(
-      ...myBusiness?.busProds
-        ?.filter((el) => el.year == i - start)
-        .map((el) => ({
+      ...busProds.map((el) => ({
+        year: i,
+        culture: el.product?.culture?.name,
+        name,
+        technology: el.cultivationTechnology?.name,
+        area: el.area,
+      }))
+    );
+    const area = busProds.reduce((p, c) => p + c.area, 0);
+    const totalArea = lands.reduce((p, c) => p + c.area, 0);
+    generalData.push({
+      year: i,
+      bold: true,
+      culture: "Разом:",
+      area: area,
+      totalArea: totalArea,
+      coefficient: totalArea ? (area / totalArea).toFixed(2) : 0,
+    });
+    plannedStructureData.push(
+      ...busProds.map((el) => {
+        const vegetationYear = income.vegetationYear?.find(
+          (e) => e.techCartId == el.techCartId
+        );
+        return {
           year: i,
           culture: el.product?.culture?.name,
-          name,
-          technology: el.cultivationTechnology?.name,
-          area: el.area,
-        }))
+          product: el.product?.name,
+          density: vegetationYear?.numberPlantsPerHectare,
+          yieldHectare:
+            (vegetationYear?.potentialYield || 0) *
+            (vegetationYear?.allCoeff || 0),
+          yield:
+            (vegetationYear?.potentialYield || 0) *
+            (vegetationYear?.allCoeff || 0) *
+            el.area,
+        };
+      })
     );
-    generalData.push({ year: i, bold: true });
-    const yearName = useVegetationYears[i - start + 1].name;
-    plannedStructureData.push({
-      year: i + " " + yearName,
+    // plannedStructureData.push({
+    //   year: i,
 
-      ...myBusiness?.busProds.reduce((p, el) => {
-        const myYield = income.yieldPlant?.find(
-          (e) => e.cultureId == el.product?.cultureId
-        );
-        const vegetation = income.vegetationYear?.find(
-          (e) => e.yieldPlantId == myYield?.id && e.year == yearName
-        );
-        //@ts-ignore
-        p[el.culture?.name! + el.cultivationTechnology.name! + "coef"] =
-          vegetation?.allCoeff || 0;
-        //@ts-ignore
-        p[el.culture?.name! + el.cultivationTechnology.name! + "yield"] =
-          Math.round(
-            myYield?.yieldPerHectare! * (vegetation?.allCoeff || 0) * 100
-          ) / 100;
-        return p;
-      }, {}),
-    });
+    //   ...myBusiness?.busProds.reduce((p, el) => {
+    //     const vegetationYear = income.vegetationYear?.find(
+    //       (e) => e.techCartId == el.techCartId
+    //     );
+    //     //@ts-ignore
+    //     // p[el.culture?.name! + el.cultivationTechnology.name! + "coef"] =
+    //     //   vegetation?.allCoeff || 0;
+    //     // //@ts-ignore
+    //     // p[el.culture?.name! + el.cultivationTechnology.name! + "yield"] =
+    //     //   Math.round(
+    //     //     myYield?.yieldPerHectare! * (vegetation?.allCoeff || 0) * 100
+    //     //   ) / 100;
+    //     return p;
+    //   }, {}),
+    // });
   }
   const generalColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
       { header: "Рік", accessorKey: "year" },
       { header: "КУЛЬТУРИ", accessorKey: "culture" },
       { header: "ТЕХНОЛОГІЇ", accessorKey: "technology" },
-      { header: "ПЛОЩА", accessorKey: "area" },
+      { header: "Площа під культурами", accessorKey: "area" },
       { header: "Загальна площа", accessorKey: "totalArea" },
+      { header: "Коефіцієнт", accessorKey: "coefficient" },
     ];
   }, []);
   const plannedStructureColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
-      { header: "Вегетація", accessorKey: "year" },
-      ...myBusiness?.busProds.map((el) => ({
-        header: el?.product?.culture?.name! + el.cultivationTechnology?.name!,
-        columns: [
-          {
-            header: "Коеф.",
-            accessorKey:
-              el?.product?.culture?.name! +
-              el.cultivationTechnology?.name! +
-              "coef",
-          },
-          {
-            header: "Урожайн.",
-            accessorKey:
-              el?.product?.culture?.name! +
-              el.cultivationTechnology?.name! +
-              "yield",
-          },
-        ],
-      })),
+      { header: "Рік", accessorKey: "year" },
+      { header: "Культура", accessorKey: "culture" },
+      { header: "Продукт", accessorKey: "product" },
+      { header: "Густота", accessorKey: "density" },
+      { header: "Уражйність (1 га)", accessorKey: "yieldHectare" },
+      { header: "Планова урожайність", accessorKey: "yield" },
     ];
   }, []);
   const laborСostsColumns = useMemo<ColumnDef<any>[]>(() => {
@@ -228,12 +243,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={4}>
+            <Th colSpan={6}>
               <TableName>Загальні дані про культури та технології</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={4}>
+            <Th colSpan={6}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
@@ -257,10 +272,10 @@ function ProductionBusinessPlan({
             </Th>
           </Tr>
         </Thead>
-        {/* <TableContent
+        <TableContent
           data={plannedStructureData}
           columns={plannedStructureColumns}
-        /> */}
+        />
       </Table>
       <Table size={"sm"}>
         <Thead>
@@ -1181,22 +1196,20 @@ function ProductionBusinessPlan({
               );
               res.push(
                 ...busProds.map((el) => {
-                  const vegetation = income.vegetationYear?.find(
-                    (e) => e.busProdId == el.id && e.techCartId == el.techCartId
-                  );
-                  const myYield = income.yieldPlant.find(
-                    (e) => e.productId == el.productId
+                  const vegetationYear = income.vegetationYear?.find(
+                    (e) => e.techCartId == el.techCartId
                   );
                   const amount =
                     +(
-                      myYield?.yieldPerHectare! * (vegetation?.allCoeff || 1)
-                    ).toFixed(2) || 0;
+                      (vegetationYear?.potentialYield || 0) *
+                      (vegetationYear?.allCoeff || 0)
+                    ) || 0;
                   const gather = (amount * el.area).toFixed(2);
                   sum += +((el.price || 0) * +gather).toFixed(2);
                   return (
                     <Tr key={el.id}>
                       <Td>{el.product?.name}</Td>
-                      <Td>{amount}</Td>
+                      <Td>{amount.toFixed(2)}</Td>
                       <Td>{el.area}</Td>
                       <Td>{gather}</Td>
                       <Td>{el.price}</Td>

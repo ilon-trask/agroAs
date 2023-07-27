@@ -73,6 +73,10 @@ export const incomeRouter = router({
     );
     return res;
   }),
+  getYieldCalculation: publicProcedure.query(async ({ ctx }) => {
+    const res = await incomeService.getCalculation();
+    return res;
+  }),
   getOneYieldPlant: publicProcedure
     .input(z.object({ plantId: z.number() }))
     .query(async ({ input }) => {
@@ -116,10 +120,6 @@ export const incomeRouter = router({
       return res;
     }),
 
-  getProduct: publicProcedure.query(async ({ ctx }) => {
-    const res = incomeService.getProduct(ctx.user);
-    return res;
-  }),
   createProduct: publicProcedure
     .input(createProduct)
     .query(({ ctx, input }) => {

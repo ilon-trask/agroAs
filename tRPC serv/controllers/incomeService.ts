@@ -32,7 +32,6 @@ class incomeService {
     const cultures: Iculture[] = await culture.findAll();
     return cultures;
   }
-
   async getYieldPlant(user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore
@@ -79,24 +78,15 @@ class incomeService {
       fruitWeight: data.fruitWeight,
       numberFlower: data.numberFlower,
       numberFruit: data.numberFruit,
-      numberPlantsPerHectare: data.numberPlantsPerHectare,
       numberSocket: data.numberSocket,
-      yieldPlantId: data.yieldPlantId,
+      yieldRoll:
+        (data?.numberSocket! *
+          data?.numberFlower! *
+          data?.numberFruit! *
+          data?.fruitWeight!) /
+        1000,
     });
-    const yieldPerRoll =
-      (data?.numberSocket! *
-        data?.numberFlower! *
-        data?.numberFruit! *
-        data?.fruitWeight!) /
-      1000;
-    await yieldPlant.update(
-      {
-        plantingDensity: data.numberPlantsPerHectare,
-        yieldPerRoll,
-        yieldPerHectare: (yieldPerRoll * data.numberPlantsPerHectare) / 1000,
-      },
-      { where: { id: data.yieldPlantId } }
-    );
+    culture;
     //@ts-ignore
     const res: resYieldPlant = await yieldPlant.findOne({
       where: { id: data.yieldPlantId! },
@@ -111,7 +101,7 @@ class incomeService {
         fruitWeight: data.fruitWeight,
         numberFlower: data.numberFlower,
         numberFruit: data.numberFruit,
-        numberPlantsPerHectare: data.numberPlantsPerHectare,
+
         numberSocket: data.numberSocket,
       },
       { where: { yieldPlantId: data.yieldPlantId } }
