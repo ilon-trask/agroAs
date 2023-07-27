@@ -104,7 +104,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -587,6 +587,21 @@ export function getBusinessPlans(map: MapStore, Bus: BusinessStore) {
     map.isLoading = false;
   });
 }
+// export function getOnePlan(bus: BusinessStore, busId: number) {
+//   client.business.getOnePlan.query({ busId }).then((res) => {
+//     const isPublic = bus.publicBusinessPlan.find((el) => el.id == busId);
+//     const isPlan = bus.businessPlan.find((el) => el.id == busId);
+//     if (isPlan) {
+//       bus.businessPlan = bus.businessPlan.filter((el) => el.id != busId);
+//       bus.newBusinessPlan = res;
+//     } else if (isPublic) {
+//       bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+//         (el) => el.id != busId
+//       );
+//       bus.newPublicBusinessPlan = res;
+//     }
+//   });
+// }
 
 export function createBusinessPlan(
   map: MapStore,
@@ -754,79 +769,79 @@ export function downloaded(map: MapStore, cartId: number, value: number) {
     cart.timesDow = res?.timesDow;
   });
 }
-export function createYieldPlant(
-  income: IncomeStore,
-  data: CreateYieldPlantType
-) {
-  client.income.createYieldPlant.query(data).then((res) => {
-    income.newYieldPlant = res;
-  });
-}
-export function getCulturalInc(income: IncomeStore) {
-  client.income.getCultural.query().then((res) => {
-    income.cultural = res;
-  });
-}
-export function getYieldPlants(income: IncomeStore) {
-  client.income.getYieldPlant.query().then((res) => {
-    income.yieldPlant = res;
-    res?.forEach((el) => {
-      income.newYieldCalc = el.yieldCalculation;
-    });
-  });
-}
-export function getYieldPlant(income: IncomeStore, plantId: number) {
-  client.income.getOneYieldPlant.query({ plantId }).then((res) => {
-    income.newYieldPlant = res;
-  });
-}
-export function createYieldCalc(
-  income: IncomeStore,
-  data: createYieldCalcType
-) {
-  client.income.createCalc.query(data).then((res) => {
-    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
-    income.newYieldPlant = res;
-    income.newYieldCalc = res.yieldCalculation;
-  });
-}
-export function updateYieldCalc(
-  income: IncomeStore,
-  data: createYieldCalcType
-) {
-  client.income.updateCalc.query(data).then((res) => {
-    if (!res) return;
+// export function createYieldPlant(
+//   income: IncomeStore,
+//   data: CreateYieldPlantType
+// ) {
+//   client.income.createYieldPlant.query(data).then((res) => {
+//     income.newYieldPlant = res;
+//   });
+// }
+// export function getCulturalInc(income: IncomeStore) {
+//   client.income.getCultural.query().then((res) => {
+//     income.cultural = res;
+//   });
+// }
+// export function getYieldPlants(income: IncomeStore) {
+//   client.income.getYieldPlant.query().then((res) => {
+//     income.yieldPlant = res;
+//     res?.forEach((el) => {
+//       income.newYieldCalc = el.yieldCalculation;
+//     });
+//   });
+// }
+// export function getYieldPlant(income: IncomeStore, plantId: number) {
+//   client.income.getOneYieldPlant.query({ plantId }).then((res) => {
+//     income.newYieldPlant = res;
+//   });
+// }
+// export function createYieldCalc(
+//   income: IncomeStore,
+//   data: createYieldCalcType
+// ) {
+//   client.income.createCalc.query(data).then((res) => {
+//     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
+//     income.newYieldPlant = res;
+//     income.newYieldCalc = res.yieldCalculation;
+//   });
+// }
+// export function updateYieldCalc(
+//   income: IncomeStore,
+//   data: createYieldCalcType
+// ) {
+//   client.income.updateCalc.query(data).then((res) => {
+//     if (!res) return;
 
-    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
-    income.newYieldPlant = res;
-    income.yieldCalc = income.yieldCalc.filter(
-      (el) => el?.id != res.yieldCalculation.id
-    );
-    income.newYieldCalc = res.yieldCalculation;
-  });
-}
+//     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res.id);
+//     income.newYieldPlant = res;
+//     income.yieldCalc = income.yieldCalc.filter(
+//       (el) => el?.id != res.yieldCalculation.id
+//     );
+//     income.newYieldCalc = res.yieldCalculation;
+//   });
+// }
 
-export function deleteYieldPlant(
-  income: IncomeStore,
-  data: { yieldPlantId: number }
-) {
-  client.income.deleteYieldPlant.query(data).then((res) => {
-    if (!res) return;
-    income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
-  });
-}
+// export function deleteYieldPlant(
+//   income: IncomeStore,
+//   data: { yieldPlantId: number }
+// ) {
+//   client.income.deleteYieldPlant.query(data).then((res) => {
+//     if (!res) return;
+//     income.yieldPlant = income.yieldPlant.filter((el) => el.id != res);
+//   });
+// }
 
-export function updateYieldPlant(
-  income: IncomeStore,
-  data: UpdateYieldPlantType
-) {
-  client.income.updateYieldPlant.query(data).then((res) => {
-    if (res) {
-      income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
-      income.newYieldPlant = res;
-    }
-  });
-}
+// export function updateYieldPlant(
+//   income: IncomeStore,
+//   data: UpdateYieldPlantType
+// ) {
+//   client.income.updateYieldPlant.query(data).then((res) => {
+//     if (res) {
+//       income.yieldPlant = income.yieldPlant.filter((el) => el.id! != res.id);
+//       income.newYieldPlant = res;
+//     }
+//   });
+// }
 export function getPurposesMaterial(map: MapStore) {
   client.oper.getPurposesMaterial.query().then((res) => {
     map.purposeMaterial = res;
@@ -1219,6 +1234,7 @@ export function deleteEnterprise(
 }
 export function getJob(enterprise: EnterpriseStore) {
   client.job.get.query().then((res) => {
+    console.log(res);
     enterprise.job = res;
   });
 }

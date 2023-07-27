@@ -15,6 +15,8 @@ class vegetationYearService {
         el.technologyCoeff *
         el.vegetationCoeff
       ).toFixed(2),
+      potentialYieldPerHectare:
+        (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
     }));
     return res;
   }
@@ -26,22 +28,11 @@ class vegetationYearService {
     const acc: IvegetationYears[] = [];
     for (let i = 0; i < data.data.length; i++) {
       const el = data.data[i];
-      const cart = await tech_cart.findOne({
-        where: {
-          cultureId: data.cultureId,
-          cultivationTechnologyId: data.cultivationTechnologyId,
-          year: el.year,
-        },
-      });
+
       let res: IvegetationYears = await vegetationYears.create({
         cultureId: data.cultureId,
         cultivationTechnologyId: data.cultivationTechnologyId,
-        seedlingsCoeff: el.seedlingsCoeff,
-        technologyCoeff: el.technologyCoeff,
-        vegetationCoeff: el.vegetationCoeff,
-        year: el.year,
-        techCartId: el.techCartId,
-        yieldPlantId: data.yieldPlantId ? data.yieldPlantId : null,
+        ...el,
         busProdId: data.busProdId,
       });
       res = JSON.parse(JSON.stringify(res));
@@ -50,6 +41,8 @@ class vegetationYearService {
         res.technologyCoeff *
         res.vegetationCoeff
       ).toFixed(2);
+      res.potentialYieldPerHectare =
+        (res.numberPerRoll * res.numberPlantsPerHectare) / 1000;
       acc.push(res);
     }
     return acc;

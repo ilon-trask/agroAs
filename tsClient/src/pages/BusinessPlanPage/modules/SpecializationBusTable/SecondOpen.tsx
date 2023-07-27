@@ -45,8 +45,10 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
   const [cultureId, setCultureId] = useState(
     map.product.find((el) => el.id == res.productId)?.cultureId! || 0
   );
-  console.log(map.product.filter((el) => el.cultureId == cultureId));
   const onClose = () => {};
+  console.log("culture");
+  console.log(map.product);
+
   return (
     <Dialog
       open={open}
@@ -160,10 +162,25 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
                     : map.maps;
                 let carts =
                   cultureId == 0
-                    ? maps
-                    : maps.filter((el) => el.cultureId == cultureId);
+                    ? res.cultivationTechnologyId == 0
+                      ? maps
+                      : maps.filter(
+                          (el) =>
+                            el.cultivationTechnologyId ==
+                            res.cultivationTechnologyId
+                        )
+                    : res.cultivationTechnologyId == 0
+                    ? maps.filter((el) => el.cultureId == cultureId)
+                    : maps.filter(
+                        (el) =>
+                          el.cultivationTechnologyId ==
+                            res.cultivationTechnologyId &&
+                          el.cultureId == cultureId
+                      );
                 return carts.map((el) => (
-                  <option value={el.id}>{el.nameCart}</option>
+                  <option value={el.id}>
+                    {el.nameCart + (el.year ? "-" + el.year : "")}
+                  </option>
                 ));
               })()}
             </Select>
@@ -218,4 +235,4 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
   );
 }
 
-export default React.memo(SecondOpen);
+export default SecondOpen;

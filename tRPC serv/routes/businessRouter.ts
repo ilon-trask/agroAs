@@ -89,11 +89,15 @@ const deleteForBusiness = z.object({
   busId: z.number(),
 });
 export type DeleteForBusiness = z.infer<typeof deleteForBusiness>;
+const getOnePlan = z.object({ busId: z.number() });
+export type GetOnePlan = z.infer<typeof getOnePlan>;
 const businessRouter = router({
-  // getCategory: publicProcedure.query(async () => {
-  //   const res = await BusinessService.getCategory();
-  //   return res;
-  // }),
+  // getOnePlan: publicProcedure
+  //   .input(getOnePlan)
+  //   .query(async ({ ctx, input }) => {
+  //     const res = await BusinessService.getOnePlan(ctx.user, input);
+  //     return res;
+  //   }),
   get: publicProcedure.query(async ({ ctx }) => {
     const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
 

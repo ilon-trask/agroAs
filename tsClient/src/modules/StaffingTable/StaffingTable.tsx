@@ -134,7 +134,7 @@ export function StaffingTableBodyRows({
         <Td colSpan={7}>Адмінісаративний персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
-        const job = enterpriseStore.job.find((e) => e.id == el.jobId);
+        const job = enterpriseStore.job?.find((e) => e.id == el.jobId);
         if (el.class == "Адміністративний")
           return (
             <StaffingTableRow
@@ -176,7 +176,7 @@ export function StaffingTableBodyRows({
         <Td colSpan={7}>Виробничий персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
-        const job = enterpriseStore.job.find((e) => e.id == el.jobId);
+        const job = enterpriseStore.job?.find((e) => e.id == el.jobId);
         if (el.class == "Виробничий")
           return (
             <StaffingTableRow

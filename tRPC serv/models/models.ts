@@ -689,71 +689,62 @@ titlePage.init(
   },
   { sequelize }
 );
-export interface IyieldPlant {
-  id?: number;
-  userId?: string;
-  plantingDensity: number;
-  yieldPerHectare: number;
-  yieldPerRoll: number;
-  timesDow: number;
-  landingPeriod: YieldPlantLandingPeriodType;
-  cultureId?: number;
-  cultivationTechnologyId?: number;
-  productId?: number;
-}
-export class yieldPlant extends Model<IyieldPlant> {
-  declare id?: number;
-  declare userId?: string;
-  declare plantingDensity: number;
-  declare yieldPerHectare: number;
-  declare yieldPerRoll: number;
-  declare timesDow: number;
-  declare landingPeriod: YieldPlantLandingPeriodType;
-  declare cultivationTechnologyId?: number;
-  declare cultureId?: number;
-  declare productId?: number;
-}
-yieldPlant.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    userId: { type: DataTypes.STRING, allowNull: false },
-    plantingDensity: { type: DataTypes.FLOAT },
-    yieldPerHectare: { type: DataTypes.FLOAT },
-    yieldPerRoll: { type: DataTypes.FLOAT },
-    timesDow: { type: DataTypes.INTEGER },
-    landingPeriod: { type: DataTypes.STRING },
-  },
-  { sequelize }
-);
-export interface IyieldCalculation {
-  id?: number;
-  numberFruit: number;
-  fruitWeight: number;
-  numberFlower: number;
-  numberSocket: number;
-  numberPlantsPerHectare: number;
-  yieldPlantId?: number;
-}
-export class yieldCalculation extends Model<IyieldCalculation> {
-  declare id?: number;
-  declare numberFruit: number;
-  declare fruitWeight: number;
-  declare numberFlower: number;
-  declare numberSocket: number;
-  declare numberPlantsPerHectare: number;
-  declare yieldPlantId?: number;
-}
-yieldCalculation.init(
-  {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    numberFruit: { type: DataTypes.FLOAT },
-    fruitWeight: { type: DataTypes.FLOAT },
-    numberSocket: { type: DataTypes.FLOAT },
-    numberFlower: { type: DataTypes.FLOAT },
-    numberPlantsPerHectare: { type: DataTypes.FLOAT },
-  },
-  { sequelize }
-);
+// export interface IyieldPlant {
+//   id?: number;
+//   userId?: string;
+//   timesDow: number;
+//   landingPeriod: YieldPlantLandingPeriodType;
+//   cultureId?: number;
+//   cultivationTechnologyId?: number;
+//   productId?: number;
+// }
+// export class yieldPlant extends Model<IyieldPlant> {
+//   declare id?: number;
+//   declare userId?: string;
+//   declare timesDow: number;
+//   declare landingPeriod: YieldPlantLandingPeriodType;
+//   declare cultivationTechnologyId?: number;
+//   declare cultureId?: number;
+//   declare productId?: number;
+// }
+// yieldPlant.init(
+//   {
+//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+//     userId: { type: DataTypes.STRING, allowNull: false },
+//     timesDow: { type: DataTypes.INTEGER },
+//     landingPeriod: { type: DataTypes.STRING },
+//   },
+//   { sequelize }
+// );
+// export interface IyieldCalculation {
+//   id?: number;
+//   numberFruit: number;
+//   fruitWeight: number;
+//   numberFlower: number;
+//   numberSocket: number;
+//   cultureId?: number;
+//   yieldRoll: number;
+// }
+// export class yieldCalculation extends Model<IyieldCalculation> {
+//   declare id?: number;
+//   declare numberFruit: number;
+//   declare fruitWeight: number;
+//   declare numberFlower: number;
+//   declare numberSocket: number;
+//   declare yieldPlantId?: number;
+//   declare yieldRoll: number;
+// }
+// yieldCalculation.init(
+//   {
+//     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+//     numberFruit: { type: DataTypes.FLOAT },
+//     fruitWeight: { type: DataTypes.FLOAT },
+//     numberSocket: { type: DataTypes.FLOAT },
+//     numberFlower: { type: DataTypes.FLOAT },
+//     yieldRoll: { type: DataTypes.FLOAT },
+//   },
+//   { sequelize }
+// );
 export interface Iculture {
   id?: number;
   name: string;
@@ -877,7 +868,7 @@ export interface Ioutcome {
   date: string;
   group: IoutcomeGroup;
   type: IoutcomeType | null;
-  costMonth: number;
+  costMonth: number | null;
   costYear?: number;
   userId: string;
   isUsing?: boolean;
@@ -885,6 +876,7 @@ export interface Ioutcome {
   buyingMachineId?: number;
   administrationId?: number;
   businessPlanId?: number;
+  isDefault?: boolean;
 }
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
@@ -1238,8 +1230,12 @@ export interface IvegetationYears {
   cultureId?: number;
   cultivationTechnologyId?: number;
   techCartId?: number | null;
-  yieldPlantId?: number | null;
+  businessPlanId?: number | null;
+  numberPlantsPerHectare: number;
+  numberPerRoll: number;
+  potentialYieldPerHectare?: number;
   busProdId?: number | null;
+  busienssPlanId?: number;
 }
 
 export class vegetationYears extends Model<IvegetationYears> {
@@ -1249,6 +1245,8 @@ export class vegetationYears extends Model<IvegetationYears> {
   declare technologyCoeff: number;
   declare seedlingsCoeff: number;
   declare busProdId?: number | null;
+  declare numberPlantsPerHectare: number;
+  declare numberPerRoll: number;
 }
 vegetationYears.init(
   {
@@ -1257,6 +1255,8 @@ vegetationYears.init(
     seedlingsCoeff: { type: DataTypes.FLOAT },
     technologyCoeff: { type: DataTypes.FLOAT },
     year: { type: DataTypes.STRING },
+    numberPlantsPerHectare: { type: DataTypes.FLOAT },
+    numberPerRoll: { type: DataTypes.FLOAT },
   },
 
   { sequelize }
@@ -1405,17 +1405,19 @@ cultivationTechnologies.hasMany(busProd);
 busProd.belongsTo(cultivationTechnologies);
 tech_cart.hasMany(busProd);
 busProd.belongsTo(tech_cart);
+businessPlan.hasMany(vegetationYears);
+vegetationYears.belongsTo(businessPlan);
 busProd.hasMany(vegetationYears);
 vegetationYears.belongsTo(busProd);
 
-yieldPlant.hasOne(yieldCalculation);
-yieldCalculation.belongsTo(yieldPlant);
+// yieldPlant.hasOne(yieldCalculation);
+// yieldCalculation.belongsTo(yieldPlant);
 
-culture.hasOne(yieldPlant);
-yieldPlant.belongsTo(culture);
+// culture.hasOne(yieldPlant);
+// yieldPlant.belongsTo(culture);
 
-product.hasOne(yieldPlant);
-yieldPlant.belongsTo(product);
+// product.hasOne(yieldPlant);
+// yieldPlant.belongsTo(product);
 
 purpose_material.hasMany(cost_material);
 cost_material.belongsTo(purpose_material);
@@ -1469,8 +1471,8 @@ outcome.belongsTo(businessPlan);
 enterprise.hasMany(businessPlan);
 businessPlan.belongsTo(enterprise);
 
-cultivationTechnologies.hasMany(yieldPlant);
-yieldPlant.belongsTo(cultivationTechnologies);
+// cultivationTechnologies.hasMany(yieldPlant);
+// yieldPlant.belongsTo(cultivationTechnologies);
 
 culture.hasMany(tech_cart);
 tech_cart.belongsTo(culture);
@@ -1496,9 +1498,6 @@ vegetationYears.belongsTo(cultivationTechnologies);
 tech_cart.hasMany(vegetationYears);
 vegetationYears.belongsTo(tech_cart);
 
-yieldPlant.hasMany(vegetationYears);
-vegetationYears.belongsTo(yieldPlant);
-
 businessPlan.hasMany(buying_machine);
 buying_machine.belongsTo(businessPlan);
 
@@ -1522,3 +1521,6 @@ financing.belongsTo(culture);
 
 financing.belongsToMany(businessPlan, { through: financBus });
 businessPlan.belongsToMany(financing, { through: financBus });
+
+// culture.hasMany(yieldCalculation);
+// yieldCalculation.belongsTo(culture);

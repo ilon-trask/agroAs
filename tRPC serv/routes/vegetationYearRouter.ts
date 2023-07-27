@@ -1,13 +1,12 @@
 import { publicProcedure, router } from "../trpc";
 import * as z from "zod";
-import JobService from "../controllers/JobService";
 import vegetationYearsService from "../controllers/vegetationYearsService";
 
 const createVegetation = z.object({
   cultivationTechnologyId: z.number(),
   cultureId: z.number(),
-  yieldPlantId: z.number().optional(),
   busProdId: z.number(),
+  businessPlanId: z.number(),
   data: z.array(
     z.object({
       year: z.enum([
@@ -27,6 +26,8 @@ const createVegetation = z.object({
       technologyCoeff: z.number(),
       seedlingsCoeff: z.number(),
       techCartId: z.number().optional(),
+      numberPlantsPerHectare: z.number(),
+      numberPerRoll: z.number(),
     })
   ),
 });

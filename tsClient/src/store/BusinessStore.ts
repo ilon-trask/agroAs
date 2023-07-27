@@ -32,7 +32,9 @@ export default class BusinessStore {
   public set publicBusinessPlan(v: resBusinessPlan[]) {
     this._publicBusinessPlan = v;
   }
-
+  public set newPublicBusinessPlan(v: resBusinessPlan) {
+    this._publicBusinessPlan.push(v);
+  }
   // public get businessCategory(): IbusinessCategory[] {
   // return this._businessCategory;
   // }

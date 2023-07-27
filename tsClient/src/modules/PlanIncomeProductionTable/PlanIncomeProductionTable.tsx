@@ -38,14 +38,14 @@ function Item({
 }) {
   const { income, map } = useContext(Context);
   const myProduct = map.product.find((e) => e.id! == el.productId!);
-  const myYield = income.yieldPlant.find(
-    (e) => e.cultureId! == myProduct?.cultureId!
+
+  const myCart = map.maps.find((e) => e.id! == el.techCartId!);
+  const vegetationYear = income.vegetationYear?.find(
+    (e) => e.techCartId == el.techCartId
   );
-  const myCart = map.maps.find((e) => {
-    return e.id! == el.techCartId!;
-  });
-  const planYield =
-    Math.round(myYield?.yieldPerHectare! * myCart?.area! * 100) / 100;
+  const planYield = (
+    vegetationYear?.potentialYieldPerHectare! * myCart?.area!
+  ).toFixed(2);
   return (
     <Tr key={el.id}>
       {!isPlan && (
@@ -67,7 +67,7 @@ function Item({
         </Td>
       )}
       <Td>{myProduct?.name}</Td>
-      <Td>{myYield?.yieldPerHectare}</Td>
+      <Td>{vegetationYear?.potentialYieldPerHectare}</Td>
       <Td>{myCart?.area}</Td>
       <Td>{planYield}</Td>
       <Td>

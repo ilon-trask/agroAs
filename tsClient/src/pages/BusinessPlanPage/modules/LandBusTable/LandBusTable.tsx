@@ -62,61 +62,62 @@ function LandBusTable({
             {(() => {
               const res = [];
               for (let i = start; i <= end; i++) {
+                const lands = myBusiness.lands.filter(
+                  (el) => getYearFromString(el.date) == i
+                );
                 res.push(
-                  myBusiness.lands
-                    .filter((el) => getYearFromString(el.date) == i)
-                    .map((el) => (
-                      <Tr key={el.id!}>
-                        <Td>
-                          <MyEditIcon
-                            onClick={() => {
-                              setOpen(true);
-                              setData({
-                                area: el.area,
-                                cadastreNumber: el.cadastreNumber,
-                                date: el.date,
-                                name: el.name,
-                                rightOfUse: el.rightOfUse as any,
-                                businessPlanId: el.businessPlanId!,
-                                landId: el.id!,
-                                ownership: el.ownership,
-                                rate: el.rate,
-                              });
-                            }}
-                          />
-                        </Td>
-                        <Td>{i}</Td>
-                        <Td>{el.rightOfUse}</Td>
-                        <Td>{+el.cadastreNumber! || "Не вказано"}</Td>
-                        <Td>{el.area}</Td>
-                        <Td>{el.rate}</Td>
-                        <Td>{el.area * el.rate}</Td>
-                        <Td>{el.ownership}</Td>
-                        <Td>
-                          <Button size={"sm"}>Додати</Button>
-                        </Td>
-                        <Td>
-                          <MyDeleteIcon
-                            onClick={() =>
-                              setDeleteData({
-                                func: () => {
-                                  setDeleteData((prev) => ({
-                                    ...prev,
-                                    isOpen: false,
-                                  }));
-                                  deleteLandForBusiness(business, {
-                                    busId: myBusiness.id!,
-                                    id: el.id!,
-                                  });
-                                },
-                                isOpen: true,
-                                text: "земельну ділянку",
-                              })
-                            }
-                          />
-                        </Td>
-                      </Tr>
-                    ))
+                  lands.map((el) => (
+                    <Tr key={el.id!}>
+                      <Td>
+                        <MyEditIcon
+                          onClick={() => {
+                            setOpen(true);
+                            setData({
+                              area: el.area,
+                              cadastreNumber: el.cadastreNumber,
+                              date: el.date,
+                              name: el.name,
+                              rightOfUse: el.rightOfUse as any,
+                              businessPlanId: el.businessPlanId!,
+                              landId: el.id!,
+                              ownership: el.ownership,
+                              rate: el.rate,
+                            });
+                          }}
+                        />
+                      </Td>
+                      <Td>{i}</Td>
+                      <Td>{el.rightOfUse}</Td>
+                      <Td>{+el.cadastreNumber! || "Не вказано"}</Td>
+                      <Td>{el.area}</Td>
+                      <Td>{el.rate}</Td>
+                      <Td>{el.area * el.rate}</Td>
+                      <Td>{el.ownership}</Td>
+                      <Td>
+                        <Button size={"sm"}>Додати</Button>
+                      </Td>
+                      <Td>
+                        <MyDeleteIcon
+                          onClick={() =>
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                }));
+                                deleteLandForBusiness(business, {
+                                  busId: myBusiness.id!,
+                                  id: el.id!,
+                                });
+                              },
+                              isOpen: true,
+                              text: "земельну ділянку",
+                            })
+                          }
+                        />
+                      </Td>
+                    </Tr>
+                  ))
                 );
                 res.push(
                   <Tr key={i} fontWeight={"bold"}>
@@ -138,6 +139,11 @@ function LandBusTable({
                       />
                     </Td>
                     <Td>{i}</Td>
+                    <Td>Разом:</Td>
+                    <Td></Td>
+                    <Td>{lands.reduce((p, c) => p + c.area, 0)}</Td>
+                    <Td></Td>
+                    <Td>{lands.reduce((p, c) => p + c.area * c.rate, 0)}</Td>
                   </Tr>
                 );
               }

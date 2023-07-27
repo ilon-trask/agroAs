@@ -12,7 +12,7 @@ import {
   getTEJ,
   getVegetationYear,
   getWorker,
-  getYieldPlants,
+  // getYieldPlants,
   getPublicBusiness,
 } from "../../http/requests";
 import useBusiness from "../../shared/hook/useBusiness";
@@ -55,11 +55,13 @@ export function getMonthAmountFromBusinessPlan(
 }
 function BiznesPlanPage() {
   console.time("all");
-  const { map, enterpriseStore, business, income, TEJ } = useContext(Context);
+  const { map, enterpriseStore, business, income, TEJ, user } =
+    useContext(Context);
+  const { id } = useParams();
   useBusiness(business, map);
   useEnterprise();
   useEffect(() => {
-    getYieldPlants(income);
+    // getOnePlan(business, +id!);
     getVegetationYear(income);
     getWorker(enterpriseStore);
     getJob(enterpriseStore);
@@ -69,12 +71,12 @@ function BiznesPlanPage() {
     getTEJ(TEJ);
     getPublicBusiness(map, business);
   }, []);
-  const { id } = useParams();
   const myBusiness =
     business.businessPlan.find((el) => el.id == id) ||
     business.publicBusinessPlan.find((el) => el.id == id);
   console.log("myBusiness");
   console.log(myBusiness);
+  console.log(enterpriseStore.job);
   myBusiness?.busProds.forEach((el) => {
     if (el.tech_cart) el.tech_cart.area = el.area;
   });
@@ -120,21 +122,39 @@ function BiznesPlanPage() {
         Повернутиcя
       </Button>
       <MyHeading>Бізнес-план {myBusiness.name}</MyHeading>
-      <GeneralBusTable myBusiness={myBusiness} />
-      <EnterpriseBusTable myBusiness={myBusiness} />
-      <LandBusTable myBusiness={myBusiness} start={start} end={end} />
-      <SpecializationBusTable myBusiness={myBusiness} end={end} start={start} />
-      <MainFinancingBusTable myBusiness={myBusiness} end={end} start={start} />
-      <BuyingMachineBusTable myBusiness={myBusiness} end={end} start={start} />
-      <BuildingBusTable myBusiness={myBusiness} end={end} start={start} />
-      <MSHPBusTable myBusiness={myBusiness} end={end} start={start} />
-      <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
-      <PlanYieldBusTable myBusiness={myBusiness} end={end} start={start} />
-      <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
-      <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
-        <Button>Отримати PDF</Button>
-        <QuizButton myBusiness={myBusiness} />
-      </Box>
+      {user.role != "" ? (
+        <>
+          <GeneralBusTable myBusiness={myBusiness} />
+          <EnterpriseBusTable myBusiness={myBusiness} />
+          <LandBusTable myBusiness={myBusiness} start={start} end={end} />
+          <SpecializationBusTable
+            myBusiness={myBusiness}
+            end={end}
+            start={start}
+          />
+          <MainFinancingBusTable
+            myBusiness={myBusiness}
+            end={end}
+            start={start}
+          />
+          <BuyingMachineBusTable
+            myBusiness={myBusiness}
+            end={end}
+            start={start}
+          />
+          <BuildingBusTable myBusiness={myBusiness} end={end} start={start} />
+          <MSHPBusTable myBusiness={myBusiness} end={end} start={start} />
+          <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
+          <PlanYieldBusTable myBusiness={myBusiness} end={end} start={start} />
+          <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
+        </>
+      ) : null}
+      {user.role != "" ? (
+        <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
+          <Button>Отримати PDF</Button>
+          <QuizButton myBusiness={myBusiness} />
+        </Box>
+      ) : null}
       <Box
         maxW={"1000px"}
         mx="auto"

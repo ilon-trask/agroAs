@@ -1,4 +1,4 @@
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "src/main";
@@ -20,12 +20,11 @@ function PlanYieldBusTable({
   const { income } = useContext(Context);
   return (
     <>
-      <MyHeading>Планування урожайності (Потенційної)</MyHeading>
+      <MyHeading>Планування урожайності</MyHeading>
       <MyTableContainer>
         <Table size={"sm"}>
           <Thead>
             <Tr>
-              <Th></Th>
               <Th>Рік</Th>
               <Th>Культура</Th>
               <Th>Продукти</Th>
@@ -36,15 +35,16 @@ function PlanYieldBusTable({
               </Th>
               <Th>
                 Урожайність
-                <br /> з гектару
-              </Th>
-              <Th>
-                Урожайність
                 <br /> з рослини
               </Th>
               <Th>
-                Строк <br />
-                посадки
+                Урожайність
+                <br /> з гектару
+              </Th>
+              <Th>
+                Планова
+                <br />
+                урожайність
               </Th>
               <Th>Налаштування</Th>
               <Th></Th>
@@ -58,12 +58,14 @@ function PlanYieldBusTable({
                   myBusiness?.busProds
                     .filter((el) => el.year == i - start)
                     .map((el) => {
-                      const myYield = income.yieldPlant.find(
-                        (e) => e.productId == el.productId
+                      const vegetationYear = myBusiness.vegetationYears.find(
+                        (e) => e.techCartId == el.techCartId!
                       );
+                      console.log("vegetationYear");
+                      console.log(vegetationYear);
+
                       return (
                         <Tr key={el.id}>
-                          <Td></Td>
                           <Td>{i}</Td>
                           <Td>
                             <Link
@@ -80,9 +82,19 @@ function PlanYieldBusTable({
                           </Td>
                           <Td>{el.product?.name}</Td>
                           <Td>{el.cultivationTechnology?.name}</Td>
-                          <Td>{myYield?.plantingDensity}</Td>
-                          <Td>{myYield?.yieldPerHectare}</Td>
-                          <Td>{myYield?.yieldPerRoll}</Td>
+                          <Td>{vegetationYear?.numberPlantsPerHectare}</Td>
+                          <Td>{vegetationYear?.numberPerRoll}</Td>
+                          <Td>{vegetationYear?.potentialYieldPerHectare}</Td>
+                          <Td>
+                            {(
+                              (vegetationYear?.potentialYieldPerHectare || 0) *
+                              (vegetationYear?.allCoeff || 0) *
+                              el.area
+                            ).toFixed(2)}
+                          </Td>
+                          <Td>
+                            <Button size="sm">Додати</Button>
+                          </Td>
                         </Tr>
                       );
                     })

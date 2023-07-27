@@ -4,12 +4,14 @@ import {
   Table,
   Tbody,
   Td,
+  Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import CreateGroupCart from "src/modules/CreateGroupCart";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyViewIcon from "src/ui/Icons/MyViewIcon";
@@ -43,6 +45,7 @@ function Enterprise() {
     form: "",
     taxGroup: "",
   });
+  const [openGroup, setOpenGroup] = useState(false);
   const { enterpriseStore, map, user } = useContext(Context);
   useEffect(() => {
     if (!enterpriseStore.enterprise[0]) getEnterprise(enterpriseStore);
@@ -144,6 +147,24 @@ function Enterprise() {
         update={cartUpdate}
         isCul={true}
       />
+      <MyHeading>Групи карт</MyHeading>
+      <MyTableContainer>
+        <Table size="sm">
+          <Thead>
+            <Tr>
+              <Th>Технологія</Th>
+              <Th>Назва</Th>
+              <Th>Площа</Th>
+              <Th>Густота</Th>
+              <Th>Культура</Th>
+              <Th>Продукт</Th>
+              <Th>Потенційна урожайність</Th>
+            </Tr>
+          </Thead>
+        </Table>
+      </MyTableContainer>
+      <Button onClick={() => setOpenGroup(true)}>Створити групу</Button>
+      {/* <CreateGroupCart open={openGroup} setOpen={setOpenGroup} /> */}
     </Container>
   );
 }

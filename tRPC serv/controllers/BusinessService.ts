@@ -25,12 +25,12 @@ import {
   Ibuilding,
   Ioutcome,
   outcome,
-  IyieldPlant,
-  yieldPlant,
   worker,
   Iworker,
   land,
   Iland,
+  vegetationYears,
+  IvegetationYears,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -43,6 +43,7 @@ import {
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
+  GetOnePlan,
   PatchBusinessPlan,
   PatchBusProd,
   PatchFinancingForBusiness,
@@ -76,7 +77,6 @@ export interface resBusProd {
   year: number | null;
   price: number | null;
   tech_cart: resTechCartsWithOpers | null;
-  yield: IyieldPlant | null;
 }
 export interface resFinancing extends Ifinancing {
   costBP?: number;
@@ -94,6 +94,7 @@ export interface resBusinessPlan extends IbusinessPlan {
   outcomes: Ioutcome[];
   workers: Iworker[];
   lands: Iland[];
+  vegetationYears: IvegetationYears[];
 }
 const includes = [
   { model: resume },
@@ -116,13 +117,38 @@ const includes = [
   },
   { model: buying_machine },
   { model: building },
-  { model: outcome },
+  // { model: vegetationYears },
   { model: worker },
   { model: land },
 ];
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
+  plans = await Promise.all(
+    plans.map(async (plan) => {
+      plan.busProds = await Promise.all(
+        plan.busProds.map(async (prod) => {
+          return {
+            ...prod,
+            tech_cart: (await changeCarts([prod.tech_cart]))[0],
+          };
+        })
+      );
+      plan.outcomes = JSON.parse(
+        JSON.stringify(
+          await outcome.findAll({
+            where: { businessPlanId: plan.id! },
+          })
+        )
+      );
+      plan.vegetationYears = JSON.parse(
+        JSON.stringify(
+          await vegetationYears.findAll({ where: { businessPlanId: plan.id! } })
+        )
+      );
 
+      return plan;
+    })
+  );
   plans = plans.map((plan) => {
     plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП");
     if (!plan.MSHP) plan.MSHP = [];
@@ -192,12 +218,11 @@ async function changeFinancing(plans: resBusinessPlan[]) {
             outcomes.push({
               ...el,
               costYear:
-                el.costMonth *
+                (el.costMonth || 0) *
                 (i == start ? 13 - +plan.dateStart.split("-")[1] : 12),
             });
           });
         outcomes.push({
-          //@ts-ignore
           costMonth: null,
           type: "Операційні",
           userId: "",
@@ -216,9 +241,9 @@ async function changeFinancing(plans: resBusinessPlan[]) {
                 c.amount;
               return p + yearSalary;
             }, 0),
+          isDefault: true,
         });
         outcomes.push({
-          //@ts-ignore
           costMonth: null,
           type: "Операційні",
           userId: "",
@@ -237,9 +262,9 @@ async function changeFinancing(plans: resBusinessPlan[]) {
                 c.amount;
               return p + (yearSalary * 0.015 + yearSalary * 0.22);
             }, 0),
+          isDefault: true,
         });
         outcomes.push({
-          //@ts-ignore
           costMonth: null,
           type: "Операційні",
           userId: "",
@@ -258,9 +283,9 @@ async function changeFinancing(plans: resBusinessPlan[]) {
                 c.amount;
               return p + yearSalary;
             }, 0),
+          isDefault: true,
         });
         outcomes.push({
-          //@ts-ignore
           costMonth: null,
           type: "Операційні",
           userId: "",
@@ -279,42 +304,53 @@ async function changeFinancing(plans: resBusinessPlan[]) {
                 c.amount;
               return p + (yearSalary * 0.015 + yearSalary * 0.22);
             }, 0),
+          isDefault: true,
+        });
+        const lands = plan.lands.filter((el) => +el.date.split("-")[0] == i);
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Оренда землі",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: lands
+            .filter((el) => el.rightOfUse == "Оренда")
+            .reduce((p, c) => p + c.area * c.rate, 0),
+          isDefault: true,
+        });
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Земельний податок",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: lands
+            .filter((el) => el.rightOfUse == "Власна")
+            .reduce((p, c) => p + c.area * c.rate, 0),
+          isDefault: true,
         });
       }
       return outcomes;
     })();
     return plan;
   });
-  plans = await Promise.all(
-    plans.map(async (el) => {
-      el.busProds = await Promise.all(
-        el.busProds.map(async (prod) => {
-          return {
-            ...prod,
-            tech_cart: (await changeCarts([prod.tech_cart]))[0],
-            yield: await yieldPlant.findOne({
-              where: {
-                cultureId: prod.product?.cultureId,
-                cultivationTechnologyId: prod.cultivationTechnologyId,
-                userId: el.userId,
-              },
-            }),
-          };
-        })
-      );
-      return el;
-    })
-  );
+
   return plans;
 }
 export async function getBusinessPlan(businessPlanId: number) {
+  console.time("include");
   //@ts-ignore
   let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
     where: { id: businessPlanId },
     //@ts-ignore
     include: includes,
   });
+  console.timeEnd("include");
+  console.time("res");
   res = (await changeFinancing([res!]))[0];
+  console.timeEnd("res");
   return res;
 }
 class BusinessService {
@@ -324,26 +360,29 @@ class BusinessService {
   // }
   async get(user: Principal | undefined) {
     if (user) {
+      console.time("include2");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
-        where: { userId: user.sub },
-        //@ts-ignore
+        where: { userId: user.sub }, //@ts-ignore
         include: includes,
       });
+      console.timeEnd("include2");
       return await changeFinancing(plans);
-
       return plans;
     } else {
+      console.time("get");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
-        //@ts-ignore
-        include: includes,
       });
-      plans = await changeFinancing(plans);
+      console.timeEnd("get");
+      return await changeFinancing(plans);
       return plans;
     }
   }
+  // async getOnePlan(user: Principal | undefined, data: GetOnePlan) {
+  //   return await getBusinessPlan(data.busId);
+  // }
   async create(user: Principal | undefined, data: CreateBusinessPlan) {
     if (!user) return;
 

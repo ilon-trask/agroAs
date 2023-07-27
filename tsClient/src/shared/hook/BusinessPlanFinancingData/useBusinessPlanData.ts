@@ -2,7 +2,6 @@ import getYearFromString from "src/shared/funcs/getYearFromString";
 import IncomeStore from "src/store/IncomeStore";
 import { resBusinessPlan } from "../../../../../tRPC serv/controllers/BusinessService";
 import { Iworker } from "../../../../../tRPC serv/models/models";
-import useVegetationYears from "../useVegetationYears";
 
 class BusinessPlanData {
   variables(
@@ -79,28 +78,16 @@ class BusinessPlanData {
     return myBusiness?.busProds
       .filter((el) => el.year == i - start)
       ?.reduce((p, c) => {
-        const vegetation = income.vegetationYear?.find(
-          (e) => e.busProdId == c.id && e.techCartId == c.techCartId
+        const vegetationYear = myBusiness.vegetationYears?.find(
+          (e) => e.techCartId == c.techCartId
         );
-        const myYield = income.yieldPlant.find(
-          (e) => e.productId == c.productId
-        );
-        const sum =
-          Math.round(
-            myYield?.yieldPerHectare! *
-              c.area *
-              (vegetation?.allCoeff! || 1) *
-              100
-          ) / 100;
-        // return p + sum * c.price! * 1000;
-        // return p + sum * c.price!;
         return +(
           p +
             +(
               +(
                 c.area *
-                  myYield?.yieldPerHectare! *
-                  (vegetation?.allCoeff || 1) || 0
+                  vegetationYear?.potentialYieldPerHectare! *
+                  (vegetationYear?.allCoeff || 1) || 0
               ).toFixed(2) * (c.price || 0)
             ) || 0
         ).toFixed(2);

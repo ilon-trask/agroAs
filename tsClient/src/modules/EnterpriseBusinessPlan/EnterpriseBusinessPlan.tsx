@@ -37,7 +37,13 @@ function EnterpriseBusinessPlan({
   let sum = 0;
   const salaryExpensesData = [];
   const wageAnalysisData = [];
-  const groundSectionData = [];
+  const groundSectionData: {
+    paymentType: string;
+    cadastreNumber: number | null;
+    area: number;
+    rate: number;
+    ownership: string;
+  }[] = [];
   const areasUsageData = [];
 
   (() => {
@@ -138,10 +144,28 @@ function EnterpriseBusinessPlan({
           Math.round(vSalaryYear * 0.235) +
           vSalaryYear,
       });
+      const rentLand = myBusiness.lands.filter(
+        (el) => +el.date.split("-")[0] == i && el.rightOfUse == "Оренда"
+      );
+      const ownLand = myBusiness.lands.filter(
+        (el) => +el.date.split("-")[0] == i && el.rightOfUse == "Власна"
+      );
       groundSectionData.push(
-        { paymentType: i },
-        { paymentType: "Оренда Землі" },
-        { paymentType: "Податок" }
+        ...rentLand.map((el) => ({
+          paymentType: "Оренда землі",
+          cadastreNumber: el.cadastreNumber,
+          area: el.area,
+          rate: el.rate,
+          ownership: el.ownership,
+        })),
+        ...ownLand.map((el) => ({
+          paymentType: "Земельний податок",
+          cadastreNumber: el.cadastreNumber,
+          area: el.area,
+          rate: el.rate,
+          ownership: el.ownership,
+        })), //@ts-ignore
+        { paymentType: i + "" }
       );
       areasUsageData.push({
         year: i,
@@ -160,19 +184,6 @@ function EnterpriseBusinessPlan({
           .reduce((p, c) => p + c.area, 0),
       });
     }
-    areasUsageData.push({
-      bold: true,
-      year: "По БП",
-      ...[...cultureSet].reduce((acc, el) => {
-        //@ts-ignore
-        acc[el] = myBusiness?.busProds.reduce(
-          (p, c) => (el == c.product?.culture?.name ? p + c.area : p),
-          0
-        );
-        return acc;
-      }, {}),
-      area: myBusiness?.busProds.reduce((p, c) => p + c.area, 0),
-    });
   })();
 
   const salaryExpensesColumns = useMemo<ColumnDef<any>[]>(() => {
@@ -213,23 +224,34 @@ function EnterpriseBusinessPlan({
       },
     ];
   }, []);
-  const groundSectionColumns = useMemo<ColumnDef<any>[]>(() => {
+  const groundSectionColumns = useMemo<
+    ColumnDef<{
+      paymentType: string;
+      cadastreNumber: number | null;
+      area: number;
+      rate: number;
+      ownership: string;
+    }>[]
+  >(() => {
     return [
       {
         header: "ВИД ОПЛАТИ",
         accessorKey: "paymentType",
       },
-      { header: "КАДАСТРОВИЙ НОМЕР" },
-      { header: "ПЛОЩА" },
-      { header: "СТАВКА" },
-      { header: "ПЛАТА ЗА ЗЕМЛЮ" },
-      { header: "ВЛАСНІСТЬ" },
+      { header: "КАДАСТРОВИЙ НОМЕР", accessorKey: "cadastreNumber" },
+      { header: "ПЛОЩА", accessorKey: "area" },
+      { header: "СТАВКА", accessorKey: "rate" },
+      {
+        header: "ПЛАТА ЗА ЗЕМЛЮ",
+        accessorFn: (row) => row.area * row.rate || "",
+      },
+      { header: "ВЛАСНІСТЬ", accessorKey: "ownership" },
     ];
   }, []);
   const areasUsageColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
       {
-        header: "Вегетація",
+        header: "Рік",
         accessorKey: "year",
       },
       {
@@ -237,7 +259,7 @@ function EnterpriseBusinessPlan({
         header: () => <Text textAlign={"center"}>Площа під культурою</Text>,
         columns: [...cultureSet].map((el) => ({ header: el, accessorKey: el })),
       },
-      { header: "Загальна площа", accessorKey: "area" },
+      { header: "Загальна площа під культурами", accessorKey: "area" },
     ];
   }, []);
   return (

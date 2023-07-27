@@ -1,6 +1,6 @@
 import { publicProcedure, router } from "../trpc";
 import z from "zod";
-import incomeService, { resYieldPlant } from "../controllers/incomeService";
+import incomeService from "../controllers/incomeService";
 import { Iculture } from "../models/models";
 const createYieldCalc = z.object({
   numberFruit: z.number(),
@@ -66,60 +66,60 @@ export const incomeRouter = router({
     const cultures: Iculture[] | undefined = await incomeService.getCultural();
     return cultures;
   }),
-
-  getYieldPlant: publicProcedure.query(async ({ ctx }) => {
-    const res: resYieldPlant[] | undefined = await incomeService.getYieldPlant(
-      ctx.user
-    );
-    return res;
-  }),
-  getOneYieldPlant: publicProcedure
-    .input(z.object({ plantId: z.number() }))
-    .query(async ({ input }) => {
-      const res: resYieldPlant = await incomeService.getOneYieldPlant(
-        input.plantId
-      );
-      return res;
-    }),
-  createYieldPlant: publicProcedure
-    .input(createYieldPlant)
-    .query(async ({ input, ctx }) => {
-      const yieldPlant: resYieldPlant | undefined =
-        await incomeService.createYieldPlant(input, ctx.user);
-      return yieldPlant;
-    }),
-  createCalc: publicProcedure
-    .input(createYieldCalc)
-    .query(async ({ input, ctx }) => {
-      const yieldCalc: resYieldPlant | undefined =
-        await incomeService.createCalc(input, ctx.user);
-      if (yieldCalc) return yieldCalc;
-    }),
-  updateCalc: publicProcedure
-    .input(createYieldCalc)
-    .query(async ({ input, ctx }) => {
-      const res: resYieldPlant | null | undefined =
-        await incomeService.updateCalc(input, ctx.user);
-      return res;
-    }),
-  deleteYieldPlant: publicProcedure
-    .input(z.object({ yieldPlantId: z.number() }))
-    .query(async ({ input, ctx }) => {
-      const res = await incomeService.deleteYieldPlant(input, ctx.user);
-      return res;
-    }),
-  updateYieldPlant: publicProcedure
-    .input(updateYieldPlant)
-    .query(async ({ input, ctx }) => {
-      const res: resYieldPlant | null | undefined =
-        await incomeService.updateYieldPlant(input, ctx.user);
-      return res;
-    }),
-
   getProduct: publicProcedure.query(async ({ ctx }) => {
-    const res = incomeService.getProduct(ctx.user);
+    const res = await incomeService.getProduct(ctx.user);
     return res;
   }),
+
+  // getYieldPlant: publicProcedure.query(async ({ ctx }) => {
+  //   const res: resYieldPlant[] | undefined = await incomeService.getYieldPlant(
+  //     ctx.user
+  //   );
+  //   return res;
+  // }),
+  // getOneYieldPlant: publicProcedure
+  //   .input(z.object({ plantId: z.number() }))
+  //   .query(async ({ input }) => {
+  //     const res: resYieldPlant = await incomeService.getOneYieldPlant(
+  //       input.plantId
+  //     );
+  //     return res;
+  //   }),
+  // createYieldPlant: publicProcedure
+  //   .input(createYieldPlant)
+  //   .query(async ({ input, ctx }) => {
+  //     const yieldPlant: resYieldPlant | undefined =
+  //       await incomeService.createYieldPlant(input, ctx.user);
+  //     return yieldPlant;
+  //   }),
+  // createCalc: publicProcedure
+  //   .input(createYieldCalc)
+  //   .query(async ({ input, ctx }) => {
+  //     const yieldCalc: resYieldPlant | undefined =
+  //       await incomeService.createCalc(input, ctx.user);
+  //     if (yieldCalc) return yieldCalc;
+  //   }),
+  // updateCalc: publicProcedure
+  //   .input(createYieldCalc)
+  //   .query(async ({ input, ctx }) => {
+  //     const res: resYieldPlant | null | undefined =
+  //       await incomeService.updateCalc(input, ctx.user);
+  //     return res;
+  //   }),
+  // deleteYieldPlant: publicProcedure
+  //   .input(z.object({ yieldPlantId: z.number() }))
+  //   .query(async ({ input, ctx }) => {
+  //     const res = await incomeService.deleteYieldPlant(input, ctx.user);
+  //     return res;
+  //   }),
+  // updateYieldPlant: publicProcedure
+  //   .input(updateYieldPlant)
+  //   .query(async ({ input, ctx }) => {
+  //     const res: resYieldPlant | null | undefined =
+  //       await incomeService.updateYieldPlant(input, ctx.user);
+  //     return res;
+  //   }),
+
   createProduct: publicProcedure
     .input(createProduct)
     .query(({ ctx, input }) => {

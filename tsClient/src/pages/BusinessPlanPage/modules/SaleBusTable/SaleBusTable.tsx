@@ -51,18 +51,14 @@ function SaleBusTable({
 
                 res.push(
                   busProds.map((el) => {
-                    const vegetation = income.vegetationYear?.find(
-                      (e) =>
-                        e.busProdId == el.id && e.techCartId == el.techCartId
-                    );
-                    const myYield = income.yieldPlant.find(
-                      (e) => e.productId == el.productId
+                    const vegetationYear = myBusiness.vegetationYears?.find(
+                      (e) => e.techCartId == el.techCartId
                     );
                     const amount =
                       +(
-                        el.area *
-                        myYield?.yieldPerHectare! *
-                        (vegetation?.allCoeff || 1)
+                        (vegetationYear?.potentialYieldPerHectare || 0) *
+                        (vegetationYear?.allCoeff || 0) *
+                        el.area
                       ).toFixed(2) || 0;
                     return (
                       <Tr key={el.id}>
@@ -74,7 +70,7 @@ function SaleBusTable({
                             }}
                           />
                         </Td>
-                        <Td>{el.year}</Td>
+                        <Td>{i}</Td>
                         <Td>{el.product?.name}</Td>
                         <Td>{amount}</Td>
                         <Td>{el.price || 0}</Td>
@@ -95,23 +91,16 @@ function SaleBusTable({
                     <Td></Td>
                     <Td>
                       {busProds.reduce((p, c) => {
-                        const vegetation = income.vegetationYear?.find(
-                          (e) =>
-                            e.busProdId == c.id && e.techCartId == c.techCartId
+                        const vegetationYear = myBusiness.vegetationYears?.find(
+                          (e) => e.techCartId == c.techCartId
                         );
-                        const myYield = income.yieldPlant.find(
-                          (e) => e.productId == c.productId
-                        );
-                        return +(
-                          p +
-                            +(
-                              +(
-                                c.area *
-                                  myYield?.yieldPerHectare! *
-                                  (vegetation?.allCoeff || 1) || 0
-                              ).toFixed(2) * (c.price || 0)
-                            ) || 0
-                        ).toFixed(2);
+                        const amount =
+                          +(
+                            (vegetationYear?.potentialYieldPerHectare || 0) *
+                            (vegetationYear?.allCoeff || 0) *
+                            c.area
+                          ).toFixed(2) || 0;
+                        return +(p + +(amount * (c.price || 0)).toFixed(2));
                       }, 0) || 0}
                     </Td>
                     <Td></Td>
@@ -126,23 +115,16 @@ function SaleBusTable({
                   <Td></Td>
                   <Td>
                     {myBusiness.busProds.reduce((p, c) => {
-                      const vegetation = income.vegetationYear?.find(
-                        (e) =>
-                          e.busProdId == c.id && e.techCartId == c.techCartId
+                      const vegetationYear = myBusiness.vegetationYears?.find(
+                        (e) => e.techCartId == c.techCartId
                       );
-                      const myYield = income.yieldPlant.find(
-                        (e) => e.productId == c.productId
-                      );
-                      return +(
-                        p +
-                          +(
-                            +(
-                              c.area *
-                                myYield?.yieldPerHectare! *
-                                (vegetation?.allCoeff || 1) || 0
-                            ).toFixed(2) * (c.price || 0)
-                          ) || 0
-                      ).toFixed(2);
+                      const amount =
+                        +(
+                          (vegetationYear?.potentialYieldPerHectare || 0) *
+                          (vegetationYear?.allCoeff || 0) *
+                          c.area
+                        ).toFixed(2) || 0;
+                      return +p + +(amount * (c.price || 0)).toFixed(2);
                     }, 0) || 0}
                   </Td>
                 </Tr>

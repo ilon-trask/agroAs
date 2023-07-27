@@ -1,6 +1,6 @@
 import { Box, Button, Heading, Input, ModalFooter } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
-import { createYieldCalc, updateYieldCalc } from "../../../http/requests";
+// import { createYieldCalc, updateYieldCalc } from "../../../http/requests";
 import { Context } from "../../../main";
 import { yieldCalcProp } from "../CreateYieldCalc";
 
@@ -15,7 +15,7 @@ type props = {
 function YieldCalc({ res, setRes, setOpen, id, update }: props) {
   const { income } = useContext(Context);
   console.log(res);
-  const myPlant = income.yieldPlant.find((el) => el.id == id);
+  // const myPlant = income.yieldPlant.find((el) => el.id == id);
   //@ts-ignore
   const myHeads = plantsHeads[myPlant?.culture.name];
   return (
@@ -114,25 +114,25 @@ function YieldCalc({ res, setRes, setOpen, id, update }: props) {
             !res.fruitWeight
           }
           onClick={() => {
-            if (!update) {
-              createYieldCalc(income, {
-                fruitWeight: +res.fruitWeight,
-                numberFlower: +res.numberFlower,
-                numberFruit: +res.numberFruit,
-                numberPlantsPerHectare: +res.numberPlantsPerHectare,
-                numberSocket: +res.numberSocket,
-                yieldPlantId: id,
-              });
-            } else {
-              updateYieldCalc(income, {
-                fruitWeight: +res.fruitWeight,
-                numberFlower: +res.numberFlower,
-                numberFruit: +res.numberFruit,
-                numberPlantsPerHectare: +res.numberPlantsPerHectare,
-                numberSocket: +res.numberSocket,
-                yieldPlantId: id,
-              });
-            }
+            // if (!update) {
+            //   createYieldCalc(income, {
+            //     fruitWeight: +res.fruitWeight,
+            //     numberFlower: +res.numberFlower,
+            //     numberFruit: +res.numberFruit,
+            //     numberPlantsPerHectare: +res.numberPlantsPerHectare,
+            //     numberSocket: +res.numberSocket,
+            //     yieldPlantId: id,
+            //   });
+            // } else {
+            //   updateYieldCalc(income, {
+            //     fruitWeight: +res.fruitWeight,
+            //     numberFlower: +res.numberFlower,
+            //     numberFruit: +res.numberFruit,
+            //     numberPlantsPerHectare: +res.numberPlantsPerHectare,
+            //     numberSocket: +res.numberSocket,
+            //     yieldPlantId: id,
+            //   });
+            // }
             setOpen(false);
           }}
         >
