@@ -404,7 +404,8 @@ class BusinessService {
     } else {
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
-        where: { isPublic: true, isAgree: true },
+        where: { isPublic: true, isAgree: true }, //@ts-ignore
+        include: includes,
       });
       return await changeFinancing(plans);
       return plans;

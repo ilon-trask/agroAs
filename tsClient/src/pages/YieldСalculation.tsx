@@ -78,9 +78,16 @@ interface IvegetationRes {
 function YieldСalculation() {
   const { busId, busProdId } = useParams();
   const { income, map, business } = useContext(Context);
-  const busProd = business.businessPlan
-    .find((el) => el.id == busId)
-    ?.busProds.find((el) => el.id == +busProdId!);
+  const busProd =
+    business.businessPlan
+      .find((el) => el.id == busId)
+      ?.busProds.find((el) => el.id == +busProdId!) ||
+    business.publicBusinessPlan
+      .find((el) => el.id == busId)
+      ?.busProds.find((el) => el.id == +busProdId!);
+  console.log(business.businessPlan);
+  console.log(business.publicBusinessPlan);
+  console.log(busProd);
 
   useEffect(() => {
     getVegetationYear(income);
