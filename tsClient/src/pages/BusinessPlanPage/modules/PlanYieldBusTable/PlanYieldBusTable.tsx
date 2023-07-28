@@ -38,13 +38,12 @@ function PlanYieldBusTable({
                 <br /> з рослини
               </Th>
               <Th>
-                Урожайність
-                <br /> з гектару
+                Потенційна <br />
+                урожайність 1(га)
               </Th>
               <Th>
-                Планова
-                <br />
-                урожайність
+                Узагальнюючий
+                <br /> коефіцієнт
               </Th>
               <Th>Налаштування</Th>
               <Th></Th>
@@ -83,13 +82,7 @@ function PlanYieldBusTable({
                           <Td>{vegetationYear?.numberPlantsPerHectare}</Td>
                           <Td>{vegetationYear?.numberPerRoll}</Td>
                           <Td>{vegetationYear?.potentialYieldPerHectare}</Td>
-                          <Td>
-                            {(
-                              (vegetationYear?.potentialYieldPerHectare || 0) *
-                              (vegetationYear?.allCoeff || 0) *
-                              el.area
-                            ).toFixed(2)}
-                          </Td>
+                          <Td>{vegetationYear?.allCoeff}</Td>
                           <Td>
                             <Button size="sm">Додати</Button>
                           </Td>
