@@ -25,27 +25,23 @@ class vegetationYearService {
     await vegetationYears.destroy({
       where: { busProdId: data.busProdId },
     });
-    const acc: IvegetationYears[] = [];
-    for (let i = 0; i < data.data.length; i++) {
-      const el = data.data[i];
 
-      let res: IvegetationYears = await vegetationYears.create({
-        cultureId: data.cultureId,
-        cultivationTechnologyId: data.cultivationTechnologyId,
-        ...el,
-        busProdId: data.busProdId,
-      });
-      res = JSON.parse(JSON.stringify(res));
-      res.allCoeff = +(
-        res.seedlingsCoeff *
-        res.technologyCoeff *
-        res.vegetationCoeff
-      ).toFixed(2);
-      res.potentialYieldPerHectare =
-        (res.numberPerRoll * res.numberPlantsPerHectare) / 1000;
-      acc.push(res);
-    }
-    return acc;
+    let res: IvegetationYears = await vegetationYears.create({
+      ...data,
+      cultureId: data.cultureId,
+      cultivationTechnologyId: data.cultivationTechnologyId,
+      busProdId: data.busProdId,
+    });
+    res = JSON.parse(JSON.stringify(res));
+    res.allCoeff = +(
+      res.seedlingsCoeff *
+      res.technologyCoeff *
+      res.vegetationCoeff
+    ).toFixed(2);
+    res.potentialYieldPerHectare =
+      (res.numberPerRoll * res.numberPlantsPerHectare) / 1000;
+
+    return res;
   }
 }
 export default new vegetationYearService();

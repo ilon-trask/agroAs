@@ -168,21 +168,21 @@ function ProductionBusinessPlan({
     });
     plannedStructureData.push(
       ...busProds.map((el) => {
-        const vegetationYear = myBusiness.vegetationYears?.find(
-          (e) => e.techCartId == el.techCartId
-        );
+        const vegetationYear = el.vegetationYear;
         return {
           year: i,
           culture: el.product?.culture?.name,
           product: el.product?.name,
           density: vegetationYear?.numberPlantsPerHectare,
-          yieldHectare:
+          yieldHectare: (
             (vegetationYear?.potentialYieldPerHectare || 0) *
-            (vegetationYear?.allCoeff || 0),
-          yield:
+            (vegetationYear?.allCoeff || 0)
+          ).toFixed(2),
+          yield: (
             (vegetationYear?.potentialYieldPerHectare || 0) *
             (vegetationYear?.allCoeff || 0) *
-            el.area,
+            el.area
+          ).toFixed(2),
         };
       })
     );
@@ -1209,9 +1209,7 @@ function ProductionBusinessPlan({
               );
               res.push(
                 ...busProds.map((el) => {
-                  const vegetationYear = myBusiness.vegetationYears?.find(
-                    (e) => e.techCartId == el.techCartId
-                  );
+                  const vegetationYear = el.vegetationYear;
                   const amount =
                     +(
                       (vegetationYear?.potentialYieldPerHectare || 0) *
@@ -1282,9 +1280,7 @@ function ProductionBusinessPlan({
 
                 res.push(
                   ...busProds?.map((el) => {
-                    const vegetationYear = myBusiness.vegetationYears?.find(
-                      (e) => e.techCartId == el.techCartId
-                    );
+                    const vegetationYear = el.vegetationYear;
                     const sum =
                       +(
                         el.area *
@@ -1369,9 +1365,7 @@ function ProductionBusinessPlan({
                 );
                 data.push(
                   ...busProd.map((el) => {
-                    const vegetationYear = myBusiness.vegetationYears?.find(
-                      (e) => e.techCartId == el.techCartId
-                    );
+                    const vegetationYear = el.vegetationYear;
                     const amount =
                       +(
                         el.area *

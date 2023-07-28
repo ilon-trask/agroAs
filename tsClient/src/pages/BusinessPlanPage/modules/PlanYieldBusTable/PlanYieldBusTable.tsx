@@ -58,9 +58,7 @@ function PlanYieldBusTable({
                   myBusiness?.busProds
                     .filter((el) => el.year == i - start)
                     .map((el) => {
-                      const vegetationYear = myBusiness.vegetationYears.find(
-                        (e) => e.techCartId == el.techCartId!
-                      );
+                      const vegetationYear = el.vegetationYear;
                       console.log("vegetationYear");
                       console.log(vegetationYear);
 

@@ -1,11 +1,9 @@
 import {
   Button,
-  Checkbox,
   Container,
   Editable,
   EditableInput,
   EditablePreview,
-  Heading,
   Table,
   Tbody,
   Td,
@@ -13,16 +11,13 @@ import {
   Th,
   Thead,
   Tr,
-  useEditable,
 } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 // import { IyieldCalculation } from "../../../tRPC serv/models/models";
-import useVegetationYears, {
-  VegetationYearsType,
-} from "../shared/hook/useVegetationYears";
+import { VegetationYearsType } from "../shared/hook/useVegetationYears";
 import {
   createVegetationYear,
   getBusinessPlans,
@@ -54,16 +49,13 @@ export const plantsHeads: Record<string, string[]> = {
 };
 interface IvegetationRes {
   id?: number;
-  data: {
-    year: VegetationYearsType;
-    vegetationCoeff: number | "";
-    technologyCoeff: number | "";
-    seedlingsCoeff: number | "";
-    numberPlantsPerHectare: number | "";
-    numberPerRoll: number | "";
-    techCartId: number | null;
-  }[];
-  techCartId?: number;
+  year: VegetationYearsType | undefined;
+  vegetationCoeff: number | string;
+  technologyCoeff: number | string;
+  seedlingsCoeff: number | string;
+  numberPlantsPerHectare: number | string;
+  numberPerRoll: number | string;
+  techCartId: number | null | undefined;
   yieldPlantId?: number;
 }
 // function convertToCSV(data: IyieldCalculation[]) {
@@ -89,61 +81,17 @@ function YieldСalculation() {
   const busProd = business.businessPlan
     .find((el) => el.id == busId)
     ?.busProds.find((el) => el.id == +busProdId!);
-  console.log(income.vegetationYear);
 
-  const [open, setOpen] = useState(false);
   useEffect(() => {
     getVegetationYear(income);
     getBusinessPlans(map, business);
   }, []);
-
-  const vegetationYear = income.vegetationYear.filter(
-    (el) => el.busProdId == busProd?.id
-  );
-  const [res, setRes] = useState<IvegetationRes>({
-    //@ts-ignore
-    data: income.vegetationYear.filter((el) => el.busProdId == busProd?.id),
-  });
-  console.log(vegetationYear);
+  //@ts-ignore
+  const [value, setValue] = useState<IvegetationRes>(busProd?.vegetationYear!);
   useEffect(() => {
     //@ts-ignore
-    setRes({ data: vegetationYear });
-  }, [JSON.stringify(vegetationYear)]);
-
-  function isChecked(name: string) {
-    let akk: boolean = false;
-    res.data.forEach((el) => {
-      if (el.year == name) {
-        akk = true;
-      }
-    });
-    return akk;
-  }
-  function changeCoeff(
-    event: string,
-    coeff:
-      | "vegetationCoeff"
-      | "technologyCoeff"
-      | "seedlingsCoeff"
-      | "numberPerRoll"
-      | "numberPlantsPerHectare",
-    name: string
-  ) {
-    setRes((prev) => ({
-      ...prev,
-      data: prev.data.map((e) => {
-        if (e.year == name) {
-          e[coeff] = event as any;
-        }
-        return e;
-      }),
-    }));
-  }
-  const carts = map.businessCarts.filter(
-    (el) =>
-      el.cultureId == busProd?.product?.cultureId &&
-      el.cultivationTechnologyId == busProd?.cultivationTechnologyId
-  );
+    setValue(busProd?.vegetationYear);
+  }, [JSON.stringify(busProd?.vegetationYear)]);
   return (
     <Container maxW="container.lg" mt={"30px"}>
       <Link to={BUSINESSpLAN_ROUTER + "/" + busProd?.businessPlanId}>
@@ -155,46 +103,6 @@ function YieldСalculation() {
         Технологія: "{busProd?.cultivationTechnology?.name}"
       </MyHeading>
       <MyHeading>Продукт:"{busProd?.product?.name}"</MyHeading>
-      {/* <Table size={"sm"} mt={5}>
-        <Thead>
-          <Tr>
-            <Th>Культура</Th>
-            <Th>Густота (шт/га)</Th>
-            <Th>Урожайність 1га (т)</Th>
-            <Th>Урожайність куща (кг)</Th>
-            {
-              //@ts-ignore
-              plantsHeads[busProd?.product?.culture.name]?.map((el) => (
-                <Th key={el}>{el}</Th>
-              ))
-            }
-            <Th>Коефіцієнт</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>{myYield?.culture.name}</Td>
-            <Td>{myCalc?.numberPlantsPerHectare || 0}</Td>
-            <Td>{myYield?.yieldPerHectare || 0}</Td>
-            <Td>{myYield?.yieldPerRoll || 0}</Td>
-            <Td>{myCalc?.numberSocket || 0}</Td>
-            <Td>{myCalc?.numberFlower || 0}</Td>
-            <Td>{myCalc?.numberFruit || 0}</Td>
-            <Td>{myCalc?.fruitWeight || 0}</Td>
-            <Td>{}</Td>
-          </Tr>
-        </Tbody>
-      </Table>
-
-      <Button
-        mt={"15px"}
-        ml={"30px"}
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        Внести/редагувати дані
-      </Button> */}
       {/* <Button onClick={() => downloadCSV([myCalc!])}>csv</Button> */}
       {/* <CreateYieldCalc
         open={open}
@@ -202,6 +110,7 @@ function YieldСalculation() {
         id={myYield?.id!}
         myCalc={myCalc}
       /> */}
+
       <Table size={"sm"}>
         <Thead>
           <Tr>
@@ -209,7 +118,6 @@ function YieldСalculation() {
               Назва
               <br /> карти
             </Th>
-            <Th></Th>
             <Th>Рік вегетації</Th>
             <Th>
               Коефіцієнт
@@ -233,163 +141,149 @@ function YieldСalculation() {
             </Th>
             <Th>Урожайність куща</Th>
             <Th>
-              Потенційна <br /> урожайність (т)
+              Потенційна <br /> урожайність (
+              {busProd?.product?.unitMeasure == "шт" ? "шт" : "т"})
             </Th>
           </Tr>
         </Thead>
         <Tbody>
-          {useVegetationYears.map((el) => {
-            const checked: boolean = isChecked(el.name);
-            const value = res.data.find((e) => e.year == el.name);
-            const cart = carts.find((e) => e.year == el.name);
-            return (
-              <Tr>
-                <Th>{cart?.nameCart}</Th>
-                <Th>
-                  <Checkbox
-                    isChecked={checked}
-                    onChange={() => {
-                      if (checked) {
-                        setRes((prev) => ({
-                          ...prev,
-                          data: prev.data.filter((e) => e.year != el.name),
-                        }));
-                      } else {
-                        setRes((prev) => ({
-                          ...prev,
-                          data: [
-                            ...prev.data,
-                            {
-                              year: el.name,
-                              seedlingsCoeff: 0,
-                              technologyCoeff: 0,
-                              vegetationCoeff: 0,
-                              numberPerRoll: 0,
-                              numberPlantsPerHectare: 0,
-                              techCartId: cart?.id!,
-                            },
-                          ],
-                        }));
-                      }
-                    }}
-                  />
-                </Th>
-                <Th>{el.name}</Th>
-                <Th>
-                  <Editable
-                    value={(value?.vegetationCoeff ?? "") + ""}
-                    onChange={(e) => changeCoeff(e, "vegetationCoeff", el.name)}
-                  >
-                    <EditablePreview h={"15px"} w={"50px"} />
-                    <EditableInput
-                      type={"number"}
-                      maxW={"fit-content"}
-                      h={"15px"}
-                      w={"50px"}
-                      borderRadius={3}
-                    />
-                  </Editable>
-                </Th>
-                <Th>
-                  <Editable
-                    value={(value?.technologyCoeff ?? "") + ""}
-                    onChange={(e) => changeCoeff(e, "technologyCoeff", el.name)}
-                  >
-                    <EditablePreview h={"15px"} w={"50px"} />
-                    <EditableInput
-                      type={"number"}
-                      maxW={"fit-content"}
-                      h={"15px"}
-                      w={"50px"}
-                      borderRadius={3}
-                    />
-                  </Editable>
-                </Th>
-                <Th>
-                  <Editable
-                    value={(value?.seedlingsCoeff ?? "") + ""}
-                    onChange={(e) => changeCoeff(e, "seedlingsCoeff", el.name)}
-                  >
-                    <EditablePreview h={"15px"} w={"50px"} />
-                    <EditableInput
-                      type={"number"}
-                      maxW={"fit-content"}
-                      h={"15px"}
-                      w={"50px"}
-                      borderRadius={3}
-                    />
-                  </Editable>
-                </Th>
-                <Th>
-                  <Text>
-                    {checked &&
-                      Math.round(
-                        +value?.seedlingsCoeff! *
-                          +value?.technologyCoeff! *
-                          +value?.vegetationCoeff! *
-                          100
-                      ) / 100}
-                  </Text>
-                </Th>
-                <Th>
-                  <Editable
-                    value={(value?.numberPlantsPerHectare ?? "") + ""}
-                    onChange={(e) =>
-                      changeCoeff(e, "numberPlantsPerHectare", el.name)
-                    }
-                  >
-                    <EditablePreview h={"15px"} w={"50px"} />
-                    <EditableInput
-                      type={"number"}
-                      maxW={"fit-content"}
-                      h={"15px"}
-                      w={"50px"}
-                      borderRadius={3}
-                    />
-                  </Editable>
-                </Th>
-                <Th>
-                  <Editable
-                    value={(value?.numberPerRoll ?? "") + ""}
-                    onChange={(e) => changeCoeff(e, "numberPerRoll", el.name)}
-                  >
-                    <EditablePreview h={"15px"} w={"50px"} />
-                    <EditableInput
-                      type={"number"}
-                      maxW={"fit-content"}
-                      h={"15px"}
-                      w={"50px"}
-                      borderRadius={3}
-                    />
-                  </Editable>
-                </Th>
-                <Th>
-                  {((value?.numberPerRoll || 0) *
-                    (value?.numberPlantsPerHectare || 0)) /
-                    1000}
-                </Th>
-              </Tr>
-            );
-          })}
+          <Tr>
+            <Td>{busProd?.tech_cart?.nameCart}</Td>
+            <Td>{busProd?.tech_cart?.year}</Td>
+            <Td>
+              <Editable
+                value={(value?.vegetationCoeff ?? "") + ""}
+                onChange={(e) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    vegetationCoeff: e,
+                  }))
+                }
+              >
+                <EditablePreview h={"15px"} w={"50px"} />
+                <EditableInput
+                  type={"number"}
+                  maxW={"fit-content"}
+                  h={"15px"}
+                  w={"50px"}
+                  borderRadius={3}
+                />
+              </Editable>
+            </Td>
+            <Td>
+              <Editable
+                value={(value?.technologyCoeff ?? "") + ""}
+                onChange={(e) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    technologyCoeff: e,
+                  }))
+                }
+              >
+                <EditablePreview h={"15px"} w={"50px"} />
+                <EditableInput
+                  type={"number"}
+                  maxW={"fit-content"}
+                  h={"15px"}
+                  w={"50px"}
+                  borderRadius={3}
+                />
+              </Editable>
+            </Td>
+            <Td>
+              <Editable
+                value={(value?.seedlingsCoeff ?? "") + ""}
+                onChange={(e) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    seedlingsCoeff: e,
+                  }))
+                }
+              >
+                <EditablePreview h={"15px"} w={"50px"} />
+                <EditableInput
+                  type={"number"}
+                  maxW={"fit-content"}
+                  h={"15px"}
+                  w={"50px"}
+                  borderRadius={3}
+                />
+              </Editable>
+            </Td>
+            <Td>
+              <Text>
+                {+(
+                  +value?.seedlingsCoeff! *
+                  +value?.technologyCoeff! *
+                  +value?.vegetationCoeff!
+                ).toFixed(2) || ""}
+              </Text>
+            </Td>
+            <Td>
+              <Editable
+                value={(value?.numberPlantsPerHectare ?? "") + ""}
+                onChange={(e) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    numberPlantsPerHectare: e,
+                  }))
+                }
+              >
+                <EditablePreview h={"15px"} w={"50px"} />
+                <EditableInput
+                  type={"number"}
+                  maxW={"fit-content"}
+                  h={"15px"}
+                  w={"50px"}
+                  borderRadius={3}
+                />
+              </Editable>
+            </Td>
+            <Td>
+              <Editable
+                value={(value?.numberPerRoll ?? "") + ""}
+                onChange={(e) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    numberPerRoll: e,
+                  }))
+                }
+              >
+                <EditablePreview h={"15px"} w={"50px"} />
+                <EditableInput
+                  type={"number"}
+                  maxW={"fit-content"}
+                  h={"15px"}
+                  w={"50px"}
+                  borderRadius={3}
+                />
+              </Editable>
+            </Td>
+            <Td>
+              {busProd?.product?.unitMeasure == "шт"
+                ? (+value?.numberPerRoll || 0) *
+                  +(value?.numberPlantsPerHectare || 0)
+                : (+(value?.numberPerRoll || 0) *
+                    +(value?.numberPlantsPerHectare || 0)) /
+                  1000}
+            </Td>
+          </Tr>
         </Tbody>
       </Table>
       <Button
         onClick={() => {
-          createVegetationYear(income, {
+          createVegetationYear(business, {
             cultivationTechnologyId: busProd?.cultivationTechnologyId!,
             cultureId: busProd?.product?.cultureId!,
             businessPlanId: +busId!,
             busProdId: busProd?.id!,
-            data: res.data.map((el) => ({
-              ...el,
-              techCartId: el?.techCartId!,
-              seedlingsCoeff: +el.seedlingsCoeff,
-              technologyCoeff: +el.technologyCoeff,
-              vegetationCoeff: +el.vegetationCoeff,
-              year: el.year,
-              numberPerRoll: +el.numberPerRoll,
-              numberPlantsPerHectare: +el.numberPlantsPerHectare,
-            })),
+            techCartId: busProd?.techCartId!,
+            seedlingsCoeff: +value.seedlingsCoeff,
+            technologyCoeff: +value.technologyCoeff,
+            vegetationCoeff: +value.vegetationCoeff,
+            year: busProd?.tech_cart?.year!,
+            numberPerRoll: +value.numberPerRoll,
+            numberPlantsPerHectare: +value.numberPlantsPerHectare,
           });
         }}
       >
