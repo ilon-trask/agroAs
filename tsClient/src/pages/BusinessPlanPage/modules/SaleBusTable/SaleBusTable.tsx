@@ -51,9 +51,7 @@ function SaleBusTable({
 
                 res.push(
                   busProds.map((el) => {
-                    const vegetationYear = myBusiness.vegetationYears?.find(
-                      (e) => e.techCartId == el.techCartId
-                    );
+                    const vegetationYear = el.vegetationYear;
                     const amount =
                       +(
                         (vegetationYear?.potentialYieldPerHectare || 0) *
@@ -91,9 +89,7 @@ function SaleBusTable({
                     <Td></Td>
                     <Td>
                       {busProds.reduce((p, c) => {
-                        const vegetationYear = myBusiness.vegetationYears?.find(
-                          (e) => e.techCartId == c.techCartId
-                        );
+                        const vegetationYear = c.vegetationYear;
                         const amount =
                           +(
                             (vegetationYear?.potentialYieldPerHectare || 0) *
@@ -115,9 +111,7 @@ function SaleBusTable({
                   <Td></Td>
                   <Td>
                     {myBusiness.busProds.reduce((p, c) => {
-                      const vegetationYear = myBusiness.vegetationYears?.find(
-                        (e) => e.techCartId == c.techCartId
-                      );
+                      const vegetationYear = c.vegetationYear;
                       const amount =
                         +(
                           (vegetationYear?.potentialYieldPerHectare || 0) *

@@ -185,9 +185,7 @@ function AdditionBusinessPlan({
 
           grossHarvest: busProds
             .map((el) => {
-              const vegetationYear = myBusiness.vegetationYears?.find(
-                (e) => e.techCartId == el.techCartId
-              );
+              const vegetationYear = el.vegetationYear;
               return (
                 Math.round(
                   vegetationYear?.potentialYieldPerHectare! *
@@ -203,9 +201,7 @@ function AdditionBusinessPlan({
 
           revenue: busProds
             .map((el) => {
-              const vegetationYear = myBusiness.vegetationYears?.find(
-                (e) => e.techCartId == el.techCartId
-              );
+              const vegetationYear = el.vegetationYear;
               let res =
                 Math.round(
                   vegetationYear?.potentialYieldPerHectare! *
@@ -560,9 +556,7 @@ function AdditionBusinessPlan({
           myBusiness?.busProds?.forEach((el) => {
             const yearName = useVegetationYears[i - start + 1].name;
 
-            const vegetationYear = myBusiness.vegetationYears?.find(
-              (e) => e.techCartId == el.techCartId
-            );
+            const vegetationYear = el.vegetationYear;
             const sum =
               Math.round(
                 (vegetationYear?.potentialYieldPerHectare! *

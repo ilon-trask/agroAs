@@ -5,6 +5,7 @@ import { Itech_cart } from "../models/models";
 import TechCartService, {
   resTechCartsWithOpers,
 } from "../controllers/TechCartService";
+import { vegetationYearEnum } from "./vegetationYearRouter";
 const createCartProps = z.object({
   nameCart: z.string(),
   area: z.number(),
@@ -15,21 +16,7 @@ const createCartProps = z.object({
   sectionId: z.number().optional(),
   cultureId: z.number().optional(),
   cultivationTechnologyId: z.number().optional(),
-  year: z
-    .enum([
-      "0рік весна",
-      "0рік осінь",
-      "1рік",
-      "2рік ",
-      "3рік",
-      "4рік",
-      "5рік",
-      "6рік",
-      "7рік",
-      "8рік",
-      "Наступні",
-    ])
-    .optional(),
+  year: vegetationYearEnum.optional(),
   isBasic: z.boolean().nullable(),
 });
 export type CreateCartType = z.infer<typeof createCartProps>;
@@ -79,21 +66,7 @@ export const cartRouter = router({
         sectionId: z.number().optional().nullable(),
         cultureId: z.number().optional(),
         cultivationTechnologyId: z.number().optional(),
-        year: z
-          .enum([
-            "0рік весна",
-            "0рік осінь",
-            "1рік",
-            "2рік ",
-            "3рік",
-            "4рік",
-            "5рік",
-            "6рік",
-            "7рік",
-            "8рік",
-            "Наступні",
-          ])
-          .optional(),
+        year: vegetationYearEnum.optional(),
         tech_operations: z
           .array(
             z.object({

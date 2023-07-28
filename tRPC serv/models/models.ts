@@ -905,9 +905,7 @@ outcome.init(
 export interface Iproduct {
   id?: number;
   name: string;
-  price: number;
-  cost: number;
-  unitMeasure: string;
+  unitMeasure: "кг" | "шт" | null;
   collectPeriod: string;
   userId: string;
   cultureId?: number;
@@ -915,9 +913,7 @@ export interface Iproduct {
 export class product extends Model<Iproduct> {
   declare id?: number;
   declare name: string;
-  declare price: number;
-  declare cost: number;
-  declare unitMeasure: string;
+  declare unitMeasure: "кг" | "шт" | null;
   declare collectPeriod: string;
   declare userId: string;
   declare cultureId?: number;
@@ -926,8 +922,6 @@ product.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING },
-    price: { type: DataTypes.FLOAT },
-    cost: { type: DataTypes.FLOAT },
     unitMeasure: { type: DataTypes.STRING },
     collectPeriod: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
@@ -1222,7 +1216,7 @@ worker.init(
 
 export interface IvegetationYears {
   id?: number;
-  year: VegetationYearsType;
+  year: VegetationYearsType | undefined;
   vegetationCoeff: number;
   technologyCoeff: number;
   seedlingsCoeff: number;
@@ -1230,12 +1224,11 @@ export interface IvegetationYears {
   cultureId?: number;
   cultivationTechnologyId?: number;
   techCartId?: number | null;
-  businessPlanId?: number | null;
   numberPlantsPerHectare: number;
   numberPerRoll: number;
   potentialYieldPerHectare?: number;
   busProdId?: number | null;
-  busienssPlanId?: number;
+  businessPlanId?: number;
 }
 
 export class vegetationYears extends Model<IvegetationYears> {
@@ -1407,8 +1400,8 @@ tech_cart.hasMany(busProd);
 busProd.belongsTo(tech_cart);
 businessPlan.hasMany(vegetationYears);
 vegetationYears.belongsTo(businessPlan);
-busProd.hasMany(vegetationYears);
-vegetationYears.belongsTo(busProd);
+busProd.hasOne(vegetationYears);
+vegetationYears.belongsTo(busProd, { onDelete: "CASCADE" });
 
 // yieldPlant.hasOne(yieldCalculation);
 // yieldCalculation.belongsTo(yieldPlant);

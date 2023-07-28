@@ -77,6 +77,7 @@ export interface resBusProd {
   year: number | null;
   price: number | null;
   tech_cart: resTechCartsWithOpers | null;
+  vegetationYear: IvegetationYears | null;
 }
 export interface resFinancing extends Ifinancing {
   costBP?: number;
@@ -94,7 +95,7 @@ export interface resBusinessPlan extends IbusinessPlan {
   outcomes: Ioutcome[];
   workers: Iworker[];
   lands: Iland[];
-  vegetationYears: IvegetationYears[];
+  // vegetationYears: IvegetationYears[];
 }
 const includes = [
   { model: resume },
@@ -113,11 +114,11 @@ const includes = [
         },
       },
       { model: cultivationTechnologies },
+      // { model: vegetationYears },
     ],
   },
   { model: buying_machine },
   { model: building },
-  // { model: vegetationYears },
   { model: worker },
   { model: land },
 ];
@@ -127,9 +128,33 @@ async function changeFinancing(plans: resBusinessPlan[]) {
     plans.map(async (plan) => {
       plan.busProds = await Promise.all(
         plan.busProds.map(async (prod) => {
+          const vegetation: IvegetationYears | null = JSON.parse(
+            JSON.stringify(
+              await vegetationYears.findOne({
+                where: { busProdId: prod.id! },
+              })
+            )
+          );
           return {
             ...prod,
             tech_cart: (await changeCarts([prod.tech_cart]))[0],
+            vegetationYear: vegetation
+              ? {
+                  ...vegetation,
+                  allCoeff: +(
+                    vegetation?.seedlingsCoeff *
+                    vegetation?.technologyCoeff *
+                    vegetation?.vegetationCoeff
+                  ).toFixed(2),
+                  potentialYieldPerHectare:
+                    prod.product?.unitMeasure == "шт"
+                      ? vegetation.numberPerRoll *
+                        vegetation.numberPlantsPerHectare
+                      : (vegetation?.numberPerRoll *
+                          vegetation?.numberPlantsPerHectare) /
+                        1000,
+                }
+              : null,
           };
         })
       );
@@ -140,25 +165,25 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           })
         )
       );
-      let vegeAcc = JSON.parse(
-        JSON.stringify(
-          await vegetationYears.findAll({
-            where: { businessPlanId: plan.id! },
-          })
-        )
-      );
-      plan.vegetationYears = (() => {
-        return vegeAcc.map((el: IvegetationYears) => ({
-          ...el,
-          allCoeff: +(
-            el.seedlingsCoeff *
-            el.technologyCoeff *
-            el.vegetationCoeff
-          ).toFixed(2),
-          potentialYieldPerHectare:
-            (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
-        }));
-      })();
+      // let vegeAcc = JSON.parse(
+      //   JSON.stringify(
+      //     await vegetationYears.findAll({
+      //       where: { businessPlanId: plan.id! },
+      //     })
+      //   )
+      // );
+      // plan.vegetationYears = (() => {
+      //   return vegeAcc.map((el: IvegetationYears) => ({
+      //     ...el,
+      //     allCoeff: +(
+      //       el.seedlingsCoeff *
+      //       el.technologyCoeff *
+      //       el.vegetationCoeff
+      //     ).toFixed(2),
+      //     potentialYieldPerHectare:
+      //       (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
+      //   }));
+      // })();
       return plan;
     })
   );
@@ -353,17 +378,13 @@ async function changeFinancing(plans: resBusinessPlan[]) {
   return plans;
 }
 export async function getBusinessPlan(businessPlanId: number) {
-  console.time("include");
   //@ts-ignore
   let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
     where: { id: businessPlanId },
     //@ts-ignore
     include: includes,
   });
-  console.timeEnd("include");
-  console.time("res");
   res = (await changeFinancing([res!]))[0];
-  console.timeEnd("res");
   return res;
 }
 class BusinessService {
@@ -373,22 +394,18 @@ class BusinessService {
   // }
   async get(user: Principal | undefined) {
     if (user) {
-      console.time("include2");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { userId: user.sub }, //@ts-ignore
         include: includes,
       });
-      console.timeEnd("include2");
       return await changeFinancing(plans);
       return plans;
     } else {
-      console.time("get");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true },
       });
-      console.timeEnd("get");
       return await changeFinancing(plans);
       return plans;
     }

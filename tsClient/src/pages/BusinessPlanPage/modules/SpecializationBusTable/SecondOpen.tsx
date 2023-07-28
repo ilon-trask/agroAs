@@ -201,6 +201,12 @@ function SecondOpen({ open, setOpen, data, setData }: props) {
       </Box>
       <ModalFooter>
         <Button
+          isDisabled={
+            !res.techCartId ||
+            !res.area ||
+            !res.cultivationTechnologyId ||
+            !res.productId
+          }
           onClick={() => {
             setOpen(false);
             if (res.ownId) {

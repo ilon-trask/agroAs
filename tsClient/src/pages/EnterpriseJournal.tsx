@@ -147,23 +147,6 @@ function Enterprise() {
         update={cartUpdate}
         isCul={true}
       />
-      <MyHeading>Групи карт</MyHeading>
-      <MyTableContainer>
-        <Table size="sm">
-          <Thead>
-            <Tr>
-              <Th>Технологія</Th>
-              <Th>Назва</Th>
-              <Th>Площа</Th>
-              <Th>Густота</Th>
-              <Th>Культура</Th>
-              <Th>Продукт</Th>
-              <Th>Потенційна урожайність</Th>
-            </Tr>
-          </Thead>
-        </Table>
-      </MyTableContainer>
-      <Button onClick={() => setOpenGroup(true)}>Створити групу</Button>
       {/* <CreateGroupCart open={openGroup} setOpen={setOpenGroup} /> */}
     </Container>
   );

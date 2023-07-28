@@ -103,7 +103,6 @@ function SpecializationBusTable({
                       cultivationTechnologyId: 0,
                       productId: 0,
                       techCartId: 0,
-
                       year: original.year - start,
                     });
                   }}

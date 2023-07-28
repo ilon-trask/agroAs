@@ -233,9 +233,7 @@ function FinancingBusinessPlan({
             const saleValue = myBusiness.busProds
               .filter((el) => el.year == i - start)
               .reduce((p, c) => {
-                const vegetationYear = myBusiness.vegetationYears?.find(
-                  (e) => e.techCartId == c.techCartId
-                );
+                const vegetationYear = c.vegetationYear;
                 const amount =
                   +(
                     c.area *

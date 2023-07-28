@@ -19,14 +19,12 @@ import {
   getProduction,
   getAdministration,
   getCartForBusiness,
-  // getYieldPlants,
   getCultureTEJMap,
   getProductTEJMap,
 } from "./http/requests";
 
 import { supabase } from "./http/requests";
 import { Box, ChakraProvider } from "@chakra-ui/react";
-
 import { theme } from "./theme";
 import { IUserRole } from "../../tRPC serv";
 import { observer } from "mobx-react-lite";

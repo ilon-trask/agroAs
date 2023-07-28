@@ -25,7 +25,6 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
-  DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
   PatchBusinessPlan,
@@ -60,7 +59,6 @@ import {
   CreateAdministration,
   PatchAdministration,
 } from "../../../tRPC serv/routes/administrationRouter";
-import { makeObservable } from "mobx";
 import EnterpriseStore from "../store/EnterpriseStore";
 import {
   CreateEnterpriseType,
@@ -88,12 +86,7 @@ import {
   CreateFinancingType,
   PatchFinancingType,
 } from "../../../tRPC serv/routes/financingRouter";
-import {
-  CreateProductType,
-  createYieldCalcType,
-  CreateYieldPlantType,
-  UpdateYieldPlantType,
-} from "../../../tRPC serv/routes/incomeRouter";
+import { CreateProductType } from "../../../tRPC serv/routes/incomeRouter";
 
 let user = new User();
 export const supabase = createClient(
@@ -104,7 +97,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
+      url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1314,15 +1307,26 @@ export function saleSetIsPlan(
 
 export function getVegetationYear(income: IncomeStore) {
   client.vegetation.get.query().then((res) => {
+    //@ts-ignore
     income.vegetationYear = res;
   });
 }
 export function createVegetationYear(
-  income: IncomeStore,
+  bus: BusinessStore,
   data: CreateVegetationType
 ) {
   client.vegetation.create.query(data).then((res) => {
-    income.vegetationYear = res;
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    bus.businessPlan = bus.businessPlan.filter(
+      (el) => el.id != res.businessPlanId
+    );
+    const busProd = business?.busProds.find((el) => el.id == res.busProdId);
+    if (!busProd) return;
+    //@ts-ignore
+    busProd.vegetationYear = res;
+    bus.newBusinessPlan = business;
+    // income.vegetationYear = res;
   });
 }
 
