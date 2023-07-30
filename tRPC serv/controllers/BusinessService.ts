@@ -147,7 +147,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
   plans = await Promise.all(
     plans.map(async (plan) => {
       // console.time("test" + plan.id);
-      console.log("test" + plan.id, new Date());
+      // console.log("test" + plan.id, new Date());
       [
         plan.buildings,
         plan.buying_machines,
