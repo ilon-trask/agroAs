@@ -217,4 +217,4 @@ function SpecializationBusTable({
   );
 }
 
-export default SpecializationBusTable;
+export default React.memo(SpecializationBusTable);

@@ -177,4 +177,4 @@ function BuildingBusTable({
   );
 }
 
-export default BuildingBusTable;
+export default React.memo(BuildingBusTable);

@@ -184,4 +184,4 @@ function MSHPBusTable({
   );
 }
 
-export default MSHPBusTable;
+export default React.memo(MSHPBusTable);

@@ -135,4 +135,4 @@ function SaleBusTable({
   );
 }
 
-export default SaleBusTable;
+export default React.memo(SaleBusTable);

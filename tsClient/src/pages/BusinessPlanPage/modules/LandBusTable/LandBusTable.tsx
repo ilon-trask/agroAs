@@ -165,4 +165,4 @@ function LandBusTable({
   );
 }
 
-export default LandBusTable;
+export default React.memo(LandBusTable);

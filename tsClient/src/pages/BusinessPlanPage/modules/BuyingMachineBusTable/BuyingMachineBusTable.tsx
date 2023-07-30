@@ -158,4 +158,4 @@ function BuyingMachineBusTable({
   );
 }
 
-export default observer(BuyingMachineBusTable);
+export default React.memo(BuyingMachineBusTable);

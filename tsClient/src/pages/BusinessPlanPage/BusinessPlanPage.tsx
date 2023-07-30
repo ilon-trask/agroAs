@@ -115,7 +115,7 @@ function BiznesPlanPage() {
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
   console.timeEnd("all");
-
+  const busId = myBusiness.id;
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Button onClick={() => navigate("/")} mt={"15px"}>

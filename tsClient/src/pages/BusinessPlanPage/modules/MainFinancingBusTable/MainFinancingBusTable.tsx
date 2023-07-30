@@ -28,4 +28,4 @@ function MainFinancingBusTable({
   );
 }
 
-export default MainFinancingBusTable;
+export default React.memo(MainFinancingBusTable);

@@ -43,7 +43,6 @@ import {
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
-  GetOnePlan,
   PatchBusinessPlan,
   PatchBusProd,
   PatchFinancingForBusiness,
@@ -61,6 +60,7 @@ import {
   changeCarts,
   resTechCartsWithOpers,
 } from "./TechCartService";
+import { changeVegetationYear } from "./vegetationYearsService";
 import { changeWorkerRes } from "./workerService";
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
@@ -136,20 +136,7 @@ const ForBusProd = async (busProds: resBusProd[]) => {
         ...prod,
         tech_cart: (await changeCarts([prod.tech_cart]))[0],
         vegetationYear: vegetation
-          ? {
-              ...vegetation,
-              allCoeff: +(
-                vegetation?.seedlingsCoeff *
-                vegetation?.technologyCoeff *
-                vegetation?.vegetationCoeff
-              ).toFixed(2),
-              potentialYieldPerHectare:
-                prod.product?.unitMeasure == "шт"
-                  ? vegetation.numberPerRoll * vegetation.numberPlantsPerHectare
-                  : (vegetation?.numberPerRoll *
-                      vegetation?.numberPlantsPerHectare) /
-                    1000,
-            }
+          ? changeVegetationYear(vegetation, prod.product!)
           : null,
       };
     })
@@ -571,38 +558,9 @@ class BusinessService {
   async deleteBusProd(user: Principal | undefined, data: DeleteBusProd) {
     if (!user) return;
     await busProd.destroy({ where: { id: data.id } });
-    return await getBusinessPlan(data.busId);
+    return data;
   }
-  //   async changeProducts(user: Principal | undefined, data: ChangeProductType) {
-  //     if (!user) return;
-  //     await busProd.destroy({ where: { businessPlanId: data.busId } });
-  //     for (let i = 0; i < data.productIds.length; i++) {
-  //       const el = data.productIds[i];
-  //       //@ts-ignore
-  //       for (let j = 0; j < el.tech.length; j++) {
-  //         const e = el.tech[j];
-  //         const last = await busProd.findOne({
-  //           order: [["id", "DESC"]],
-  //         });
-  //         await busProd.create({
-  //           id: last?.id! + 1,
-  //           businessPlanId: data?.busId,
-  //           productId: el.productId,
-  //           cultivationTechnologyId: e.cultivationTechnologyId,
-  //           area: +e.area,
-  //           year: el.year,
-  //         });
-  //       }
-  //     }
-  //     //@ts-ignore
-  //     let res: resBusinessPlan = await businessPlan.findOne({
-  //       where: { id: data.busId },
-  //       //@ts-ignore
-  //       include: includes,
-  //     });
-  //     res = changeFinancing([res])[0];
-  //     return res;
-  //   }
+
   async createFinancingForBusiness(
     user: Principal | undefined,
     data: CreateFinancingForBusiness
@@ -645,6 +603,9 @@ class BusinessService {
       },
       { where: { id: data.financingId } }
     );
+    let res: Ifinancing | null = await financing.findOne({
+      where: { id: data.financingId },
+    });
     return await getBusinessPlan(data.busId);
   }
   async deleteFinancingForBusiness(
@@ -653,7 +614,7 @@ class BusinessService {
   ) {
     if (!user) return;
     await financing.destroy({ where: { id: data.id } });
-    return await getBusinessPlan(data.busId);
+    return data;
   }
   async createBuyingMachineForBusiness(
     user: Principal | undefined,
@@ -716,7 +677,7 @@ class BusinessService {
       enterpriseId: data.enterpriseId,
       userId: user.sub,
     });
-    return await getBusinessPlan(data.businessPlanId);
+    return res;
   }
   async patchBuildingForBusiness(
     user: Principal | undefined,
@@ -735,7 +696,10 @@ class BusinessService {
       },
       { where: { id: data.buildId } }
     );
-    return await getBusinessPlan(data.businessPlanId);
+    const res: Ibuilding | null = await building.findOne({
+      where: { id: data.buildId },
+    });
+    return res;
   }
   async deleteBuildingForBusiness(
     user: Principal | undefined,
@@ -743,14 +707,14 @@ class BusinessService {
   ) {
     if (!user) return;
     await building.destroy({ where: { id: data.id } });
-    return await getBusinessPlan(data.busId);
+    return data;
   }
   async createOutcomeForBusiness(
     user: Principal | undefined,
     data: createOutcomeType
   ) {
     if (!user) return;
-    await outcome.create({
+    const res: Ioutcome = await outcome.create({
       name: data.name,
       costMonth: data.costMonth,
       date: data.date,
@@ -759,7 +723,7 @@ class BusinessService {
       businessPlanId: data.businessPlanId!,
       type: data.type,
     });
-    return await getBusinessPlan(data.businessPlanId);
+    return res;
   }
   async patchOutcomeForBusiness(
     user: Principal | undefined,
@@ -776,7 +740,10 @@ class BusinessService {
       },
       { where: { id: data.outcomeId } }
     );
-    return await getBusinessPlan(data.businessPlanId);
+    const res: Ioutcome | null = await outcome.findOne({
+      where: { id: data.outcomeId },
+    });
+    return res;
   }
   async deleteOutcomeForBusiness(
     user: Principal | undefined,
@@ -784,14 +751,14 @@ class BusinessService {
   ) {
     if (!user) return;
     await outcome.destroy({ where: { id: data.id } });
-    return await getBusinessPlan(data.busId);
+    return data;
   }
   async createLandForBusiness(
     user: Principal | undefined,
     data: CreateLandType
   ) {
     if (!user) return;
-    await land.create({
+    const res: Iland = await land.create({
       name: data.name,
       area: data.area,
       cadastreNumber: data.cadastreNumber,
@@ -803,7 +770,7 @@ class BusinessService {
       rate: data.rate,
       userId: user.sub,
     });
-    return await getBusinessPlan(data.businessPlanId!);
+    return res;
   }
   async patchLandForBusiness(user: Principal | undefined, data: PatchLandType) {
     if (!user) return;
@@ -815,7 +782,10 @@ class BusinessService {
         where: { id: data.landId },
       }
     );
-    return await getBusinessPlan(data.businessPlanId!);
+    const res: Iland | null = await land.findOne({
+      where: { id: data.landId },
+    });
+    return res;
   }
   async deleteLandForBusiness(
     user: Principal | undefined,
@@ -823,7 +793,7 @@ class BusinessService {
   ) {
     if (!user) return;
     await land.destroy({ where: { id: data.id } });
-    return await getBusinessPlan(data.busId!);
+    return data;
   }
 }
 export default new BusinessService();
