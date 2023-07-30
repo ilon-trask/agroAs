@@ -85,6 +85,8 @@ function EnterpriseBusTable({
           setUpdate={() => {}}
           res={res}
           setRes={setRes as any}
+          isBusiness={true}
+          busId={myBusiness.id!}
         />
       )}
       {/* <ChoseEnterprise open={open} setOpen={setOpen} /> */}

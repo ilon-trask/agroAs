@@ -327,38 +327,13 @@ function AdditionBusinessPlan({
   );
   return (
     <>
-      <SectionTitle aref={aref}>Додатки</SectionTitle>
+      <SectionTitle aref={aref} mt={"30px"}>
+        Додатки
+      </SectionTitle>
       <Paragraph>Додаток А. Установчі документи</Paragraph>
       <Paragraph>Додаток Б. Штатний роспис</Paragraph>
       <Table size={"sm"}>
         <Thead>
-          <Tr>
-            <Th colSpan={7}>
-              <Paragraph>
-                3.2. Власники, керуючий персонал, працівники підприємства.
-              </Paragraph>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <Description>
-                Для функціонування підприємства планується створити сімейне
-                фермерське господарство у вигляді ФОП з 2 членами сім’ї та
-                найняти …. працівників, з них …. На постійній основі, а ….
-                Сезонно. Детальні розрахунки зведено у вигляді таблиці.
-              </Description>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableName>{`Штатний розпис ${form} на 1 га`}</TableName>
-            </Th>
-          </Tr>
-          <Tr>
-            <Th colSpan={7}>
-              <TableNumber></TableNumber>
-            </Th>
-          </Tr>
           <StaffingTableHeadRow isPlan={true} />
         </Thead>
         <Tbody>

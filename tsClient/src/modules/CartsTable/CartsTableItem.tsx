@@ -1,13 +1,12 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { deleteCart, setIsPublic } from "../http/requests";
-import { Context } from "../main";
-import { cartProps } from "../modules/CreateCart";
-import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
-
+import { deleteCart, setIsPublic } from "../../http/requests";
+import { Context } from "../../main";
+import { cartProps } from "../CreateCart/CreateCart";
+import { TEHMAP_ROUTER, TEJ_ROUTER } from "../../utils/consts";
 import { Tr, Td, Checkbox, Tooltip } from "@chakra-ui/react";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
+import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import MyViewIcon from "src/ui/Icons/MyViewIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";

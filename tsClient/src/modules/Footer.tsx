@@ -13,11 +13,8 @@ const NavBar = observer(() => {
   const [open, setOpen] = useState(false);
   return (
     <Box
-      // bgColor={"#20401e"}
       style={{
         background: "rgba( 93, 160, 93, 0.55 )",
-        // boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-        // backdropFilter: "blur( 4px )",
       }}
       py={"10px"}
       mt={"auto"}

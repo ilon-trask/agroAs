@@ -117,73 +117,75 @@ const includes = [
       // { model: vegetationYears },
     ],
   },
-  { model: buying_machine },
-  { model: building },
-  { model: worker },
-  { model: land },
+  // { model: buying_machine },
+  // { model: building },
+  // { model: worker },
+  // { model: land },
 ];
+const ForBusProd = async (busProds: resBusProd[]) => {
+  return await Promise.all(
+    busProds.map(async (prod) => {
+      const vegetation: IvegetationYears | null = JSON.parse(
+        JSON.stringify(
+          await vegetationYears.findOne({
+            where: { busProdId: prod.id! },
+          })
+        )
+      );
+      return {
+        ...prod,
+        tech_cart: (await changeCarts([prod.tech_cart]))[0],
+        vegetationYear: vegetation
+          ? {
+              ...vegetation,
+              allCoeff: +(
+                vegetation?.seedlingsCoeff *
+                vegetation?.technologyCoeff *
+                vegetation?.vegetationCoeff
+              ).toFixed(2),
+              potentialYieldPerHectare:
+                prod.product?.unitMeasure == "шт"
+                  ? vegetation.numberPerRoll * vegetation.numberPlantsPerHectare
+                  : (vegetation?.numberPerRoll *
+                      vegetation?.numberPlantsPerHectare) /
+                    1000,
+            }
+          : null,
+      };
+    })
+  );
+};
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
     plans.map(async (plan) => {
-      plan.busProds = await Promise.all(
-        plan.busProds.map(async (prod) => {
-          const vegetation: IvegetationYears | null = JSON.parse(
-            JSON.stringify(
-              await vegetationYears.findOne({
-                where: { busProdId: prod.id! },
-              })
-            )
-          );
-          return {
-            ...prod,
-            tech_cart: (await changeCarts([prod.tech_cart]))[0],
-            vegetationYear: vegetation
-              ? {
-                  ...vegetation,
-                  allCoeff: +(
-                    vegetation?.seedlingsCoeff *
-                    vegetation?.technologyCoeff *
-                    vegetation?.vegetationCoeff
-                  ).toFixed(2),
-                  potentialYieldPerHectare:
-                    prod.product?.unitMeasure == "шт"
-                      ? vegetation.numberPerRoll *
-                        vegetation.numberPlantsPerHectare
-                      : (vegetation?.numberPerRoll *
-                          vegetation?.numberPlantsPerHectare) /
-                        1000,
-                }
-              : null,
-          };
-        })
-      );
-      plan.outcomes = JSON.parse(
-        JSON.stringify(
-          await outcome.findAll({
-            where: { businessPlanId: plan.id! },
-          })
-        )
-      );
-      // let vegeAcc = JSON.parse(
-      //   JSON.stringify(
-      //     await vegetationYears.findAll({
-      //       where: { businessPlanId: plan.id! },
-      //     })
-      //   )
-      // );
-      // plan.vegetationYears = (() => {
-      //   return vegeAcc.map((el: IvegetationYears) => ({
-      //     ...el,
-      //     allCoeff: +(
-      //       el.seedlingsCoeff *
-      //       el.technologyCoeff *
-      //       el.vegetationCoeff
-      //     ).toFixed(2),
-      //     potentialYieldPerHectare:
-      //       (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
-      //   }));
-      // })();
+      // console.time("test" + plan.id);
+      console.log("test" + plan.id, new Date());
+      [
+        plan.buildings,
+        plan.buying_machines,
+        plan.workers,
+        plan.outcomes,
+        plan.lands,
+        plan.busProds,
+      ] = await Promise.all([
+        building.findAll({
+          where: { businessPlanId: plan.id },
+        }),
+        buying_machine.findAll({
+          where: { businessPlanId: plan.id },
+        }),
+        worker.findAll({
+          where: { businessPlanId: plan.id },
+        }),
+        outcome.findAll({
+          where: { businessPlanId: plan.id! },
+        }),
+        land.findAll({ where: { businessPlanId: plan.id } }),
+        ForBusProd(plan.busProds),
+      ]);
+      plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
+      console.log("test" + plan.id, new Date());
       return plan;
     })
   );
@@ -394,19 +396,25 @@ class BusinessService {
   // }
   async get(user: Principal | undefined) {
     if (user) {
+      console.time("include");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { userId: user.sub }, //@ts-ignore
         include: includes,
       });
-      return await changeFinancing(plans);
+      console.timeEnd("include");
+      console.time("func");
+      plans = await changeFinancing(plans);
+      console.timeEnd("func");
       return plans;
     } else {
+      console.time("include2");
       //@ts-ignore
       let plans: resBusinessPlan[] = await businessPlan.findAll({
         where: { isPublic: true, isAgree: true }, //@ts-ignore
         include: includes,
       });
+      console.timeEnd("include2");
       return await changeFinancing(plans);
       return plans;
     }
@@ -490,13 +498,18 @@ class BusinessService {
     return res;
   }
   async getPublic() {
+    console.time("запит");
     //@ts-ignore
     const res: resBusinessPlan[] = await businessPlan.findAll({
       where: { isPublic: true },
       //@ts-ignore
       include: includes,
     });
-    return await changeFinancing(res);
+    console.timeEnd("запит");
+    console.time("функ");
+    const akk = await changeFinancing(res);
+    console.timeEnd("функ");
+    return akk;
   }
   async setIsAgree(user: Principal | undefined, data: SetIsAgreeBusinessPlan) {
     if (!user) return;

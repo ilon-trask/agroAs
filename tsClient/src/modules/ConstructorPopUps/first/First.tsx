@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 import { resTechCartsWithOpers } from "../../../../../tRPC serv/controllers/TechCartService";
-import MapInputs from "../../../components/MapInputs";
+import MapInputs from "../../CreateCart/MapInputs";
 import { Context } from "../../../main";
 import { cartProps } from "../../CreateCart";
 import GeneralDataTable from "../../GeneralDataTable";

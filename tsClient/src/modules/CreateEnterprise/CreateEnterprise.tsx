@@ -9,7 +9,11 @@ import {
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import Dialog from "../../components/Dialog";
-import { createEnterprise, patchEnterprise } from "../../http/requests";
+import {
+  createEnterprise,
+  patchEnterprise,
+  patchEnterpriseForBusiness,
+} from "../../http/requests";
 import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
@@ -23,7 +27,7 @@ type props = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
   res: CreateEnterpriseProps;
   setRes: Dispatch<SetStateAction<CreateEnterpriseProps>>;
-};
+} & ({ isBusiness: true; busId: number } | { isBusiness?: false });
 export type CreateEnterpriseProps = {
   entId?: number;
   name: string;
@@ -32,15 +36,9 @@ export type CreateEnterpriseProps = {
 };
 const obj = {};
 
-function CreateEnterprise({
-  open,
-  setOpen,
-  update,
-  setUpdate,
-  res,
-  setRes,
-}: props) {
-  const { enterpriseStore } = useContext(Context);
+function CreateEnterprise(props: props) {
+  const { open, res, setOpen, setRes, setUpdate, update } = props;
+  const { enterpriseStore, business } = useContext(Context);
   return (
     <Dialog
       open={open}
@@ -60,8 +58,18 @@ function CreateEnterprise({
           onClick={() => {
             if (res.name && res.form) {
               if (update) {
-                //@ts-ignore
-                patchEnterprise(enterpriseStore, res);
+                if (props.isBusiness) {
+                  //@ts-ignore
+                  patchEnterpriseForBusiness(
+                    business,
+                    enterpriseStore,
+                    res,
+                    props.busId
+                  );
+                } else {
+                  //@ts-ignore
+                  patchEnterprise(enterpriseStore, res);
+                }
               } else {
                 //@ts-ignore
                 createEnterprise(enterpriseStore, res);

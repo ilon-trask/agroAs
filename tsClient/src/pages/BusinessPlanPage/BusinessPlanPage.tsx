@@ -149,6 +149,9 @@ function BiznesPlanPage() {
           <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
         </>
       ) : null}
+      <Box display={"flex"} justifyContent={"center"}>
+        <Button>Сформувати</Button>
+      </Box>
       {user.role != "" ? (
         <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
           <Button>Отримати PDF</Button>
@@ -201,6 +204,7 @@ function BiznesPlanPage() {
             dateStart={myBusiness?.dateStart!}
             productSet={productSet}
             aref={resumeRef}
+            myBusiness={myBusiness}
           />
           <EnterpriseBusinessPlan
             cultureSet={cultureSet}

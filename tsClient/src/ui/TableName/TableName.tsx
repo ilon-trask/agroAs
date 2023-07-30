@@ -3,7 +3,12 @@ import React from "react";
 
 function TableName({ children }: { children: string }) {
   return (
-    <Text fontSize={"16px"} textTransform={"none"} textAlign={"center"}>
+    <Text
+      fontSize={"16px"}
+      textTransform={"none"}
+      textAlign={"center"}
+      mt={"10px"}
+    >
       {children}
     </Text>
   );

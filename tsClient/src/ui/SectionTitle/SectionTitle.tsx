@@ -16,7 +16,7 @@ function SectionTitle({
       fontSize={"24px"}
       textAlign={"left"}
       textTransform={"none"}
-      mt={mt}
+      mt={mt || "25px"}
       ml={30}
     >
       {children}

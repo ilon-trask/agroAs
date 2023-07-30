@@ -1,4 +1,4 @@
-import { Text } from "@chakra-ui/react";
+import { Text, TextProps } from "@chakra-ui/react";
 import React from "react";
 
 function Paragraph({ children }: { children: string }) {
@@ -9,6 +9,7 @@ function Paragraph({ children }: { children: string }) {
       fontWeight={"bold"}
       textTransform={"none"}
       ml={"20px"}
+      mt={"15px"}
     >
       {children}
     </Text>

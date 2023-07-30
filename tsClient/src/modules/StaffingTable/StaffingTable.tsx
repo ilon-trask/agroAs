@@ -129,8 +129,8 @@ export function StaffingTableBodyRows({
   return (
     <>
       <Tr>
-        <Td></Td>
-        <Td></Td>
+        {/* <Td></Td> */}
+        {/* <Td></Td> */}
         <Td colSpan={7}>Адмінісаративний персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
@@ -150,8 +150,8 @@ export function StaffingTableBodyRows({
           );
       })}
       <Tr>
-        <Td></Td>
-        <Td></Td>
+        {/* <Td></Td>
+        <Td></Td> */}
         <Td colSpan={7}>Інженерно технічний</Td>
       </Tr>
       {thisWorkers?.map((el) => {
@@ -171,8 +171,8 @@ export function StaffingTableBodyRows({
           );
       })}
       <Tr>
-        <Td></Td>
-        <Td></Td>
+        {/* <Td></Td>
+        <Td></Td> */}
         <Td colSpan={7}>Виробничий персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {

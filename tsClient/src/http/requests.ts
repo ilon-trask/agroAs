@@ -1,4 +1,4 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { createTRPCProxyClient, httpBatchLink, httpLink } from "@trpc/client";
 import { type AppRouter } from "../../../tRPC serv/index";
 import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
 import {
@@ -96,8 +96,8 @@ export const supabase = createClient(
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
-    httpBatchLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+    httpLink({
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1213,6 +1213,28 @@ export function patchEnterprise(
       (el) => el.id != res.id
     );
     EnterpriseStore.newEnterprise = res;
+  });
+}
+export function patchEnterpriseForBusiness(
+  bus: BusinessStore,
+  EnterpriseStore: EnterpriseStore,
+  data: PatchEnterpriseType,
+  busId: number
+) {
+  console.log("forBusiness");
+  client.enterprise.patch.query(data).then((res) => {
+    if (!res) return;
+    EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
+      (el) => el.id != res.id
+    );
+    EnterpriseStore.newEnterprise = res;
+    const business = bus.businessPlan.find((el) => el.id == busId);
+    if (!business) return;
+
+    business.enterprise = res;
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != busId);
+    console.log(business);
+    bus.newBusinessPlan = business;
   });
 }
 export function deleteEnterprise(

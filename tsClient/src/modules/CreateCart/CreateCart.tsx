@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { Itech_cart } from "../../../tRPC serv/models/models";
-import Dialog, { func } from "../components/Dialog";
-import MapInputs from "../components/MapInputs";
-import { createCart, updateMap } from "../http/requests";
-import { VegetationYearsType } from "../shared/hook/useVegetationYears";
-import { Icart } from "../pages/MapJornal";
+import { Itech_cart } from "../../../../tRPC serv/models/models";
+import Dialog, { func } from "../../components/Dialog";
+import MapInputs from "./MapInputs";
+import { createCart, updateMap } from "../../http/requests";
+import { VegetationYearsType } from "../../shared/hook/useVegetationYears";
+import { Icart } from "../../pages/MapJornal";
 export type cartProps = {
   id?: number;
   nameCart: string;
