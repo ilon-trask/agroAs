@@ -1,2 +1,3 @@
-import CreateCart from "./CreateCart";
+import CreateCart, { cartProps } from "./CreateCart";
+export type { cartProps };
 export default CreateCart;

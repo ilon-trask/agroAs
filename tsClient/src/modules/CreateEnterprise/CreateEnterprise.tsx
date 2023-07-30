@@ -59,10 +59,10 @@ function CreateEnterprise(props: props) {
             if (res.name && res.form) {
               if (update) {
                 if (props.isBusiness) {
-                  //@ts-ignore
                   patchEnterpriseForBusiness(
                     business,
                     enterpriseStore,
+                    //@ts-ignore
                     res,
                     props.busId
                   );

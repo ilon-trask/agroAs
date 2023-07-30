@@ -1,12 +1,12 @@
 import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { Table, TableProps } from "@chakra-ui/react";
+import { Table, TableProps as TabProps } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import TableContent from "./TableContent";
-export interface MyTableProps extends TableProps {
+export interface TableProps extends TabProps {
   data: any[];
   columns: ColumnDef<any>[];
 }
-function TableComponent(props: MyTableProps) {
+function TableComponent(props: TableProps) {
   const { data, columns } = props;
   return (
     <Table size={"sm"} {...props}>
