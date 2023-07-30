@@ -114,4 +114,4 @@ function PlanYieldBusTable({
   );
 }
 
-export default PlanYieldBusTable;
+export default React.memo(PlanYieldBusTable);

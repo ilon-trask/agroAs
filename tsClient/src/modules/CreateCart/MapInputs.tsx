@@ -1,11 +1,11 @@
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
-import { Context } from "../main";
-import { createCart, updateMap } from "../http/requests";
-import { CartProps, cartProps } from "../modules/CreateCart";
+import { Context } from "../../main";
+import { createCart, updateMap } from "../../http/requests";
+import { CartProps, cartProps } from "./CreateCart";
 import style from "./Input.module.css";
-import { func } from "./Dialog";
+import { func } from "../../components/Dialog";
 import { useParams } from "react-router-dom";
-import { Itech_cart } from "../../../tRPC serv/models/models";
+import { Itech_cart } from "../../../../tRPC serv/models/models";
 import {
   Box,
   Heading,
@@ -15,8 +15,8 @@ import {
   ModalFooter,
   Input,
 } from "@chakra-ui/react";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
-import useVegetationYears from "../shared/hook/useVegetationYears";
+import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
+import useVegetationYears from "../../shared/hook/useVegetationYears";
 const createCartFunc: func<cartProps> = (
   id,
   map,

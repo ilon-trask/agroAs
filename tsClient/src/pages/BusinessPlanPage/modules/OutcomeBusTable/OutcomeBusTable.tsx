@@ -296,4 +296,4 @@ function OutcomeBusTable({
   );
 }
 
-export default OutcomeBusTable;
+export default React.memo(OutcomeBusTable);

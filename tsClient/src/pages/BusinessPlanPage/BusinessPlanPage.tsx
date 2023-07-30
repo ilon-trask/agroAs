@@ -115,7 +115,7 @@ function BiznesPlanPage() {
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
   console.timeEnd("all");
-
+  const busId = myBusiness.id;
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Button onClick={() => navigate("/")} mt={"15px"}>
@@ -149,6 +149,9 @@ function BiznesPlanPage() {
           <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
         </>
       ) : null}
+      <Box display={"flex"} justifyContent={"center"}>
+        <Button>Сформувати</Button>
+      </Box>
       {user.role != "" ? (
         <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
           <Button>Отримати PDF</Button>
@@ -201,6 +204,7 @@ function BiznesPlanPage() {
             dateStart={myBusiness?.dateStart!}
             productSet={productSet}
             aref={resumeRef}
+            myBusiness={myBusiness}
           />
           <EnterpriseBusinessPlan
             cultureSet={cultureSet}

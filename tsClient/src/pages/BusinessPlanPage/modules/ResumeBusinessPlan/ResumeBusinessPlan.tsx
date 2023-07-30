@@ -1,5 +1,6 @@
-import { Table, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Table, Tbody, Td, Text, Tr } from "@chakra-ui/react";
 import React, { RefObject } from "react";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import Paragraph from "../../../../ui/Paragraph";
 import SectionTitle from "../../../../ui/SectionTitle";
 
@@ -8,11 +9,13 @@ function ResumeBusinessPlan({
   dateStart,
   productSet,
   aref,
+  myBusiness,
 }: {
   area: number;
   dateStart: string;
   productSet: Set<String>;
   aref: RefObject<HTMLTableElement>;
+  myBusiness: resBusinessPlan;
 }) {
   return (
     <>
@@ -28,15 +31,30 @@ function ResumeBusinessPlan({
           <Tr>
             <Td>Опис проекту</Td>
             <Td colSpan={2}>
-              Проект створення ягідної плантації площею {area} га
+              Проект створення ягідної плантації середньою загальною площею{" "}
+              {
+                +(
+                  myBusiness.lands.reduce((p, c) => p + c.area, 0) /
+                  (myBusiness.realizationTime + 1)
+                ).toFixed(3)
+              }{" "}
+              га, середньою корисною площею{" "}
+              {
+                +(
+                  myBusiness.busProds.reduce((p, c) => p + c.area, 0) /
+                  (myBusiness.realizationTime + 1)
+                ).toFixed(3)
+              }{" "}
+              га
             </Td>
           </Tr>
 
           <Tr>
             <Td>Місце розташування</Td>
             <Td colSpan={2}>
-              Ягідник буде розташовуватися на території Київської області.
+              Ягідник буде розташовуватися на території України.
             </Td>
+            <Td></Td>
           </Tr>
           <Tr>
             <Td>Актуальність</Td>
@@ -66,6 +84,22 @@ function ResumeBusinessPlan({
           <Tr>
             <Td rowSpan={3}>Термін реалізації проекту</Td>
             <Td>Проектний період</Td>
+            <Td>
+              {(() => {
+                const monthAmount = 13 - +myBusiness.dateStart?.split("-")[1];
+                if (monthAmount == 12) {
+                  return <Text>Років:-{myBusiness.realizationTime + 1}</Text>;
+                } else {
+                  return (
+                    <Text>
+                      Років:-{myBusiness.realizationTime}, місяців:-
+                      {monthAmount}
+                    </Text>
+                  );
+                }
+                return null;
+              })()}
+            </Td>
           </Tr>
           <Tr>
             <Td>Початок реалізації</Td>
@@ -82,7 +116,21 @@ function ResumeBusinessPlan({
                     <Td rowSpan={productSet.size}>
                       Основні продукти підприємства
                     </Td>
-                    <Td>{el}, охолоджені для реалізації (т)</Td>
+                    <Td>{el}, охолоджена для реалізації (т)</Td>
+                    <Td>
+                      {myBusiness.busProds.reduce((p, c) => {
+                        if (c.product?.name == el)
+                          return +(
+                            p +
+                            (c.vegetationYear?.potentialYieldPerHectare || 0) *
+                              (c.vegetationYear?.allCoeff || 0) *
+                              c.area
+                          ).toFixed(3);
+                        else {
+                          return p;
+                        }
+                      }, 0)}
+                    </Td>
                   </Tr>
                 </React.Fragment>
               ) : (
@@ -169,29 +217,28 @@ function ResumeBusinessPlan({
         <Tbody>
           <Tr>
             <Td rowSpan={4}>Цілі проекту</Td>
-            <Td>отримання прибутку від діяльності</Td>
+            <Td>Отримання прибутку від діяльності</Td>
           </Tr>
           <Tr>
             <Td>
-              часткове задоволення попиту на ягоди на ринку України та Європи
+              Часткове задоволення попиту на ягоди на ринку України та Європи
             </Td>
           </Tr>
           <Tr>
-            <Td>створення нових робочих місць під час реалізації проекту;</Td>
+            <Td>Створення нових робочих місць під час реалізації проекту;</Td>
           </Tr>
           <Tr>
             <Td>
-              створення нових потоків надходжень до державного та місцевих
+              Створення нових потоків надходжень до державного та місцевих
               бюджетів.
             </Td>
           </Tr>
 
           <Tr>
-            <Td rowSpan={4}>Завдання проекту</Td>
+            <Td rowSpan={3}>Завдання проекту</Td>
             <Td colSpan={2}>
-              Розробка та опис шляхів створення підприємства з організації
-              горіхового саду та подальшого продажу врожаю у вигляді горіхів в
-              шкарлупі;
+              Створити системний та цілісний документ який, обгрунтує створення
+              підприємства з вирощування.
             </Td>
           </Tr>
           <Tr>
@@ -220,12 +267,13 @@ function ResumeBusinessPlan({
           </Tr>
           <Tr>
             <Td rowSpan={2}>Мета проекту</Td>
-            <Td>Висадка ягідника</Td>
+            <Td>
+              Розробка та опис шляхів створення підприємства з організації
+              ягідника та подальшого продажу врожаю;
+            </Td>
           </Tr>
           <Tr>
-            <Td>
-              Створення основи для можливого подальшого розширення бізнесу.
-            </Td>
+            <Td>Створення основи для можливого розвитку бізнесу.</Td>
           </Tr>
           <Tr>
             <Td>Географія збуту</Td>

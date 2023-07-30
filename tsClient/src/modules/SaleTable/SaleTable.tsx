@@ -36,7 +36,10 @@ export function SaleTableHeadRows({ isPlan }: { isPlan?: boolean }) {
         </Th>
       )}
       <Th>К-сть т</Th>
-      <Th>Ціна грн/т</Th>
+      <Th>
+        Ціна <br />
+        грн/т
+      </Th>
       <Th>Сума грн</Th>
       {!isPlan && <Th></Th>}
       <Th></Th>

@@ -43,7 +43,6 @@ function TableContent({ data, columns }: TableProps) {
                 <Td
                   whiteSpace={"pre-wrap"}
                   key={cell.id}
-                  // style={{ whiteSpace: "pre-wrap" }}
                   fontWeight={
                     row.original.bold == true
                       ? "bold"

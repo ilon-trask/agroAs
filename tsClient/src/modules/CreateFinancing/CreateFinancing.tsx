@@ -45,7 +45,7 @@ export type FinancingProps = {
     | DerjPurposeType
     | GrantPurposeType
     | "";
-  cost: number | "";
+  cost: number | string;
   enterpriseId: number | undefined;
   isUseCost: boolean;
   calculationMethod: CreditCalculationMethodType | "";
@@ -248,21 +248,22 @@ function CreateFinancing({
       <ModalFooter>
         <Button
           onClick={() => {
+            console.log(res);
+
             if (
               res.name &&
               res.cost &&
               res.date &&
               res.purpose &&
               res.calculationMethod &&
-              res.type &&
-              res.cultureId
+              res.type
             ) {
               res.cost = +res.cost;
               if (update) {
                 patchFinancingForBusiness(business, {
                   busId: busId,
                   financingId: res.id!,
-                  cost: res.cost,
+                  cost: +res.cost,
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
@@ -270,12 +271,12 @@ function CreateFinancing({
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   type: res.type,
-                  cultureId: res.cultureId,
+                  cultureId: res.cultureId ? +res.cultureId : null,
                 });
               } else {
                 createFinancingForBusiness(business, {
                   busId: busId,
-                  cost: res.cost,
+                  cost: +res.cost,
                   date: res.date,
                   name: res.name,
                   purpose: res.purpose,
@@ -283,7 +284,7 @@ function CreateFinancing({
                   enterpriseId: res.enterpriseId,
                   calculationMethod: res.calculationMethod,
                   type: res.type,
-                  cultureId: res.cultureId,
+                  cultureId: res.cultureId ? +res.cultureId : null,
                 });
               }
               setOpen(false);

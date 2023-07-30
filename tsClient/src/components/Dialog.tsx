@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import { observer } from "mobx-react-lite";
-// import Button from "../ui/Button/Button";
 import { FC } from "react";
 import { Icell } from "../../../tRPC serv/controllers/OperService";
 import MapStore from "../store/MapStore";

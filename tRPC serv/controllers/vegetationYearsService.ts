@@ -1,24 +1,54 @@
 import { Principal } from "..";
-import { IvegetationYears, tech_cart, vegetationYears } from "../models/models";
+import {
+  busProd,
+  IbusProd,
+  Iproduct,
+  IvegetationYears,
+  product,
+  vegetationYears,
+} from "../models/models";
 import { CreateVegetationType } from "../routes/vegetationYearRouter";
+interface BusProdInclude extends IbusProd {
+  product: Iproduct;
+}
+interface vegetationInclude extends IvegetationYears {
+  busProd: BusProdInclude;
+}
+export function changeVegetationYear(
+  vegetationYear: IvegetationYears,
+  product: Iproduct
+) {
+  vegetationYear = JSON.parse(JSON.stringify(vegetationYear));
+  product = JSON.parse(JSON.stringify(product));
+  return {
+    ...vegetationYear,
+    allCoeff: +(
+      vegetationYear?.seedlingsCoeff *
+      vegetationYear?.technologyCoeff *
+      vegetationYear?.vegetationCoeff
+    ).toFixed(2),
+    potentialYieldPerHectare:
+      product?.unitMeasure == "шт"
+        ? vegetationYear.numberPerRoll * vegetationYear.numberPlantsPerHectare
+        : (vegetationYear?.numberPerRoll *
+            vegetationYear?.numberPlantsPerHectare) /
+          1000,
+  };
+}
+const include = { model: busProd, include: [{ model: product }] };
 
 class vegetationYearService {
   async get(user: Principal | undefined) {
     if (!user) return;
-    let res: IvegetationYears[] | null | undefined =
-      await vegetationYears.findAll();
+    //@ts-ignore
+    let res: vegetationInclude[] | null | undefined =
+      await vegetationYears.findAll({
+        include: include,
+      });
+
     res = JSON.parse(JSON.stringify(res));
-    res = res?.map((el) => ({
-      ...el,
-      allCoeff: +(
-        el.seedlingsCoeff *
-        el.technologyCoeff *
-        el.vegetationCoeff
-      ).toFixed(2),
-      potentialYieldPerHectare:
-        (el.numberPerRoll * el.numberPlantsPerHectare) / 1000,
-    }));
-    return res;
+    const akk = res?.map((el) => changeVegetationYear(el, el.busProd.product!));
+    return akk;
   }
   async create(user: Principal | undefined, data: CreateVegetationType) {
     if (!user) return;
@@ -26,22 +56,20 @@ class vegetationYearService {
       where: { busProdId: data.busProdId },
     });
 
-    let res: IvegetationYears = await vegetationYears.create({
+    let acc: IvegetationYears = await vegetationYears.create({
       ...data,
       cultureId: data.cultureId,
       cultivationTechnologyId: data.cultivationTechnologyId,
       busProdId: data.busProdId,
     });
-    res = JSON.parse(JSON.stringify(res));
-    res.allCoeff = +(
-      res.seedlingsCoeff *
-      res.technologyCoeff *
-      res.vegetationCoeff
-    ).toFixed(2);
-    res.potentialYieldPerHectare =
-      (res.numberPerRoll * res.numberPlantsPerHectare) / 1000;
+    //@ts-ignore
+    let res: vegetationInclude = await vegetationYears.findOne({
+      where: { id: acc.id },
+      include: include,
+    });
 
-    return res;
+    if (!res) return;
+    return changeVegetationYear(res, res.busProd.product!) || res;
   }
 }
 export default new vegetationYearService();

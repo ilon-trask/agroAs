@@ -2,15 +2,15 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
-import { Context } from "../main";
-import CartsTableItem from "../components/CartsTableItem";
-import { cartProps } from "./CreateCart";
+import { Context } from "../../main";
+import CartsTableItem from "./CartsTableItem";
+import { cartProps } from "../CreateCart/CreateCart";
 
-import Loader from "../components/Loader";
+import Loader from "../../components/Loader";
 
 import { Table, Thead, Tbody, Tfoot, Tr, Th, Box, Td } from "@chakra-ui/react";
-import { resTechCartsWithOpers } from "../../../tRPC serv/controllers/TechCartService";
-import { IUserRole } from "../../../tRPC serv";
+import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
+import { IUserRole } from "../../../../tRPC serv";
 
 interface props {
   maps: resTechCartsWithOpers[] | [];

@@ -6,10 +6,9 @@ const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(radioAnatomy.keys);
 
 const baseStyle = definePartsStyle({
-  // define the part you're going to style
   control: {
-    borderRadius: "12px", // change the border radius
-    borderColor: "grey.700", // change the border color
+    borderRadius: "12px",
+    borderColor: "grey.700",
   },
 });
 

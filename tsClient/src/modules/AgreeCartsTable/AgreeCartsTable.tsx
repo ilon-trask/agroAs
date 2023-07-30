@@ -9,7 +9,7 @@ import Loader from "../../components/Loader";
 import { Table, Thead, Tbody, Tr, Th, Box } from "@chakra-ui/react";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { Itech_cart } from "../../../../tRPC serv/models/models";
-import { cartProps } from "../CreateCart";
+import { cartProps } from "src/modules/CreateCart";
 
 interface props {
   setRes: Dispatch<SetStateAction<cartProps>>;

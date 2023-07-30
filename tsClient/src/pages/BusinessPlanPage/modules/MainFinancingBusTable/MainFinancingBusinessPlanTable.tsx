@@ -111,7 +111,7 @@ function MainFinancingBusinessPlanTable({
         accessorKey: "date",
         cell: ({ row: { original } }) => (
           <>
-            {original.isAll ? (
+            {original.isAll || original.name == "Початкові інвестиції" ? (
               <></>
             ) : original.isYear ? (
               <MyAddIcon
@@ -119,7 +119,7 @@ function MainFinancingBusinessPlanTable({
                   setOpen(true);
                   setRes({
                     calculationMethod: "",
-                    cost: 0,
+                    cost: "",
                     date: original.year + "-01-01",
                     enterpriseId: undefined,
                     isUseCost: false,

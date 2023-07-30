@@ -35,8 +35,6 @@ function App() {
   useEffect(() => {
     (async () => {
       if (ind > 0) {
-        // getWorks(map);
-        // getYieldPlants(income);
         getCultural(map);
         getPurposesMaterial(map);
         getCultureTEJMap(map);
@@ -54,11 +52,7 @@ function App() {
           getNoAgreeBusiness(map, business);
           getIsAgreeCarts(map);
         }
-        if (
-          // user.role == "ADMIN" ||
-          // user.role == "service_role" ||
-          user.role == ""
-        ) {
+        if (user.role == "") {
           agreeCarts(map);
           getAgreeTEJ(TEJ);
           getTechnologiesTEJ(TEJ);

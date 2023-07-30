@@ -1,4 +1,4 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { createTRPCProxyClient, httpBatchLink, httpLink } from "@trpc/client";
 import { type AppRouter } from "../../../tRPC serv/index";
 import { Icell, prope } from "../../../tRPC serv/controllers/OperService";
 import {
@@ -96,7 +96,7 @@ export const supabase = createClient(
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
-    httpBatchLink({
+    httpLink({
       url: import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
@@ -1215,6 +1215,28 @@ export function patchEnterprise(
     EnterpriseStore.newEnterprise = res;
   });
 }
+export function patchEnterpriseForBusiness(
+  bus: BusinessStore,
+  EnterpriseStore: EnterpriseStore,
+  data: PatchEnterpriseType,
+  busId: number
+) {
+  console.log("forBusiness");
+  client.enterprise.patch.query(data).then((res) => {
+    if (!res) return;
+    EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
+      (el) => el.id != res.id
+    );
+    EnterpriseStore.newEnterprise = res;
+    const business = bus.businessPlan.find((el) => el.id == busId);
+    if (!business) return;
+
+    business.enterprise = res;
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != busId);
+    console.log(business);
+    bus.newBusinessPlan = business;
+  });
+}
 export function deleteEnterprise(
   EnterpriseStore: EnterpriseStore,
   entId: number
@@ -1427,9 +1449,13 @@ export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
 }
 export function deleteBusProd(bus: BusinessStore, data: DeleteBusProd) {
   client.business.deleteBusProd.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.busId);
+    if (!business) return;
+    business.busProds = business.busProds.filter((el) => el.id != res.id);
+    bus.businessPlan = [
+      ...bus.businessPlan.filter((el) => el.id != res.busId),
+      business,
+    ];
   });
 }
 
@@ -1501,9 +1527,13 @@ export function createBuildingForBusiness(
   data: CreateBuildingType
 ) {
   client.business.createBuildingForBusiness.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.buildings = [...business.buildings, res];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 
@@ -1512,9 +1542,17 @@ export function patchBuildingForBusiness(
   data: PatchBuildingType
 ) {
   client.business.patchBuildingForBusiness.query(data).then((res) => {
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.buildings = [
+      ...business.buildings.filter((el) => el.id != res?.id),
+      res,
+    ];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 
@@ -1523,9 +1561,13 @@ export function deleteBuildingForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteBuildingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.busId);
+    if (!business) return;
+    business.buildings = business.buildings.filter((el) => el.id != res.id);
+    bus.businessPlan = [
+      ...bus.businessPlan.filter((el) => el.id != res.busId),
+      business,
+    ];
   });
 }
 
@@ -1534,9 +1576,13 @@ export function createOutcomeForBusiness(
   data: createOutcomeType
 ) {
   client.business.createOutcomeForBusiness.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.outcomes = [...business.outcomes, res];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 
@@ -1545,9 +1591,17 @@ export function patchOutcomeForBusiness(
   data: patchOutcomeType
 ) {
   client.business.patchOutcomeForBusiness.query(data).then((res) => {
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.outcomes = [
+      ...business.outcomes.filter((el) => el.id != res?.id),
+      res,
+    ];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 
@@ -1556,9 +1610,13 @@ export function deleteOutcomeForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteOutcomeForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.busId);
+    if (!business) return;
+    business.outcomes = business.outcomes.filter((el) => el.id != res.id);
+    bus.businessPlan = [
+      ...bus.businessPlan.filter((el) => el.id != res.busId),
+      business,
+    ];
   });
 }
 
@@ -1567,16 +1625,25 @@ export function createLandForBusiness(
   data: CreateLandType
 ) {
   client.business.createLandForBusiness.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.lands = [...business.lands, res];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 export function patchLandForBusiness(bus: BusinessStore, data: PatchLandType) {
   client.business.patchLandForBusiness.query(data).then((res) => {
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
+    if (!business) return;
+    //@ts-ignore
+    business.lands = [...business.lands.filter((el) => el.id != res?.id), res];
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }
 export function deleteLandForBusiness(
@@ -1584,8 +1651,11 @@ export function deleteLandForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteLandForBusiness.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.busId);
+    if (!business) return;
+    business.lands = business.lands.filter((el) => el.id != res.id);
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
-    bus.newBusinessPlan = res;
+    bus.newBusinessPlan = business;
   });
 }

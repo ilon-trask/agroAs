@@ -1,4 +1,13 @@
-import { Heading, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
@@ -8,6 +17,7 @@ import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/Busin
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import useIncomeTypes from "src/shared/hook/useIncomeTypes";
 import useOutcomeGroup from "src/shared/hook/useOutcomeGroup";
+import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
@@ -70,6 +80,7 @@ function FinancingBusinessPlan({
       { header: "За рік", accessorKey: "inYear" },
     ];
   }, []);
+  let sum = 0;
   for (let i = start; i <= end; i++) {
     fundraisingPlanData.push(
       ...(thisCredit
@@ -156,6 +167,8 @@ function FinancingBusinessPlan({
     ).reduce((p, c) => p + c.cost * c.amount, 0);
     const creatingValue = 0;
     const opersValue = 0;
+    sum +=
+      machinesValue + buildingValue + mshpValue + creatingValue + opersValue;
     investmentPlan.push(
       { indicators: "Прям інвестицій", bold: true },
       {
@@ -186,20 +199,47 @@ function FinancingBusinessPlan({
       }
     );
   }
+  investmentPlan.push({
+    indicators: "Загальна потреба коштів (вартість проекту)",
+    bold: true,
+    inYear: sum,
+  });
   // fundraisingPlanData.push()
-  investmentPlan.push({ indicators: "Вартість проекту", bold: true });
   return (
     <>
       <SectionTitle aref={aref}>Фінансування</SectionTitle>
+      <Table size={"sm"}>
+        <Tr>
+          <Td>
+            <Box color={"red"}>
+              <Description>Опис</Description>
+            </Box>
+          </Td>
+        </Tr>
+      </Table>
       <Heading textAlign={"center"} size={"sm"} mt={5}>
         План залучення коштів
       </Heading>
+      <Table size={"sm"}>
+        <Tr>
+          <Th>
+            <TableNumber />
+          </Th>
+        </Tr>
+      </Table>
       <TableComponent
         data={fundraisingPlanData}
         columns={fundraisingPlanColumns}
       />
       <Table size={"sm"}>
         <Thead>
+          <Tr>
+            <Td colSpan={6}>
+              <Box color={"red"}>
+                <Description>Опис</Description>
+              </Box>
+            </Td>
+          </Tr>
           <Tr>
             <Th colSpan={6}>
               <TableName>План інвестування коштів</TableName>
@@ -215,6 +255,13 @@ function FinancingBusinessPlan({
       </Table>
       <Table size={"sm"}>
         <Thead>
+          <Tr>
+            <Td colSpan={4}>
+              <Box color={"red"}>
+                <Description>Опис</Description>
+              </Box>
+            </Td>
+          </Tr>
           <Tr>
             <Th colSpan={5}>
               <TableName>Грошовий потік (річний)</TableName>

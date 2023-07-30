@@ -11,11 +11,7 @@ import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/Busines
 import CreateEnterprise, {
   CreateEnterpriseProps,
 } from "../../../../modules/CreateEnterprise/CreateEnterprise";
-function EnterpriseBusTable({
-  myBusiness,
-}: {
-  myBusiness: resBusinessPlan | undefined;
-}) {
+function EnterpriseBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
   const [res, setRes] = useState<CreateEnterpriseProps>();
   const [open, setOpen] = useState(false);
   return (
@@ -85,6 +81,8 @@ function EnterpriseBusTable({
           setUpdate={() => {}}
           res={res}
           setRes={setRes as any}
+          isBusiness={true}
+          busId={myBusiness.id!}
         />
       )}
       {/* <ChoseEnterprise open={open} setOpen={setOpen} /> */}
@@ -92,4 +90,4 @@ function EnterpriseBusTable({
   );
 }
 
-export default EnterpriseBusTable;
+export default React.memo(EnterpriseBusTable);

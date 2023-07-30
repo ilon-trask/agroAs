@@ -5,7 +5,7 @@ function Description({
   children,
   mt,
 }: {
-  children: string;
+  children: any;
   mt?: number | string;
 }) {
   return (
@@ -14,6 +14,7 @@ function Description({
       fontWeight={"normal"}
       textTransform={"none"}
       mt={mt}
+      marginTop={"5px"}
     >
       {children}
     </Text>

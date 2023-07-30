@@ -50,19 +50,19 @@ function EnterpriseBusinessPlan({
     for (let i = start; i <= end; i++) {
       const workers = thisWorkers?.filter((el) => el.year == i - start);
 
-      let adAmount = 0;
-      let adSalary = 0;
-      let adSalaryYear = 0;
-      workers?.forEach((e) => {
-        if (e.class == "Адміністративний") {
-          adAmount += e.amount;
-          adSalary += e.salary * e.amount;
-          adSalaryYear +=
-            e.salary *
-            e.amount *
-            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
-        }
-      });
+      // let adAmount = 0;
+      // let adSalary = 0;
+      // let adSalaryYear = 0;
+      // workers?.forEach((e) => {
+      //   if (e.class == "Адміністративний") {
+      //     adAmount += e.amount;
+      //     adSalary += e.salary * e.amount;
+      //     adSalaryYear +=
+      //       e.salary *
+      //       e.amount *
+      //       (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
+      //   }
+      // });
       let vAmount = 0;
       let vSalary = 0;
       let vSalaryYear = 0;
@@ -76,41 +76,41 @@ function EnterpriseBusinessPlan({
             (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
         }
       });
-      let iAmount = 0;
-      let iSalary = 0;
-      let iSalaryYear = 0;
-      workers?.forEach((e) => {
-        if (e.class == "Інженерно технічний") {
-          iAmount += e.amount;
-          iSalary += e.salary * e.amount;
-          iSalaryYear +=
-            e.salary *
-            e.amount *
-            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
-        }
-      });
+      // let iAmount = 0;
+      // let iSalary = 0;
+      // let iSalaryYear = 0;
+      // workers?.forEach((e) => {
+      //   if (e.class == "Інженерно технічний") {
+      //     iAmount += e.amount;
+      //     iSalary += e.salary * e.amount;
+      //     iSalaryYear +=
+      //       e.salary *
+      //       e.amount *
+      //       (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
+      //   }
+      // });
       sum +=
-        Math.round(adSalaryYear * 0.235) +
-        adSalaryYear +
-        (Math.round(vSalaryYear * 0.235) + vSalaryYear) +
-        (Math.round(iSalaryYear * 0.235) + iSalaryYear);
+        // Math.round(adSalaryYear * 0.235) +
+        // adSalaryYear +
+        Math.round(vSalaryYear * 0.235) + vSalaryYear;
+      // +(Math.round(iSalaryYear * 0.235) + iSalaryYear);
       salaryExpensesData.push(
-        {
-          type: "Адміністративний",
-          amount: adAmount,
-          averageZP: Math.round(adSalary / adAmount),
-          AnnualSalaryFund: adSalaryYear,
-          tax: Math.round(adSalaryYear * 0.235),
-          general: Math.round(adSalaryYear * 0.235) + adSalaryYear,
-        },
-        {
-          type: "ІТП",
-          amount: iAmount,
-          averageZP: Math.round(iSalary / iAmount),
-          AnnualSalaryFund: iSalaryYear,
-          tax: Math.round(iSalaryYear * 0.235),
-          general: Math.round(iSalaryYear * 0.235) + iSalaryYear,
-        },
+        // {
+        //   type: "Адміністративний",
+        //   amount: adAmount,
+        //   averageZP: Math.round(adSalary / adAmount),
+        //   AnnualSalaryFund: adSalaryYear,
+        //   tax: Math.round(adSalaryYear * 0.235),
+        //   general: Math.round(adSalaryYear * 0.235) + adSalaryYear,
+        // },
+        // {
+        //   type: "ІТП",
+        //   amount: iAmount,
+        //   averageZP: Math.round(iSalary / iAmount),
+        //   AnnualSalaryFund: iSalaryYear,
+        //   tax: Math.round(iSalaryYear * 0.235),
+        //   general: Math.round(iSalaryYear * 0.235) + iSalaryYear,
+        // },
         {
           type: "Виробничий",
           amount: vAmount,
@@ -121,14 +121,14 @@ function EnterpriseBusinessPlan({
         },
         { type: i }
       );
-      wageAnalysisData.push({
-        year: "Адміністративний",
-        amount: Math.round(adSalaryYear * 0.235) + adSalaryYear,
-      });
-      wageAnalysisData.push({
-        year: "ІТР",
-        amount: Math.round(iSalaryYear * 0.235) + iSalaryYear,
-      });
+      // wageAnalysisData.push({
+      //   year: "Адміністративний",
+      //   amount: Math.round(adSalaryYear * 0.235) + adSalaryYear,
+      // });
+      // wageAnalysisData.push({
+      //   year: "ІТР",
+      //   amount: Math.round(iSalaryYear * 0.235) + iSalaryYear,
+      // });
       wageAnalysisData.push({
         year: "Виробничий",
         amount: Math.round(vSalaryYear * 0.235) + vSalaryYear,
@@ -137,12 +137,11 @@ function EnterpriseBusinessPlan({
         bold: true,
         year: i,
         amount:
-          Math.round(adSalaryYear * 0.235) +
-          adSalaryYear +
-          Math.round(iSalaryYear * 0.235) +
-          iSalaryYear +
-          Math.round(vSalaryYear * 0.235) +
-          vSalaryYear,
+          // Math.round(adSalaryYear * 0.235) +
+          // adSalaryYear +
+          // Math.round(iSalaryYear * 0.235) +
+          // iSalaryYear +
+          Math.round(vSalaryYear * 0.235) + vSalaryYear,
       });
       const rentLand = myBusiness.lands.filter(
         (el) => +el.date.split("-")[0] == i && el.rightOfUse == "Оренда"
@@ -286,11 +285,11 @@ function EnterpriseBusinessPlan({
           </Tr>
           <Tr>
             <Td>Статус (стан)</Td>
-            <Td>{}</Td>
+            <Td>Новостворене (незареєстроване)</Td>
           </Tr>
           <Tr>
             <Td>Юридична адреса</Td>
-            <Td></Td>
+            <Td>Україна</Td>
           </Tr>
           <Tr>
             <Td>
@@ -319,11 +318,8 @@ function EnterpriseBusinessPlan({
             <Td>{form}</Td>
           </Tr>
           <Tr>
-            <Td rowSpan={5}>Переваги …… СФГ ФОП з 2 членами сім’ї</Td>
-            <Td>
-              спрощена система обліку та звітності порівняно із юридичною
-              особою;
-            </Td>
+            <Td rowSpan={5}>Переваги зареєстрованого СПД (ФГ)</Td>
+            <Td>спрощена система обліку та звітності;</Td>
           </Tr>
           <Tr>
             <Td>державна підтримка</Td>
@@ -358,15 +354,17 @@ function EnterpriseBusinessPlan({
             <Td>подальший розвиток та розширення діяльності.</Td>
           </Tr>
           <Tr>
-            <Td>Основні види діяльності за КВЕД-2010</Td>
-            <Td></Td>
+            <Td>Основні види діяльності за КВЕД</Td>
+            <Td>
+              01.25 Вирощування ягід, горіхів, інших плодових дерев і чагарників
+            </Td>
           </Tr>
           <Tr>
             <Td rowSpan={3}>Податки</Td>
             <Td>
-              ФОП, як роботодавець, зобов&#39;язується сплачувати Єдиний
-              соціальний внесок на загальнообов&#39;язкове державне соціальне
-              страхування (ЄСВ) та військовий збір (ВЗ) за співробітників.
+              Роботодавець зобов&#39;язується сплачувати Єдиний соціальний
+              внесок на загальнообов&#39;язкове державне соціальне страхування
+              (ЄСВ) та військовий збір (ВЗ) за співробітників.
             </Td>
           </Tr>
           <Tr>
@@ -377,7 +375,16 @@ function EnterpriseBusinessPlan({
           </Tr>
           <Tr>
             <Td rowSpan={2}>Необхідні умови для початку діяльності:</Td>
-            <Td>Наявність земельної ділянки площею ..... призначенням...</Td>
+            <Td>
+              Наявність земельної ділянки площею{" "}
+              {
+                +(
+                  myBusiness.lands.reduce((p, c) => p + c.area, 0) /
+                  (myBusiness.realizationTime + 1)
+                ).toFixed(3)
+              }{" "}
+              га
+            </Td>
           </Tr>
           <Tr>
             <Td>Реєстрація суб’єкта підприємницької діяльності</Td>
@@ -387,21 +394,41 @@ function EnterpriseBusinessPlan({
       <Paragraph>
         3.2. Власники, керуючий персонал, працівники підприємства.
       </Paragraph>
+      <Table size="sm" mt={3}>
+        <Thead>
+          <Tr>
+            <Td rowSpan={2}>Засновники</Td>
+            <Td>П.І.Б</Td>
+            <Td>%</Td>
+          </Tr>
+          <Tr>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+          <Tr>
+            <Td rowSpan={2}>Керіник</Td> <Td>П.І.Б</Td>
+            <Td>Освіта</Td>
+          </Tr>
+          <Tr>
+            <Td></Td>
+            <Td></Td>
+          </Tr>
+        </Thead>
+      </Table>
       <Description>
-        Для функціонування підприємства планується створити сімейне фермерське
-        господарство у вигляді ФОП з 2 членами сім’ї та найняти …. працівників,
-        з них …. На постійній основі, а …. Сезонно. Детальні розрахунки зведено
-        у вигляді таблиці.
-      </Description>
-      <Description>
-        Загальна кількість персоналу, який планується залучити для забезпечення
-        роботи підприємства, становить … осіб, з яких… співробітників –
-        постійний адміністративний персонал, що працюватиме з … року Проекту, …
-        постійних працівників із … року, … співробітників (оператори лінії)
-        працюватимуть на постійній основі із …-го року і … сезонних робітників,
-        що працюватимуть з квітня по серпень. Загальний прогнозний фонд оплати
-        праці, при повноцінній роботі підприємства, на місяць за проектом складе
-        $... .
+        Загальна кількість персоналу, яка залучається для забезпечення роботи
+        підприємства, планується у штатному розписі. Загальний прогнозний фонд
+        оплати праці, при повноцінній роботі підприємства за проектом складе{" "}
+        {myBusiness?.workers.reduce(
+          (p, c) =>
+            p +
+            (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+              (+c.dateTo?.split("-")[1] - +c.dateFrom?.split("-")[1] + 1 ||
+                12) *
+              c.amount,
+          0
+        )}{" "}
+        грн. Детальні розрахунки зведено у вигляді таблиці.
       </Description>
       <Table size={"sm"}>
         <Thead>
@@ -427,6 +454,11 @@ function EnterpriseBusinessPlan({
           </Tr>
         </Tfoot>
       </Table>
+      <Description>
+        Оплату праці виробничого персоналу плануємо при розрахунках
+        технологічної карти згідно потреб технології і порівнюємо з штатним
+        розписом згідно з відпрацьованим робочим часом
+      </Description>
       <Table size={"sm"}>
         <Thead>
           <Tr>
@@ -446,9 +478,13 @@ function EnterpriseBusinessPlan({
       </Table>
       <Paragraph>3.3. Земельні ділянки та структура насаджень</Paragraph>
       <Description>
-        {`Проект буде здійснюватися на земельній ділянці загальною площею 
-    ${myBusiness?.busProds.reduce((p, c) => p + c.area, 0)}га, з правом
-    використання на весь період реалізації.`}
+        {`Проект буде здійснюватися на земельній ділянці площею 
+    ${+(
+      myBusiness.lands.reduce((p, c) => p + c.area, 0) /
+      (myBusiness.realizationTime + 1)
+    ).toFixed(
+      3
+    )} га, з правом використання на весь період реалізації. Вартість користування земельними ділянками розраїовуємо в вигляді таблиці.`}
       </Description>
       <Table size={"sm"}>
         <Thead>
@@ -466,7 +502,7 @@ function EnterpriseBusinessPlan({
         <TableContent data={groundSectionData} columns={groundSectionColumns} />
       </Table>
       <Description>
-        Використання площ під культурою описано у табличному вигляді.
+        Використання площ під культурами описано у табличному вигляді.
       </Description>
       <TableComponent data={areasUsageData} columns={areasUsageColumns} />
     </>

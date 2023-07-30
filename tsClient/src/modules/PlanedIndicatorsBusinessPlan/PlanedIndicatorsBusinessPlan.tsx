@@ -85,20 +85,17 @@ function PlanedIndicatorsBusinessPlan({
             </Th>
           </Tr>
           <Tr>
-            <Td colSpan={9} py={1}>
+            <Th colSpan={9} py={1}>
               <TableNumber />
-            </Td>
+            </Th>
           </Tr>
         </Thead>
       </Table>
-      <TableComponent data={data} columns={columns} />
+      <TableComponent data={data} columns={columns} fontSize={"10px"} />
       <Text fontWeight={"bold"} fontSize={"20px"}>
         Результат: період років - {end - start}; Прибуток:
         {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
       </Text>
-      <Heading textAlign={"center"} size={"sm"} mt={5}>
-        Розрахунок собівартості продукції
-      </Heading>
     </>
   );
 }

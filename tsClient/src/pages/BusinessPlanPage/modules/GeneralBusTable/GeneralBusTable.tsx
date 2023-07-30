@@ -77,4 +77,4 @@ function GeneralBusTable({
   );
 }
 
-export default GeneralBusTable;
+export default React.memo(GeneralBusTable);
