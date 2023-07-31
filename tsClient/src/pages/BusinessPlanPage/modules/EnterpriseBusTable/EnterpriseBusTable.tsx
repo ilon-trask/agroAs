@@ -1,9 +1,19 @@
-import { Table, Tbody, Td, Thead, Tr } from "@chakra-ui/react";
+import {
+  AccordionItem,
+  AccordionPanel,
+  Table,
+  Tbody,
+  Td,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import BusHeading from "src/ui/BusHeading";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyViewIcon from "src/ui/Icons/MyViewIcon";
+import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { ENTERPRISE_FORM_ROUTER } from "src/utils/consts";
@@ -15,78 +25,82 @@ function EnterpriseBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
   const [res, setRes] = useState<CreateEnterpriseProps>();
   const [open, setOpen] = useState(false);
   return (
-    <>
-      <MyHeading>Підприємство</MyHeading>
-      <MyTableContainer>
-        <Table size={"sm"}>
-          <Thead>
-            <Tr>
-              <Td></Td>
-              <Td>Назва підприємства</Td>
-              <Td>Організаційно правова форма</Td>
-              <Td>Група оподаткування</Td>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {myBusiness?.enterpriseId ? (
+    <AccordionItem>
+      <MyAccordionButton>
+        <BusHeading>Підприємство</BusHeading>
+      </MyAccordionButton>
+      <AccordionPanel>
+        <MyTableContainer>
+          <Table size={"sm"}>
+            <Thead>
               <Tr>
-                <Td
-                  onClick={() => {
-                    setRes({
-                      entId: myBusiness?.enterpriseId!,
-                      form: myBusiness?.enterprise?.form!,
-                      name: myBusiness?.enterprise?.name!,
-                      taxGroup: myBusiness?.enterprise?.taxGroup!,
-                    });
-                    setOpen(true);
-                  }}
-                >
-                  <MyEditIcon />
-                </Td>
-                <Td>{myBusiness?.enterprise?.name}</Td>
-                <Td>
-                  <Link
-                    to={
-                      ENTERPRISE_FORM_ROUTER +
-                      "/" +
-                      myBusiness?.enterprise?.form +
-                      "/" +
-                      myBusiness?.id
-                    }
+                <Td></Td>
+                <Td>Назва підприємства</Td>
+                <Td>Організаційно правова форма</Td>
+                <Td>Група оподаткування</Td>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {myBusiness?.enterpriseId ? (
+                <Tr>
+                  <Td
+                    onClick={() => {
+                      setRes({
+                        entId: myBusiness?.enterpriseId!,
+                        form: myBusiness?.enterprise?.form!,
+                        name: myBusiness?.enterprise?.name!,
+                        taxGroup: myBusiness?.enterprise?.taxGroup!,
+                      });
+                      setOpen(true);
+                    }}
                   >
-                    <MyViewIcon />
-                    {myBusiness?.enterprise?.form}
-                  </Link>
-                </Td>
-                <Td>{myBusiness?.enterprise?.taxGroup}</Td>
-              </Tr>
-            ) : (
-              <Tr>
-                <Td>
-                  <MyAddIcon />
-                </Td>
-                <Td></Td>
-                <Td></Td>
-                <Td></Td>
-              </Tr>
-            )}
-          </Tbody>
-        </Table>
-      </MyTableContainer>
-      {open && res && (
-        <CreateEnterprise
-          open={open}
-          setOpen={setOpen}
-          update={true}
-          setUpdate={() => {}}
-          res={res}
-          setRes={setRes as any}
-          isBusiness={true}
-          busId={myBusiness.id!}
-        />
-      )}
-      {/* <ChoseEnterprise open={open} setOpen={setOpen} /> */}
-    </>
+                    <MyEditIcon />
+                  </Td>
+                  <Td>{myBusiness?.enterprise?.name}</Td>
+                  <Td>
+                    <Link
+                      to={
+                        ENTERPRISE_FORM_ROUTER +
+                        "/" +
+                        myBusiness?.enterprise?.form +
+                        "/" +
+                        myBusiness?.id
+                      }
+                    >
+                      <MyViewIcon />
+                      {myBusiness?.enterprise?.form}
+                    </Link>
+                  </Td>
+                  <Td>{myBusiness?.enterprise?.taxGroup}</Td>
+                </Tr>
+              ) : (
+                <Tr>
+                  <Td>
+                    <MyAddIcon />
+                  </Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              )}
+            </Tbody>
+          </Table>
+        </MyTableContainer>
+        {open && res && (
+          <CreateEnterprise
+            open={open}
+            setOpen={setOpen}
+            update={true}
+            setUpdate={() => {}}
+            res={res}
+            setRes={setRes as any}
+            isBusiness={true}
+            busId={myBusiness.id!}
+          />
+        )}
+        {/* <ChoseEnterprise open={open} setOpen={setOpen} /> */}
+      </AccordionPanel>
+    </AccordionItem>
   );
 }
 

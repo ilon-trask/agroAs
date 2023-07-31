@@ -348,12 +348,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={4}>
+            <Th colSpan={5}>
               <TableName>Технологічні карти</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={4}>
+            <Th colSpan={5}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
@@ -435,12 +435,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableName>Техніка та обладнання</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
@@ -512,12 +512,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableName>Будівлі та споруди</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>
@@ -580,12 +580,12 @@ function ProductionBusinessPlan({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableName>Малоцінні і швидко зношувальні предмети</TableName>
             </Th>
           </Tr>
           <Tr>
-            <Th colSpan={5}>
+            <Th colSpan={6}>
               <TableNumber></TableNumber>
             </Th>
           </Tr>

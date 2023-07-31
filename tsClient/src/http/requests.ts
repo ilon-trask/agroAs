@@ -1435,27 +1435,57 @@ export async function getCartForBusiness(map: MapStore) {
 
 export function createBusProd(bus: BusinessStore, data: CreateBusProd) {
   client.business.createBusProd.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
   client.business.patchBusProd.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function deleteBusProd(bus: BusinessStore, data: DeleteBusProd) {
   client.business.deleteBusProd.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.busProds = business.busProds.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.busProds = business.busProds.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.busProds = pubBusiness.busProds.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1464,9 +1494,18 @@ export function createFinancingForBusiness(
   data: CreateFinancingForBusiness
 ) {
   client.business.createFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      ); //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function patchFinancingForBusiness(
@@ -1474,9 +1513,19 @@ export function patchFinancingForBusiness(
   data: PatchFinancingForBusiness
 ) {
   client.business.patchFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function deleteFinancingForBusiness(
@@ -1484,9 +1533,19 @@ export function deleteFinancingForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function createBuyingMachineForBusiness(
@@ -1494,9 +1553,19 @@ export function createBuyingMachineForBusiness(
   data: CreateBuyingMachine
 ) {
   client.business.createBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1505,9 +1574,19 @@ export function patchBuyingMachineForBusiness(
   data: PatchBuyingMachine
 ) {
   client.business.patchBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1516,9 +1595,19 @@ export function deleteBuyingMachineForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1528,12 +1617,24 @@ export function createBuildingForBusiness(
 ) {
   client.business.createBuildingForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.buildings = [...business.buildings, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.buildings = [...business.buildings, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.buildings = [...pubBusiness.buildings, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1544,15 +1645,30 @@ export function patchBuildingForBusiness(
   client.business.patchBuildingForBusiness.query(data).then((res) => {
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.buildings = [
-      ...business.buildings.filter((el) => el.id != res?.id),
-      res,
-    ];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.buildings = [
+        ...business.buildings.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.buildings = [
+        ...pubBusiness.buildings.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1562,12 +1678,22 @@ export function deleteBuildingForBusiness(
 ) {
   client.business.deleteBuildingForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.buildings = business.buildings.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.buildings = business.buildings.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.buildings = pubBusiness.buildings.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1577,12 +1703,24 @@ export function createOutcomeForBusiness(
 ) {
   client.business.createOutcomeForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.outcomes = [...business.outcomes, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.outcomes = [...business.outcomes, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.outcomes = [...pubBusiness.outcomes, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1593,15 +1731,30 @@ export function patchOutcomeForBusiness(
   client.business.patchOutcomeForBusiness.query(data).then((res) => {
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.outcomes = [
-      ...business.outcomes.filter((el) => el.id != res?.id),
-      res,
-    ];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.outcomes = [
+        ...business.outcomes.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.outcomes = [
+        ...pubBusiness.outcomes.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1611,12 +1764,22 @@ export function deleteOutcomeForBusiness(
 ) {
   client.business.deleteOutcomeForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.outcomes = business.outcomes.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.outcomes = business.outcomes.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.outcomes = pubBusiness.outcomes.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1626,24 +1789,56 @@ export function createLandForBusiness(
 ) {
   client.business.createLandForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.lands = [...business.lands, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.lands = [...business.lands, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.lands = [...pubBusiness.lands, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 export function patchLandForBusiness(bus: BusinessStore, data: PatchLandType) {
   client.business.patchLandForBusiness.query(data).then((res) => {
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.lands = [...business.lands.filter((el) => el.id != res?.id), res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      business.lands = [
+        //@ts-ignore
+        ...business.lands.filter((el) => el.id != res?.id),
+        //@ts-ignore
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      pubBusiness.lands = [
+        //@ts-ignore
+        ...pubBusiness.lands.filter((el) => el.id != res?.id),
+        //@ts-ignore
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.publicBusinessPlan = pubBusiness;
+    }
   });
 }
 export function deleteLandForBusiness(
@@ -1652,10 +1847,19 @@ export function deleteLandForBusiness(
 ) {
   client.business.deleteLandForBusiness.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.lands = business.lands.filter((el) => el.id != res.id);
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.lands = business.lands.filter((el) => el.id != res.id);
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      pubBusiness.lands = pubBusiness.lands.filter((el) => el.id != res.id);
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }

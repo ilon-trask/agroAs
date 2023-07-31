@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Box, Button, TableContainer } from "@chakra-ui/react";
+import { Accordion, Box, Button, TableContainer } from "@chakra-ui/react";
 import BusinessConceptTable from "../../modules/TEJConceptTable";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../../main";
@@ -77,12 +77,8 @@ function BiznesPlanPage() {
   console.log("myBusiness");
   console.log(myBusiness);
   console.log(enterpriseStore.job);
-  myBusiness?.busProds.forEach((el) => {
-    if (el.tech_cart) el.tech_cart.area = el.area;
-  });
 
   const [ready, setReady] = useState(false);
-  const { start, end } = getStartAndEndBusinessPlan(myBusiness!);
   const titleRef = useRef<HTMLTableElement>(null);
   const resumeRef = useRef<HTMLTableElement>(null);
   const enterpriseRef = useRef<HTMLTableElement>(null);
@@ -95,11 +91,15 @@ function BiznesPlanPage() {
   useEffect(() => {
     if (myBusiness) setReady(true);
   }, [myBusiness]);
+  myBusiness?.busProds.forEach((el) => {
+    if (el.tech_cart) el.tech_cart.area = el.area;
+  });
   const navigate = useNavigate();
   if (!ready || !myBusiness) return <Box></Box>;
   const productSet = new Set(
     myBusiness?.busProds?.map((el) => el.product?.culture?.product!)
   );
+  const { start, end } = getStartAndEndBusinessPlan(myBusiness);
   const cultureSet = new Set(
     myBusiness?.busProds?.map((el) => el?.product?.culture?.name!)
   );
@@ -115,15 +115,18 @@ function BiznesPlanPage() {
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
   console.timeEnd("all");
-  const busId = myBusiness.id;
+
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Button onClick={() => navigate("/")} mt={"15px"}>
         Повернутиcя
       </Button>
-      <MyHeading>Бізнес-план {myBusiness.name}</MyHeading>
+      <MyHeading>
+        Бізнес-план: <br />
+        {myBusiness.name}
+      </MyHeading>
       {user.role != "" ? (
-        <>
+        <Accordion allowMultiple={true} allowToggle={true} width={"1100px"}>
           <GeneralBusTable myBusiness={myBusiness} />
           <EnterpriseBusTable myBusiness={myBusiness} />
           <LandBusTable myBusiness={myBusiness} start={start} end={end} />
@@ -147,7 +150,7 @@ function BiznesPlanPage() {
           <OutcomeBusTable myBusiness={myBusiness} end={end} start={start} />
           <PlanYieldBusTable myBusiness={myBusiness} end={end} start={start} />
           <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
-        </>
+        </Accordion>
       ) : null}
       <Box display={"flex"} justifyContent={"center"}>
         <Button>Сформувати</Button>

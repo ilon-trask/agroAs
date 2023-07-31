@@ -1,5 +1,3 @@
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import z from "zod";
 import { publicProcedure, router } from "./trpc";
 import express from "express";
 import cors from "cors";
@@ -15,8 +13,6 @@ import { cartRouter } from "./routes/cartRouter";
 import { tractorRouter } from "./routes/tractorRouter";
 import { machineRouter } from "./routes/machineRouter";
 import { operRouter } from "./routes/operRouter";
-
-import OS from "os";
 import { inferAsyncReturnType } from "@trpc/server";
 import { workRouter } from "./routes/workRouter";
 import { culturalRouter } from "./routes/culturalRouter";

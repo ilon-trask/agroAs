@@ -1,4 +1,10 @@
-import { Box } from "@chakra-ui/react";
+import {
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+} from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -6,11 +12,12 @@ import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import TableComponent from "src/components/TableComponent";
 import { deleteBusProd } from "src/http/requests";
 import { Context } from "src/main";
+import BusHeading from "src/ui/BusHeading";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyViewIcon from "src/ui/Icons/MyViewIcon";
-import MyHeading from "src/ui/MyHeading";
+import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { TEHMAP_ROUTER } from "src/utils/consts";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
@@ -192,28 +199,32 @@ function SpecializationBusTable({
   const [open, setOpen] = useState(false);
 
   return (
-    <>
-      <MyHeading>Спеціалізація</MyHeading>
-      <MyTableContainer>
-        <TableComponent columns={specColumns} data={specData} />
-      </MyTableContainer>
-      {open ? (
-        <SecondOpen
-          open={open}
-          setOpen={setOpen}
-          data={data}
-          setData={setData}
-        />
-      ) : null}
-      {deleteData.isOpen ? (
-        <DeleteAlert
-          func={deleteData.func}
-          isOpen={deleteData.isOpen}
-          text={deleteData.text}
-          setOpen={setDeleteData}
-        />
-      ) : null}
-    </>
+    <AccordionItem>
+      <MyAccordionButton>
+        <BusHeading>Спеціалізація</BusHeading>
+      </MyAccordionButton>
+      <AccordionPanel>
+        <MyTableContainer>
+          <TableComponent columns={specColumns} data={specData} />
+        </MyTableContainer>
+        {open ? (
+          <SecondOpen
+            open={open}
+            setOpen={setOpen}
+            data={data}
+            setData={setData}
+          />
+        ) : null}
+        {deleteData.isOpen ? (
+          <DeleteAlert
+            func={deleteData.func}
+            isOpen={deleteData.isOpen}
+            text={deleteData.text}
+            setOpen={setDeleteData}
+          />
+        ) : null}
+      </AccordionPanel>
+    </AccordionItem>
   );
 }
 
