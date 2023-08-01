@@ -97,7 +97,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -290,11 +290,59 @@ export async function deleteOper(
     .query({ cartId: +cartId, operId: operId })
     .then((data) => {
       map.opers = map.opers.filter((el) => el.id != data.id);
-      let mapData = map.maps.find((el) => el.id == data.techCartId);
-      if (!mapData) {
-        mapData = map.complex.find((el) => el.id == data.techCartId)!;
-      }
+      let mapData = map.allMaps.find((el) => el.id == data.techCartId);
+      if (!mapData) throw new Error("no mapData");
+      mapData.tech_operations = mapData.tech_operations?.filter(
+        (el) => el.id != data.id
+      );
       mapData.costHectare! -= operValue(data);
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
       map.isLoading = false;
     });
 }
@@ -319,10 +367,8 @@ export async function createOperation(
     .then((data: { oper: tech_operation; prope: prope }) => {
       const { oper, prope } = data;
       map.newOper = oper;
-      let mapData = map.maps.find((el) => el.id == oper.techCartId);
-      if (!mapData) {
-        mapData = map.complex.find((el) => el.id == oper.techCartId)!;
-      }
+      let mapData = map.allMaps.find((el) => el.id == oper.techCartId);
+      if (!mapData) throw new Error("no mapData");
       mapData.tech_operations?.push(oper);
       mapData.costHectare! += operValue(oper);
       if ("nameMaterials" in prope) {
@@ -335,6 +381,53 @@ export async function createOperation(
         map.newCostHandWork = prope;
       } else if ("fuelConsumption" in prope) {
         map.newCostMechanical = prope;
+      }
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
       }
       map.isLoading = false;
     });
@@ -370,6 +463,12 @@ export async function patchOperation(
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
       //@ts-ignore
       mapData.costHectare! += operValue(res);
+      if (mapData)
+        mapData.tech_operations = [
+          //@ts-ignore
+          ...mapData.tech_operations.filter((el) => el.id != res.id),
+          res,
+        ];
       map.costHandWork = map.costHandWork.filter(
         (el) => el.techOperationId != arr.res.operId
       );
@@ -402,6 +501,53 @@ export async function patchOperation(
       } else if (res.cost_hand_work) {
         mapOperData.cost_hand_work = res.cost_hand_work;
         map.newCostHandWork = res.cost_hand_work;
+      }
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
       }
       map.isLoading = false;
     });

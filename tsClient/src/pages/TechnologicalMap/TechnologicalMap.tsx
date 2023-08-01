@@ -75,6 +75,9 @@ const TechnologicalMap = observer(() => {
     let a = getSectionsOpers(map, +id!);
     return a;
   }, [map.opers, operData]);
+  console.log(myMap);
+  console.log(operData);
+
   useEffect(() => {
     const myMap = map.maps.find((el) => el.id == id);
     console.log(myMap);
