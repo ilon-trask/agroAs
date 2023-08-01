@@ -80,6 +80,7 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
   let carts: (resTechCartsWithOpers | null)[] = JSON.parse(
     JSON.stringify(Scarts)
   );
+  //@ts-ignore
   carts = await Promise.all(
     carts.map(async (cart) => {
       const tech_operations = await Promise.all(

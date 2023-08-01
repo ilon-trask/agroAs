@@ -25,7 +25,7 @@ type props = {
       deleteOpen: boolean;
       setDeleteOpen: (open: boolean) => void;
     }
-  | { useIcons: false; tech_opers: resTechOperation[] | null }
+  | { useIcons: false; tech_opers: resTechOperation[] | undefined }
 );
 
 function TechnologicalMapContent(props: props) {

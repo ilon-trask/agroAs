@@ -68,10 +68,7 @@ const TechnologicalMap = observer(() => {
   const navigate = useNavigate();
   const pdfContent = useRef<HTMLDivElement>(null);
 
-  let myMap =
-    map.maps.find((el) => el.id == id) ||
-    map.complex.find((el) => el.id == id) ||
-    map.businessCarts.find((el) => el.id == id);
+  let myMap = map.allMaps.find((el) => el.id == id);
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
   const sections = useMemo(() => {

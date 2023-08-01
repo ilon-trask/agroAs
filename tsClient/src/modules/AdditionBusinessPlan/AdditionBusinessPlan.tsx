@@ -391,6 +391,7 @@ function AdditionBusinessPlan({
                 useIcons={false}
                 id={prod.techCartId!}
                 myMap={prod.tech_cart!}
+                tech_opers={prod.tech_cart?.tech_operations}
               />
             );
           });

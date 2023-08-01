@@ -35,9 +35,7 @@ function TEJjustification() {
   const { cartId } = useParams();
   const navigate = useNavigate();
 
-  const myCart =
-    map.maps?.find((el) => el.id == cartId) ||
-    map.businessCarts?.find((el) => el.id == cartId);
+  const myCart = map.allMaps?.find((el) => el.id == cartId);
   console.log("myCart");
   console.log(myCart);
 

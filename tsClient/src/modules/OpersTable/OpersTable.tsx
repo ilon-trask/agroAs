@@ -93,8 +93,11 @@ type props = {
 function OpersTable(props: props) {
   const { map } = useContext(Context);
 
-  const operData =
-    props.opers || map.opers.filter((el) => el?.techCartId == props.id);
+  const operData: resTechOperation[] = JSON.parse(
+    JSON.stringify(
+      props.opers || map.opers.filter((el) => el?.techCartId == props.id)
+    )
+  );
   operData.sort((a, b) => a.id! - b.id!);
   console.log(operData);
 
