@@ -23,8 +23,11 @@ const patch: funcProps = function (
   setUpdate
 ) {
   //@ts-ignore
-  const [second] = map[el.cell].filter((mat) => mat.techOperationId == el.id);
-  const [cart] = map.maps.filter((map) => map.id == el.techCartId);
+  const second = map[el.cell].find((mat) => mat.techOperationId == el.id);
+  const cart =
+    map.maps.find((map) => map.id == el.techCartId) ||
+    map.agreeCarts.find((map) => map.id == el.techCartId) ||
+    map.businessCarts.find((map) => map.id == el.techCartId);
 
   if (el.cell == "costMechanical") {
     setRes({

@@ -97,7 +97,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -350,7 +350,9 @@ export async function patchOperation(
 ) {
   map.isLoading = true;
 
-  let [mapData] = map.maps.filter((el) => el.id == cartId);
+  let mapData =
+    map.maps.find((el) => el.id == cartId) ||
+    map.businessCarts.find((el) => el.id == cartId);
 
   let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
   //@ts-ignore

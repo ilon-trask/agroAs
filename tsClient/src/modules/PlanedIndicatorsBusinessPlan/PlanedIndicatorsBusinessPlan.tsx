@@ -93,8 +93,23 @@ function PlanedIndicatorsBusinessPlan({
       </Table>
       <TableComponent data={data} columns={columns} fontSize={"10px"} />
       <Text fontWeight={"bold"} fontSize={"20px"}>
-        Результат: період років - {end - start}; Прибуток:
-        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
+        Результат: період
+        {(() => {
+          const monthAmount = 13 - +myBusiness.dateStart?.split("-")[1];
+          if (monthAmount == 12) {
+            return <> років:-{myBusiness.realizationTime + 1},</>;
+          } else {
+            return (
+              <>
+                років:-{myBusiness.realizationTime}, місяців:-
+                {monthAmount},
+              </>
+            );
+          }
+          return null;
+        })()}{" "}
+        прибуток:{" "}
+        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}.
       </Text>
     </>
   );

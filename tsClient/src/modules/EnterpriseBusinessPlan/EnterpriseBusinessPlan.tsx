@@ -215,7 +215,7 @@ function EnterpriseBusinessPlan({
         ],
       },
       {
-        header: "ХАРАКТЕРИСТИКА",
+        header: "Відхилення",
         accessorKey: "",
       },
       {

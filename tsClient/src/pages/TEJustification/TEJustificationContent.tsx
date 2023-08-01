@@ -2,7 +2,6 @@ import { Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { useContext, Dispatch, SetStateAction } from "react";
 import { Context } from "src/main";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
-import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
 import { ItechnologicalEconomicJustification } from "../../../../tRPC serv/models/models";
@@ -23,17 +22,20 @@ type props = {
 function TEJustificationContent(props: props) {
   const { map } = useContext(Context);
   const { myJustification, myCart, isPlan } = props;
+
   let costMechTot = 0;
   let peopleHourTot = 0;
   let medCostHand = 0;
   let medCostHandCounter = 0;
   let costHand = 0;
   let costMech = 0;
-  const grades = map.grade;
+
   myCart?.tech_operations?.forEach((el) => {
     costHand += (el?.costHandWork || 0) * myJustification?.area!;
     costMech += (el?.costMachineWork || 0) * myJustification?.area!;
   });
+  console.log(myCart);
+
   return (
     <>
       <MyTableContainer>
@@ -42,7 +44,6 @@ function TEJustificationContent(props: props) {
             <Tr>
               {!isPlan && <Th></Th>}
               <Th>Назва карти</Th>
-
               <Th>Кількість га</Th>
               <Th>Ціна грн/га</Th>
               <Th>Сума грн</Th>
@@ -71,7 +72,6 @@ function TEJustificationContent(props: props) {
           </Tbody>
         </Table>
       </MyTableContainer>
-
       <Text
         textAlign={"center"}
         fontSize={"14px"}
@@ -99,8 +99,8 @@ function TEJustificationContent(props: props) {
               <Td>Грн/год</Td>
               <Td></Td>
             </Tr>
-            {map.opers
-              .filter((el) => el.cell == "costMechanical")
+            {myCart?.tech_operations
+              ?.filter((el) => el.cell == "costMechanical")
               .map((el) => {
                 const totalCost = el.costMachineWork! * myJustification?.area!;
                 const peopleHour =
@@ -132,8 +132,8 @@ function TEJustificationContent(props: props) {
               <Td>Грн/год</Td>
               <Td></Td>
             </Tr>
-            {map.opers
-              .filter(
+            {myCart?.tech_operations
+              ?.filter(
                 (el) =>
                   el.cell == "costHandWork" ||
                   (el.cell == "costMechanical" && el.costHandWork)
@@ -209,8 +209,8 @@ function TEJustificationContent(props: props) {
             {(() => {
               let acc: number[] = [];
               let mechHours = 0;
-              return map.opers
-                .filter((el) => el.cell == "costMechanical")
+              return myCart?.tech_operations
+                ?.filter((el) => el.cell == "costMechanical")
                 .map((el, ind) => {
                   let amountOfTractorDepreciationPerHour =
                     el?.aggregate?.amountOfTractorDepreciationPerHour;
@@ -265,8 +265,8 @@ function TEJustificationContent(props: props) {
             {(() => {
               let acc: number[] = [];
               let mechHours = 0;
-              return map.opers
-                .filter((el) => el.cell == "costMechanical")
+              return myCart?.tech_operations
+                ?.filter((el) => el.cell == "costMechanical")
                 .map((el, ind) => {
                   let amountOfMachineDepreciationPerHour =
                     el?.aggregate?.amountOfMachineDepreciationPerHour;
@@ -350,9 +350,14 @@ function TEJustificationContent(props: props) {
               return (
                 <>
                   {map.purposeMaterial.map((el) => {
-                    const mat = map.costMaterials.filter(
-                      (e) => e?.purpose_material?.id == el?.id
-                    );
+                    const mat =
+                      myCart?.tech_operations
+                        ?.filter((el) => el.cell == "costMaterials")
+                        .map((el) => el.cost_material)
+                        .filter((e) => e?.purposeMaterialId == el?.id) || [];
+
+                    console.log("єmatє");
+                    console.log(mat);
                     if (mat[0])
                       return (
                         <>
@@ -364,19 +369,21 @@ function TEJustificationContent(props: props) {
                             <Td></Td>
                             <Td></Td>
                           </Tr>
-                          {mat.map((elem) => {
+                          {mat?.map((elem) => {
                             const hco =
-                              elem.consumptionPerHectare *
+                              (elem?.consumptionPerHectare || 0) *
                               myJustification?.area!;
-                            const hp = hco * elem.price;
+                            const hp = hco * (elem?.price || 0);
                             cost += hp;
+                            console.log("try elem");
+
                             return (
-                              <Tr key={elem.id}>
+                              <Tr key={elem?.id}>
                                 <Td></Td>
-                                <Td>{elem.nameMaterials}</Td>
-                                <Td>{elem.unitsOfConsumption}</Td>
+                                <Td>{elem?.nameMaterials}</Td>
+                                <Td>{elem?.unitsOfConsumption}</Td>
                                 <Td>{hco}</Td>
-                                <Td>{elem.price}</Td>
+                                <Td>{elem?.price}</Td>
                                 <Td>{hp}</Td>
                               </Tr>
                             );
@@ -420,18 +427,21 @@ function TEJustificationContent(props: props) {
           <Tbody>
             {(() => {
               let cost = 0;
-              const serv = map.costServices;
+              const serv =
+                myCart?.tech_operations
+                  ?.filter((el) => el.cell == "costServices")
+                  .map((el) => el.cost_service) || [];
               return (
                 <>
                   {serv.map((elem) => {
-                    cost += myJustification?.area! * elem.price;
+                    cost += myJustification?.area! * (elem?.price || 0);
                     return (
-                      <Tr key={elem.id}>
-                        <Td>{elem.nameService}</Td>
-                        <Td>{elem.unitsOfCost}</Td>
+                      <Tr key={elem?.id}>
+                        <Td>{elem?.nameService}</Td>
+                        <Td>{elem?.unitsOfCost}</Td>
                         <Td>{myJustification?.area}</Td>
-                        <Td>{elem.price}</Td>
-                        <Td>{myJustification?.area! * elem.price}</Td>
+                        <Td>{elem?.price}</Td>
+                        <Td>{myJustification?.area! * (elem?.price || 0)}</Td>
                       </Tr>
                     );
                   })}
@@ -470,18 +480,21 @@ function TEJustificationContent(props: props) {
           <Tbody>
             {(() => {
               let cost = 0;
-              const trans = map.costTransport;
+              const trans =
+                myCart?.tech_operations
+                  ?.filter((el) => el.cell == "costTransport")
+                  .map((el) => el.cost_transport) || [];
               return (
                 <>
                   {trans.map((elem) => {
-                    cost += myJustification?.area! * elem.price;
+                    cost += myJustification?.area! * (elem?.price || 0);
                     return (
-                      <Tr key={elem.id}>
-                        <Td>{elem.nameTransport}</Td>
-                        <Td>{elem.unitsOfCost}</Td>
+                      <Tr key={elem?.id}>
+                        <Td>{elem?.nameTransport}</Td>
+                        <Td>{elem?.unitsOfCost}</Td>
                         <Td>{myJustification?.area}</Td>
-                        <Td>{elem.price}</Td>
-                        <Td>{myJustification?.area! * elem.price}</Td>
+                        <Td>{elem?.price}</Td>
+                        <Td>{myJustification?.area! * (elem?.price || 0)}</Td>
                       </Tr>
                     );
                   })}

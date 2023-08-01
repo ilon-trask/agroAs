@@ -44,16 +44,11 @@ function useBusinessPlanFinancingData(
     );
     const variables = useBusinessPlanData.variables(
       thisWorkers,
-      sumDirect,
+      direct,
       i,
       start
     );
-    const outcome = useBusinessPlanData.outcome(
-      thisWorkers,
-      sumDirect,
-      i,
-      start
-    );
+    const outcome = useBusinessPlanData.outcome(thisWorkers, direct, i, start);
     console.log(direct);
 
     sumPermanent += permanent;

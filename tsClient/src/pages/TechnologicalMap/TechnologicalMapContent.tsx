@@ -5,7 +5,10 @@ import GeneralDataTable from "src/modules/GeneralDataTable";
 import OpersTable from "src/modules/OpersTable/OpersTable";
 import MyHeading from "src/ui/MyHeading";
 import { Icell } from "../../../../tRPC serv/controllers/OperService";
-import { resTechCartsWithOpers } from "../../../../tRPC serv/controllers/TechCartService";
+import {
+  resTechCartsWithOpers,
+  resTechOperation,
+} from "../../../../tRPC serv/controllers/TechCartService";
 
 type props = {
   myMap: resTechCartsWithOpers | undefined;
@@ -22,7 +25,7 @@ type props = {
       deleteOpen: boolean;
       setDeleteOpen: (open: boolean) => void;
     }
-  | { useIcons: false }
+  | { useIcons: false; tech_opers: resTechOperation[] | null }
 );
 
 function TechnologicalMapContent(props: props) {
@@ -70,7 +73,11 @@ function TechnologicalMapContent(props: props) {
             <GeneralDataTable useIcons={props.useIcons} myMap={props.myMap} />
           </Box>
           <OpersTable
-            opers={props.myMap?.tech_operations!}
+            opers={
+              props.tech_opers?.length
+                ? props.tech_opers
+                : props.myMap?.tech_operations
+            }
             useIcons={props.useIcons}
             id={props.id}
             area={props.myMap?.area || 0}

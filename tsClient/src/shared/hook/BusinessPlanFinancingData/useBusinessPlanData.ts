@@ -4,19 +4,14 @@ import { resBusinessPlan } from "../../../../../tRPC serv/controllers/BusinessSe
 import { Iworker } from "../../../../../tRPC serv/models/models";
 
 class BusinessPlanData {
-  variables(
-    thisWorkers: Iworker[],
-    sumDirect: number,
-    i: number,
-    start: number
-  ) {
-    return this.generalProduct(thisWorkers, i, start) + sumDirect;
+  variables(thisWorkers: Iworker[], direct: number, i: number, start: number) {
+    return this.generalProduct(thisWorkers, i, start) + direct;
   }
-  outcome(thisWorkers: Iworker[], sumDirect: number, i: number, start: number) {
+  outcome(thisWorkers: Iworker[], direct: number, i: number, start: number) {
     return (
       this.permanent(thisWorkers, i, start) +
       this.generalProduct(thisWorkers, i, start) +
-      sumDirect
+      direct
     );
   }
   itrLaborRemuneration(thisWorkers: Iworker[], i: number, start: number) {

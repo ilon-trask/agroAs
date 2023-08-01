@@ -136,6 +136,7 @@ const TechnologicalMap = observer(() => {
         <Box ref={pdfContent} className="print-container">
           {myMap ? (
             <TechnologicalMapContent
+              tech_opers={operData}
               myMap={myMap}
               useIcons={user.isAuth}
               deleteOpen={deleteOpen}

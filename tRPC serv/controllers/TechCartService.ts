@@ -65,26 +65,70 @@ let cellNames: {
 export const cartsIncludes = [
   {
     model: tech_operation,
-    include: [
-      { model: cost_material, include: [purpose_material] },
-      cost_service,
-      cost_transport,
-      cost_hand_work,
-      { model: aggregate, include: [tractor, agricultural_machine] },
-    ],
+    // include: [
+    // { model: cost_material, include: [purpose_material] },
+    // cost_service,
+    // cost_transport,
+    // cost_hand_work,
+    // { model: aggregate, include: [tractor, agricultural_machine] },
+    // ],
   },
 ];
+
 export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
-  Scarts.sort((a, b) => {
-    if (a && b) {
-      return a.id! - b.id!;
-    } else {
-      return 0;
-    }
-  });
-  const carts: (resTechCartsWithOpers | null)[] = JSON.parse(
+  Scarts.sort((a, b) => (a && b ? a.id! - b.id! : 0));
+  let carts: (resTechCartsWithOpers | null)[] = JSON.parse(
     JSON.stringify(Scarts)
   );
+  carts = await Promise.all(
+    carts.map(async (cart) => {
+      const tech_operations = await Promise.all(
+        //@ts-ignore
+        cart?.tech_operations?.map(async (oper) => {
+          const [
+            cost_materials,
+            cost_services,
+            cost_transports,
+            cost_hand_works,
+            aggregates,
+          ] = await Promise.all([
+            cost_material.findOne({
+              where: { techOperationId: oper.id },
+              include: purpose_material,
+            }),
+            cost_service.findOne({
+              where: { techOperationId: oper.id },
+            }),
+            cost_transport.findOne({
+              where: { techOperationId: oper.id },
+            }),
+            cost_hand_work.findOne({
+              where: { techOperationId: oper.id },
+            }),
+            aggregate.findOne({
+              where: { techOperationId: oper.id },
+              include: [tractor, agricultural_machine],
+            }),
+          ]);
+
+          return {
+            ...oper,
+            cost_material: cost_materials,
+            cost_service: cost_services,
+            cost_transport: cost_transports,
+            cost_hand_work: cost_hand_works,
+            aggregate: aggregates,
+          };
+        })
+      );
+
+      return {
+        ...cart,
+        tech_operations,
+      };
+    })
+  );
+  console.log(carts);
 
   let promises: (Promise<resTechCartsWithOpers | resTechOperation> | null)[] =
     [];
