@@ -990,6 +990,8 @@ export interface Ifinancing {
   type: FinancingType;
   name: string;
   date: string;
+  year: number;
+  month: number | null;
   cost: number;
   purpose:
     | CreditPurposeType
@@ -1009,6 +1011,8 @@ export class financing extends Model<Ifinancing> {
   declare name: string;
   declare type: FinancingType;
   declare date: string;
+  declare year: number;
+  declare month: number;
   declare cost: number;
   declare cultureId?: number;
   declare purpose:
@@ -1027,6 +1031,8 @@ financing.init(
     cost: { type: DataTypes.INTEGER },
     type: { type: DataTypes.STRING },
     date: { type: DataTypes.DATEONLY },
+    year: { type: DataTypes.INTEGER },
+    month: { type: DataTypes.INTEGER },
     name: { type: DataTypes.STRING },
     purpose: { type: DataTypes.STRING },
     isUseCost: {
@@ -1342,7 +1348,41 @@ export class financBus extends Model<IFinancBus> {
   declare businessPlanId: number;
   declare financingId: number;
 }
-
+interface IcreditParameter {
+  id?: number;
+  procent: number;
+  startDatePayments: string;
+  monthlyСommission: number;
+  commissionForCredit: number;
+  repaymentMethod: string;
+  paymentsFrequency: string;
+  termType: string;
+  creditTerm: number;
+}
+export class creditParameter extends Model<IcreditParameter> {
+  declare id: number;
+  declare procent: number;
+  declare startDatePayments: string;
+  declare monthlyСommission: number;
+  declare commissionForCredit: number;
+  declare repaymentMethod: string;
+  declare paymentsFrequency: string;
+  declare termType: string;
+  declare creditTerm: number;
+}
+creditParameter.init(
+  {
+    procent: { type: DataTypes.FLOAT },
+    startDatePayments: { type: DataTypes.STRING },
+    monthlyСommission: { type: DataTypes.INTEGER },
+    commissionForCredit: { type: DataTypes.INTEGER },
+    repaymentMethod: { type: DataTypes.STRING },
+    paymentsFrequency: { type: DataTypes.STRING },
+    termType: { type: DataTypes.STRING },
+    creditTerm: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
 financBus.init({}, { sequelize });
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
@@ -1512,8 +1552,10 @@ building.belongsTo(businessPlan);
 culture.hasMany(financing);
 financing.belongsTo(culture);
 
-financing.belongsToMany(businessPlan, { through: financBus });
-businessPlan.belongsToMany(financing, { through: financBus });
+businessPlan.hasMany(financing);
+financing.belongsTo(businessPlan);
+// financing.belongsToMany(businessPlan,{through:financBus});
+// businessPlan.belongsToMany(financing, { through: financBus });
 
 // culture.hasMany(yieldCalculation);
 // yieldCalculation.belongsTo(culture);

@@ -19,6 +19,9 @@ import getYearFromString from "src/shared/funcs/getYearFromString";
 import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import { deleteFinancingForBusiness } from "src/http/requests";
 import { Context } from "src/main";
+import CreditParameterDialog, {
+  CreditParameterProps,
+} from "./CreditParameterDialog";
 type props = {
   financing: resFinancing[] | undefined;
   start: number;
@@ -39,12 +42,15 @@ function MainFinancingBusinessPlanTable({
     isOpen: false,
     text: "фінансування",
   });
+  const [parameterOpen, setParameterOpen] = useState(false);
+  const [parameterData, setParameterData] = useState<
+    CreditParameterProps | undefined
+  >();
   const { business } = useContext(Context);
   const data = (() => {
     const result: any[] = [];
     for (let i = start; i <= end; i++) {
-      const fin =
-        financing?.filter((el) => getYearFromString(el.date) == i) || [];
+      const fin = financing?.filter((el) => el.year == i - start) || [];
       fin.forEach((el) =>
         result.push({
           id: el.id,
@@ -61,6 +67,7 @@ function MainFinancingBusinessPlanTable({
           date: el.date,
           isUseCost: el.isUseCost,
           cultureId: el.cultureId,
+          month: el.month,
         })
       );
       result.push({
@@ -103,6 +110,7 @@ function MainFinancingBusinessPlanTable({
       isUseCost: boolean;
       cultureId?: number;
       isAll?: boolean;
+      month: number;
     }>[]
   >(
     () => [
@@ -127,6 +135,8 @@ function MainFinancingBusinessPlanTable({
                     purpose: "",
                     type: "",
                     cultureId: "",
+                    month: "",
+                    year: original.year - start,
                   });
                 }}
               />
@@ -146,6 +156,8 @@ function MainFinancingBusinessPlanTable({
                     purpose: original.purpose,
                     type: original.type,
                     cultureId: original.cultureId,
+                    month: original.month,
+                    year: original.year - start,
                   });
                 }}
               />
@@ -174,7 +186,28 @@ function MainFinancingBusinessPlanTable({
             {original.isAll ? (
               <></>
             ) : (
-              !original.isYear && <Button size={"sm"}>Додати</Button>
+              !original.isYear && (
+                <Button
+                  size={"sm"}
+                  onClick={() => {
+                    setParameterOpen(true);
+                    setParameterData({
+                      amount: original.costBP,
+                      commissionForCredit: 0,
+                      creditTerm: end - original.year,
+                      monthlyСommission: 0,
+                      paymentsFrequency: "",
+                      procent: 0,
+                      repaymentMethod: "",
+                      id: original.id,
+                      year: original.year,
+                      month: original.month,
+                    });
+                  }}
+                >
+                  Додати
+                </Button>
+              )
             )}
           </>
         ),
@@ -231,6 +264,13 @@ function MainFinancingBusinessPlanTable({
           isOpen={deleteData.isOpen}
           setOpen={setDeleteData}
           text={deleteData.text}
+        />
+      ) : null}
+      {parameterOpen && parameterData ? (
+        <CreditParameterDialog
+          open={parameterOpen}
+          setOpen={setParameterOpen}
+          data={parameterData}
         />
       ) : null}
     </>

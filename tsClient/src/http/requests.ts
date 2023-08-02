@@ -13,14 +13,11 @@ import {
   Imachine,
   Isection,
   Ispecial_work,
-  Itech_cart,
   Itech_operation,
   Itractor,
   tech_operation,
 } from "../../../tRPC serv/models/models";
-import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
-// import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import {
   CreateBusinessPlan,
   CreateBusProd,
@@ -88,7 +85,6 @@ import {
 } from "../../../tRPC serv/routes/financingRouter";
 import { CreateProductType } from "../../../tRPC serv/routes/incomeRouter";
 
-let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""

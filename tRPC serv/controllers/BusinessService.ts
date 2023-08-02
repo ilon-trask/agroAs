@@ -219,6 +219,8 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       }),
       {
         date: plan?.dateStart!,
+        year: 0,
+        month: null,
         typeName: "Інвестиції",
         calculationMethod: "На бізнес-план",
         calculationType: "Індивідуальний",
@@ -571,6 +573,8 @@ class BusinessService {
       date: data.date,
       type: data.type,
       name: data.name,
+      year: data.year,
+      month: data.month,
       purpose: data.purpose,
       calculationMethod: data.calculationMethod,
       calculationType: null,
@@ -600,6 +604,7 @@ class BusinessService {
         purpose: data.purpose,
         calculationMethod: data.calculationMethod,
         cultureId: data.cultureId,
+        month: data.month,
       },
       { where: { id: data.financingId } }
     );
