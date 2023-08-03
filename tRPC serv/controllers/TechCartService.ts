@@ -129,7 +129,6 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
       };
     })
   );
-  console.log(carts);
 
   let promises: (Promise<resTechCartsWithOpers | resTechOperation> | null)[] =
     [];

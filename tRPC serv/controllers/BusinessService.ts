@@ -31,6 +31,8 @@ import {
   Iland,
   vegetationYears,
   IvegetationYears,
+  creditParameter,
+  IcreditParameter,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -40,6 +42,7 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
+  CreateUpdateCreditParameter,
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
@@ -82,6 +85,7 @@ export interface resBusProd {
 export interface resFinancing extends Ifinancing {
   costBP?: number;
   costHectare?: number;
+  creditParameter: IcreditParameter | undefined;
 }
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
@@ -100,7 +104,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 const includes = [
   { model: resume },
   { model: titlePage },
-  { model: financing },
+  { model: financing, include: [{ model: creditParameter }] },
   { model: enterprise },
   {
     model: busProd,
@@ -222,6 +226,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
         year: 0,
         month: null,
         typeName: "Інвестиції",
+        creditParameter: undefined,
         calculationMethod: "На бізнес-план",
         calculationType: "Індивідуальний",
         costBP: plan?.initialAmount!,
@@ -238,9 +243,65 @@ async function changeFinancing(plans: resBusinessPlan[]) {
 
     const start = +plan?.dateStart?.split("-")[0]!;
     const end = +start + +plan?.realizationTime!;
+    const { creditBody, creditProc } = (() => {
+      const creds = plan.financings.filter(
+        (el) => el.type == "credit" && el.creditParameter
+      );
+      const creditBody: Record<number, number> = {};
+      const creditProc: Record<number, number> = {};
+      for (let i = 0; i < creds.length; i++) {
+        const el = creds[i];
+        const par = el.creditParameter;
+        if (!par) throw new Error("нема par");
+
+        const amount = +((el.costBP || 0) / par.creditTerm).toFixed(2);
+        let remainder = el.costBP || 0;
+        for (let y = start + 1; y <= end; y++) {
+          if (par.paymentsFrequency == "Кожен рік") {
+            if (par.repaymentMethod == "Класична схема") {
+              creditBody[y]
+                ? (creditBody[y] += amount)
+                : (creditBody[y] = amount);
+              const procent = +(remainder * (par.procent / 100)).toFixed(2);
+              creditProc[y]
+                ? (creditProc[y] += procent)
+                : (creditProc[y] = procent);
+              remainder -= amount;
+            }
+          }
+        }
+      }
+      return { creditBody, creditProc };
+    })();
+    console.log("creditBody");
+    console.log(creditBody);
+
     plan.outcomes = (() => {
       const outcomes: Ioutcome[] = [];
       for (let i = start; i <= end; i++) {
+        const fin = plan.financings.filter(
+          (el) => el.year == i - start && el.type == "credit"
+        );
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Тіло кредиту",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: creditBody[i] || 0,
+          isDefault: true,
+        });
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "% кредиту",
+          group: "Постійні",
+          date: i + "-01-01",
+          costYear: creditProc[i] || 0,
+          isDefault: true,
+        });
         plan.outcomes
           .filter((el) => +el.date.split("-")[0] == i)
           .forEach((el) => {
@@ -370,7 +431,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
 }
 export async function getBusinessPlan(businessPlanId: number) {
   //@ts-ignore
-  let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+  let res: resBusinessPlan | null = await businessPlan.findOne({
     where: { id: businessPlanId },
     //@ts-ignore
     include: includes,
@@ -779,14 +840,7 @@ class BusinessService {
   }
   async patchLandForBusiness(user: Principal | undefined, data: PatchLandType) {
     if (!user) return;
-    await land.update(
-      {
-        ...data,
-      },
-      {
-        where: { id: data.landId },
-      }
-    );
+    await land.update({ ...data }, { where: { id: data.landId } });
     const res: Iland | null = await land.findOne({
       where: { id: data.landId },
     });
@@ -799,6 +853,23 @@ class BusinessService {
     if (!user) return;
     await land.destroy({ where: { id: data.id } });
     return data;
+  }
+  async createUpdateCreditParameter(data: CreateUpdateCreditParameter) {
+    const isParameter = await creditParameter.findOne({
+      where: { financingId: data.financingId },
+    });
+    if (isParameter) {
+      await creditParameter.update(
+        { ...data },
+        { where: { financingId: data.financingId } }
+      );
+    } else {
+      await creditParameter.create({
+        ...data,
+        termType: data.termType || "на бізнес-план",
+      });
+    }
+    return await getBusinessPlan(data.busId);
   }
 }
 export default new BusinessService();

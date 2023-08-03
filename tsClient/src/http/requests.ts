@@ -22,6 +22,7 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
+  CreateUpdateCreditParameter,
   DeleteBusProd,
   DeleteForBusiness,
   PatchBusinessPlan,
@@ -2038,6 +2039,27 @@ export function deleteLandForBusiness(
       );
       //@ts-ignore
       bus.newPublicBusinessPlan = pubBusiness;
+    }
+  });
+}
+
+export function createUpdateCreditParameter(
+  bus: BusinessStore,
+  data: CreateUpdateCreditParameter
+) {
+  client.business.createUpdateCreditParameter.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.id!);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id!);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
     }
   });
 }

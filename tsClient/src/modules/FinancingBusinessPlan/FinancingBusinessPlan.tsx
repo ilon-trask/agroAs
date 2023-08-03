@@ -57,7 +57,6 @@ function FinancingBusinessPlan({
     together: number | "";
     bold?: boolean;
   }[] = [];
-  const { income } = useContext(Context);
   const investmentPlan = [];
   const fundraisingPlanColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
@@ -398,17 +397,7 @@ function FinancingBusinessPlan({
                       (e) =>
                         getYearFromString(e.date) == i && e.group == el.name
                     )
-                    .reduce(
-                      (p, c) =>
-                        p +
-                        c.costMonth! *
-                          getMonthAmountFromBusinessPlan(
-                            myBusiness.dateStart,
-                            i,
-                            start
-                          ),
-                      0
-                    );
+                    .reduce((p, c) => p + (c.costYear || 0), 0);
                   return value ? (
                     <Tr key={el.id}>
                       <Td>{i}</Td>

@@ -12,7 +12,8 @@ import { AdministrationPeriodCalcType } from "../../tsClient/src/shared/hook/use
 import { EnterpriseFormType } from "../../tsClient/src/shared/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "../../tsClient/src/shared/hook/useEnterpriseTaxGroup";
 import { WorkerClassesType } from "../../tsClient/src/shared/hook/useWorkersClasses";
-import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
+import { RepaymentsMethodsType } from "../../tsClient/src/shared/hook/useRepaymentMethods";
+import { PaymentsFrequencysType } from "../../tsClient/src/shared/hook/usePaymentsFrequencys";
 import { VegetationYearsType } from "../../tsClient/src/shared/hook/useVegetationYears";
 import { CreditCalculationMethodType } from "../../tsClient/src/shared/hook/useCreditCalculationMethod";
 import { CreditCalculationTypeType } from "../../tsClient/src/shared/hook/useCreditCalculationType";
@@ -1348,16 +1349,17 @@ export class financBus extends Model<IFinancBus> {
   declare businessPlanId: number;
   declare financingId: number;
 }
-interface IcreditParameter {
+export interface IcreditParameter {
   id?: number;
   procent: number;
-  startDatePayments: string;
+  startDatePayments: string | null;
   monthlyСommission: number;
   commissionForCredit: number;
-  repaymentMethod: string;
-  paymentsFrequency: string;
-  termType: string;
+  repaymentMethod: RepaymentsMethodsType;
+  paymentsFrequency: PaymentsFrequencysType;
+  termType: "на бізнес-план" | "на роки" | null;
   creditTerm: number;
+  financingId?: number;
 }
 export class creditParameter extends Model<IcreditParameter> {
   declare id: number;
@@ -1369,6 +1371,7 @@ export class creditParameter extends Model<IcreditParameter> {
   declare paymentsFrequency: string;
   declare termType: string;
   declare creditTerm: number;
+  declare financingId?: number;
 }
 creditParameter.init(
   {
@@ -1559,3 +1562,5 @@ financing.belongsTo(businessPlan);
 
 // culture.hasMany(yieldCalculation);
 // yieldCalculation.belongsTo(culture);
+financing.hasOne(creditParameter);
+creditParameter.belongsTo(financing);

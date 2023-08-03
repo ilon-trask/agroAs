@@ -76,7 +76,6 @@ function BiznesPlanPage() {
     business.publicBusinessPlan.find((el) => el.id == id);
   console.log("myBusiness");
   console.log(myBusiness);
-  console.log(enterpriseStore.job);
 
   const [ready, setReady] = useState(false);
   const titleRef = useRef<HTMLTableElement>(null);
@@ -104,11 +103,11 @@ function BiznesPlanPage() {
     myBusiness?.busProds?.map((el) => el?.product?.culture?.name!)
   );
   let thisWorkers = myBusiness?.workers?.filter(
-    (e) => e.form == myBusiness?.enterprise?.form
+    ({ form }) => form == myBusiness?.enterprise?.form
   );
   const thisCredit = myBusiness?.financings.filter((el) => el.type == "credit");
   const thisInvestment = myBusiness?.financings.filter(
-    (el) => el.type == "investment"
+    ({ type }) => type == "investment"
   );
   const thisDerj = myBusiness?.financings.filter(
     ({ type }) => type == "derj_support"

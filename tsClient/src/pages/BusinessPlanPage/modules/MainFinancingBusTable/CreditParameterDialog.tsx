@@ -18,37 +18,28 @@ import {
   Tab,
   TabPanel,
   Td,
+  Text,
 } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import { useForm } from "react-hook-form";
 import Dialog from "src/components/Dialog";
+import { createUpdateCreditParameter } from "src/http/requests";
+import { Context } from "src/main";
 import useMonthArray from "src/shared/hook/useMonthArray";
 import MyHeading from "src/ui/MyHeading";
+import usePaymentsFrequencys, {
+  PaymentsFrequencysType,
+} from "src/shared/hook/usePaymentsFrequencys";
+import useRepaymentMethods, {
+  RepaymentsMethodsType,
+} from "src/shared/hook/useRepaymentMethods";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   data: CreditParameterProps;
+  busId: number;
 };
-const repaymentMethods: [
-  { id: 1; name: "Ануїтет" },
-  { id: 2; name: "Класична схема" }
-] = [
-  { id: 1, name: "Ануїтет" },
-  { id: 2, name: "Класична схема" },
-];
-const paymentsFrequencys: [
-  { id: 1; name: "Кожний місяць" },
-  //   { id: 2; name: "Кожний квартал" },
-  //   { id: 3; name: "Кожні 6 місяців" },
-  { id: 4; name: "Кожен рік" }
-] = [
-  { id: 1, name: "Кожний місяць" },
-  //   { id: 2, name: "Кожний квартал" },
-  //   { id: 3, name: "Кожні 6 місяців" },
-  { id: 4, name: "Кожен рік" },
-];
-type PaymentsFrequencysType = (typeof paymentsFrequencys)[number]["name"];
-type PaymentsMethodsType = (typeof repaymentMethods)[number]["name"];
+
 export type CreditParameterProps = {
   id?: number;
   amount: string | number;
@@ -56,12 +47,13 @@ export type CreditParameterProps = {
   creditTerm: string | number;
   monthlyСommission: string | number;
   commissionForCredit: string | number;
-  repaymentMethod: string;
-  paymentsFrequency: string;
+  repaymentMethod: RepaymentsMethodsType | "";
+  paymentsFrequency: PaymentsFrequencysType | "";
   year: number;
   month: number;
 };
-function CreditParameterDialog({ open, setOpen, data }: props) {
+function CreditParameterDialog({ open, setOpen, data, busId }: props) {
+  const { business } = useContext(Context);
   const {
     control,
     handleSubmit,
@@ -83,6 +75,18 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
   });
   const onSubmit = (res: CreditParameterProps) => {
     console.log(res);
+    if (res.id && res.repaymentMethod && res.paymentsFrequency)
+      createUpdateCreditParameter(business, {
+        creditTerm: +res.creditTerm,
+        financingId: res.id,
+        monthlyСommission: +res.monthlyСommission,
+        commissionForCredit: +res.commissionForCredit,
+        repaymentMethod: res.repaymentMethod,
+        paymentsFrequency: res.paymentsFrequency,
+        procent: +res.procent,
+        busId,
+      });
+    setOpen(false);
   };
   return (
     <Dialog open={open} setOpen={setOpen}>
@@ -155,7 +159,7 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
                 <option value="" hidden defaultChecked>
                   Виберіть опцію
                 </option>{" "}
-                {repaymentMethods.map((el) => (
+                {useRepaymentMethods.map((el) => (
                   <option value={el.name} key={el.id}>
                     {el.name}
                   </option>
@@ -171,7 +175,7 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
                 <option value="" hidden defaultChecked>
                   Виберіть опцію
                 </option>
-                {paymentsFrequencys.map((el) => (
+                {usePaymentsFrequencys.map((el) => (
                   <option value={el.name} key={el.id}>
                     {el.name}
                   </option>
@@ -184,13 +188,10 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
             <Box mt={2} maxH={"416px"} overflowY={"auto"}>
               <Tabs align="center">
                 <TabList>
-                  <Tab>Діаграма</Tab>
                   <Tab>Відсотки</Tab>
+                  <Tab>Діаграма</Tab>
                 </TabList>
                 <TabPanels>
-                  <TabPanel>
-                    <p>one!</p>
-                  </TabPanel>
                   <TabPanel>
                     <Table size="sm">
                       <Thead>
@@ -206,92 +207,19 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
                         {(() => {
                           if (watch("paymentsFrequency") == "Кожен рік") {
                             const res = [];
-                            let remainder = data.amount;
-                            const amount = +(
-                              +data.amount / +watch("creditTerm")
-                            ).toFixed(2);
-                            for (
-                              let i = data.year + 1;
-                              i <= +data.year + +watch("creditTerm");
-                              i++
-                            ) {
-                              res.push(
-                                <Tr key={i}>
-                                  <Td>{i}</Td>
-                                  <Td>{amount}</Td>
-                                  <Td>
-                                    {
-                                      +(
-                                        +remainder *
-                                        (+watch("procent") / 100)
-                                      ).toFixed(2)
-                                    }
-                                  </Td>
-                                  <Td>
-                                    {
-                                      +(
-                                        amount +
-                                        +(
-                                          +remainder *
-                                          (+watch("procent") / 100)
-                                        ).toFixed(2)
-                                      ).toFixed(2)
-                                    }
-                                  </Td>
-                                  <Td>
-                                    {(() => {
-                                      //@ts-ignore
-                                      remainder -= amount;
-                                      return +(+remainder).toFixed(2);
-                                    })()}
-                                  </Td>
-                                </Tr>
-                              );
-                            }
-                            return res;
-                          } else if (
-                            watch("paymentsFrequency") == "Кожний місяць"
-                          ) {
-                            const res = [];
-                            const amount = +(
-                              +data.amount /
-                              (+watch("creditTerm") * 12)
-                            ).toFixed(2);
-                            let remainder = data.amount;
-
-                            for (
-                              let i = data.year;
-                              i <= +data.year + +watch("creditTerm");
-                              i++
-                            ) {
-                              let sumAmount = 0;
-                              let sumProcent = 0;
-                              let sumPayment = 0;
-                              let month = 0;
-                              if (i == data.year) {
-                                month = data.month;
-                              }
-                              let max = 12;
-                              if (i == +data.year + +watch("creditTerm")) {
-                                max = data.month;
-                              }
-                              for (let j = month; j < max; j++) {
-                                console.log(j);
-                                sumAmount += amount;
-                                sumProcent += +(
-                                  +remainder *
-                                  (+watch("procent") / 100)
-                                ).toFixed(2);
-                                sumPayment += +(
-                                  amount +
-                                  +(
-                                    +remainder *
-                                    (+watch("procent") / 100)
-                                  ).toFixed(2)
-                                ).toFixed(2);
+                            if (watch("repaymentMethod") == "Класична схема") {
+                              let remainder = data.amount;
+                              const amount = +(
+                                +data.amount / +watch("creditTerm")
+                              ).toFixed(2);
+                              for (
+                                let i = data.year + 1;
+                                i <= +data.year + +watch("creditTerm");
+                                i++
+                              ) {
                                 res.push(
-                                  <Tr key={j + "" + i}>
-                                    <Td>{useMonthArray[j]?.name}</Td>
+                                  <Tr key={i}>
+                                    <Td>{i}</Td>
                                     <Td>{amount}</Td>
                                     <Td>
                                       {
@@ -322,28 +250,115 @@ function CreditParameterDialog({ open, setOpen, data }: props) {
                                   </Tr>
                                 );
                               }
-                              console.log(i);
-                              res.push(
-                                <Tr key={i}>
-                                  <Td fontWeight={"bold"}>{i}</Td>
-                                  <Td fontWeight={"bold"}>
-                                    {+sumAmount.toFixed(2)}
-                                  </Td>
-                                  <Td fontWeight={"bold"}>
-                                    {+sumProcent.toFixed(2)}
-                                  </Td>
-                                  <Td fontWeight={"bold"}>
-                                    {+sumPayment.toFixed(2)}
-                                  </Td>
-                                </Tr>
-                              );
+                            }
+                            return res;
+                          } else if (
+                            watch("paymentsFrequency") == "Кожний місяць"
+                          ) {
+                            const res = [];
+                            if (watch("repaymentMethod") == "Класична схема") {
+                              const amount = +(
+                                +data.amount /
+                                (+watch("creditTerm") * 12)
+                              ).toFixed(2);
+                              let remainder = data.amount;
+
+                              for (
+                                let i = data.year;
+                                i <= +data.year + +watch("creditTerm");
+                                i++
+                              ) {
+                                let sumAmount = 0;
+                                let sumProcent = 0;
+                                let sumPayment = 0;
+                                let month = 0;
+                                if (i == data.year) {
+                                  month = data.month;
+                                }
+                                let max = 12;
+                                if (i == +data.year + +watch("creditTerm")) {
+                                  max = data.month;
+                                }
+                                for (let j = month; j < max; j++) {
+                                  sumAmount += amount;
+                                  sumProcent += +(
+                                    +remainder *
+                                    (+watch("procent") / 100)
+                                  ).toFixed(2);
+                                  sumPayment += +(
+                                    amount +
+                                    +(
+                                      +remainder *
+                                      (+watch("procent") / 100)
+                                    ).toFixed(2)
+                                  ).toFixed(2);
+                                  res.push(
+                                    <Tr key={j + "" + i}>
+                                      <Td>{useMonthArray[j]?.name}</Td>
+                                      <Td>{amount}</Td>
+                                      <Td>
+                                        {
+                                          +(
+                                            +remainder *
+                                            (+watch("procent") / 100)
+                                          ).toFixed(2)
+                                        }
+                                      </Td>
+                                      <Td>
+                                        {
+                                          +(
+                                            amount +
+                                            +(
+                                              +remainder *
+                                              (+watch("procent") / 100)
+                                            ).toFixed(2)
+                                          ).toFixed(2)
+                                        }
+                                      </Td>
+                                      <Td>
+                                        {(() => {
+                                          //@ts-ignore
+                                          remainder -= amount;
+                                          return +(+remainder).toFixed(2);
+                                        })()}
+                                      </Td>
+                                    </Tr>
+                                  );
+                                }
+                                console.log(i);
+                                res.push(
+                                  <Tr key={i}>
+                                    <Td fontWeight={"bold"}>{i}</Td>
+                                    <Td fontWeight={"bold"}>
+                                      {+sumAmount.toFixed(2)}
+                                    </Td>
+                                    <Td fontWeight={"bold"}>
+                                      {+sumProcent.toFixed(2)}
+                                    </Td>
+                                    <Td fontWeight={"bold"}>
+                                      {+sumPayment.toFixed(2)}
+                                    </Td>
+                                  </Tr>
+                                );
+                              }
                             }
                             return res;
                           }
-                          return null;
+                          return (
+                            <Tr>
+                              <Td colSpan={5}>
+                                <Text textAlign={"center"} fontSize={"18px"}>
+                                  Ви не заповнили всі поля
+                                </Text>
+                              </Td>
+                            </Tr>
+                          );
                         })()}
                       </Tbody>
                     </Table>
+                  </TabPanel>
+                  <TabPanel>
+                    <p>one!</p>
                   </TabPanel>
                 </TabPanels>
               </Tabs>
