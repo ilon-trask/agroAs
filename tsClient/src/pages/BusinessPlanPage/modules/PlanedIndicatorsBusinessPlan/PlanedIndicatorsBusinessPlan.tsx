@@ -8,7 +8,7 @@ import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 
 function PlanedIndicatorsBusinessPlan({
   start,

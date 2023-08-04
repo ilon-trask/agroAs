@@ -12,13 +12,13 @@ import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Ifinancing, Iworker } from "../../../../tRPC serv/models/models";
-import CashFlowTable from "../CashFlowTable";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import { Ifinancing, Iworker } from "../../../../../../tRPC serv/models/models";
+import CashFlowTable from "../../../../modules/CashFlowTable";
 import {
   StaffingTableBodyRows,
   StaffingTableHeadRow,
-} from "../StaffingTable/StaffingTable";
+} from "../../../../modules/StaffingTable/StaffingTable";
 
 function AdditionBusinessPlan({
   form,

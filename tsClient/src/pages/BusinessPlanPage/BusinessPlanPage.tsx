@@ -27,11 +27,11 @@ export type iChild =
   | "";
 import TitleBusinessPlan from "src/pages/BusinessPlanPage/modules/TitleBusinessPlan";
 import ResumeBusinessPlan from "src/pages/BusinessPlanPage/modules/ResumeBusinessPlan";
-import EnterpriseBusinessPlan from "src/modules/EnterpriseBusinessPlan";
-import ProductionBusinessPlan from "src/modules/ProductionBusinessPlan/ProductionBusinessPlan";
-import FinancingBusinessPlan from "src/modules/FinancingBusinessPlan";
-import PlanedIndicatorsBusinessPlan from "src/modules/PlanedIndicatorsBusinessPlan";
-import AdditionBusinessPlan from "src/modules/AdditionBusinessPlan";
+import EnterpriseBusinessPlan from "src/pages/BusinessPlanPage/modules/EnterpriseBusinessPlan";
+import ProductionBusinessPlan from "src/pages/BusinessPlanPage/modules/ProductionBusinessPlan/ProductionBusinessPlan";
+import FinancingBusinessPlan from "src/pages/BusinessPlanPage/modules/FinancingBusinessPlan";
+import PlanedIndicatorsBusinessPlan from "src/pages/BusinessPlanPage/modules/PlanedIndicatorsBusinessPlan";
+import AdditionBusinessPlan from "src/pages/BusinessPlanPage/modules/AdditionBusinessPlan";
 import EnterpriseBusTable from "src/pages/BusinessPlanPage/modules/EnterpriseBusTable";
 import SpecializationBusTable from "src/pages/BusinessPlanPage/modules/SpecializationBusTable";
 import GeneralBusTable from "src/pages/BusinessPlanPage/modules/GeneralBusTable";
@@ -43,7 +43,7 @@ import OutcomeBusTable from "./modules/OutcomeBusTable";
 import QuizButton from "./modules/QuizButton";
 import MSHPBusTable from "./modules/MSHPBusTable/MSHPBusTable";
 import SaleBusTable from "./modules/SaleBusTable";
-import getStartAndEndBusinessPlan from "src/shared/hook/getStartAndEndBusinessPlan";
+import getStartAndEndBusinessPlan from "src/shared/funcs/getStartAndEndBusinessPlan";
 import LandBusTable from "./modules/LandBusTable";
 import PlanYieldBusTable from "./modules/PlanYieldBusTable";
 export function getMonthAmountFromBusinessPlan(
@@ -200,8 +200,6 @@ function BiznesPlanPage() {
             aref={titleRef}
           />
           <ResumeBusinessPlan
-            area={myBusiness?.busProds?.reduce((p, c) => p + c.area, 0) || 0}
-            dateStart={myBusiness?.dateStart!}
             productSet={productSet}
             aref={resumeRef}
             myBusiness={myBusiness}

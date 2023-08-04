@@ -146,6 +146,15 @@ const ForBusProd = async (busProds: resBusProd[]) => {
     })
   );
 };
+function changeBuilding(buildings: Ibuilding[]) {
+  return buildings.map((el) => ({
+    ...el,
+    depreciationMonth: el.depreciationPeriod
+      ? +(el.startPrice / (el.depreciationPeriod * 12)).toFixed(2)
+      : null,
+  }));
+}
+
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
@@ -176,18 +185,18 @@ async function changeFinancing(plans: resBusinessPlan[]) {
         ForBusProd(plan.busProds),
       ]);
       plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
+      plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
       // console.log("test" + plan.id, new Date());
       return plan;
     })
   );
   plans = plans.map((plan) => {
-    plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП");
-    if (!plan.MSHP) plan.MSHP = [];
+    plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП") || [];
     plan.buying_machines = plan.buying_machines.filter(
       (el) => el.purpose != "МШП"
     );
+    plan.buildings = changeBuilding(plan.buildings);
     plan.workers = changeWorkerRes(plan.workers);
-
     plan.financings = [
       ...plan.financings.map((el) => {
         let area = 1;
@@ -696,7 +705,7 @@ class BusinessService {
     const res: Ibuying_machine = await buying_machine.create({
       amount: data.amount,
       brand: data.brand,
-      cost: data.cost,
+      price: data.price,
       date: data.date,
       year: data.year,
       name: data.name,
@@ -716,7 +725,7 @@ class BusinessService {
       {
         amount: data.amount,
         brand: data.brand,
-        cost: data.cost,
+        price: data.price,
         date: data.date,
         name: data.name,
         purpose: data.purpose,
@@ -767,13 +776,15 @@ class BusinessService {
         description: data.description,
         businessPlanId: data.businessPlanId,
         enterpriseId: data.enterpriseId,
+        introductionDate: data.introductionDate,
       },
       { where: { id: data.buildId } }
     );
     const res: Ibuilding | null = await building.findOne({
       where: { id: data.buildId },
     });
-    return res;
+    if (!res) return;
+    return changeBuilding([JSON.parse(JSON.stringify(res))])[0];
   }
   async deleteBuildingForBusiness(
     user: Principal | undefined,

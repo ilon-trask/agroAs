@@ -52,7 +52,7 @@ export function BuyingMachineTableBodyRow({
             buyingId: el.id,
             amount: el.amount,
             brand: el.brand,
-            cost: el.cost,
+            price: el.price,
             date: el.date,
             name: el.name,
             purpose: el.purpose,
@@ -69,8 +69,8 @@ export function BuyingMachineTableBodyRow({
       <Td>{el.name}</Td>
       <Td>{el.brand}</Td>
       <Td>{el.amount}</Td>
-      <Td>{el.cost}</Td>
-      <Td>{el.cost * el.amount}</Td>
+      <Td>{el.price}</Td>
+      <Td>{el.price * el.amount}</Td>
       <Td>
         <Button size={"sm"}>Додати</Button>
       </Td>

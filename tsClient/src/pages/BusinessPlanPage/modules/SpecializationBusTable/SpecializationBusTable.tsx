@@ -1,10 +1,4 @@
-import {
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-} from "@chakra-ui/react";
+import { AccordionItem, AccordionPanel, Box } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";

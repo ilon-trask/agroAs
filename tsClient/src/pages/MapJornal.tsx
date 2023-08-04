@@ -131,10 +131,11 @@ const MapJornal = observer(function () {
   const [buyingMachineRes, setBuyingMachineRes] =
     useState<CreateBuyingMachineProps>({
       name: "",
+      year: 0,
       brand: "",
       date: "",
       amount: "",
-      cost: "",
+      price: "",
       purpose: "",
       businessPlanId: 0,
       enterpriseId: 0,

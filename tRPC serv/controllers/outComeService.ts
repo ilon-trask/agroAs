@@ -21,6 +21,7 @@ class outcomeService {
       name: data.name,
       costMonth: data.costMonth,
       date: data.date,
+      year: data.year,
       group: data.group,
       userId: user.sub,
       businessPlanId: data.businessPlanId!,

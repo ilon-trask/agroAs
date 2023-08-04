@@ -15,10 +15,12 @@ import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import { CartsTableHeadRow } from "src/modules/CartsTable";
-import { PlanIncomeProductionTableHeadRow } from "../PlanIncomeProductionTable/PlanIncomeProductionTable";
-import { SaleTableHeadRows } from "../SaleTable/SaleTable";
+import { PlanIncomeProductionTableHeadRow } from "../../../../modules/PlanIncomeProductionTable/PlanIncomeProductionTable";
+import { SaleTableHeadRows } from "../../../../modules/SaleTable/SaleTable";
+import getMonthsFromBusiness from "src/shared/funcs/getMonthsFromBusiness";
+import getMonthFromString from "src/shared/funcs/getMonthFromString";
 
 function ProductionBusinessPlan({
   start,
@@ -141,7 +143,7 @@ function ProductionBusinessPlan({
   // })();
   const plannedStructureData = [];
   const generalData = [];
-  for (let i = start; i < end; i++) {
+  for (let i = start; i <= end; i++) {
     const busProds = myBusiness?.busProds?.filter((el) => el.year == i - start);
     const lands = myBusiness?.lands?.filter((el) => el.year == i - start);
 
@@ -360,7 +362,7 @@ function ProductionBusinessPlan({
         <Tbody>
           {(() => {
             const res = [];
-            for (let i = start; i < end; i++) {
+            for (let i = start; i <= end; i++) {
               const busProds = myBusiness.busProds.filter(
                 (el) => el.year == i - start
               );
@@ -370,7 +372,9 @@ function ProductionBusinessPlan({
                     <Td>{i}</Td>
                     <Td>{el.tech_cart?.nameCart}</Td>
                     <Td>{el.area}</Td>
-                    <Td>{(el.tech_cart?.costHectare || 0) * el.area}</Td>
+                    <Td>
+                      {+((el.tech_cart?.costHectare || 0) * el.area).toFixed(2)}
+                    </Td>
                     <Td>{el.tech_cart?.costHectare}</Td>
                   </Tr>
                 ))
@@ -382,7 +386,9 @@ function ProductionBusinessPlan({
                   <Td>{busProds.reduce((p, c) => p + c.area, 0)}</Td>
                   <Td>
                     {busProds.reduce(
-                      (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                      (p, c) =>
+                        p +
+                        +((c.tech_cart?.costHectare || 0) * c.area).toFixed(2),
                       0
                     )}
                   </Td>
@@ -402,7 +408,9 @@ function ProductionBusinessPlan({
                 <Td></Td>
                 <Td>
                   {myBusiness.busProds.reduce(
-                    (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                    (p, c) =>
+                      p +
+                      +((c.tech_cart?.costHectare || 0) * c.area).toFixed(2),
                     0
                   )}
                 </Td>
@@ -465,7 +473,7 @@ function ProductionBusinessPlan({
                       <Td>{i}</Td>
                       <Td>{el.name}</Td>
                       <Td>{el.amount}</Td>
-                      <Td>{el.amount * el.cost}</Td>
+                      <Td>{el.amount * el.price}</Td>
                       <Td></Td>
                       <Td></Td>
                     </Tr>
@@ -477,7 +485,9 @@ function ProductionBusinessPlan({
                   <Td>{i}</Td>
                   <Td>Разом:</Td>
                   <Td>{machines.reduce((p, c) => p + c.amount, 0)}</Td>
-                  <Td>{machines.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td>
+                    {machines.reduce((p, c) => p + c.amount * c.price, 0)}
+                  </Td>
                   <Td></Td>
                   <Td></Td>
                 </Tr>
@@ -492,7 +502,7 @@ function ProductionBusinessPlan({
                 </Td>
                 <Td>
                   {myBusiness.buying_machines.reduce(
-                    (p, c) => p + c.amount * c.cost,
+                    (p, c) => p + c.amount * c.price,
                     0
                   )}
                 </Td>
@@ -542,8 +552,8 @@ function ProductionBusinessPlan({
                     <Td>{el.name}</Td>
                     <Td>1</Td>
                     <Td>{el.startPrice}</Td>
-                    <Td></Td>
-                    <Td></Td>
+                    <Td>{el.depreciationMonth}</Td>
+                    <Td>{el.introductionDate}</Td>
                   </Tr>
                 ))
               );
@@ -610,7 +620,7 @@ function ProductionBusinessPlan({
                     <Td>{i}</Td>
                     <Td>{el.name}</Td>
                     <Td>{el.amount}</Td>
-                    <Td>{el.amount * el.cost}</Td>
+                    <Td>{el.amount * el.price}</Td>
                     <Td></Td>
                     <Td></Td>
                   </Tr>
@@ -622,7 +632,7 @@ function ProductionBusinessPlan({
                   <Td>{i}</Td>
                   <Td>Разом:</Td>
                   <Td>{MSHP.reduce((p, c) => p + c.amount, 0)}</Td>
-                  <Td>{MSHP.reduce((p, c) => p + c.amount * c.cost, 0)}</Td>
+                  <Td>{MSHP.reduce((p, c) => p + c.amount * c.price, 0)}</Td>
                   <Td></Td>
                   <Td></Td>
                 </Tr>
@@ -634,7 +644,10 @@ function ProductionBusinessPlan({
                 <Td>ВСЕ РАЗОМ:</Td>
                 <Td>{myBusiness?.MSHP?.reduce((p, c) => p + c.amount, 0)}</Td>
                 <Td>
-                  {myBusiness?.MSHP?.reduce((p, c) => p + c.amount * c.cost, 0)}
+                  {myBusiness?.MSHP?.reduce(
+                    (p, c) => p + c.amount * c.price,
+                    0
+                  )}
                 </Td>
               </Tr>
             );
@@ -681,19 +694,48 @@ function ProductionBusinessPlan({
         <Tbody>
           {(() => {
             const res = [];
+            let businessSum = 0;
             for (let i = start; i <= end; i++) {
-              if (i <= start + 6) {
-                res.push(
-                  <Tr key={i}>
-                    <Td>{i}</Td>
-                  </Tr>
-                );
-              }
+              const buildingValue = +myBusiness.buildings
+                .filter(
+                  (el) =>
+                    (getYearFromString(el.introductionDate || "") || 0) <= i &&
+                    (getYearFromString(el.introductionDate || "") || 0) +
+                      (el.depreciationPeriod || 0) >=
+                      i
+                )
+                .reduce(
+                  (p, c) =>
+                    p +
+                    (c.depreciationMonth || 0) *
+                      (i == getYearFromString(c.introductionDate)
+                        ? 13 - getMonthFromString(c.introductionDate!)
+                        : 12),
+                  0
+                )
+                .toFixed(2);
+
+              businessSum += buildingValue;
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td>{buildingValue}</Td>
+                </Tr>
+              );
             }
+            res.push(
+              <Tr key={end + 1}>
+                <Td>Разом</Td>
+                <Td></Td>
+                <Td>{businessSum.toFixed(2)}</Td>
+              </Tr>
+            );
             return res;
           })()}
+
           <Tr>
-            <Td>Разом</Td>
+            <Td>Залишкова вартість</Td>
           </Tr>
         </Tbody>
       </Table>
@@ -845,7 +887,7 @@ function ProductionBusinessPlan({
         <Tbody>
           {(() => {
             const res = [];
-            for (let i = start; i < end; i++) {
+            for (let i = start; i <= end; i++) {
               let sum = 0;
               const busProds = myBusiness.busProds.filter(
                 (el) => el.year == i - start

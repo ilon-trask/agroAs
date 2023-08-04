@@ -57,6 +57,7 @@ function LandPlatTable({
                   rate: el.rate,
                   rightOfUse: el.rightOfUse,
                   cadastreNumber: el.cadastreNumber,
+                  year: el.year,
                   enterpriseId: el.enterpriseId!,
                   name: el.name,
                   businessPlanId: el.businessPlanId!,

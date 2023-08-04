@@ -38,7 +38,7 @@ export type CreateBuyingMachineProps = {
   year: number;
   purpose: BuyingMachinePurposeType | "" | "МШП";
   amount: number | "";
-  cost: number | "";
+  price: number | "";
   businessPlanId: number;
   enterpriseId?: number;
 };
@@ -76,7 +76,7 @@ function CreateBuyingMachine({
           name: "",
           amount: "",
           brand: "",
-          cost: "",
+          price: "",
           date: "",
           purpose: "",
           businessPlanId: prev.businessPlanId,
@@ -164,9 +164,9 @@ function CreateBuyingMachine({
               placeholder="Вкажіть ціну"
               inputMode="numeric"
               type="number"
-              value={input?.cost}
+              value={input?.price}
               onChange={(e) => {
-                setInput((prev) => ({ ...prev, cost: e.target.value as any }));
+                setInput((prev) => ({ ...prev, price: e.target.value as any }));
               }}
             />
           </Box>
@@ -239,7 +239,7 @@ function CreateBuyingMachine({
             !input?.name &&
             !input?.brand &&
             !input?.amount &&
-            !input?.cost &&
+            !input?.price &&
             !input?.date &&
             !input?.purpose
           }
@@ -248,16 +248,16 @@ function CreateBuyingMachine({
               input.name &&
               input.brand &&
               input.amount &&
-              input.cost &&
+              input.price &&
               input.date &&
               input.purpose
             ) {
-              input.cost = +input.cost;
+              input.price = +input.price;
               input.amount = +input.amount;
               if (update) {
                 patchBuyingMachineForBusiness(business, {
                   ...input,
-                  cost: +input.cost,
+                  price: +input.price,
                   amount: +input.amount,
                   purpose: input.purpose,
                   buyingId: input.buyingId!,
@@ -265,7 +265,7 @@ function CreateBuyingMachine({
               } else {
                 createBuyingMachineForBusiness(business, {
                   ...input,
-                  cost: +input.cost,
+                  price: +input.price,
                   amount: +input.amount,
                   purpose: input.purpose,
                 });

@@ -1058,7 +1058,7 @@ export interface Ibuying_machine {
   brand: string;
   date: string;
   year: number;
-  cost: number;
+  price: number;
   amount: number;
   purpose: BuyingMachinePurposeType | "МШП";
   userId: string;
@@ -1071,7 +1071,7 @@ export class buying_machine extends Model<Ibuying_machine> {
   declare brand: string;
   declare date: string;
   declare year: number;
-  declare cost: number;
+  declare price: number;
   declare amount: number;
   declare purpose: BuyingMachinePurposeType | "МШП";
   declare userId: string;
@@ -1084,7 +1084,7 @@ buying_machine.init(
     date: { type: DataTypes.DATEONLY },
     year: { type: DataTypes.INTEGER },
     amount: { type: DataTypes.INTEGER },
-    cost: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.INTEGER },
     purpose: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
@@ -1323,11 +1323,13 @@ export interface Ibuilding {
   readonly id?: number;
   name: string;
   startPrice: number;
-  depreciationPeriod: string | null;
+  depreciationPeriod: number | null;
   date: string;
   year: number;
   description: string;
+  introductionDate: string | null;
   userId: string;
+  depreciationMonth?: number | null;
   readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null;
 }
@@ -1338,18 +1340,20 @@ export class building extends Model<Ibuilding> {
   declare year: number;
   declare description: string;
   declare startPrice: number;
-  declare depreciationPeriod: string;
+  declare introductionDate: string;
+  declare depreciationPeriod: number;
   declare userId: string;
 }
 building.init(
   {
     name: { type: DataTypes.STRING },
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
-    depreciationPeriod: { type: DataTypes.STRING },
+    depreciationPeriod: { type: DataTypes.INTEGER },
     date: { type: DataTypes.STRING },
     year: { type: DataTypes.INTEGER },
     description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
+    introductionDate: { type: DataTypes.STRING },
   },
   { sequelize }
 );

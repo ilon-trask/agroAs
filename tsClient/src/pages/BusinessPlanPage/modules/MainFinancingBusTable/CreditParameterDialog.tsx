@@ -355,9 +355,7 @@ function CreditParameterDialog({ open, setOpen, data, busId }: props) {
                       </Tbody>
                     </Table>
                   </TabPanel>
-                  <TabPanel>
-                    <p>one!</p>
-                  </TabPanel>
+                  <TabPanel></TabPanel>
                 </TabPanels>
               </Tabs>
             </Box>

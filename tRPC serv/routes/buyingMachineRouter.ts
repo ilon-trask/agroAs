@@ -4,7 +4,7 @@ import BuyingMachineService from "../controllers/BuyingMachineService";
 export const createBuyingMachine = z.object({
   name: z.string(),
   brand: z.string(),
-  cost: z.number(),
+  price: z.number(),
   amount: z.number(),
   purpose: z.enum(["Трактор", "СГ машина", "Технологічне обладнання", "МШП"]),
   date: z.string(),

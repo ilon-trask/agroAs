@@ -20,6 +20,8 @@ export interface CreateBuildingProps {
   year: number;
   description: string;
   startPrice: string | number;
+  introductionDate?: string | null;
+  depreciationPeriod?: number | string | null;
   businessPlanId: number | null | undefined;
   enterpriseId?: number;
 }
@@ -121,6 +123,9 @@ function CreateBuilding({
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
                   buildId: res.id!,
+                  depreciationPeriod: res.depreciationPeriod
+                    ? +res.depreciationPeriod
+                    : null,
                 });
               } else {
                 createBuildingForBusiness(business, {
@@ -128,6 +133,9 @@ function CreateBuilding({
                   businessPlanId: res.businessPlanId!,
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
+                  depreciationPeriod: res.depreciationPeriod
+                    ? +res.depreciationPeriod
+                    : null,
                 });
               }
               setUpdate(false);

@@ -20,12 +20,12 @@ import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Ifinancing } from "../../../../tRPC serv/models/models";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import { Ifinancing } from "../../../../../../tRPC serv/models/models";
 import {
   CashFlowTableHead,
   CashFlowTableHeadBegin,
-} from "../CashFlowTable/CashFlowTable";
+} from "../../../../modules/CashFlowTable/CashFlowTable";
 
 function FinancingBusinessPlan({
   start,
@@ -155,14 +155,14 @@ function FinancingBusinessPlan({
     // const mshp ;
     const machinesValue = myBusiness.buying_machines
       .filter((el) => el.year == i - start)
-      .reduce((p, c) => p + c.cost, 0);
+      .reduce((p, c) => p + c.price * c.amount, 0);
     const buildingValue = myBusiness.buildings
       .filter((el) => el.year == i - start)
       .reduce((p, c) => p + +c.startPrice, 0);
 
     const mshpValue = myBusiness.MSHP.filter(
       (el) => el.year == i - start
-    ).reduce((p, c) => p + c.cost * c.amount, 0);
+    ).reduce((p, c) => p + c.price * c.amount, 0);
     const creatingValue = 0;
     const opersValue = 0;
     sum +=
@@ -293,12 +293,12 @@ function FinancingBusinessPlan({
                 .reduce((p, c) => p + c.cost, 0) + saleValue;
             const outcome =
               myBusiness.MSHP.filter((el) => el.year == i - start).reduce(
-                (p, c) => p + c.amount * c.cost,
+                (p, c) => p + c.price * c.amount,
                 0
               ) +
               myBusiness.buying_machines
                 .filter((el) => el.year == i - start)
-                .reduce((p, c) => p + c.amount * c.cost, 0) +
+                .reduce((p, c) => p + c.price * c.amount, 0) +
               myBusiness.buildings
                 .filter((el) => el.year == i - start)
                 .reduce((p, c) => p + +c.startPrice, 0) +
@@ -361,7 +361,7 @@ function FinancingBusinessPlan({
                   <Td>
                     {myBusiness.MSHP.filter(
                       (el) => el.year == i - start
-                    ).reduce((p, c) => p + c.amount * c.cost, 0)}
+                    ).reduce((p, c) => p + c.price * c.amount, 0)}
                   </Td>
                 </Tr>
                 <Tr>
@@ -372,7 +372,7 @@ function FinancingBusinessPlan({
                   <Td>
                     {myBusiness.buying_machines
                       .filter((el) => el.year == i - start)
-                      .reduce((p, c) => p + c.amount * c.cost, 0)}
+                      .reduce((p, c) => p + c.price * c.amount, 0)}
                   </Td>
                 </Tr>
                 <Tr>

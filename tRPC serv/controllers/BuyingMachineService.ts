@@ -25,8 +25,9 @@ class buyingMachineService {
     const res: Ibuying_machine = await buying_machine.create({
       amount: data.amount,
       brand: data.brand,
-      cost: data.cost,
+      price: data.price,
       date: data.date,
+      year: data.year,
       name: data.name,
       purpose: data.purpose,
       userId: user.sub,
@@ -41,7 +42,7 @@ class buyingMachineService {
       {
         amount: data.amount,
         brand: data.brand,
-        cost: data.cost,
+        price: data.price,
         date: data.date,
         name: data.name,
         purpose: data.purpose,
