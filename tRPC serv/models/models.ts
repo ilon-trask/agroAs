@@ -867,6 +867,7 @@ export interface Ioutcome {
   id?: number;
   name: string;
   date: string;
+  year: number;
   group: IoutcomeGroup;
   type: IoutcomeType | null;
   costMonth: number | null;
@@ -882,6 +883,7 @@ export interface Ioutcome {
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
   declare date: string;
+  declare year: number;
   declare name: string;
   declare costMonth: number;
   declare group: IoutcomeGroup;
@@ -894,6 +896,7 @@ outcome.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     name: { type: DataTypes.STRING },
     costMonth: { type: DataTypes.FLOAT(2) },
     group: { type: DataTypes.STRING },

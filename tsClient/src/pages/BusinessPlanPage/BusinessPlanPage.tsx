@@ -54,7 +54,6 @@ export function getMonthAmountFromBusinessPlan(
   return i == start ? 13 - +dateStart.split("-")[1] : 12;
 }
 function BiznesPlanPage() {
-  console.time("all");
   const { map, enterpriseStore, business, income, TEJ, user } =
     useContext(Context);
   const { id } = useParams();
@@ -113,7 +112,6 @@ function BiznesPlanPage() {
     ({ type }) => type == "derj_support"
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
-  console.timeEnd("all");
 
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
@@ -240,7 +238,6 @@ function BiznesPlanPage() {
             start={start}
             end={end}
             myBusiness={myBusiness!}
-            thisWorkers={thisWorkers!}
           />
           <AdditionBusinessPlan
             start={start}

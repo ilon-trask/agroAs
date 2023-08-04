@@ -273,8 +273,6 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       }
       return { creditBody, creditProc };
     })();
-    console.log("creditBody");
-    console.log(creditBody);
 
     plan.outcomes = (() => {
       const outcomes: Ioutcome[] = [];
@@ -289,6 +287,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Тіло кредиту",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: creditBody[i] || 0,
           isDefault: true,
         });
@@ -299,6 +298,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "% кредиту",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: creditProc[i] || 0,
           isDefault: true,
         });
@@ -319,6 +319,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оплата праці АП",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Адміністративний"
@@ -340,6 +341,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Нарахування (ЄСВ+ВЗ)",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Адміністративний"
@@ -361,6 +363,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оплата праці ІТР",
           group: "Загально виробничі",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Інженерно технічний"
@@ -382,6 +385,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Нарахування (ЄСВ+ВЗ)",
           group: "Загально виробничі",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Інженерно технічний"
@@ -404,6 +408,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оренда землі",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: lands
             .filter((el) => el.rightOfUse == "Оренда")
             .reduce((p, c) => p + c.area * c.rate, 0),
@@ -416,6 +421,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Земельний податок",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: lands
             .filter((el) => el.rightOfUse == "Власна")
             .reduce((p, c) => p + c.area * c.rate, 0),
@@ -787,6 +793,7 @@ class BusinessService {
       group: data.group,
       userId: user.sub,
       businessPlanId: data.businessPlanId!,
+      year: data.year,
       type: data.type,
     });
     return res;

@@ -1,6 +1,12 @@
 import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useContext, useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import TableComponent from "src/components/TableComponent";
 import CreateFinancing from "src/modules/CreateFinancing";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
@@ -23,6 +29,205 @@ import CreditParameterDialog, {
   CreditParameterProps,
 } from "./CreditParameterDialog";
 import MyTableContainer from "src/ui/MyTableContainer";
+type FinancingTableProps = {
+  start: number;
+  end: number;
+  financing: resFinancing[] | undefined;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setParameterOpen: Dispatch<SetStateAction<boolean>>;
+  setRes: Dispatch<SetStateAction<any>>;
+  setParameterData: Dispatch<SetStateAction<any>>;
+  setDeleteData: Dispatch<SetStateAction<DeleteProps>>;
+  busId: number;
+};
+function FinancingTable({
+  end,
+  financing,
+  start,
+  setOpen,
+  setParameterData,
+  setParameterOpen,
+  setRes,
+  setUpdate,
+  setDeleteData,
+  busId,
+}: FinancingTableProps) {
+  const { business } = useContext(Context);
+  return (
+    <MyTableContainer>
+      <Table size={"sm"} whiteSpace={"pre-wrap"}>
+        <Thead>
+          <Tr>
+            <Th></Th>
+            <Th>Рік</Th>
+            <Th>Тип</Th>
+            <Th>Назва</Th>
+            <Th>Сума на БП</Th>
+            <Th>Призначення</Th>
+            <Th>Метод розрахунку</Th>
+            <Th>Сума на гектар</Th>
+            <Th>Графік</Th>
+            <Th></Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(() => {
+            const res: any[] = [];
+            for (let i = start; i <= end; i++) {
+              const fin = financing?.filter((el) => el.year == i - start) || [];
+              fin.forEach((el) =>
+                res.push(
+                  <Tr key={el.id!}>
+                    <Td>
+                      {el.name == "Початкові інвестиції" ? (
+                        <></>
+                      ) : (
+                        <MyEditIcon
+                          onClick={() => {
+                            setOpen(true);
+                            setUpdate(true);
+                            setRes({
+                              id: el.id,
+                              calculationMethod: el.calculationMethod,
+                              cost: el.cost,
+                              date: el.date,
+                              enterpriseId: undefined,
+                              isUseCost: el.isUseCost,
+                              name: el.name,
+                              purpose: el.purpose,
+                              type: el.type,
+                              cultureId: el.cultureId,
+                              month: el.month!,
+                              year: el.year - start,
+                            });
+                          }}
+                        />
+                      )}
+                    </Td>
+                    <Td>{i}</Td>
+                    <Td>{el.typeName}</Td>
+                    <Td>{el.name}</Td>
+                    <Td>{el.costBP || 0}</Td>
+                    <Td>{el.purpose}</Td>
+                    <Td>{el.calculationMethod}</Td>
+                    <Td>{el.costHectare?.toFixed(2) || 0}</Td>
+                    <Td>
+                      <Button
+                        size={"sm"}
+                        onClick={() => {
+                          if (el.type == "credit") {
+                            setParameterOpen(true);
+                            setParameterData({
+                              amount: el.costBP!,
+                              commissionForCredit:
+                                el.creditParameter?.commissionForCredit || 0,
+                              creditTerm: end - i,
+                              monthlyСommission:
+                                el.creditParameter?.monthlyСommission || 0,
+                              paymentsFrequency:
+                                el.creditParameter?.paymentsFrequency || "",
+                              procent: el.creditParameter?.procent || 0,
+                              repaymentMethod:
+                                el.creditParameter?.repaymentMethod || "",
+                              id: el.id,
+                              year: el.year,
+                              month: el.month!,
+                            });
+                          }
+                        }}
+                      >
+                        Додати
+                      </Button>
+                    </Td>
+                    <Td>
+                      {el.name == "Початкові інвестиції" ? (
+                        <></>
+                      ) : (
+                        <MyDeleteIcon
+                          onClick={() => {
+                            setDeleteData({
+                              func: () => {
+                                setDeleteData((prev) => ({
+                                  ...prev,
+                                  isOpen: false,
+                                }));
+                                deleteFinancingForBusiness(business, {
+                                  busId,
+                                  id: el.id!,
+                                });
+                              },
+                              isOpen: true,
+                              text: "фінансування",
+                            });
+                          }}
+                        />
+                      )}
+                    </Td>
+                  </Tr>
+                )
+              );
+              res.push(
+                <Tr key={i} fontWeight={"bold"}>
+                  <Td>
+                    <MyAddIcon
+                      onClick={() => {
+                        setOpen(true);
+                        setRes({
+                          calculationMethod: "",
+                          cost: "",
+                          date: i + "-01-01",
+                          enterpriseId: undefined,
+                          isUseCost: false,
+                          name: "",
+                          purpose: "",
+                          type: "",
+                          cultureId: "",
+                          month: "",
+                          year: i - start,
+                        });
+                      }}
+                    />
+                  </Td>
+                  <Td>{i}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{fin.reduce((p, c) => p + (c.costBP || 0), 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td></Td>
+                  <Td>{fin.reduce((p, c) => p + (c.costHectare || 0), 0)}</Td>
+                  <Td></Td>
+                  <Td></Td>
+                </Tr>
+              );
+            }
+            res.push(
+              <Tr key={"all"} fontWeight={"bold"}>
+                <Td></Td>
+                <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
+
+                <Td></Td>
+                <Td>{financing?.reduce((p, c) => p + (c.costBP || 0), 0)}</Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td>
+                  {financing?.reduce((p, c) => p + (c.costHectare || 0), 0)}
+                </Td>
+                <Td></Td>
+                <Td></Td>
+              </Tr>
+            );
+            return res;
+          })()}
+        </Tbody>
+      </Table>
+    </MyTableContainer>
+  );
+}
+const MemoedFinancingTable = React.memo(FinancingTable);
 type props = {
   financing: resFinancing[] | undefined;
   start: number;
@@ -43,11 +248,12 @@ function MainFinancingBusinessPlanTable({
     isOpen: false,
     text: "фінансування",
   });
+  const financingData = useMemo(() => financing, [JSON.stringify(financing)]);
   const [parameterOpen, setParameterOpen] = useState(false);
   const [parameterData, setParameterData] = useState<
     CreditParameterProps | undefined
   >();
-  const { business } = useContext(Context);
+
   // const data = (() => {
   //   const result: any[] = [];
   //   for (let i = start; i <= end; i++) {
@@ -251,177 +457,18 @@ function MainFinancingBusinessPlanTable({
   return (
     <>
       {/* <TableComponent columns={columns} data={data} /> */}
-      <MyTableContainer>
-        <Table size={"sm"} whiteSpace={"pre-wrap"}>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th>Рік</Th>
-              <Th>Тип</Th>
-              <Th>Назва</Th>
-              <Th>Сума на БП</Th>
-              <Th>Призначення</Th>
-              <Th>Метод розрахунку</Th>
-              <Th>Сума на гектар</Th>
-              <Th>Графік</Th>
-              <Th></Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {(() => {
-              const res: any[] = [];
-              for (let i = start; i <= end; i++) {
-                const fin =
-                  financing?.filter((el) => el.year == i - start) || [];
-                fin.forEach((el) =>
-                  res.push(
-                    <Tr key={el.id!}>
-                      <Td>
-                        {el.name == "Початкові інвестиції" ? (
-                          <></>
-                        ) : (
-                          <MyEditIcon
-                            onClick={() => {
-                              setOpen(true);
-                              setUpdate(true);
-                              setRes({
-                                id: el.id,
-                                calculationMethod: el.calculationMethod,
-                                cost: el.cost,
-                                date: el.date,
-                                enterpriseId: undefined,
-                                isUseCost: el.isUseCost,
-                                name: el.name,
-                                purpose: el.purpose,
-                                type: el.type,
-                                cultureId: el.cultureId,
-                                month: el.month!,
-                                year: el.year - start,
-                              });
-                            }}
-                          />
-                        )}
-                      </Td>
-                      <Td>{i}</Td>
-                      <Td>{el.typeName}</Td>
-                      <Td>{el.name}</Td>
-                      <Td>{el.costBP || 0}</Td>
-                      <Td>{el.purpose}</Td>
-                      <Td>{el.calculationMethod}</Td>
-                      <Td>{el.costHectare?.toFixed(2) || 0}</Td>
-                      <Td>
-                        <Button
-                          size={"sm"}
-                          onClick={() => {
-                            if (el.type == "credit") {
-                              setParameterOpen(true);
-                              setParameterData({
-                                amount: el.costBP!,
-                                commissionForCredit:
-                                  el.creditParameter?.commissionForCredit || 0,
-                                creditTerm: end - i,
-                                monthlyСommission:
-                                  el.creditParameter?.monthlyСommission || 0,
-                                paymentsFrequency:
-                                  el.creditParameter?.paymentsFrequency || "",
-                                procent: el.creditParameter?.procent || 0,
-                                repaymentMethod:
-                                  el.creditParameter?.repaymentMethod || "",
-                                id: el.id,
-                                year: el.year,
-                                month: el.month!,
-                              });
-                            }
-                          }}
-                        >
-                          Додати
-                        </Button>
-                      </Td>
-                      <Td>
-                        {el.name == "Початкові інвестиції" ? (
-                          <></>
-                        ) : (
-                          <MyDeleteIcon
-                            onClick={() => {
-                              setDeleteData({
-                                func: () => {
-                                  setDeleteData((prev) => ({
-                                    ...prev,
-                                    isOpen: false,
-                                  }));
-                                  deleteFinancingForBusiness(business, {
-                                    busId,
-                                    id: el.id!,
-                                  });
-                                },
-                                isOpen: true,
-                                text: "фінансування",
-                              });
-                            }}
-                          />
-                        )}
-                      </Td>
-                    </Tr>
-                  )
-                );
-                res.push(
-                  <Tr key={i} fontWeight={"bold"}>
-                    <Td>
-                      <MyAddIcon
-                        onClick={() => {
-                          setOpen(true);
-                          setRes({
-                            calculationMethod: "",
-                            cost: "",
-                            date: i + "-01-01",
-                            enterpriseId: undefined,
-                            isUseCost: false,
-                            name: "",
-                            purpose: "",
-                            type: "",
-                            cultureId: "",
-                            month: "",
-                            year: i - start,
-                          });
-                        }}
-                      />
-                    </Td>
-                    <Td>{i}</Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td>{fin.reduce((p, c) => p + (c.costBP || 0), 0)}</Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td>{fin.reduce((p, c) => p + (c.costHectare || 0), 0)}</Td>
-                    <Td></Td>
-                    <Td></Td>
-                  </Tr>
-                );
-              }
-              res.push(
-                <Tr key={"all"} fontWeight={"bold"}>
-                  <Td></Td>
-                  <Td colSpan={2}>ВСЕ РАЗОМ:</Td>
-
-                  <Td></Td>
-                  <Td>{financing?.reduce((p, c) => p + (c.costBP || 0), 0)}</Td>
-                  <Td></Td>
-                  <Td></Td>
-                  <Td></Td>
-                  <Td>
-                    {financing?.reduce((p, c) => p + (c.costHectare || 0), 0)}
-                  </Td>
-                  <Td></Td>
-                  <Td></Td>
-                </Tr>
-              );
-              return res;
-            })()}
-          </Tbody>
-        </Table>
-      </MyTableContainer>
+      <MemoedFinancingTable
+        busId={busId}
+        end={end}
+        financing={financingData}
+        setDeleteData={setDeleteData}
+        setOpen={setOpen}
+        setParameterData={setParameterData}
+        setParameterOpen={setParameterOpen}
+        setRes={setRes}
+        setUpdate={setUpdate}
+        start={start}
+      />
       {open && res && (
         <CreateFinancing
           busId={busId}

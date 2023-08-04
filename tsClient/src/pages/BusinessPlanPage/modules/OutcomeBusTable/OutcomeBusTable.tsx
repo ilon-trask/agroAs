@@ -19,7 +19,6 @@ import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
-import MyHeading from "src/ui/MyHeading";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import { getMonthAmountFromBusinessPlan } from "../../BusinessPlanPage";
@@ -68,9 +67,7 @@ function OutcomeBusTable({
                   let sum = 0;
                   for (let i = start; i <= end; i++) {
                     const outcomes = myBusiness.outcomes.filter(
-                      (el) =>
-                        getYearFromString(el.date) == i &&
-                        el.group == "Постійні"
+                      (el) => el.year == i - start && el.group == "Постійні"
                     );
                     const monthAmount = getMonthAmountFromBusinessPlan(
                       myBusiness.dateStart,
@@ -92,12 +89,13 @@ function OutcomeBusTable({
                                     group: el.group,
                                     name: el.name,
                                     businessPlanId: el.businessPlanId,
+                                    year: i - start,
                                   });
                                 }}
                               />
                             ) : null}
                           </Td>
-                          <Td>{getYearFromString(el.date)}</Td>
+                          <Td>{i}</Td>
                           <Td>{el.name}</Td>
                           <Td>{el.costMonth}</Td>
                           <Td>{el.costYear}</Td>
@@ -146,6 +144,7 @@ function OutcomeBusTable({
                                 group: "Постійні",
                                 name: "",
                                 businessPlanId: myBusiness.id!,
+                                year: i - start,
                               });
                             }}
                           />
@@ -201,8 +200,7 @@ function OutcomeBusTable({
                   for (let i = start; i <= end; i++) {
                     const outcomes = myBusiness.outcomes.filter(
                       (el) =>
-                        getYearFromString(el.date) == i &&
-                        el.group == "Загально виробничі"
+                        el.year == i - start && el.group == "Загально виробничі"
                     );
                     const monthAmount = getMonthAmountFromBusinessPlan(
                       myBusiness.dateStart,
@@ -224,12 +222,13 @@ function OutcomeBusTable({
                                     group: el.group,
                                     name: el.name,
                                     businessPlanId: el.businessPlanId,
+                                    year: el.year,
                                   });
                                 }}
                               />
                             ) : null}
                           </Td>
-                          <Td>{getYearFromString(el.date)}</Td>
+                          <Td>{i}</Td>
                           <Td>{el.name}</Td>
                           <Td>{el.costMonth}</Td>
                           <Td>{el.costYear}</Td>
@@ -278,6 +277,7 @@ function OutcomeBusTable({
                                 group: "Загально виробничі",
                                 name: "",
                                 businessPlanId: myBusiness.id!,
+                                year: i - start,
                               });
                             }}
                           />

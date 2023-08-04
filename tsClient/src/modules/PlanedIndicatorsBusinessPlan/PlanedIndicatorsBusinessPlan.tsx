@@ -1,4 +1,4 @@
-import { Table, Th, Thead, Tr, Heading, Td, Text } from "@chakra-ui/react";
+import { Table, Th, Thead, Tr, Text } from "@chakra-ui/react";
 import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import { ColumnDef } from "@tanstack/react-table";
@@ -9,31 +9,20 @@ import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Iworker } from "../../../../tRPC serv/models/models";
 
 function PlanedIndicatorsBusinessPlan({
   start,
   end,
   myBusiness,
   aref,
-  thisWorkers,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
-  thisWorkers: Iworker[];
   aref: RefObject<HTMLTableElement>;
 }) {
   const { income } = useContext(Context);
-
-  const data = useBusinessPlanFinancingData(
-    start,
-    end,
-    myBusiness,
-    income,
-    thisWorkers
-  );
-
+  const data = useBusinessPlanFinancingData(start, end, myBusiness);
   const columns = useMemo<ColumnDef<any>[]>(() => {
     return [
       { header: "", accessorKey: "date" },

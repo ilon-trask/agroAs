@@ -10,6 +10,7 @@ export const createOutcome = z.object({
     .nullish()
     .optional(),
   group: z.enum(["Прямі", "Загально виробничі", "Постійні", "Не визначино"]),
+  year: z.number(),
   businessPlanId: z.number(),
 });
 export type createOutcomeType = z.infer<typeof createOutcome>;

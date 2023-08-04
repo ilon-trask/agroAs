@@ -9,10 +9,9 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { RefObject, useContext, useMemo } from "react";
+import React, { RefObject, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
-import { Context } from "src/main";
 import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import useIncomeTypes from "src/shared/hook/useIncomeTypes";

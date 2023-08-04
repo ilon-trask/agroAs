@@ -55,10 +55,8 @@ export type CreditParameterProps = {
 function CreditParameterDialog({ open, setOpen, data, busId }: props) {
   const { business } = useContext(Context);
   const {
-    control,
     handleSubmit,
     register,
-    reset,
     formState: { errors },
     watch,
   } = useForm({

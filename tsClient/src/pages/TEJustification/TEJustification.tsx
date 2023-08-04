@@ -36,8 +36,6 @@ function TEJjustification() {
   const navigate = useNavigate();
 
   const myCart = map.allMaps?.find((el) => el.id == cartId);
-  console.log("myCart");
-  console.log(myCart);
 
   let myJustification: resTechnologicalEconomicJustification | undefined;
   if (user.role == "") {
@@ -55,7 +53,6 @@ function TEJjustification() {
   }
 
   useEffect(() => {
-    console.log("try2");
     getCarts(map, +cartId!);
     getGrades(map);
     getTractor(map);
@@ -65,7 +62,6 @@ function TEJjustification() {
   //   if (user.role == "" && myJustification?.culture?.id)
   //     getYieldPlant(income, myJustification?.culture?.id!);
   // }, [myJustification?.culture?.id]);
-  console.log(myCart);
   const [updCartOpen, setUpdCartOpen] = useState(false);
   const [updCartRes, setUpdCartRes] =
     useState<ItechnologicalEconomicJustification>({

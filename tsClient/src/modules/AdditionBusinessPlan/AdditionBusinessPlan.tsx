@@ -4,9 +4,9 @@ import React, { RefObject, useContext, useMemo } from "react";
 import { Context } from "src/main";
 import TechnologicalMapContent from "src/pages/TechnologicalMap/TechnologicalMapContent";
 import getYearFromString from "src/shared/funcs/getYearFromString";
+import useBusinessPlanData from "src/shared/hook/BusinessPlanFinancingData/useBusinessPlanData";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import useVegetationYears from "src/shared/hook/useVegetationYears";
-import Description from "src/ui/Description";
 import MyHeading from "src/ui/MyHeading";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
@@ -46,285 +46,247 @@ function AdditionBusinessPlan({
   aref: RefObject<HTMLTableElement>;
 }) {
   const { map, income } = useContext(Context);
-  const technologyCultureData = (() => {
-    const res: {
-      period: string | number;
-      year: string | number;
-      culture: string | number;
-      technology: string | number;
-      map: string | number;
-      area: string | number;
-      totalCost: string | number;
-      OPFund: string | number;
-      ESV_VZ: string | number;
-      direct: string | number;
-      OP_ITR_Fund: string | number;
-      ESV_VZ_ITR: string | number;
-      otherTotalProduction: string | number;
-      totalProduction: string | number;
-      variable: string | number;
-      OP_ADM_Fund: string | number;
-      ESV_VZ_ADM: string | number;
-      otherPermanent: string | number;
-      permanent: string | number;
-      expenses: string | number;
-      income: string | number;
-      product: string | number;
-      grossHarvest: string | number;
-      cost: string | number;
-      revenue: string | number;
-      investment: string | number;
-      sum: string | number;
-      bold?: boolean;
-    }[] = [];
-    let years: number[] = new Array(
-      myBusiness?.realizationTime! + 1 < 11
-        ? myBusiness?.realizationTime! + 1
-        : 11
-    ).fill(1);
+  // const technologyCultureData = (() => {
+  //   const res: {
+  //     period: string | number;
+  //     year: string | number;
+  //     culture: string | number;
+  //     technology: string | number;
+  //     map: string | number;
+  //     area: string | number;
+  //     totalCost: string | number;
+  //     OPFund: string | number;
+  //     ESV_VZ: string | number;
+  //     direct: string | number;
+  //     OP_ITR_Fund: string | number;
+  //     ESV_VZ_ITR: string | number;
+  //     otherTotalProduction: string | number;
+  //     totalProduction: string | number;
+  //     variable: string | number;
+  //     OP_ADM_Fund: string | number;
+  //     ESV_VZ_ADM: string | number;
+  //     otherPermanent: string | number;
+  //     permanent: string | number;
+  //     expenses: string | number;
+  //     income: string | number;
+  //     product: string | number;
+  //     grossHarvest: string | number;
+  //     cost: string | number;
+  //     revenue: string | number;
+  //     investment: string | number;
+  //     sum: string | number;
+  //     bold?: boolean;
+  //   }[] = [];
+  //   let years: number[] = new Array(
+  //     myBusiness?.realizationTime! + 1 < 11
+  //       ? myBusiness?.realizationTime! + 1
+  //       : 11
+  //   ).fill(1);
 
-    years.map((el, ind) => {
-      let sumArea = 0,
-        sumCost = 0,
-        sumSalary = 0,
-        sumESV = 0,
-        sumDirect = 0,
-        sumTake = 0;
-      const thisYear = start + ind;
-      const busProds = myBusiness.busProds.filter((el) => el.year == ind);
-      const sumCredit = thisCredit
-        ?.filter((el) => getYearFromString(el.date) == thisYear)
-        .reduce((p, c) => p + c.cost, 0);
-      const sumInv = thisInvestment
-        ?.filter((el) => getYearFromString(el.date) == thisYear)
-        .reduce((p, c) => p + c.cost, 0);
-      const sumDerj = thisDerj
-        ?.filter((el) => getYearFromString(el.date) == thisYear)
-        .reduce((p, c) => p + c.cost, 0);
-      const sumGrand = thisGrand
-        ?.filter((el) => getYearFromString(el.date) == thisYear)
-        .reduce((p, c) => p + c.cost, 0);
-      res.push(
-        {
-          period: ind,
-          year: thisYear,
-          product: busProds
-            .map((el) => el.product?.name.split(" ").join("\u00A0"))
-            .join("\n"),
-          culture: busProds
-            .map((el) => el.product?.culture?.name.split(" ").join("\u00A0"))
-            .join("\n"),
-          technology: busProds
-            .map((el) =>
-              el.cultivationTechnology?.name.split(" ").join("\u00A0")
-            )
-            .join("\n"),
-          map: busProds.map((el) => el.tech_cart?.nameCart).join("\n"),
-          area: busProds
-            .map((el) => {
-              sumArea += el.area;
-              return el.area;
-            })
-            .join("\n"),
-          totalCost: busProds
-            .map((el) => {
-              let res = (el.tech_cart?.costHectare || 0) * el.area;
-              sumCost += res;
-              return res;
-            })
-            .join("\n"),
-          OPFund: busProds
-            .map((el) => {
-              let res =
-                (el.tech_cart?.totalCostHandWork ||
-                  0 + el.tech_cart?.totalCostMachineWork! ||
-                  0) * el.area;
-              sumSalary += res;
-              return res;
-            })
-            .join("\n"),
-          ESV_VZ: busProds
-            .map((el) => {
-              let res = Math.round(
-                (el.tech_cart?.totalCostHandWork ||
-                  0 + el.tech_cart?.totalCostMachineWork! ||
-                  0) *
-                  el.area *
-                  0.235
-              );
-              sumESV += res;
-              return res;
-            })
-            .join("\n"),
-          direct: busProds
-            .map((el) => {
-              let res =
-                Math.round(
-                  (el.tech_cart?.totalCostHandWork ||
-                    0 + el.tech_cart?.totalCostMachineWork! ||
-                    0) *
-                    el.area *
-                    0.235
-                ) +
-                  el.tech_cart?.costHectare! * el.area || 0;
-              sumDirect += res;
-              return res;
-            })
-            .join("\n"),
-          OP_ITR_Fund: "",
-          ESV_VZ_ITR: "",
-          otherTotalProduction: "",
-          totalProduction: "",
-          variable: "",
-          OP_ADM_Fund: "",
-          ESV_VZ_ADM: "",
-          otherPermanent: "",
-          permanent: "",
-          expenses: "",
-          income: "",
+  //   years.map((el, ind) => {
+  //     let sumArea = 0,
+  //       sumCost = 0,
+  //       sumSalary = 0,
+  //       sumESV = 0,
+  //       sumDirect = 0,
+  //       sumTake = 0;
+  //     const thisYear = start + ind;
+  //     const busProds = myBusiness.busProds.filter((el) => el.year == ind);
+  //     const sumCredit = thisCredit
+  //       ?.filter((el) => getYearFromString(el.date) == thisYear)
+  //       .reduce((p, c) => p + c.cost, 0);
+  //     const sumInv = thisInvestment
+  //       ?.filter((el) => getYearFromString(el.date) == thisYear)
+  //       .reduce((p, c) => p + c.cost, 0);
+  //     const sumDerj = thisDerj
+  //       ?.filter((el) => getYearFromString(el.date) == thisYear)
+  //       .reduce((p, c) => p + c.cost, 0);
+  //     const sumGrand = thisGrand
+  //       ?.filter((el) => getYearFromString(el.date) == thisYear)
+  //       .reduce((p, c) => p + c.cost, 0);
+  //     res.push(
+  //       {
+  //         period: ind,
+  //         year: thisYear,
+  //         product: busProds
+  //           .map((el) => el.product?.name.split(" ").join("\u00A0"))
+  //           .join("\n"),
+  //         culture: busProds
+  //           .map((el) => el.product?.culture?.name.split(" ").join("\u00A0"))
+  //           .join("\n"),
+  //         technology: busProds
+  //           .map((el) =>
+  //             el.cultivationTechnology?.name.split(" ").join("\u00A0")
+  //           )
+  //           .join("\n"),
+  //         map: busProds.map((el) => el.tech_cart?.nameCart).join("\n"),
+  //         area: busProds
+  //           .map((el) => {
+  //             sumArea += el.area;
+  //             return el.area;
+  //           })
+  //           .join("\n"),
+  //         totalCost: busProds
+  //           .map((el) => {
+  //             let res = (el.tech_cart?.costHectare || 0) * el.area;
+  //             sumCost += res;
+  //             return res;
+  //           })
+  //           .join("\n"),
+  //         OPFund: busProds
+  //           .map((el) => {
+  //             let res = useBusinessPlanData.oneOPFund(el);
+  //             sumSalary += res;
+  //             return res;
+  //           })
+  //           .join("\n"),
+  //         ESV_VZ: busProds
+  //           .map((el) => {
+  //             let res = Math.round(useBusinessPlanData.oneESV_VZ(el));
+  //             sumESV += res;
+  //             return res;
+  //           })
+  //           .join("\n"),
+  //         direct: busProds
+  //           .map((el) => {
+  //             let res = useBusinessPlanData.oneDirect(el);
+  //             sumDirect += res;
+  //             return res;
+  //           })
+  //           .join("\n"),
+  //         OP_ITR_Fund: "",
+  //         ESV_VZ_ITR: "",
+  //         otherTotalProduction: "",
+  //         totalProduction: "",
+  //         variable: "",
+  //         OP_ADM_Fund: "",
+  //         ESV_VZ_ADM: "",
+  //         otherPermanent: "",
+  //         permanent: "",
+  //         expenses: "",
+  //         income: "",
 
-          grossHarvest: busProds
-            .map((el) => {
-              const vegetationYear = el.vegetationYear;
-              return (
-                Math.round(
-                  vegetationYear?.potentialYieldPerHectare! *
-                    vegetationYear?.allCoeff! *
-                    el.area
-                ) || 0
-              );
-            })
-            .join("\n"),
-          cost: busProds
-            .map((el) => el.product?.culture?.priceBerry! * 1000)
-            .join("\n"),
+  //         grossHarvest: busProds
+  //           .map((el) => {
+  //             const vegetationYear = el.vegetationYear;
+  //             return (
+  //               Math.round(
+  //                 vegetationYear?.potentialYieldPerHectare! *
+  //                   vegetationYear?.allCoeff! *
+  //                   el.area
+  //               ) || 0
+  //             );
+  //           })
+  //           .join("\n"),
+  //         cost: busProds
+  //           .map((el) => el.product?.culture?.priceBerry! * 1000)
+  //           .join("\n"),
 
-          revenue: busProds
-            .map((el) => {
-              const vegetationYear = el.vegetationYear;
-              let res =
-                Math.round(
-                  vegetationYear?.potentialYieldPerHectare! *
-                    vegetationYear?.allCoeff! *
-                    el.area
-                ) *
-                  el.product?.culture?.priceBerry! *
-                  1000 || 0;
-              sumTake += res;
-              return res;
-            })
-            .join("\n"),
-          investment: [
-            ind == 0 ? "Початкові\u00A0інвестиції" : "Інвестиції",
-            "Кредит",
-            "Держ\u00A0підтримка",
-            "Грант",
-          ].join("\n"),
-          sum: [sumInv, sumCredit, sumDerj, sumGrand].join("\n"),
-        },
-        {
-          bold: true,
-          period: "Разом\u00A0за\u00A0рік",
-          year: "",
-          culture: "",
-          technology: "",
-          map: "",
-          area: sumArea,
-          totalCost: sumCost,
-          OPFund: sumSalary,
-          ESV_VZ: sumESV,
-          direct: sumDirect,
-          OP_ITR_Fund: thisWorkers
-            .filter((el) => el.class == "Інженерно технічний")
-            .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0),
-          ESV_VZ_ITR:
-            thisWorkers
-              .filter((el) => el.class == "Інженерно технічний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 0.235,
-          otherTotalProduction: 0,
-          totalProduction: Math.round(
-            thisWorkers
-              .filter((el) => el.class == "Інженерно технічний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-          ),
-          variable:
-            Math.round(
-              thisWorkers
-                .filter((el) => el.class == "Інженерно технічний")
-                .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-            ) + sumDirect,
-          OP_ADM_Fund: Math.round(
-            thisWorkers
-              .filter((el) => el.class == "Адміністративний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0)
-          ),
-          ESV_VZ_ADM: Math.round(
-            thisWorkers
-              .filter((el) => el.class == "Адміністративний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 0.235
-          ),
-          otherPermanent: 0,
-          permanent: Math.round(
-            thisWorkers
-              .filter((el) => el.class == "Адміністративний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-          ),
-          expenses:
-            thisWorkers
-              .filter((el) => el.class == "Адміністративний")
-              .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) *
-              1.235 +
-            Math.round(
-              thisWorkers
-                .filter((el) => el.class == "Інженерно технічний")
-                .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
-            ) +
-            sumDirect,
-          income: sumTake + (ind == 0 ? myBusiness.initialAmount : 0),
-          product: "",
-          grossHarvest: "",
-          cost: "",
-          revenue: sumTake,
-          investment: "",
-          sum:
-            (sumCredit || 0) + (sumInv || 0) + (sumDerj || 0) + (sumGrand || 0),
-        }
-      );
-    });
-    return res;
-  })();
-  const technologyCultureColumns = useMemo<ColumnDef<any>[]>(
-    () => [
-      { header: "Період", accessorKey: "period" },
-      { header: "Рік", accessorKey: "year" },
-      { header: "Продукт", accessorKey: "product" },
-      { header: "Культура", accessorKey: "culture" },
-      { header: "Технологія", accessorKey: "technology" },
-      { header: "Карта", accessorKey: "map" },
-      { header: "Площа", accessorKey: "area" },
-      { header: "Загальна вартість", accessorKey: "totalCost" },
-      { header: "Фонд ОП", accessorKey: "OPFund" },
-      { header: "ЄСВ + ВЗ", accessorKey: "ESV_VZ" },
-      { header: "Прямі", accessorKey: "direct" },
-      { header: "Фонд ОП ІТР", accessorKey: "OP_ITR_Fund" },
-      { header: "ЄСВ ВЗ ІТР", accessorKey: "ESV_VZ_ITR" },
-      { header: "інші заг. вир.", accessorKey: "otherTotalProduction" },
-      { header: "Заг. Вир.", accessorKey: "totalProduction" },
-      { header: "Змінні", accessorKey: "variable" },
-      { header: "Фонд ОП АДМ", accessorKey: "OP_ADM_Fund" },
-      { header: "ЄСВ ВЗ АДМ", accessorKey: "ESV_VZ_ADM" },
-      { header: "Інші постійні", accessorKey: "otherPermanent" },
-      { header: "Постійні", accessorKey: "permanent" },
-      { header: "Витрати", accessorKey: "expenses" },
-      { header: "Доходи", accessorKey: "income" },
-      { header: "Валовий збір тон", accessorKey: "grossHarvest" },
-      { header: "Ціна", accessorKey: "cost" },
-      { header: "Виручка", accessorKey: "revenue" },
-      { header: "Інвестування", accessorKey: "investment" },
-      { header: "Сума", accessorKey: "sum" },
-    ],
-    []
-  );
+  //         revenue: busProds
+  //           .map((el) => {
+  //             const vegetationYear = el.vegetationYear;
+  //             let res =
+  //               Math.round(
+  //                 vegetationYear?.potentialYieldPerHectare! *
+  //                   vegetationYear?.allCoeff! *
+  //                   el.area
+  //               ) *
+  //                 el.product?.culture?.priceBerry! *
+  //                 1000 || 0;
+  //             sumTake += res;
+  //             return res;
+  //           })
+  //           .join("\n"),
+  //         investment: [
+  //           ind == 0 ? "Початкові\u00A0інвестиції" : "Інвестиції",
+  //           "Кредит",
+  //           "Держ\u00A0підтримка",
+  //           "Грант",
+  //         ].join("\n"),
+  //         sum: [sumInv, sumCredit, sumDerj, sumGrand].join("\n"),
+  //       },
+  //       {
+  //         bold: true,
+  //         period: "Разом\u00A0за\u00A0рік",
+  //         year: "",
+  //         culture: "",
+  //         technology: "",
+  //         map: "",
+  //         area: sumArea,
+  //         totalCost: sumCost,
+  //         OPFund: sumSalary,
+  //         ESV_VZ: sumESV,
+  //         direct: useBusinessPlanData.sumDirect(myBusiness.busProds),
+  //         OP_ITR_Fund: useBusinessPlanData.OP_ITR_Fund(thisWorkers),
+  //         ESV_VZ_ITR: useBusinessPlanData.ESV_VZ_ITR(thisWorkers),
+  //         otherTotalProduction: 0,
+  //         totalProduction: useBusinessPlanData.totalProduction(thisWorkers),
+  //         variable: useBusinessPlanData.variables(
+  //           thisWorkers,
+  //           myBusiness.busProds
+  //         ),
+  //         OP_ADM_Fund: Math.round(useBusinessPlanData.OP_ADM_Fund(thisWorkers)),
+  //         ESV_VZ_ADM: Math.round(useBusinessPlanData.ESV_VZ_ADM(thisWorkers)),
+  //         otherPermanent: 0,
+  //         permanent: Math.round(
+  //           useBusinessPlanData.sumPermanent(myBusiness.outcomes)
+  //         ),
+  //         expenses:
+  //           thisWorkers
+  //             .filter((el) => el.class == "Адміністративний")
+  //             .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) *
+  //             1.235 +
+  //           Math.round(
+  //             thisWorkers
+  //               .filter((el) => el.class == "Інженерно технічний")
+  //               .reduce((p, c) => p + c.salary * c.amountOfMounths!, 0) * 1.235
+  //           ) +
+  //           sumDirect,
+  //         income: sumTake + (ind == 0 ? myBusiness.initialAmount : 0),
+  //         product: "",
+  //         grossHarvest: "",
+  //         cost: "",
+  //         revenue: sumTake,
+  //         investment: "",
+  //         sum:
+  //           (sumCredit || 0) + (sumInv || 0) + (sumDerj || 0) + (sumGrand || 0),
+  //       }
+  //     );
+  //   });
+  //   return res;
+  // })();
+  // const technologyCultureColumns = useMemo<ColumnDef<any>[]>(
+  //   () => [
+  //     { header: "Період", accessorKey: "period" },
+  //     { header: "Рік", accessorKey: "year" },
+  //     { header: "Продукт", accessorKey: "product" },
+  //     { header: "Культура", accessorKey: "culture" },
+  //     { header: "Технологія", accessorKey: "technology" },
+  //     { header: "Карта", accessorKey: "map" },
+  //     { header: "Площа", accessorKey: "area" },
+  //     { header: "Загальна вартість", accessorKey: "totalCost" },
+  //     { header: "Фонд ОП", accessorKey: "OPFund" },
+  //     { header: "ЄСВ + ВЗ", accessorKey: "ESV_VZ" },
+  //     { header: "Прямі", accessorKey: "direct" },
+  //     { header: "Фонд ОП ІТР", accessorKey: "OP_ITR_Fund" },
+  //     { header: "ЄСВ ВЗ ІТР", accessorKey: "ESV_VZ_ITR" },
+  //     { header: "інші заг. вир.", accessorKey: "otherTotalProduction" },
+  //     { header: "Заг. Вир.", accessorKey: "totalProduction" },
+  //     { header: "Змінні", accessorKey: "variable" },
+  //     { header: "Фонд ОП АДМ", accessorKey: "OP_ADM_Fund" },
+  //     { header: "ЄСВ ВЗ АДМ", accessorKey: "ESV_VZ_ADM" },
+  //     { header: "Інші постійні", accessorKey: "otherPermanent" },
+  //     { header: "Постійні", accessorKey: "permanent" },
+  //     { header: "Витрати", accessorKey: "expenses" },
+  //     { header: "Доходи", accessorKey: "income" },
+  //     { header: "Валовий збір тон", accessorKey: "grossHarvest" },
+  //     { header: "Ціна", accessorKey: "cost" },
+  //     { header: "Виручка", accessorKey: "revenue" },
+  //     { header: "Інвестування", accessorKey: "investment" },
+  //     { header: "Сума", accessorKey: "sum" },
+  //   ],
+  //   []
+  // );
   return (
     <>
       <SectionTitle aref={aref} mt={"30px"}>

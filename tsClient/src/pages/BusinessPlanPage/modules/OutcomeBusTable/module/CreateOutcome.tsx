@@ -17,6 +17,7 @@ export interface CreateOutcomeProps {
   costMonth: number | string;
   group: IoutcomeGroup | "";
   businessPlanId?: number;
+  year: number;
 }
 function CreateOutcome({
   open,
