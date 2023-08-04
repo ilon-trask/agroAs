@@ -41,6 +41,7 @@ function BuildingBusTable({
     name: "",
     startPrice: "",
     businessPlanId: myBusiness.id!,
+    year: 0,
   });
   const [open, setOpen] = useState(false);
   const [update, setUpdate] = useState(false);
@@ -75,7 +76,7 @@ function BuildingBusTable({
                 let sum = 0;
                 for (let i = start; i <= end; i++) {
                   const building = myBusiness.buildings.filter(
-                    (el) => getYearFromString(el.date) == i
+                    (el) => el.year == i - start
                   );
                   res.push(
                     building.map((el) => (
@@ -92,6 +93,7 @@ function BuildingBusTable({
                                 description: el.description,
                                 name: el.name,
                                 startPrice: el.startPrice,
+                                year: el.year,
                               });
                             }}
                           />
@@ -143,6 +145,7 @@ function BuildingBusTable({
                               name: "",
                               startPrice: "",
                               businessPlanId: myBusiness.id!,
+                              year: i - start,
                             });
                           }}
                         />

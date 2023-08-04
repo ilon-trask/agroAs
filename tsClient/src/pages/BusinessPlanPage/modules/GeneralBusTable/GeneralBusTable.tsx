@@ -58,7 +58,6 @@ function GeneralTable({
             <Td
               onClick={() => {
                 setBusinessOpen(true);
-
                 setBusinessRes({
                   dateStart: dateStart,
                   initialAmount: initialAmount,

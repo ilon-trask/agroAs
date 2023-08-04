@@ -35,6 +35,7 @@ export type CreateBuyingMachineProps = {
   name: string;
   brand: string;
   date: string;
+  year: number;
   purpose: BuyingMachinePurposeType | "" | "МШП";
   amount: number | "";
   cost: number | "";
@@ -80,6 +81,7 @@ function CreateBuyingMachine({
           purpose: "",
           businessPlanId: prev.businessPlanId,
           enterpriseId: prev.enterpriseId,
+          year: 0,
         }))
       }
     >

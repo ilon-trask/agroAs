@@ -55,6 +55,7 @@ function BuildingTable({
                   name: el.name,
                   startPrice: el.startPrice + "",
                   businessPlanId: el.businessPlanId!,
+                  year: el.year,
                 });
               }}
             >

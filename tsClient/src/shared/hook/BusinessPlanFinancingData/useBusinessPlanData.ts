@@ -169,7 +169,7 @@ class BusinessPlanData {
   // }
   yearFinancing(myBusiness: resBusinessPlan, i: number, start: number) {
     let financing = myBusiness.financings
-      .filter((el) => getYearFromString(el.date) == i)
+      .filter((el) => el.year == i - start)
       .reduce((p, c) => p + (c.costBP || 0), 0);
     // if (i == start) {
     //   financing += myBusiness.initialAmount;

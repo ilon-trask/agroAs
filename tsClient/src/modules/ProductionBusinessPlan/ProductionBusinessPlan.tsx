@@ -143,9 +143,7 @@ function ProductionBusinessPlan({
   const generalData = [];
   for (let i = start; i < end; i++) {
     const busProds = myBusiness?.busProds?.filter((el) => el.year == i - start);
-    const lands = myBusiness?.lands?.filter(
-      (el) => getYearFromString(el.date) == i
-    );
+    const lands = myBusiness?.lands?.filter((el) => el.year == i - start);
 
     generalData.push(
       ...busProds.map((el) => ({
@@ -458,7 +456,7 @@ function ProductionBusinessPlan({
             const res = [];
             for (let i = start; i <= end; i++) {
               const machines = myBusiness?.buying_machines?.filter(
-                (el) => getYearFromString(el.date) == i
+                (el) => el.year == i - start
               );
               if (machines) {
                 res.push(
@@ -535,7 +533,7 @@ function ProductionBusinessPlan({
             const res = [];
             for (let i = start; i <= end; i++) {
               const buildings = myBusiness?.buildings?.filter(
-                (el) => getYearFromString(el.date) == i
+                (el) => el.year == i - start
               );
               res.push(
                 buildings.map((el) => (
@@ -603,7 +601,7 @@ function ProductionBusinessPlan({
             const res = [];
             for (let i = start; i <= end; i++) {
               const MSHP = myBusiness?.MSHP?.filter(
-                (el) => getYearFromString(el.date) == i
+                (el) => el.year == i - start
               );
 
               res.push(
@@ -993,13 +991,11 @@ function ProductionBusinessPlan({
                   (el) => el.year == i - start
                 );
                 const permanent = myBusiness.outcomes.filter(
-                  (el) =>
-                    getYearFromString(el.date) == i && el.group == "Постійні"
+                  (el) => el.year == i - start && el.group == "Постійні"
                 );
                 const general = myBusiness.outcomes.filter(
                   (el) =>
-                    getYearFromString(el.date) == i &&
-                    el.group == "Загально виробничі"
+                    el.year == i - start && el.group == "Загально виробничі"
                 );
                 const monthAmount = getMonthAmountFromBusinessPlan(
                   myBusiness.dateStart,

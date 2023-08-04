@@ -8,6 +8,7 @@ export const createBuyingMachine = z.object({
   amount: z.number(),
   purpose: z.enum(["Трактор", "СГ машина", "Технологічне обладнання", "МШП"]),
   date: z.string(),
+  year: z.number(),
   businessPlanId: z.number(),
   enterpriseId: z.number().nullish(),
 });

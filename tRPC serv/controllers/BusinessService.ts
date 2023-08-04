@@ -256,7 +256,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
 
         const amount = +((el.costBP || 0) / par.creditTerm).toFixed(2);
         let remainder = el.costBP || 0;
-        for (let y = start + 1; y <= end; y++) {
+        for (let y = start + el.year; y <= end; y++) {
           if (par.paymentsFrequency == "Кожен рік") {
             if (par.repaymentMethod == "Класична схема") {
               creditBody[y]
@@ -698,6 +698,7 @@ class BusinessService {
       brand: data.brand,
       cost: data.cost,
       date: data.date,
+      year: data.year,
       name: data.name,
       purpose: data.purpose,
       userId: user.sub,
@@ -743,6 +744,7 @@ class BusinessService {
       name: data.name,
       depreciationPeriod: data.depreciationPeriod,
       date: data.date,
+      year: data.year,
       description: data.description,
       startPrice: data.startPrice,
       businessPlanId: data.businessPlanId,
@@ -834,6 +836,7 @@ class BusinessService {
     const res: Iland = await land.create({
       name: data.name,
       area: data.area,
+      year: data.year,
       cadastreNumber: data.cadastreNumber,
       businessPlanId: data.businessPlanId,
       enterpriseId: data.enterpriseId,

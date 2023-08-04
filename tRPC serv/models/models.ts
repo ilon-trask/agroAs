@@ -1057,6 +1057,7 @@ export interface Ibuying_machine {
   name: string;
   brand: string;
   date: string;
+  year: number;
   cost: number;
   amount: number;
   purpose: BuyingMachinePurposeType | "МШП";
@@ -1069,6 +1070,7 @@ export class buying_machine extends Model<Ibuying_machine> {
   declare name: string;
   declare brand: string;
   declare date: string;
+  declare year: number;
   declare cost: number;
   declare amount: number;
   declare purpose: BuyingMachinePurposeType | "МШП";
@@ -1080,6 +1082,7 @@ buying_machine.init(
     name: { type: DataTypes.STRING },
     brand: { type: DataTypes.STRING },
     date: { type: DataTypes.DATEONLY },
+    year: { type: DataTypes.INTEGER },
     amount: { type: DataTypes.INTEGER },
     cost: { type: DataTypes.INTEGER },
     purpose: { type: DataTypes.STRING },
@@ -1268,6 +1271,7 @@ export interface Iland {
   readonly id?: number;
   name: string;
   cadastreNumber: number | null;
+  year: number;
   area: number;
   userId: string;
   date: string;
@@ -1282,6 +1286,7 @@ export class land extends Model<Iland> {
   declare id: number;
   declare name: string;
   declare cadastreNumber: number;
+  declare year: number;
   declare area: number;
   declare userId: string;
   declare date: string;
@@ -1298,6 +1303,7 @@ land.init(
     },
     name: { type: DataTypes.STRING },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     cadastreNumber: { type: DataTypes.STRING },
     area: { type: DataTypes.FLOAT },
     rate: { type: DataTypes.INTEGER },
@@ -1319,6 +1325,7 @@ export interface Ibuilding {
   startPrice: number;
   depreciationPeriod: string | null;
   date: string;
+  year: number;
   description: string;
   userId: string;
   readonly enterpriseId?: number | null;
@@ -1328,6 +1335,7 @@ export class building extends Model<Ibuilding> {
   declare id: number;
   declare name: string;
   declare date: string;
+  declare year: number;
   declare description: string;
   declare startPrice: number;
   declare depreciationPeriod: string;
@@ -1339,6 +1347,7 @@ building.init(
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
     depreciationPeriod: { type: DataTypes.STRING },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
   },

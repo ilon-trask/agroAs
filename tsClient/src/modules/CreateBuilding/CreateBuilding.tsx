@@ -17,6 +17,7 @@ export interface CreateBuildingProps {
   id?: number;
   name: string;
   date: string;
+  year: number;
   description: string;
   startPrice: string | number;
   businessPlanId: number | null | undefined;
@@ -57,6 +58,7 @@ function CreateBuilding({
           date: "",
           name: "",
           startPrice: "",
+          year: 0,
         }))
       }
     >
@@ -137,6 +139,7 @@ function CreateBuilding({
                 date: "",
                 name: "",
                 startPrice: "",
+                year: 0,
               }));
             }
           }}

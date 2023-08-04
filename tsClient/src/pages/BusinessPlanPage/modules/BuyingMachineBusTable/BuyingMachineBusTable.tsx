@@ -7,7 +7,6 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
 import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import {
@@ -17,7 +16,6 @@ import {
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "src/modules/CreateBuyingMachine";
-import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
@@ -44,6 +42,7 @@ function BuyingMachineBusTable({
       purpose: "",
       businessPlanId: myBusiness?.id!,
       enterpriseId: myBusiness?.enterpriseId!,
+      year: 0,
     });
   const [update, setUpdate] = useState(false);
   const [deleteData, setDeleteData] = useState<DeleteProps>({
@@ -67,7 +66,7 @@ function BuyingMachineBusTable({
                 const res = [];
                 for (let i = start; i <= end; i++) {
                   const machines = myBusiness?.buying_machines?.filter(
-                    (el) => getYearFromString(el.date) == i
+                    (el) => el.year == i - start
                   );
                   if (machines) {
                     res.push(
@@ -80,6 +79,7 @@ function BuyingMachineBusTable({
                           setUpdate={setUpdate}
                           setDeleteOpen={setDeleteData}
                           busId={myBusiness?.id!}
+                          i={i}
                         />
                       ))
                     );
@@ -99,6 +99,7 @@ function BuyingMachineBusTable({
                               date: i + "-01-01",
                               name: "",
                               purpose: "",
+                              year: i - start,
                             });
                           }}
                         />

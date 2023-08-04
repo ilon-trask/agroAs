@@ -33,7 +33,7 @@ type LandProps = {
   start: number;
   end: number;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setData: Dispatch<SetStateAction<any>>;
+  setData: Dispatch<SetStateAction<CreateLandProps>>;
   setDeleteData: Dispatch<SetStateAction<DeleteProps>>;
   myBusiness: resBusinessPlan;
 };
@@ -68,7 +68,7 @@ function LandTable({
             const res = [];
             for (let i = start; i <= end; i++) {
               const lands = myBusiness.lands.filter(
-                (el) => getYearFromString(el.date) == i
+                (el) => el.year == i - start
               );
               res.push(
                 lands.map((el) => (
@@ -87,6 +87,7 @@ function LandTable({
                             landId: el.id!,
                             ownership: el.ownership,
                             rate: el.rate,
+                            year: el.year,
                           });
                         }}
                       />
@@ -139,6 +140,7 @@ function LandTable({
                           rightOfUse: "",
                           ownership: "",
                           rate: "",
+                          year: i - start,
                         });
                       }}
                     />
@@ -178,6 +180,7 @@ function LandBusTable({
     rightOfUse: "",
     ownership: "",
     rate: "",
+    year: 0,
   });
 
   const [deleteData, setDeleteData] = useState<DeleteProps>({

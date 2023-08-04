@@ -7,6 +7,7 @@ export const createBuilding = z.object({
   startPrice: z.number(),
   depreciationPeriod: z.string().nullish(),
   date: z.string(),
+  year: z.number(),
   description: z.string(),
   businessPlanId: z.number(),
   enterpriseId: z.number().nullish(),

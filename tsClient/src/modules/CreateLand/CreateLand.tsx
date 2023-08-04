@@ -25,6 +25,7 @@ export interface CreateLandProps {
   businessPlanId?: number;
   enterpriseId?: number;
   date: string;
+  year: number;
   rate: number | string;
   ownership: "Комунальна" | "Приватна" | "Державна" | "";
   rightOfUse: "Оренда" | "Власна" | "";
@@ -47,6 +48,7 @@ function CreateLand({
     rightOfUse: "",
     ownership: "",
     rate: "",
+    year: 0,
   });
   useEffect(() => setRes(data), [data]);
   return (
@@ -71,6 +73,7 @@ function CreateLand({
           rightOfUse: "",
           ownership: "",
           rate: "",
+          year: 0,
         }))
       }
     >
@@ -208,6 +211,7 @@ function CreateLand({
                 rightOfUse: "",
                 ownership: "",
                 rate: "",
+                year: 0,
               }));
             }
           }}

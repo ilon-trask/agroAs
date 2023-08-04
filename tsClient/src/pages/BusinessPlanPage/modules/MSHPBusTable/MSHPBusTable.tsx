@@ -47,6 +47,7 @@ function MSHPBusTable({
     date: "",
     name: "",
     purpose: "МШП",
+    year: 0,
   });
   const [update, setUpdate] = useState(false);
   const [deleteData, setDeleteData] = useState<DeleteProps>({
@@ -72,7 +73,7 @@ function MSHPBusTable({
                 let sum = 0;
                 for (let i = start; i <= end; i++) {
                   const MSHP = myBusiness.MSHP.filter(
-                    (el) => getYearFromString(el.date) == i
+                    (el) => el.year == i - start
                   );
                   res.push(
                     MSHP.map((el) => (
@@ -92,6 +93,7 @@ function MSHPBusTable({
                                 purpose: el.purpose,
                                 buyingId: el.id!,
                                 enterpriseId: el.enterpriseId!,
+                                year: el.year,
                               });
                             }}
                           />
@@ -144,6 +146,7 @@ function MSHPBusTable({
                               date: i + "-01-01",
                               name: "",
                               purpose: "МШП",
+                              year: i - start,
                             });
                           }}
                         />
