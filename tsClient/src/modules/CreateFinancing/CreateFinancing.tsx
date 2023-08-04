@@ -33,7 +33,7 @@ import useDerjPurpose from "src/shared/hook/useDerjPurpose";
 import useGrantPurpose from "src/shared/hook/useGrantPurpose";
 import useInvestmentOrigin from "src/shared/hook/useInvestmentOrigin";
 import useFinancingType from "src/shared/hook/useFinancingType";
-import { useParams } from "react-router-dom";
+import useMonthArray from "src/shared/hook/useMonthArray";
 export type FinancingProps = {
   id?: number;
   name: string;
@@ -50,6 +50,8 @@ export type FinancingProps = {
   isUseCost: boolean;
   calculationMethod: CreditCalculationMethodType | "";
   cultureId?: number | null | "";
+  year: number;
+  month: number | string;
 };
 type props = {
   open: boolean;
@@ -68,7 +70,7 @@ function CreateFinancing({
   update,
   busId,
 }: props) {
-  const { income, business, map } = useContext(Context);
+  const { business, map } = useContext(Context);
   const [res, setRes] = useState(data);
   const arr =
     res.type == "credit"
@@ -104,6 +106,8 @@ function CreateFinancing({
           calculationMethod: "",
           calculationType: "",
           cultureId: undefined,
+          month: "",
+          year: 0,
         }))
       }
     >
@@ -123,6 +127,25 @@ function CreateFinancing({
             }
             placeholder="Введіть данні"
           />
+        </Box>
+        <Box>
+          <Heading as={"h4"} size="sm" minW={"max-content"}>
+            Виберіть місяць
+          </Heading>
+          <Select
+            size={"sm"}
+            value={res.month}
+            onChange={(e) =>
+              setRes((prev) => ({ ...prev, month: e.target.value }))
+            }
+          >
+            <option value="" hidden defaultChecked>
+              Виберіть опцію
+            </option>
+            {useMonthArray.map((el) => (
+              <option value={el.id}>{el.name}</option>
+            ))}
+          </Select>
         </Box>
         <Box maxW={"190px"}>
           <Heading as={"h4"} size="sm" minW={"max-content"}>
@@ -272,6 +295,8 @@ function CreateFinancing({
                   calculationMethod: res.calculationMethod,
                   type: res.type,
                   cultureId: res.cultureId ? +res.cultureId : null,
+                  year: res.year,
+                  month: +res.month,
                 });
               } else {
                 createFinancingForBusiness(business, {
@@ -285,6 +310,8 @@ function CreateFinancing({
                   calculationMethod: res.calculationMethod,
                   type: res.type,
                   cultureId: res.cultureId ? +res.cultureId : null,
+                  year: res.year,
+                  month: +res.month,
                 });
               }
               setOpen(false);
@@ -299,6 +326,8 @@ function CreateFinancing({
                 calculationMethod: "",
                 type: prev.type,
                 cultureId: undefined,
+                month: "",
+                year: 0,
               }));
             }
           }}

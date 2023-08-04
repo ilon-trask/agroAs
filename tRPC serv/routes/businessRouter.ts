@@ -91,6 +91,21 @@ const deleteForBusiness = z.object({
 export type DeleteForBusiness = z.infer<typeof deleteForBusiness>;
 const getOnePlan = z.object({ busId: z.number() });
 export type GetOnePlan = z.infer<typeof getOnePlan>;
+const createUpdateCreditParameter = z.object({
+  financingId: z.number(),
+  procent: z.number(),
+  startDatePayments: z.string().nullish(),
+  monthlyСommission: z.number(),
+  repaymentMethod: z.enum(["Ануїтет", "Класична схема"]),
+  paymentsFrequency: z.enum(["Кожний місяць", "Кожен рік"]),
+  termType: z.enum(["на бізнес-план", "на роки"]).nullish(),
+  creditTerm: z.number(),
+  commissionForCredit: z.number(),
+  busId: z.number(),
+});
+export type CreateUpdateCreditParameter = z.infer<
+  typeof createUpdateCreditParameter
+>;
 const businessRouter = router({
   // getOnePlan: publicProcedure
   //   .input(getOnePlan)
@@ -294,6 +309,12 @@ const businessRouter = router({
     .input(deleteForBusiness)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.deleteLandForBusiness(ctx.user, input);
+      return res;
+    }),
+  createUpdateCreditParameter: publicProcedure
+    .input(createUpdateCreditParameter)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createUpdateCreditParameter(input);
       return res;
     }),
 });

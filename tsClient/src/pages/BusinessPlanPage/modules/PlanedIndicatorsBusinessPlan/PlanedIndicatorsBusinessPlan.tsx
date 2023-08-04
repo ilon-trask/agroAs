@@ -1,4 +1,4 @@
-import { Table, Th, Thead, Tr, Heading, Td, Text } from "@chakra-ui/react";
+import { Table, Th, Thead, Tr, Text } from "@chakra-ui/react";
 import React, { RefObject, useContext, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import { ColumnDef } from "@tanstack/react-table";
@@ -8,32 +8,21 @@ import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Iworker } from "../../../../tRPC serv/models/models";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 
 function PlanedIndicatorsBusinessPlan({
   start,
   end,
   myBusiness,
   aref,
-  thisWorkers,
 }: {
   start: number;
   end: number;
   myBusiness: resBusinessPlan;
-  thisWorkers: Iworker[];
   aref: RefObject<HTMLTableElement>;
 }) {
   const { income } = useContext(Context);
-
-  const data = useBusinessPlanFinancingData(
-    start,
-    end,
-    myBusiness,
-    income,
-    thisWorkers
-  );
-
+  const data = useBusinessPlanFinancingData(start, end, myBusiness);
   const columns = useMemo<ColumnDef<any>[]>(() => {
     return [
       { header: "", accessorKey: "date" },
@@ -93,8 +82,23 @@ function PlanedIndicatorsBusinessPlan({
       </Table>
       <TableComponent data={data} columns={columns} fontSize={"10px"} />
       <Text fontWeight={"bold"} fontSize={"20px"}>
-        Результат: період років - {end - start}; Прибуток:
-        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}
+        Результат: період
+        {(() => {
+          const monthAmount = 13 - +myBusiness.dateStart?.split("-")[1];
+          if (monthAmount == 12) {
+            return <> років:-{myBusiness.realizationTime + 1},</>;
+          } else {
+            return (
+              <>
+                років:-{myBusiness.realizationTime}, місяців:-
+                {monthAmount},
+              </>
+            );
+          }
+          return null;
+        })()}{" "}
+        прибуток:{" "}
+        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}.
       </Text>
     </>
   );

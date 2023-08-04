@@ -1,14 +1,11 @@
-import { Button, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Td, Th, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { DeleteProps } from "src/components/DeleteAlert";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import { Ibuying_machine } from "../../../../tRPC serv/models/models";
-import {
-  deleteBuyingMachine,
-  deleteBuyingMachineForBusiness,
-} from "../../http/requests";
+import { deleteBuyingMachineForBusiness } from "../../http/requests";
 import { Context } from "../../main";
 import { CreateBuyingMachineProps } from "../CreateBuyingMachine";
 
@@ -34,6 +31,7 @@ export function BuyingMachineTableBodyRow({
   setRes,
   setUpdate,
   busId,
+  i,
 }: {
   el: Ibuying_machine;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -41,6 +39,7 @@ export function BuyingMachineTableBodyRow({
   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
   setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
   busId: number;
+  i: number | undefined;
 }) {
   const { business } = useContext(Context);
   return (
@@ -53,24 +52,25 @@ export function BuyingMachineTableBodyRow({
             buyingId: el.id,
             amount: el.amount,
             brand: el.brand,
-            cost: el.cost,
+            price: el.price,
             date: el.date,
             name: el.name,
             purpose: el.purpose,
             businessPlanId: el.businessPlanId!,
             enterpriseId: el.enterpriseId!,
+            year: el.year,
           });
         }}
       >
         <MyEditIcon />
       </Td>
 
-      <Td>{getYearFromString(el.date)}</Td>
+      <Td>{i || getYearFromString(el.date)}</Td>
       <Td>{el.name}</Td>
       <Td>{el.brand}</Td>
       <Td>{el.amount}</Td>
-      <Td>{el.cost}</Td>
-      <Td>{el.cost * el.amount}</Td>
+      <Td>{el.price}</Td>
+      <Td>{el.price * el.amount}</Td>
       <Td>
         <Button size={"sm"}>Додати</Button>
       </Td>

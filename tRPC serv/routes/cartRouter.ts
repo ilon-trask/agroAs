@@ -27,7 +27,6 @@ export const cartRouter = router({
     .input(z.object({ cartId: z.number() }))
     .query(async ({ input }) => {
       const carts = await TechCartService.getCart(input.cartId);
-
       return carts;
     }),
   getOnlyCart: publicProcedure.query(async ({ ctx }) => {

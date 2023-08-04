@@ -5,14 +5,10 @@ import Paragraph from "../../../../ui/Paragraph";
 import SectionTitle from "../../../../ui/SectionTitle";
 
 function ResumeBusinessPlan({
-  area,
-  dateStart,
   productSet,
   aref,
   myBusiness,
 }: {
-  area: number;
-  dateStart: string;
   productSet: Set<String>;
   aref: RefObject<HTMLTableElement>;
   myBusiness: resBusinessPlan;
@@ -103,7 +99,7 @@ function ResumeBusinessPlan({
           </Tr>
           <Tr>
             <Td>Початок реалізації</Td>
-            <Td minW={"max-content"}>{dateStart}</Td>
+            <Td minW={"max-content"}>{myBusiness.dateStart}</Td>
           </Tr>
           <Tr>
             <Td>Початок продажів</Td>

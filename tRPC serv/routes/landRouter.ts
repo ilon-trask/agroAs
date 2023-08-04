@@ -7,6 +7,7 @@ export const createLand = z.object({
   area: z.number(),
   cadastreNumber: z.number().nullish().optional(),
   date: z.string(),
+  year: z.number(),
   rightOfUse: z.enum(["Оренда", "Власна"]),
   businessPlanId: z.number().optional().nullable(),
   enterpriseId: z.number().nullish().optional(),

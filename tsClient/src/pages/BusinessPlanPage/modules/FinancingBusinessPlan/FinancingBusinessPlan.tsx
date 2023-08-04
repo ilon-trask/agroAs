@@ -9,10 +9,9 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { RefObject, useContext, useMemo } from "react";
+import React, { RefObject, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
-import { Context } from "src/main";
 import { getMonthAmountFromBusinessPlan } from "src/pages/BusinessPlanPage/BusinessPlanPage";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import useIncomeTypes from "src/shared/hook/useIncomeTypes";
@@ -21,12 +20,12 @@ import Description from "src/ui/Description";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
-import { Ifinancing } from "../../../../tRPC serv/models/models";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import { Ifinancing } from "../../../../../../tRPC serv/models/models";
 import {
   CashFlowTableHead,
   CashFlowTableHeadBegin,
-} from "../CashFlowTable/CashFlowTable";
+} from "../../../../modules/CashFlowTable/CashFlowTable";
 
 function FinancingBusinessPlan({
   start,
@@ -57,7 +56,6 @@ function FinancingBusinessPlan({
     together: number | "";
     bold?: boolean;
   }[] = [];
-  const { income } = useContext(Context);
   const investmentPlan = [];
   const fundraisingPlanColumns = useMemo<ColumnDef<any>[]>(() => {
     return [
@@ -84,10 +82,10 @@ function FinancingBusinessPlan({
   for (let i = start; i <= end; i++) {
     fundraisingPlanData.push(
       ...(thisCredit
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .map((el) => ({
           name: el.name,
-          year: getYearFromString(el.date)!,
+          year: i,
           credit: el.cost,
           investment: 0,
           DerjSupport: 0,
@@ -95,10 +93,10 @@ function FinancingBusinessPlan({
           together: el.cost,
         })) || []),
       ...(thisInvestment
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .map((el) => ({
           name: el.name,
-          year: getYearFromString(el.date)!,
+          year: i,
           investment: el.cost,
           credit: 0,
           DerjSupport: 0,
@@ -106,10 +104,10 @@ function FinancingBusinessPlan({
           together: el.cost,
         })) || []),
       ...(thisDerj
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .map((el) => ({
           name: el.name,
-          year: getYearFromString(el.date)!,
+          year: i,
           DerjSupport: el.cost,
           investment: 0,
           credit: 0,
@@ -117,10 +115,10 @@ function FinancingBusinessPlan({
           together: el.cost,
         })) || []),
       ...(thisGrand
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .map((el) => ({
           name: el.name,
-          year: getYearFromString(el.date)!,
+          year: i,
           grant: el.cost,
           DerjSupport: 0,
           investment: 0,
@@ -130,19 +128,19 @@ function FinancingBusinessPlan({
     );
     const sumInv =
       thisInvestment
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .reduce((p, c) => p + c.cost, 0) || 0;
     const sumCred =
       thisCredit
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .reduce((p, c) => p + c.cost, 0) || 0;
     const sumDerj =
       thisDerj
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .reduce((p, c) => p + c.cost, 0) || 0;
     const sumGrand =
       thisGrand
-        ?.filter((el) => getYearFromString(el.date) == i)
+        ?.filter((el) => el.year == i - start)
         .reduce((p, c) => p + c.cost, 0) || 0;
     fundraisingPlanData.push({
       year: i,
@@ -156,15 +154,15 @@ function FinancingBusinessPlan({
     });
     // const mshp ;
     const machinesValue = myBusiness.buying_machines
-      .filter((el) => getYearFromString(el.date) == i)
-      .reduce((p, c) => p + c.cost, 0);
+      .filter((el) => el.year == i - start)
+      .reduce((p, c) => p + c.price * c.amount, 0);
     const buildingValue = myBusiness.buildings
-      .filter((el) => getYearFromString(el.date) == i)
+      .filter((el) => el.year == i - start)
       .reduce((p, c) => p + +c.startPrice, 0);
 
     const mshpValue = myBusiness.MSHP.filter(
-      (el) => getYearFromString(el.date) == i
-    ).reduce((p, c) => p + c.cost * c.amount, 0);
+      (el) => el.year == i - start
+    ).reduce((p, c) => p + c.price * c.amount, 0);
     const creatingValue = 0;
     const opersValue = 0;
     sum +=
@@ -291,20 +289,21 @@ function FinancingBusinessPlan({
               }, 0);
             const incomeValue =
               myBusiness.financings
-                .filter((e) => getYearFromString(e.date) == i)
+                .filter((el) => el.year == i - start)
                 .reduce((p, c) => p + c.cost, 0) + saleValue;
             const outcome =
-              myBusiness.MSHP.filter(
-                (el) => getYearFromString(el.date) == i
-              ).reduce((p, c) => p + c.amount * c.cost, 0) +
+              myBusiness.MSHP.filter((el) => el.year == i - start).reduce(
+                (p, c) => p + c.price * c.amount,
+                0
+              ) +
               myBusiness.buying_machines
-                .filter((el) => getYearFromString(el.date) == i)
-                .reduce((p, c) => p + c.amount * c.cost, 0) +
+                .filter((el) => el.year == i - start)
+                .reduce((p, c) => p + c.price * c.amount, 0) +
               myBusiness.buildings
-                .filter((el) => getYearFromString(el.date) == i)
+                .filter((el) => el.year == i - start)
                 .reduce((p, c) => p + +c.startPrice, 0) +
               myBusiness.outcomes
-                .filter((e) => getYearFromString(e.date) == i)
+                .filter((el) => el.year == i - start)
                 .reduce(
                   (p, c) =>
                     p +
@@ -333,10 +332,7 @@ function FinancingBusinessPlan({
               <Tbody key={i + "body"}>
                 {useIncomeTypes.map((el) => {
                   const value = myBusiness.financings
-                    .filter(
-                      (e) =>
-                        getYearFromString(e.date) == i && e.typeName == el.name
-                    )
+                    .filter((e) => e.year == i - start && e.typeName == el.name)
                     .reduce((p, c) => p + c.cost, 0);
                   return value ? (
                     <Tr key={el.id}>
@@ -345,9 +341,7 @@ function FinancingBusinessPlan({
                       <Td>
                         {myBusiness.financings
                           .filter(
-                            (e) =>
-                              getYearFromString(e.date) == i &&
-                              e.typeName == el.name
+                            (e) => e.year == i - start && e.typeName == el.name
                           )
                           .reduce((p, c) => p + c.cost, 0)}
                       </Td>
@@ -366,8 +360,8 @@ function FinancingBusinessPlan({
                   <Td>{"МШП"}</Td>
                   <Td>
                     {myBusiness.MSHP.filter(
-                      (el) => getYearFromString(el.date) == i
-                    ).reduce((p, c) => p + c.amount * c.cost, 0)}
+                      (el) => el.year == i - start
+                    ).reduce((p, c) => p + c.price * c.amount, 0)}
                   </Td>
                 </Tr>
                 <Tr>
@@ -377,8 +371,8 @@ function FinancingBusinessPlan({
                   <Td>{"Техніка та обладнання"}</Td>
                   <Td>
                     {myBusiness.buying_machines
-                      .filter((el) => getYearFromString(el.date) == i)
-                      .reduce((p, c) => p + c.amount * c.cost, 0)}
+                      .filter((el) => el.year == i - start)
+                      .reduce((p, c) => p + c.price * c.amount, 0)}
                   </Td>
                 </Tr>
                 <Tr>
@@ -388,27 +382,14 @@ function FinancingBusinessPlan({
                   <Td>{"Будівлі та споруди"}</Td>
                   <Td>
                     {myBusiness.buildings
-                      .filter((el) => getYearFromString(el.date) == i)
+                      .filter((el) => el.year == i - start)
                       .reduce((p, c) => p + +c.startPrice, 0)}
                   </Td>
                 </Tr>
                 {useOutcomeGroup.map((el) => {
                   const value = myBusiness.outcomes
-                    .filter(
-                      (e) =>
-                        getYearFromString(e.date) == i && e.group == el.name
-                    )
-                    .reduce(
-                      (p, c) =>
-                        p +
-                        c.costMonth! *
-                          getMonthAmountFromBusinessPlan(
-                            myBusiness.dateStart,
-                            i,
-                            start
-                          ),
-                      0
-                    );
+                    .filter((e) => e.year == i - start && e.group == el.name)
+                    .reduce((p, c) => p + (c.costYear || 0), 0);
                   return value ? (
                     <Tr key={el.id}>
                       <Td>{i}</Td>

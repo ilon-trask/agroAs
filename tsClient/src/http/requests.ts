@@ -13,18 +13,16 @@ import {
   Imachine,
   Isection,
   Ispecial_work,
-  Itech_cart,
   Itech_operation,
   Itractor,
   tech_operation,
 } from "../../../tRPC serv/models/models";
-import User from "../store/UserStore";
 import { createClient } from "@supabase/supabase-js";
-// import { type BusinessProps } from "../modules/createTEJ/CreateTEJ";
 import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
+  CreateUpdateCreditParameter,
   DeleteBusProd,
   DeleteForBusiness,
   PatchBusinessPlan,
@@ -88,7 +86,6 @@ import {
 } from "../../../tRPC serv/routes/financingRouter";
 import { CreateProductType } from "../../../tRPC serv/routes/incomeRouter";
 
-let user = new User();
 export const supabase = createClient(
   import.meta.env.VITE_DB_LINK + "",
   import.meta.env.VITE_DB_KEY + ""
@@ -227,8 +224,8 @@ export async function setIsPublic(
 
 export async function deleteCart(map: MapStore, id: number) {
   map.isLoading = true;
-  await client.cart.delete.query({ id: id }).then((data: { id: number }) => {
-    map.maps = map.maps.filter((el) => el.id != data.id);
+  await client.cart.delete.query({ id: id }).then((data) => {
+    map.maps = map.maps.filter((el) => el.id != data?.id);
     map.isLoading = false;
   });
 }
@@ -237,6 +234,7 @@ export async function createCart(map: MapStore, data: CreateCartType) {
   map.isLoading = true;
 
   await client.cart.create.query(data).then((res) => {
+    if (!res) return;
     if (res.isComplex) {
       map.newComplex = res as resTechCartsWithOpers;
     } else {
@@ -287,14 +285,61 @@ export async function deleteOper(
   map.isLoading = true;
   await client.oper.delete
     .query({ cartId: +cartId, operId: operId })
-    //@ts-ignore
-    .then((data: any) => {
+    .then((data) => {
       map.opers = map.opers.filter((el) => el.id != data.id);
-      let mapData = map.maps.find((el) => el.id == data.techCartId);
-      if (!mapData) {
-        mapData = map.complex.find((el) => el.id == data.techCartId)!;
-      }
+      let mapData = map.allMaps.find((el) => el.id == data.techCartId);
+      if (!mapData) throw new Error("no mapData");
+      mapData.tech_operations = mapData.tech_operations?.filter(
+        (el) => el.id != data.id
+      );
       mapData.costHectare! -= operValue(data);
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
       map.isLoading = false;
     });
 }
@@ -319,10 +364,8 @@ export async function createOperation(
     .then((data: { oper: tech_operation; prope: prope }) => {
       const { oper, prope } = data;
       map.newOper = oper;
-      let mapData = map.maps.find((el) => el.id == oper.techCartId);
-      if (!mapData) {
-        mapData = map.complex.find((el) => el.id == oper.techCartId)!;
-      }
+      let mapData = map.allMaps.find((el) => el.id == oper.techCartId);
+      if (!mapData) throw new Error("no mapData");
       mapData.tech_operations?.push(oper);
       mapData.costHectare! += operValue(oper);
       if ("nameMaterials" in prope) {
@@ -335,6 +378,53 @@ export async function createOperation(
         map.newCostHandWork = prope;
       } else if ("fuelConsumption" in prope) {
         map.newCostMechanical = prope;
+      }
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
       }
       map.isLoading = false;
     });
@@ -349,11 +439,10 @@ export async function patchOperation(
   cartId: number
 ) {
   map.isLoading = true;
-
-  let [mapData] = map.maps.filter((el) => el.id == cartId);
-
-  let [operData] = map.opers.filter((el) => el.id == arr.res.operId);
-  //@ts-ignore
+  let mapData = map.allMaps.find((el) => el.id == cartId);
+  if (!mapData) return;
+  let operData = map.opers.find((el) => el.id == arr.res.operId);
+  if (!operData) return;
   let mapOperData = mapData.tech_operations?.find(
     (el) => el?.id == arr.res.operId
   );
@@ -369,8 +458,14 @@ export async function patchOperation(
       map.opers = map.opers.filter((el) => el.id != arr.res.operId);
       map.newOper = res;
       // let [mapData] = map.maps.filter((el) => el.id == res.techCartId);
-
+      //@ts-ignore
       mapData.costHectare! += operValue(res);
+      if (mapData)
+        mapData.tech_operations = [
+          //@ts-ignore
+          ...mapData.tech_operations.filter((el) => el.id != res.id),
+          res,
+        ];
       map.costHandWork = map.costHandWork.filter(
         (el) => el.techOperationId != arr.res.operId
       );
@@ -404,6 +499,53 @@ export async function patchOperation(
         mapOperData.cost_hand_work = res.cost_hand_work;
         map.newCostHandWork = res.cost_hand_work;
       }
+      const justMap = map.maps.find((el) => el.id == mapData?.id!);
+      if (justMap) {
+        //@ts-ignore
+        map.maps = [...map.maps.filter((el) => el.id != mapData?.id!), mapData];
+        map.isLoading = false;
+        return;
+      }
+      const complex = map.complex.find((el) => el.id == mapData?.id!);
+      if (complex) {
+        map.complex = [
+          //@ts-ignore
+          ...map.complex.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const noAgree = map.NoAgreeCarts.find((el) => el.id == mapData?.id!);
+      if (noAgree) {
+        map.NoAgreeCarts = [
+          //@ts-ignore
+          ...map.NoAgreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const agree = map.agreeCarts.find((el) => el.id == mapData?.id!);
+      if (agree) {
+        map.agreeCarts = [
+          //@ts-ignore
+          ...map.agreeCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
+      const business = map.businessCarts.find((el) => el.id == mapData?.id!);
+      if (business) {
+        map.businessCarts = [
+          //@ts-ignore
+          ...map.businessCarts.filter((el) => el.id != mapData?.id!), //@ts-ignore
+          mapData,
+        ];
+        map.isLoading = false;
+        return;
+      }
       map.isLoading = false;
     });
 }
@@ -414,13 +556,14 @@ export function getSection(map: MapStore) {
 
 export function createTractor(map: MapStore, res: Itractor) {
   client.tractor.create.query(res).then((data) => {
-    map.newTractor = data;
+    if (data) map.newTractor = data;
   });
 }
 
 export function patchTractor(map: MapStore, res: Itractor) {
   map.isLoading = true;
-  client.tractor.patch.query(res).then((data: Itractor) => {
+  client.tractor.patch.query(res).then((data) => {
+    if (!data) return;
     map.tractor = map.tractor.filter((el) => el.id != data.id);
     map.newTractor = data;
     map.isLoading = false;
@@ -428,14 +571,14 @@ export function patchTractor(map: MapStore, res: Itractor) {
 }
 
 export function getTractor(map: MapStore) {
-  client.tractor.get.query().then((res: Itractor[]) => {
-    map.tractor = res;
+  client.tractor.get.query().then((res) => {
+    if (res) map.tractor = res;
   });
 }
 
 export function createMachine(map: MapStore, res: Imachine) {
-  client.machine.create.query(res).then((data: Imachine) => {
-    map.newMachine = data;
+  client.machine.create.query(res).then((data) => {
+    if (data) map.newMachine = data;
   });
 }
 
@@ -459,9 +602,10 @@ export function getGrades(map: MapStore) {
   });
 }
 export function getCopyCarts(map: MapStore) {
-  client.cart.getCopyCarts
-    .query() //@ts-ignore
-    .then((data: Itech_cart[]) => (map.copyCarts = data));
+  client.cart.getCopyCarts.query().then((data) => {
+    //@ts-ignore
+    if (data) map.copyCarts = data;
+  });
 }
 export function makeCopyCarts(map: MapStore, cartId: number) {
   client.cart.makeCopy.query({ cartId }).then((data) => {
@@ -492,6 +636,7 @@ export function patchWork(map: MapStore, data: any) {
 }
 export function getCopyTractors(map: MapStore) {
   client.tractor.getCopyTractors.query().then((res) => {
+    if (!res) return;
     map.copyTractors = [];
     map.copyTractors = res;
   });
@@ -506,6 +651,7 @@ export function makeCopyTractor(map: MapStore, tractorId: number) {
 }
 export function getCopyMachine(map: MapStore) {
   client.machine.getCopyMachine.query().then((res) => {
+    if (!res) return;
     map.copyMachine = [];
     map.copyMachine = res;
   });
@@ -858,7 +1004,7 @@ export function getProductTEJMap(map: MapStore) {
 }
 export function createProduct(map: MapStore, data: CreateProductType) {
   client.income.createProduct.query(data).then((res) => {
-    map.newProduct = res;
+    if (res) map.newProduct = res;
   });
 }
 export function getCultivationTechnologiesMap(map: MapStore) {
@@ -882,7 +1028,7 @@ export function getTEJ(TEJ: TEJStore) {
 export function createTEJ(data: createTEJType, TEJ: TEJStore) {
   client.TEJ.create.query(data).then((res) => {
     //@ts-ignore
-    TEJ.newJustification = res;
+    if (res) TEJ.newJustification = res;
   });
 }
 
@@ -935,6 +1081,7 @@ export function getNoAgreeJustification(TEJ: TEJStore) {
 
 export function setIsAgreeTEJ(TEJ: TEJStore, data: setIsPublicTEJType) {
   client.TEJ.setIsAgree.query(data).then((res) => {
+    if (!res) return;
     TEJ.justification = TEJ.justification.filter((el) => el.id != res.id!); //@ts-ignore
     TEJ.newJustification = res;
     if (data.isAgree) {
@@ -987,13 +1134,13 @@ export function copyComplex(map: MapStore, complexId: number, cartId: number) {
 
 export function createOutcome(map: MapStore, data: createOutcomeType) {
   client.outcome.create.query(data).then((res) => {
-    map.newOutcome = res;
+    if (res) map.newOutcome = res;
   });
 }
 
 export function getOutcome(map: MapStore) {
   client.outcome.get.query().then((res) => {
-    map.outcome = res;
+    if (res) map.outcome = res;
   });
 }
 export function setIsUsingOutcome(
@@ -1001,6 +1148,7 @@ export function setIsUsingOutcome(
   data: { outcomeId: number; value: boolean }
 ) {
   client.outcome.setIsUsing.query(data).then((res) => {
+    if (!res) return;
     map.outcome = map.outcome.filter((el) => el.id != res?.id);
     map.newOutcome = res!;
   });
@@ -1024,13 +1172,13 @@ export function createProduction(
   data: createProductionType
 ) {
   client.production.create.query(data).then((res) => {
-    income.newProduction = res;
+    if (res) income.newProduction = res;
   });
 }
 
 export function getProduction(incomeStore: IncomeStore) {
   client.production.get.query().then((res) => {
-    incomeStore.production = res;
+    if (res) incomeStore.production = res;
   });
 }
 export function patchProduction(
@@ -1058,11 +1206,15 @@ export function deleteProduction(
   });
 }
 export function createSale(incomeStore: IncomeStore, data: createSaleType) {
-  client.sale.create.query(data).then((res) => (incomeStore.newSale = res));
+  client.sale.create.query(data).then((res) => {
+    if (res) incomeStore.newSale = res;
+  });
 }
 
 export function getSale(incomeStore: IncomeStore) {
-  client.sale.get.query().then((res) => (incomeStore.sale = res));
+  client.sale.get.query().then((res) => {
+    if (res) incomeStore.sale = res;
+  });
 }
 
 export function patchSale(incomeStore: IncomeStore, data: PatchSaleType) {
@@ -1142,10 +1294,13 @@ export function deleteFinancing(incomeStore: IncomeStore, financingId: number) {
 }
 
 export function getBuyingMachine(map: MapStore) {
-  client.buyingMachine.get.query().then((res) => (map.buyingMachine = res));
+  client.buyingMachine.get.query().then((res) => {
+    if (res) map.buyingMachine = res;
+  });
 }
 export function createBuyingMachine(map: MapStore, data: CreateBuyingMachine) {
   client.buyingMachine.create.query(data).then((res) => {
+    if (!res) return;
     map.newBuyingMachine = res;
   });
 }
@@ -1169,11 +1324,13 @@ export function createAdministration(
   data: CreateAdministration
 ) {
   client.administration.create.query(data).then((res) => {
+    if (!res) return;
     map.newAdministration = res;
   });
 }
 export function getAdministration(map: MapStore) {
   client.administration.get.query().then((res) => {
+    if (!res) return;
     map.administration = res;
   });
 }
@@ -1192,6 +1349,7 @@ export function deleteAdministration(map: MapStore, admId: number) {
 
 export function getEnterprise(EnterpriseStore: EnterpriseStore) {
   client.enterprise.get.query().then((res) => {
+    if (!res) return;
     EnterpriseStore.enterprise = res;
   });
 }
@@ -1200,6 +1358,7 @@ export function createEnterprise(
   data: CreateEnterpriseType
 ) {
   client.enterprise.create.query(data).then((res) => {
+    if (!res) return;
     EnterpriseStore.newEnterprise = res;
   });
 }
@@ -1255,7 +1414,7 @@ export function getJob(enterprise: EnterpriseStore) {
 }
 export function createJob(enterprise: EnterpriseStore, data: CreateJobType) {
   client.job.create.query(data).then((res) => {
-    enterprise.newJob = res;
+    if (res) enterprise.newJob = res;
   });
 }
 export function patchJob(enterprise: EnterpriseStore, data: PatchJobType) {
@@ -1276,11 +1435,13 @@ export function deleteJob(
 
 export function getWorker(enterprise: EnterpriseStore) {
   client.worker.get.query().then((res) => {
+    if (!res) return;
     enterprise.worker = res;
   });
 }
 export function createWorker(bus: BusinessStore, data: CreateWorkerType) {
   client.worker.create.query(data).then((res) => {
+    if (!res) return;
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
     bus.newBusinessPlan = res;
@@ -1338,6 +1499,7 @@ export function createVegetationYear(
   data: CreateVegetationType
 ) {
   client.vegetation.create.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
     if (!business) return;
     bus.businessPlan = bus.businessPlan.filter(
@@ -1395,6 +1557,7 @@ export function deleteLand(
 
 export function getBuilding(enterprise: EnterpriseStore) {
   client.building.get.query().then((res) => {
+    if (!res) return;
     enterprise.building = res;
   });
 }
@@ -1403,6 +1566,7 @@ export function createBuilding(
   data: CreateBuildingType
 ) {
   client.building.create.query(data).then((res) => {
+    if (!res) return;
     enterprise.newBuilding = res;
   });
 }
@@ -1435,27 +1599,60 @@ export async function getCartForBusiness(map: MapStore) {
 
 export function createBusProd(bus: BusinessStore, data: CreateBusProd) {
   client.business.createBusProd.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function patchBusProd(bus: BusinessStore, data: PatchBusProd) {
   client.business.patchBusProd.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function deleteBusProd(bus: BusinessStore, data: DeleteBusProd) {
   client.business.deleteBusProd.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.busProds = business.busProds.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.busProds = business.busProds.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.busProds = pubBusiness.busProds.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1464,9 +1661,19 @@ export function createFinancingForBusiness(
   data: CreateFinancingForBusiness
 ) {
   client.business.createFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      ); //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function patchFinancingForBusiness(
@@ -1474,9 +1681,20 @@ export function patchFinancingForBusiness(
   data: PatchFinancingForBusiness
 ) {
   client.business.patchFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function deleteFinancingForBusiness(
@@ -1484,9 +1702,20 @@ export function deleteFinancingForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteFinancingForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 export function createBuyingMachineForBusiness(
@@ -1494,9 +1723,20 @@ export function createBuyingMachineForBusiness(
   data: CreateBuyingMachine
 ) {
   client.business.createBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1505,9 +1745,20 @@ export function patchBuyingMachineForBusiness(
   data: PatchBuyingMachine
 ) {
   client.business.patchBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1516,9 +1767,20 @@ export function deleteBuyingMachineForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteBuyingMachineForBusiness.query(data).then((res) => {
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = res;
+    if (!res) return;
+    const business = bus.businessPlan.find((el) => el.id == res.id);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }
 
@@ -1527,13 +1789,26 @@ export function createBuildingForBusiness(
   data: CreateBuildingType
 ) {
   client.business.createBuildingForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.buildings = [...business.buildings, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.buildings = [...business.buildings, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.buildings = [...pubBusiness.buildings, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1542,17 +1817,34 @@ export function patchBuildingForBusiness(
   data: PatchBuildingType
 ) {
   client.business.patchBuildingForBusiness.query(data).then((res) => {
+    console.log(res);
+
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.buildings = [
-      ...business.buildings.filter((el) => el.id != res?.id),
-      res,
-    ];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.buildings = [
+        ...business.buildings.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.buildings = [
+        ...pubBusiness.buildings.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1561,13 +1853,24 @@ export function deleteBuildingForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteBuildingForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.buildings = business.buildings.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.buildings = business.buildings.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.buildings = pubBusiness.buildings.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1576,13 +1879,26 @@ export function createOutcomeForBusiness(
   data: createOutcomeType
 ) {
   client.business.createOutcomeForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.outcomes = [...business.outcomes, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.outcomes = [...business.outcomes, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.outcomes = [...pubBusiness.outcomes, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1593,15 +1909,30 @@ export function patchOutcomeForBusiness(
   client.business.patchOutcomeForBusiness.query(data).then((res) => {
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.outcomes = [
-      ...business.outcomes.filter((el) => el.id != res?.id),
-      res,
-    ];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.outcomes = [
+        ...business.outcomes.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.outcomes = [
+        ...pubBusiness.outcomes.filter((el) => el.id != res?.id),
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 
@@ -1610,13 +1941,24 @@ export function deleteOutcomeForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteOutcomeForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.outcomes = business.outcomes.filter((el) => el.id != res.id);
-    bus.businessPlan = [
-      ...bus.businessPlan.filter((el) => el.id != res.busId),
-      business,
-    ];
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.outcomes = business.outcomes.filter((el) => el.id != res.id);
+      bus.businessPlan = [
+        ...bus.businessPlan.filter((el) => el.id != res.busId),
+        business,
+      ];
+    } else if (pubBusiness) {
+      pubBusiness.outcomes = pubBusiness.outcomes.filter(
+        (el) => el.id != res.id
+      );
+      bus.publicBusinessPlan = [
+        ...bus.publicBusinessPlan.filter((el) => el.id != res.busId),
+        pubBusiness,
+      ];
+    }
   });
 }
 
@@ -1625,25 +1967,58 @@ export function createLandForBusiness(
   data: CreateLandType
 ) {
   client.business.createLandForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.lands = [...business.lands, res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      //@ts-ignore
+      business.lands = [...business.lands, res];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      //@ts-ignore
+      pubBusiness.lands = [...pubBusiness.lands, res];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
   });
 }
 export function patchLandForBusiness(bus: BusinessStore, data: PatchLandType) {
   client.business.patchLandForBusiness.query(data).then((res) => {
     if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.businessPlanId);
-    if (!business) return;
-    //@ts-ignore
-    business.lands = [...business.lands.filter((el) => el.id != res?.id), res];
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find(
+      (el) => el.id == res.businessPlanId
+    );
+    if (business) {
+      business.lands = [
+        //@ts-ignore
+        ...business.lands.filter((el) => el.id != res?.id),
+        //@ts-ignore
+        res,
+      ];
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      pubBusiness.lands = [
+        //@ts-ignore
+        ...pubBusiness.lands.filter((el) => el.id != res?.id),
+        //@ts-ignore
+        res,
+      ];
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.publicBusinessPlan = pubBusiness;
+    }
   });
 }
 export function deleteLandForBusiness(
@@ -1651,11 +2026,42 @@ export function deleteLandForBusiness(
   data: DeleteForBusiness
 ) {
   client.business.deleteLandForBusiness.query(data).then((res) => {
+    if (!res) return;
     const business = bus.businessPlan.find((el) => el.id == res.busId);
-    if (!business) return;
-    business.lands = business.lands.filter((el) => el.id != res.id);
-    bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
-    //@ts-ignore
-    bus.newBusinessPlan = business;
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.busId);
+    if (business) {
+      business.lands = business.lands.filter((el) => el.id != res.id);
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = business;
+    } else if (pubBusiness) {
+      pubBusiness.lands = pubBusiness.lands.filter((el) => el.id != res.id);
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = pubBusiness;
+    }
+  });
+}
+
+export function createUpdateCreditParameter(
+  bus: BusinessStore,
+  data: CreateUpdateCreditParameter
+) {
+  client.business.createUpdateCreditParameter.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.id!);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id!);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
   });
 }

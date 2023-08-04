@@ -19,6 +19,7 @@ class BuildingService {
       name: data.name,
       depreciationPeriod: data.depreciationPeriod,
       date: data.date,
+      year: data.year,
       description: data.description,
       startPrice: data.startPrice,
       businessPlanId: data.businessPlanId,

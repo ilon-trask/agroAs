@@ -23,8 +23,8 @@ const patch: funcProps = function (
   setUpdate
 ) {
   //@ts-ignore
-  const [second] = map[el.cell].filter((mat) => mat.techOperationId == el.id);
-  const [cart] = map.maps.filter((map) => map.id == el.techCartId);
+  const second = map[el.cell].find((mat) => mat.techOperationId == el.id);
+  const cart = map.allMaps.find((map) => map.id == el.techCartId);
 
   if (el.cell == "costMechanical") {
     setRes({
@@ -38,8 +38,8 @@ const patch: funcProps = function (
       agriculturalMachineId: second.agriculturalMachineId,
       unitProductionAggregate: second.unitProductionAggregate,
       operId: el.id,
-      salary: cart.salary,
-      priceDiesel: cart.priceDiesel,
+      salary: cart?.salary,
+      priceDiesel: cart?.priceDiesel,
     });
   } else if (el.cell == "costHandWork") {
     setRes({
@@ -58,7 +58,7 @@ const patch: funcProps = function (
       unitOfMeasurement: second.unitOfMeasurement || "",
       yieldСapacity: +second.yieldСapacity || "",
       operId: el.id,
-      salary: cart.salary,
+      salary: cart?.salary,
     });
   } else if (el.cell == "costMaterials") {
     setRes({

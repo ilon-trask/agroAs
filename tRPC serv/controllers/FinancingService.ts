@@ -22,7 +22,7 @@ class FinancingService {
       name: data.name,
       purpose: data.purpose,
       calculationMethod: data.calculationMethod,
-
+      year: data.year,
       isUseCost: data.isUseCost,
       cultureId: data.cultureId,
       userId: user.sub,

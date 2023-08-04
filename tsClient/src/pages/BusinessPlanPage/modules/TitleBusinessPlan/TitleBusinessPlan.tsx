@@ -11,9 +11,8 @@ function TitleBusinessPlan({
   aref: RefObject<HTMLTableElement>;
 }) {
   return (
-    <>
+    <Box ref={aref}>
       <Box
-        ref={aref}
         mx={"auto"}
         w={"fit-content"}
         mt={20}
@@ -51,8 +50,8 @@ function TitleBusinessPlan({
         <Text>Івано-франківськ</Text>
         <Text>2023</Text>
       </Box>
-    </>
+    </Box>
   );
 }
 
-export default TitleBusinessPlan;
+export default React.memo(TitleBusinessPlan);

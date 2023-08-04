@@ -197,6 +197,15 @@ export default class MapStore {
   public set newBusinessCarts(maps: resTechCartsWithOpers) {
     this._businessCarts.push(maps);
   }
+  public get allMaps() {
+    return [
+      ...this._maps,
+      ...this._businessCarts,
+      ...this._complex,
+      ...this._agreeCarts,
+      ...this._NoAgreeCarts,
+    ];
+  }
   public get maps() {
     return JSON.parse(JSON.stringify(this._maps)) as resTechCartsWithOpers[];
   }

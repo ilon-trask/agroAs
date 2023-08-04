@@ -1,14 +1,10 @@
-import IncomeStore from "src/store/IncomeStore";
 import { resBusinessPlan } from "../../../../../tRPC serv/controllers/BusinessService";
-import { Iworker } from "../../../../../tRPC serv/models/models";
 import useBusinessPlanData from "./useBusinessPlanData";
 
 function useBusinessPlanFinancingData(
   start: number,
   end: number,
-  myBusiness: resBusinessPlan,
-  income: IncomeStore,
-  thisWorkers: Iworker[]
+  myBusiness: resBusinessPlan
 ) {
   let sumPermanent = 0,
     sumGeneralProduction = 0,
@@ -33,28 +29,32 @@ function useBusinessPlanFinancingData(
         financing: 0,
       });
     }
-    const direct = useBusinessPlanData.direct(myBusiness, i, start);
-    const fin = useBusinessPlanData.fin(myBusiness, i, start, income);
-    const financing = useBusinessPlanData.financing(myBusiness, i, start);
-    const permanent = useBusinessPlanData.permanent(thisWorkers, i, start);
-    const generalProduction = useBusinessPlanData.generalProduct(
-      thisWorkers,
+    // const direct = useBusinessPlanData.oneDirect(myBusiness, i, start);
+    const direct = 0;
+    const fin = useBusinessPlanData.yearFin(myBusiness, i, start);
+    const financing = useBusinessPlanData.yearFinancing(myBusiness, i, start);
+    const permanent = useBusinessPlanData.yearPermanent(
+      myBusiness.outcomes,
       i,
       start
     );
-    const variables = useBusinessPlanData.variables(
-      thisWorkers,
-      sumDirect,
+    const generalProduction = useBusinessPlanData.yearGeneralProduct(
+      myBusiness.outcomes,
       i,
       start
     );
-    const outcome = useBusinessPlanData.outcome(
-      thisWorkers,
-      sumDirect,
+    const variables = useBusinessPlanData.yearVariables(
+      myBusiness.outcomes,
+      myBusiness,
       i,
       start
     );
-    console.log(direct);
+    const outcome = useBusinessPlanData.yearOutcome(
+      myBusiness.outcomes,
+      myBusiness,
+      i,
+      start
+    );
 
     sumPermanent += permanent;
     sumDirect += direct;
@@ -75,12 +75,9 @@ function useBusinessPlanFinancingData(
       fin: fin.toFixed(),
       financing: financing.toFixed(),
     };
-    console.log("akk");
-    console.log(akk);
-
     res.push(akk);
   }
-  console.log(sumDirect);
+
   res.push({
     date: "Разом",
     permanent: sumPermanent,

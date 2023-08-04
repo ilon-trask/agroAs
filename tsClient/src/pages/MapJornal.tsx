@@ -110,6 +110,8 @@ const MapJornal = observer(function () {
   });
   let maps: resTechCartsWithOpers[] = JSON.parse(JSON.stringify(map.maps));
   maps.sort((a, b) => a.id! - b.id!);
+  console.log(maps);
+
   let works: Ispecial_work[] = JSON.parse(JSON.stringify(map.works));
   works.sort((a, b) => a.id! - b.id!);
   const [complex, setComplex] = useState(false);
@@ -129,10 +131,11 @@ const MapJornal = observer(function () {
   const [buyingMachineRes, setBuyingMachineRes] =
     useState<CreateBuyingMachineProps>({
       name: "",
+      year: 0,
       brand: "",
       date: "",
       amount: "",
-      cost: "",
+      price: "",
       purpose: "",
       businessPlanId: 0,
       enterpriseId: 0,

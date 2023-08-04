@@ -8,7 +8,7 @@ import CreateWorker from "../modules/CreateWorker";
 import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
 import { BUSINESSpLAN_ROUTER } from "../utils/consts";
 import { EnterpriseFormType } from "../shared/hook/useEnterpriseForm";
-import getStartAndEndBusinessPlan from "src/shared/hook/getStartAndEndBusinessPlan";
+import getStartAndEndBusinessPlan from "src/shared/funcs/getStartAndEndBusinessPlan";
 import {
   StaffingTableBody,
   StaffingTableHeadRow,

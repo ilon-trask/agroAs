@@ -12,7 +12,8 @@ import { AdministrationPeriodCalcType } from "../../tsClient/src/shared/hook/use
 import { EnterpriseFormType } from "../../tsClient/src/shared/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "../../tsClient/src/shared/hook/useEnterpriseTaxGroup";
 import { WorkerClassesType } from "../../tsClient/src/shared/hook/useWorkersClasses";
-import { YieldPlantLandingPeriodType } from "../../tsClient/src/shared/hook/useYieldPlantLandingPeriod";
+import { RepaymentsMethodsType } from "../../tsClient/src/shared/hook/useRepaymentMethods";
+import { PaymentsFrequencysType } from "../../tsClient/src/shared/hook/usePaymentsFrequencys";
 import { VegetationYearsType } from "../../tsClient/src/shared/hook/useVegetationYears";
 import { CreditCalculationMethodType } from "../../tsClient/src/shared/hook/useCreditCalculationMethod";
 import { CreditCalculationTypeType } from "../../tsClient/src/shared/hook/useCreditCalculationType";
@@ -866,6 +867,7 @@ export interface Ioutcome {
   id?: number;
   name: string;
   date: string;
+  year: number;
   group: IoutcomeGroup;
   type: IoutcomeType | null;
   costMonth: number | null;
@@ -881,6 +883,7 @@ export interface Ioutcome {
 export class outcome extends Model<Ioutcome> {
   declare id?: number;
   declare date: string;
+  declare year: number;
   declare name: string;
   declare costMonth: number;
   declare group: IoutcomeGroup;
@@ -893,6 +896,7 @@ outcome.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     name: { type: DataTypes.STRING },
     costMonth: { type: DataTypes.FLOAT(2) },
     group: { type: DataTypes.STRING },
@@ -990,6 +994,8 @@ export interface Ifinancing {
   type: FinancingType;
   name: string;
   date: string;
+  year: number;
+  month: number | null;
   cost: number;
   purpose:
     | CreditPurposeType
@@ -1009,6 +1015,8 @@ export class financing extends Model<Ifinancing> {
   declare name: string;
   declare type: FinancingType;
   declare date: string;
+  declare year: number;
+  declare month: number;
   declare cost: number;
   declare cultureId?: number;
   declare purpose:
@@ -1027,6 +1035,8 @@ financing.init(
     cost: { type: DataTypes.INTEGER },
     type: { type: DataTypes.STRING },
     date: { type: DataTypes.DATEONLY },
+    year: { type: DataTypes.INTEGER },
+    month: { type: DataTypes.INTEGER },
     name: { type: DataTypes.STRING },
     purpose: { type: DataTypes.STRING },
     isUseCost: {
@@ -1047,7 +1057,8 @@ export interface Ibuying_machine {
   name: string;
   brand: string;
   date: string;
-  cost: number;
+  year: number;
+  price: number;
   amount: number;
   purpose: BuyingMachinePurposeType | "МШП";
   userId: string;
@@ -1059,7 +1070,8 @@ export class buying_machine extends Model<Ibuying_machine> {
   declare name: string;
   declare brand: string;
   declare date: string;
-  declare cost: number;
+  declare year: number;
+  declare price: number;
   declare amount: number;
   declare purpose: BuyingMachinePurposeType | "МШП";
   declare userId: string;
@@ -1070,8 +1082,9 @@ buying_machine.init(
     name: { type: DataTypes.STRING },
     brand: { type: DataTypes.STRING },
     date: { type: DataTypes.DATEONLY },
+    year: { type: DataTypes.INTEGER },
     amount: { type: DataTypes.INTEGER },
-    cost: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.INTEGER },
     purpose: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
@@ -1258,6 +1271,7 @@ export interface Iland {
   readonly id?: number;
   name: string;
   cadastreNumber: number | null;
+  year: number;
   area: number;
   userId: string;
   date: string;
@@ -1272,6 +1286,7 @@ export class land extends Model<Iland> {
   declare id: number;
   declare name: string;
   declare cadastreNumber: number;
+  declare year: number;
   declare area: number;
   declare userId: string;
   declare date: string;
@@ -1288,6 +1303,7 @@ land.init(
     },
     name: { type: DataTypes.STRING },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     cadastreNumber: { type: DataTypes.STRING },
     area: { type: DataTypes.FLOAT },
     rate: { type: DataTypes.INTEGER },
@@ -1307,10 +1323,13 @@ export interface Ibuilding {
   readonly id?: number;
   name: string;
   startPrice: number;
-  depreciationPeriod: string | null;
+  depreciationPeriod: number | null;
   date: string;
+  year: number;
   description: string;
+  introductionDate: string | null;
   userId: string;
+  depreciationMonth?: number | null;
   readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null;
 }
@@ -1318,19 +1337,23 @@ export class building extends Model<Ibuilding> {
   declare id: number;
   declare name: string;
   declare date: string;
+  declare year: number;
   declare description: string;
   declare startPrice: number;
-  declare depreciationPeriod: string;
+  declare introductionDate: string;
+  declare depreciationPeriod: number;
   declare userId: string;
 }
 building.init(
   {
     name: { type: DataTypes.STRING },
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
-    depreciationPeriod: { type: DataTypes.STRING },
+    depreciationPeriod: { type: DataTypes.INTEGER },
     date: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
+    introductionDate: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -1342,7 +1365,43 @@ export class financBus extends Model<IFinancBus> {
   declare businessPlanId: number;
   declare financingId: number;
 }
-
+export interface IcreditParameter {
+  id?: number;
+  procent: number;
+  startDatePayments: string | null;
+  monthlyСommission: number;
+  commissionForCredit: number;
+  repaymentMethod: RepaymentsMethodsType;
+  paymentsFrequency: PaymentsFrequencysType;
+  termType: "на бізнес-план" | "на роки" | null;
+  creditTerm: number;
+  financingId?: number;
+}
+export class creditParameter extends Model<IcreditParameter> {
+  declare id: number;
+  declare procent: number;
+  declare startDatePayments: string;
+  declare monthlyСommission: number;
+  declare commissionForCredit: number;
+  declare repaymentMethod: string;
+  declare paymentsFrequency: string;
+  declare termType: string;
+  declare creditTerm: number;
+  declare financingId?: number;
+}
+creditParameter.init(
+  {
+    procent: { type: DataTypes.FLOAT },
+    startDatePayments: { type: DataTypes.STRING },
+    monthlyСommission: { type: DataTypes.INTEGER },
+    commissionForCredit: { type: DataTypes.INTEGER },
+    repaymentMethod: { type: DataTypes.STRING },
+    paymentsFrequency: { type: DataTypes.STRING },
+    termType: { type: DataTypes.STRING },
+    creditTerm: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
 financBus.init({}, { sequelize });
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
@@ -1512,8 +1571,12 @@ building.belongsTo(businessPlan);
 culture.hasMany(financing);
 financing.belongsTo(culture);
 
-financing.belongsToMany(businessPlan, { through: financBus });
-businessPlan.belongsToMany(financing, { through: financBus });
+businessPlan.hasMany(financing);
+financing.belongsTo(businessPlan);
+// financing.belongsToMany(businessPlan,{through:financBus});
+// businessPlan.belongsToMany(financing, { through: financBus });
 
 // culture.hasMany(yieldCalculation);
 // yieldCalculation.belongsTo(culture);
+financing.hasOne(creditParameter);
+creditParameter.belongsTo(financing);

@@ -19,7 +19,7 @@ class landService {
       businessPlanId: data.businessPlanId,
       ownership: data.ownership,
       rate: data.rate,
-
+      year: data.year,
       enterpriseId: data.enterpriseId,
       date: data.date,
       rightOfUse: data.rightOfUse,

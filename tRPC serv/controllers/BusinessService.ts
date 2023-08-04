@@ -31,6 +31,8 @@ import {
   Iland,
   vegetationYears,
   IvegetationYears,
+  creditParameter,
+  IcreditParameter,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -40,6 +42,7 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
+  CreateUpdateCreditParameter,
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
@@ -82,6 +85,7 @@ export interface resBusProd {
 export interface resFinancing extends Ifinancing {
   costBP?: number;
   costHectare?: number;
+  creditParameter: IcreditParameter | undefined;
 }
 export interface resBusinessPlan extends IbusinessPlan {
   resume: Iresume;
@@ -100,7 +104,7 @@ export interface resBusinessPlan extends IbusinessPlan {
 const includes = [
   { model: resume },
   { model: titlePage },
-  { model: financing },
+  { model: financing, include: [{ model: creditParameter }] },
   { model: enterprise },
   {
     model: busProd,
@@ -142,6 +146,15 @@ const ForBusProd = async (busProds: resBusProd[]) => {
     })
   );
 };
+function changeBuilding(buildings: Ibuilding[]) {
+  return buildings.map((el) => ({
+    ...el,
+    depreciationMonth: el.depreciationPeriod
+      ? +(el.startPrice / (el.depreciationPeriod * 12)).toFixed(2)
+      : null,
+  }));
+}
+
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
@@ -172,18 +185,18 @@ async function changeFinancing(plans: resBusinessPlan[]) {
         ForBusProd(plan.busProds),
       ]);
       plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
+      plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
       // console.log("test" + plan.id, new Date());
       return plan;
     })
   );
   plans = plans.map((plan) => {
-    plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП");
-    if (!plan.MSHP) plan.MSHP = [];
+    plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП") || [];
     plan.buying_machines = plan.buying_machines.filter(
       (el) => el.purpose != "МШП"
     );
+    plan.buildings = changeBuilding(plan.buildings);
     plan.workers = changeWorkerRes(plan.workers);
-
     plan.financings = [
       ...plan.financings.map((el) => {
         let area = 1;
@@ -219,7 +232,10 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       }),
       {
         date: plan?.dateStart!,
+        year: 0,
+        month: null,
         typeName: "Інвестиції",
+        creditParameter: undefined,
         calculationMethod: "На бізнес-план",
         calculationType: "Індивідуальний",
         costBP: plan?.initialAmount!,
@@ -236,9 +252,65 @@ async function changeFinancing(plans: resBusinessPlan[]) {
 
     const start = +plan?.dateStart?.split("-")[0]!;
     const end = +start + +plan?.realizationTime!;
+    const { creditBody, creditProc } = (() => {
+      const creds = plan.financings.filter(
+        (el) => el.type == "credit" && el.creditParameter
+      );
+      const creditBody: Record<number, number> = {};
+      const creditProc: Record<number, number> = {};
+      for (let i = 0; i < creds.length; i++) {
+        const el = creds[i];
+        const par = el.creditParameter;
+        if (!par) throw new Error("нема par");
+
+        const amount = +((el.costBP || 0) / par.creditTerm).toFixed(2);
+        let remainder = el.costBP || 0;
+        for (let y = start + el.year; y <= end; y++) {
+          if (par.paymentsFrequency == "Кожен рік") {
+            if (par.repaymentMethod == "Класична схема") {
+              creditBody[y]
+                ? (creditBody[y] += amount)
+                : (creditBody[y] = amount);
+              const procent = +(remainder * (par.procent / 100)).toFixed(2);
+              creditProc[y]
+                ? (creditProc[y] += procent)
+                : (creditProc[y] = procent);
+              remainder -= amount;
+            }
+          }
+        }
+      }
+      return { creditBody, creditProc };
+    })();
+
     plan.outcomes = (() => {
       const outcomes: Ioutcome[] = [];
       for (let i = start; i <= end; i++) {
+        const fin = plan.financings.filter(
+          (el) => el.year == i - start && el.type == "credit"
+        );
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Тіло кредиту",
+          group: "Постійні",
+          date: i + "-01-01",
+          year: i - start,
+          costYear: creditBody[i] || 0,
+          isDefault: true,
+        });
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "% кредиту",
+          group: "Постійні",
+          date: i + "-01-01",
+          year: i - start,
+          costYear: creditProc[i] || 0,
+          isDefault: true,
+        });
         plan.outcomes
           .filter((el) => +el.date.split("-")[0] == i)
           .forEach((el) => {
@@ -256,6 +328,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оплата праці АП",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Адміністративний"
@@ -277,6 +350,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Нарахування (ЄСВ+ВЗ)",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Адміністративний"
@@ -298,6 +372,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оплата праці ІТР",
           group: "Загально виробничі",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Інженерно технічний"
@@ -319,6 +394,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Нарахування (ЄСВ+ВЗ)",
           group: "Загально виробничі",
           date: i + "-01-01",
+          year: i - start,
           costYear: plan.workers
             .filter(
               (el) => el.year == i - start && el.class == "Інженерно технічний"
@@ -341,6 +417,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Оренда землі",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: lands
             .filter((el) => el.rightOfUse == "Оренда")
             .reduce((p, c) => p + c.area * c.rate, 0),
@@ -353,6 +430,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           name: "Земельний податок",
           group: "Постійні",
           date: i + "-01-01",
+          year: i - start,
           costYear: lands
             .filter((el) => el.rightOfUse == "Власна")
             .reduce((p, c) => p + c.area * c.rate, 0),
@@ -368,7 +446,7 @@ async function changeFinancing(plans: resBusinessPlan[]) {
 }
 export async function getBusinessPlan(businessPlanId: number) {
   //@ts-ignore
-  let res: resBusinessPlan | undefined | null = await businessPlan.findOne({
+  let res: resBusinessPlan | null = await businessPlan.findOne({
     where: { id: businessPlanId },
     //@ts-ignore
     include: includes,
@@ -571,6 +649,8 @@ class BusinessService {
       date: data.date,
       type: data.type,
       name: data.name,
+      year: data.year,
+      month: data.month,
       purpose: data.purpose,
       calculationMethod: data.calculationMethod,
       calculationType: null,
@@ -600,6 +680,7 @@ class BusinessService {
         purpose: data.purpose,
         calculationMethod: data.calculationMethod,
         cultureId: data.cultureId,
+        month: data.month,
       },
       { where: { id: data.financingId } }
     );
@@ -624,8 +705,9 @@ class BusinessService {
     const res: Ibuying_machine = await buying_machine.create({
       amount: data.amount,
       brand: data.brand,
-      cost: data.cost,
+      price: data.price,
       date: data.date,
+      year: data.year,
       name: data.name,
       purpose: data.purpose,
       userId: user.sub,
@@ -643,7 +725,7 @@ class BusinessService {
       {
         amount: data.amount,
         brand: data.brand,
-        cost: data.cost,
+        price: data.price,
         date: data.date,
         name: data.name,
         purpose: data.purpose,
@@ -671,6 +753,7 @@ class BusinessService {
       name: data.name,
       depreciationPeriod: data.depreciationPeriod,
       date: data.date,
+      year: data.year,
       description: data.description,
       startPrice: data.startPrice,
       businessPlanId: data.businessPlanId,
@@ -693,13 +776,15 @@ class BusinessService {
         description: data.description,
         businessPlanId: data.businessPlanId,
         enterpriseId: data.enterpriseId,
+        introductionDate: data.introductionDate,
       },
       { where: { id: data.buildId } }
     );
     const res: Ibuilding | null = await building.findOne({
       where: { id: data.buildId },
     });
-    return res;
+    if (!res) return;
+    return changeBuilding([JSON.parse(JSON.stringify(res))])[0];
   }
   async deleteBuildingForBusiness(
     user: Principal | undefined,
@@ -721,6 +806,7 @@ class BusinessService {
       group: data.group,
       userId: user.sub,
       businessPlanId: data.businessPlanId!,
+      year: data.year,
       type: data.type,
     });
     return res;
@@ -761,6 +847,7 @@ class BusinessService {
     const res: Iland = await land.create({
       name: data.name,
       area: data.area,
+      year: data.year,
       cadastreNumber: data.cadastreNumber,
       businessPlanId: data.businessPlanId,
       enterpriseId: data.enterpriseId,
@@ -774,14 +861,7 @@ class BusinessService {
   }
   async patchLandForBusiness(user: Principal | undefined, data: PatchLandType) {
     if (!user) return;
-    await land.update(
-      {
-        ...data,
-      },
-      {
-        where: { id: data.landId },
-      }
-    );
+    await land.update({ ...data }, { where: { id: data.landId } });
     const res: Iland | null = await land.findOne({
       where: { id: data.landId },
     });
@@ -794,6 +874,23 @@ class BusinessService {
     if (!user) return;
     await land.destroy({ where: { id: data.id } });
     return data;
+  }
+  async createUpdateCreditParameter(data: CreateUpdateCreditParameter) {
+    const isParameter = await creditParameter.findOne({
+      where: { financingId: data.financingId },
+    });
+    if (isParameter) {
+      await creditParameter.update(
+        { ...data },
+        { where: { financingId: data.financingId } }
+      );
+    } else {
+      await creditParameter.create({
+        ...data,
+        termType: data.termType || "на бізнес-план",
+      });
+    }
+    return await getBusinessPlan(data.busId);
   }
 }
 export default new BusinessService();

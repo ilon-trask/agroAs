@@ -1,5 +1,7 @@
+import { AccordionItem, AccordionPanel } from "@chakra-ui/react";
 import React, { useState } from "react";
-import MyHeading from "src/ui/MyHeading";
+import BusHeading from "src/ui/BusHeading";
+import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import MainFinancingBusinessPlanTable from "./MainFinancingBusinessPlanTable";
@@ -14,17 +16,21 @@ function MainFinancingBusTable({
   end: number;
 }) {
   return (
-    <>
-      <MyHeading>Залучення фінансування</MyHeading>
-      <MyTableContainer>
-        <MainFinancingBusinessPlanTable
-          financing={myBusiness?.financings}
-          busId={myBusiness?.id!}
-          end={end}
-          start={start}
-        />
-      </MyTableContainer>
-    </>
+    <AccordionItem>
+      <MyAccordionButton>
+        <BusHeading>Залучення фінансування</BusHeading>
+      </MyAccordionButton>
+      <AccordionPanel>
+        <MyTableContainer>
+          <MainFinancingBusinessPlanTable
+            financing={myBusiness?.financings}
+            busId={myBusiness?.id!}
+            end={end}
+            start={start}
+          />
+        </MyTableContainer>
+      </AccordionPanel>
+    </AccordionItem>
   );
 }
 

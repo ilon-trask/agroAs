@@ -61,7 +61,8 @@ const Service = observer(
     const { map } = useContext(Context);
     const { id } = useParams();
     useEffect(() => {
-      setRes({ ...res, unitsOfCost: "грн/га" });
+      if (res.unitsOfCost != "грн/га")
+        setRes({ ...res, unitsOfCost: "грн/га" });
     }, [res]);
     return (
       <ModalBody>

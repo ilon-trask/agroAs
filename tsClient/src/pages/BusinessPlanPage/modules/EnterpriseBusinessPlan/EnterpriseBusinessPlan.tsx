@@ -2,13 +2,13 @@ import { Table, Tbody, Td, Text, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { RefObject, useMemo } from "react";
 import { EnterpriseFormType } from "src/shared/hook/useEnterpriseForm";
 import { EnterpriseTaxGroupType } from "src/shared/hook/useEnterpriseTaxGroup";
-import Description from "../../ui/Description";
+import Description from "../../../../ui/Description";
 import Paragraph from "src/ui/Paragraph";
 import SectionTitle from "src/ui/SectionTitle";
 import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
-import { Iworker } from "../../../../tRPC serv/models/models";
-import { resBusinessPlan } from "../../../../tRPC serv/controllers/BusinessService";
+import { Iworker } from "../../../../../../tRPC serv/models/models";
+import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import { ColumnDef } from "@tanstack/react-table";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
@@ -50,19 +50,19 @@ function EnterpriseBusinessPlan({
     for (let i = start; i <= end; i++) {
       const workers = thisWorkers?.filter((el) => el.year == i - start);
 
-      // let adAmount = 0;
-      // let adSalary = 0;
-      // let adSalaryYear = 0;
-      // workers?.forEach((e) => {
-      //   if (e.class == "Адміністративний") {
-      //     adAmount += e.amount;
-      //     adSalary += e.salary * e.amount;
-      //     adSalaryYear +=
-      //       e.salary *
-      //       e.amount *
-      //       (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
-      //   }
-      // });
+      let adAmount = 0;
+      let adSalary = 0;
+      let adSalaryYear = 0;
+      workers?.forEach((e) => {
+        if (e.class == "Адміністративний") {
+          adAmount += e.amount;
+          adSalary += e.salary * e.amount;
+          adSalaryYear +=
+            e.salary *
+            e.amount *
+            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
+        }
+      });
       let vAmount = 0;
       let vSalary = 0;
       let vSalaryYear = 0;
@@ -76,41 +76,42 @@ function EnterpriseBusinessPlan({
             (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
         }
       });
-      // let iAmount = 0;
-      // let iSalary = 0;
-      // let iSalaryYear = 0;
-      // workers?.forEach((e) => {
-      //   if (e.class == "Інженерно технічний") {
-      //     iAmount += e.amount;
-      //     iSalary += e.salary * e.amount;
-      //     iSalaryYear +=
-      //       e.salary *
-      //       e.amount *
-      //       (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
-      //   }
-      // });
+      let iAmount = 0;
+      let iSalary = 0;
+      let iSalaryYear = 0;
+      workers?.forEach((e) => {
+        if (e.class == "Інженерно технічний") {
+          iAmount += e.amount;
+          iSalary += e.salary * e.amount;
+          iSalaryYear +=
+            e.salary *
+            e.amount *
+            (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
+        }
+      });
       sum +=
-        // Math.round(adSalaryYear * 0.235) +
-        // adSalaryYear +
-        Math.round(vSalaryYear * 0.235) + vSalaryYear;
-      // +(Math.round(iSalaryYear * 0.235) + iSalaryYear);
+        Math.round(adSalaryYear * 0.235) +
+        adSalaryYear +
+        Math.round(vSalaryYear * 0.235) +
+        vSalaryYear;
+      +(Math.round(iSalaryYear * 0.235) + iSalaryYear);
       salaryExpensesData.push(
-        // {
-        //   type: "Адміністративний",
-        //   amount: adAmount,
-        //   averageZP: Math.round(adSalary / adAmount),
-        //   AnnualSalaryFund: adSalaryYear,
-        //   tax: Math.round(adSalaryYear * 0.235),
-        //   general: Math.round(adSalaryYear * 0.235) + adSalaryYear,
-        // },
-        // {
-        //   type: "ІТП",
-        //   amount: iAmount,
-        //   averageZP: Math.round(iSalary / iAmount),
-        //   AnnualSalaryFund: iSalaryYear,
-        //   tax: Math.round(iSalaryYear * 0.235),
-        //   general: Math.round(iSalaryYear * 0.235) + iSalaryYear,
-        // },
+        {
+          type: "Адміністративний",
+          amount: adAmount,
+          averageZP: Math.round(adSalary / adAmount),
+          AnnualSalaryFund: adSalaryYear,
+          tax: Math.round(adSalaryYear * 0.235),
+          general: Math.round(adSalaryYear * 0.235) + adSalaryYear,
+        },
+        {
+          type: "ІТП",
+          amount: iAmount,
+          averageZP: Math.round(iSalary / iAmount),
+          AnnualSalaryFund: iSalaryYear,
+          tax: Math.round(iSalaryYear * 0.235),
+          general: Math.round(iSalaryYear * 0.235) + iSalaryYear,
+        },
         {
           type: "Виробничий",
           amount: vAmount,
@@ -214,7 +215,7 @@ function EnterpriseBusinessPlan({
         ],
       },
       {
-        header: "ХАРАКТЕРИСТИКА",
+        header: "Відхилення",
         accessorKey: "",
       },
       {
@@ -504,7 +505,21 @@ function EnterpriseBusinessPlan({
       <Description>
         Використання площ під культурами описано у табличному вигляді.
       </Description>
-      <TableComponent data={areasUsageData} columns={areasUsageColumns} />
+      <Table size={"sm"}>
+        <Thead>
+          <Tr>
+            <Th colSpan={[...cultureSet].length + 2}>
+              <TableName>Структура насаджень</TableName>
+            </Th>
+          </Tr>
+          <Tr>
+            <Th colSpan={[...cultureSet].length + 2}>
+              <TableNumber />
+            </Th>
+          </Tr>
+        </Thead>
+        <TableContent data={areasUsageData} columns={areasUsageColumns} />
+      </Table>
     </>
   );
 }

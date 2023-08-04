@@ -23,21 +23,20 @@ import UpdateAreaCart from "../../modules/UpdateAreaTEJ";
 import { resTechnologicalEconomicJustification } from "../../../../tRPC serv/controllers/TEJService";
 import TEJustificationContent from "./TEJustificationContent";
 import { iChild, iName } from "../BusinessPlanPage";
+import MyHeading from "src/ui/MyHeading";
 function TEJjustification() {
   const [openResume, setOpenResume] = useState<boolean>(false);
   const [openTitle, setOpenTitle] = useState<boolean>(false);
   const [name, setName] = useState<iName>();
   const [child, setChild] = useState<iChild>();
   const [showSelectCart, setShowSelectCart] = useState<boolean>(false);
-  const [infCartId, setInfCartId] = useState<number>(0);
-  const { map, user, income, TEJ } = useContext(Context);
+  const { map, user, TEJ } = useContext(Context);
   useTEJ(TEJ);
   const { cartId } = useParams();
   const navigate = useNavigate();
 
-  const myCart =
-    map.maps?.find((el) => el.id == cartId) ||
-    map.businessCarts?.find((el) => el.id == cartId);
+  const myCart = map.allMaps?.find((el) => el.id == cartId);
+
   let myJustification: resTechnologicalEconomicJustification | undefined;
   if (user.role == "") {
     myJustification = TEJ.agreeJustification?.find(
@@ -54,7 +53,6 @@ function TEJjustification() {
   }
 
   useEffect(() => {
-    console.log("try2");
     getCarts(map, +cartId!);
     getGrades(map);
     getTractor(map);
@@ -64,10 +62,7 @@ function TEJjustification() {
   //   if (user.role == "" && myJustification?.culture?.id)
   //     getYieldPlant(income, myJustification?.culture?.id!);
   // }, [myJustification?.culture?.id]);
-  console.log(myCart);
-
   const [updCartOpen, setUpdCartOpen] = useState(false);
-
   const [updCartRes, setUpdCartRes] =
     useState<ItechnologicalEconomicJustification>({
       area: 0,
@@ -107,14 +102,7 @@ function TEJjustification() {
           )}
         </Box>
       </Box>
-      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        Техніко економічні показники <br />
-        {myJustification?.culture?.name} (
-        {myJustification?.cultivationTechnology?.name.toLocaleLowerCase()})
-      </Heading>
-      <Heading mt={3} textAlign={"center"} fontSize={"25"}>
-        {/* {myBusiness?.name} */}
-      </Heading>
+      <MyHeading>Техніко економічні показники</MyHeading>
       <TEJustificationContent
         isPlan={false}
         myCart={myCart!}

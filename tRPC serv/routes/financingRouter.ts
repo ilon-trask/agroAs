@@ -8,6 +8,8 @@ export const createFinancing = z.object({
   type: z.enum(["investment", "credit", "derj_support", "grant"]),
   name: z.string(),
   date: z.string(),
+  year: z.number(),
+  month: z.number().nullish(),
   isUseCost: z.boolean(),
   purpose: z.enum([
     "Поповнення обігових коштів",
@@ -30,7 +32,9 @@ export type PatchFinancingType = z.infer<typeof patchFinancing>;
 
 export const financingRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
-    const res: Ifinancing[] | undefined = await FinancingService.get(ctx.user);
+    const res: Ifinancing[] | undefined | null = await FinancingService.get(
+      ctx.user
+    );
     return res;
   }),
   create: publicProcedure
