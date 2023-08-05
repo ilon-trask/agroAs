@@ -1,6 +1,7 @@
 import { Button, Td, Th, Tr } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { DeleteProps } from "src/components/DeleteAlert";
+import { amortizationProps } from "src/pages/BusinessPlanPage/modules/AmortizationDialog/AmortizationDialog";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
@@ -31,6 +32,8 @@ export function BuyingMachineTableBodyRow({
   setRes,
   setUpdate,
   busId,
+  setAmortizationData,
+  setAmortizationOpen,
   i,
 }: {
   el: Ibuying_machine;
@@ -39,6 +42,8 @@ export function BuyingMachineTableBodyRow({
   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
   setDeleteOpen: Dispatch<SetStateAction<DeleteProps>>;
   busId: number;
+  setAmortizationOpen: Dispatch<SetStateAction<boolean>>;
+  setAmortizationData: Dispatch<SetStateAction<amortizationProps | undefined>>;
   i: number | undefined;
 }) {
   const { business } = useContext(Context);
@@ -72,7 +77,23 @@ export function BuyingMachineTableBodyRow({
       <Td>{el.price}</Td>
       <Td>{el.price * el.amount}</Td>
       <Td>
-        <Button size={"sm"}>Додати</Button>
+        <Button
+          size={"sm"}
+          onClick={() => {
+            setAmortizationOpen(true);
+            setAmortizationData({
+              id: el.amortization?.id,
+              amount: el.amortization?.amount || "",
+              busId: busId,
+              depreciationPeriod: el.amortization?.depreciationPeriod || 7,
+              introductionDate: el.amortization?.introductionDate || "",
+              mainAmount: el.amount,
+              buyingMachineId: el.id,
+            });
+          }}
+        >
+          Додати
+        </Button>
       </Td>
       <Td
         onClick={() => {

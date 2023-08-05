@@ -474,8 +474,8 @@ function ProductionBusinessPlan({
                       <Td>{el.name}</Td>
                       <Td>{el.amount}</Td>
                       <Td>{el.amount * el.price}</Td>
-                      <Td></Td>
-                      <Td></Td>
+                      <Td>{el.amortization?.depreciationPerMonth}</Td>
+                      <Td>{el.amortization?.introductionDate}</Td>
                     </Tr>
                   ))
                 );
@@ -552,8 +552,8 @@ function ProductionBusinessPlan({
                     <Td>{el.name}</Td>
                     <Td>1</Td>
                     <Td>{el.startPrice}</Td>
-                    <Td>{el.depreciationMonth}</Td>
-                    <Td>{el.introductionDate}</Td>
+                    <Td>{el.amortization?.depreciationPerMonth}</Td>
+                    <Td>{el.amortization?.introductionDate}</Td>
                   </Tr>
                 ))
               );
@@ -621,8 +621,8 @@ function ProductionBusinessPlan({
                     <Td>{el.name}</Td>
                     <Td>{el.amount}</Td>
                     <Td>{el.amount * el.price}</Td>
-                    <Td></Td>
-                    <Td></Td>
+                    <Td>{el.amortization?.depreciationPerMonth}</Td>
+                    <Td>{el.amortization?.introductionDate}</Td>
                   </Tr>
                 ))
               );
@@ -695,40 +695,101 @@ function ProductionBusinessPlan({
           {(() => {
             const res = [];
             let businessSum = 0;
+            let buyingSum = 0;
+            let MSHPSum = 0;
             for (let i = start; i <= end; i++) {
               const buildingValue = +myBusiness.buildings
                 .filter(
                   (el) =>
-                    (getYearFromString(el.introductionDate || "") || 0) <= i &&
-                    (getYearFromString(el.introductionDate || "") || 0) +
-                      (el.depreciationPeriod || 0) >=
+                    (getYearFromString(
+                      el.amortization?.introductionDate || ""
+                    ) || 0) <= i &&
+                    (getYearFromString(
+                      el.amortization?.introductionDate || ""
+                    ) || 0) +
+                      (el.amortization?.depreciationPeriod || 0) >=
                       i
                 )
                 .reduce(
                   (p, c) =>
                     p +
-                    (c.depreciationMonth || 0) *
-                      (i == getYearFromString(c.introductionDate)
-                        ? 13 - getMonthFromString(c.introductionDate!)
+                    (c.amortization?.depreciationPerMonth || 0) *
+                      (i == getYearFromString(c.amortization?.introductionDate!)
+                        ? 13 -
+                          getMonthFromString(c.amortization?.introductionDate!)
                         : 12),
                   0
                 )
                 .toFixed(2);
-
+              const buyingValue = +myBusiness.buying_machines
+                .filter(
+                  (el) =>
+                    (getYearFromString(
+                      el.amortization?.introductionDate || ""
+                    ) || 0) <= i &&
+                    (getYearFromString(
+                      el.amortization?.introductionDate || ""
+                    ) || 0) +
+                      (el.amortization?.depreciationPeriod || 0) >=
+                      i
+                )
+                .reduce(
+                  (p, c) =>
+                    p +
+                    (c.amortization?.depreciationPerMonth || 0) *
+                      (i == getYearFromString(c.amortization?.introductionDate!)
+                        ? 13 -
+                          getMonthFromString(c.amortization?.introductionDate!)
+                        : 12),
+                  0
+                )
+                .toFixed(2);
+              const MSHPValue = +myBusiness.MSHP.filter(
+                (el) =>
+                  (getYearFromString(el.amortization?.introductionDate || "") ||
+                    0) <= i &&
+                  (getYearFromString(el.amortization?.introductionDate || "") ||
+                    0) +
+                    (el.amortization?.depreciationPeriod || 0) >=
+                    i
+              )
+                .reduce(
+                  (p, c) =>
+                    p +
+                    (c.amortization?.depreciationPerMonth || 0) *
+                      (i == getYearFromString(c.amortization?.introductionDate!)
+                        ? 13 -
+                          getMonthFromString(c.amortization?.introductionDate!)
+                        : 12),
+                  0
+                )
+                .toFixed(2);
               businessSum += buildingValue;
+              buyingSum += buyingValue;
+              MSHPSum += MSHPValue;
               res.push(
                 <Tr key={i} fontWeight={"bold"}>
                   <Td>{i}</Td>
-                  <Td></Td>
+                  <Td>{buyingValue}</Td>
                   <Td>{buildingValue}</Td>
+                  <Td>{MSHPValue}</Td>
+                  <Td>0</Td>
+                  <Td>{buyingValue + buildingValue + MSHPValue}</Td>
                 </Tr>
               );
             }
             res.push(
               <Tr key={end + 1}>
                 <Td>Разом</Td>
-                <Td></Td>
+                <Td>{buyingSum.toFixed(2)}</Td>
                 <Td>{businessSum.toFixed(2)}</Td>
+                <Td>{MSHPSum.toFixed(2)}</Td>
+                <Td>{0}</Td>
+                <Td>
+                  {+buyingSum.toFixed(2) +
+                    +businessSum.toFixed(2) +
+                    +MSHPSum.toFixed(2)}
+                </Td>
               </Tr>
             );
             return res;

@@ -33,6 +33,8 @@ import {
   IvegetationYears,
   creditParameter,
   IcreditParameter,
+  amortization,
+  Iamortization,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -42,7 +44,8 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
-  CreateUpdateCreditParameter,
+  CreateUpdateAmortizationType,
+  CreateUpdateCreditParameterType,
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
@@ -146,11 +149,33 @@ const ForBusProd = async (busProds: resBusProd[]) => {
     })
   );
 };
-function changeBuilding(buildings: Ibuilding[]) {
+function changeAmortization(
+  amortization: Iamortization,
+  price: number
+): Iamortization {
+  return {
+    ...amortization,
+    depreciationPerMonth: +(
+      (price * amortization.amount) /
+      (amortization.depreciationPeriod * 12)
+    ).toFixed(2),
+  };
+}
+function changeBuyingMachines(
+  buying_machines: Ibuying_machine[]
+): Ibuying_machine[] {
+  return buying_machines.map((el) => ({
+    ...el,
+    amortization: el.amortization
+      ? changeAmortization(el.amortization, el.price)
+      : null,
+  }));
+}
+function changeBuildings(buildings: Ibuilding[]) {
   return buildings.map((el) => ({
     ...el,
-    depreciationMonth: el.depreciationPeriod
-      ? +(el.startPrice / (el.depreciationPeriod * 12)).toFixed(2)
+    amortization: el.amortization
+      ? changeAmortization(el.amortization, el.startPrice)
       : null,
   }));
 }
@@ -171,9 +196,11 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       ] = await Promise.all([
         building.findAll({
           where: { businessPlanId: plan.id },
+          include: amortization,
         }),
         buying_machine.findAll({
           where: { businessPlanId: plan.id },
+          include: amortization,
         }),
         worker.findAll({
           where: { businessPlanId: plan.id },
@@ -186,16 +213,18 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       ]);
       plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
       plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
+      plan.buying_machines = JSON.parse(JSON.stringify(plan.buying_machines));
       // console.log("test" + plan.id, new Date());
       return plan;
     })
   );
   plans = plans.map((plan) => {
+    plan.buying_machines = changeBuyingMachines(plan.buying_machines);
     plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП") || [];
     plan.buying_machines = plan.buying_machines.filter(
       (el) => el.purpose != "МШП"
     );
-    plan.buildings = changeBuilding(plan.buildings);
+    plan.buildings = changeBuildings(plan.buildings);
     plan.workers = changeWorkerRes(plan.workers);
     plan.financings = [
       ...plan.financings.map((el) => {
@@ -751,7 +780,6 @@ class BusinessService {
     if (!user) return;
     const res: Ibuilding = await building.create({
       name: data.name,
-      depreciationPeriod: data.depreciationPeriod,
       date: data.date,
       year: data.year,
       description: data.description,
@@ -770,13 +798,11 @@ class BusinessService {
     await building.update(
       {
         name: data.name,
-        depreciationPeriod: data.depreciationPeriod,
         startPrice: data.startPrice,
         date: data.date,
         description: data.description,
         businessPlanId: data.businessPlanId,
         enterpriseId: data.enterpriseId,
-        introductionDate: data.introductionDate,
       },
       { where: { id: data.buildId } }
     );
@@ -784,7 +810,7 @@ class BusinessService {
       where: { id: data.buildId },
     });
     if (!res) return;
-    return changeBuilding([JSON.parse(JSON.stringify(res))])[0];
+    return changeBuildings([JSON.parse(JSON.stringify(res))])[0];
   }
   async deleteBuildingForBusiness(
     user: Principal | undefined,
@@ -875,7 +901,7 @@ class BusinessService {
     await land.destroy({ where: { id: data.id } });
     return data;
   }
-  async createUpdateCreditParameter(data: CreateUpdateCreditParameter) {
+  async createUpdateCreditParameter(data: CreateUpdateCreditParameterType) {
     const isParameter = await creditParameter.findOne({
       where: { financingId: data.financingId },
     });
@@ -889,6 +915,14 @@ class BusinessService {
         ...data,
         termType: data.termType || "на бізнес-план",
       });
+    }
+    return await getBusinessPlan(data.busId);
+  }
+  async createUpdateAmortization(data: CreateUpdateAmortizationType) {
+    if (data.id) {
+      await amortization.update({ ...data }, { where: { id: data.id } });
+    } else {
+      await amortization.create({ ...data });
     }
     return await getBusinessPlan(data.busId);
   }

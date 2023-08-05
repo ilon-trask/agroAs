@@ -28,9 +28,8 @@ import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
-import BuildingParametersDialog, {
-  BuildingParameterProps,
-} from "./BuildingParametersDialog";
+import AmortizationDialog from "../AmortizationDialog";
+import { amortizationProps } from "../AmortizationDialog/AmortizationDialog";
 type BuildingProps = {
   end: number;
   start: number;
@@ -38,7 +37,8 @@ type BuildingProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   setRes: Dispatch<SetStateAction<CreateBuildingProps>>;
   setDeleteData: Dispatch<SetStateAction<DeleteProps>>;
-  setParameterOpen: Dispatch<SetStateAction<boolean>>;
+  setAmortizationOpen: Dispatch<SetStateAction<boolean>>;
+  setAmortizationData: Dispatch<SetStateAction<amortizationProps | undefined>>;
   myBusiness: resBusinessPlan;
 };
 function BuildingTable({
@@ -49,7 +49,8 @@ function BuildingTable({
   setUpdate,
   myBusiness,
   setDeleteData,
-  setParameterOpen,
+  setAmortizationOpen,
+  setAmortizationData,
 }: BuildingProps) {
   const { business } = useContext(Context);
   return (
@@ -90,8 +91,6 @@ function BuildingTable({
                             name: el.name,
                             startPrice: el.startPrice,
                             year: el.year,
-                            depreciationPeriod: el.depreciationPeriod,
-                            introductionDate: el.introductionDate,
                           });
                         }}
                       />
@@ -104,17 +103,17 @@ function BuildingTable({
                       <Button
                         size={"sm"}
                         onClick={() => {
-                          setParameterOpen(true);
-                          setRes({
-                            id: el.id!,
-                            businessPlanId: el.businessPlanId,
-                            date: el.date,
-                            description: el.description,
-                            name: el.name,
-                            startPrice: el.startPrice,
-                            year: el.year,
-                            depreciationPeriod: el.depreciationPeriod ?? 25,
-                            introductionDate: el.introductionDate!,
+                          setAmortizationOpen(true);
+                          setAmortizationData({
+                            id: el.amortization?.id,
+                            amount: el.amortization?.amount || "",
+                            busId: myBusiness.id!,
+                            depreciationPeriod:
+                              el.amortization?.depreciationPeriod || 25,
+                            introductionDate:
+                              el.amortization?.introductionDate || "",
+                            mainAmount: 1,
+                            buildingId: el.id,
                           });
                         }}
                       >
@@ -215,7 +214,10 @@ function BuildingBusTable({
     isOpen: false,
     text: "будівлю",
   });
-  const [parameterOpen, setParameterOpen] = useState(false);
+  const [amortizationOpen, setAmortizationOpen] = useState(false);
+  const [amortizationData, setAmortizationData] = useState<
+    amortizationProps | undefined
+  >();
   const businessData = useMemo(
     () => myBusiness,
     [myBusiness.id, JSON.stringify(myBusiness.buildings)]
@@ -227,14 +229,15 @@ function BuildingBusTable({
       </MyAccordionButton>
       <AccordionPanel>
         <MemoedBuildingTable
+          start={start}
           end={end}
           myBusiness={businessData}
           setDeleteData={setDeleteData}
           setOpen={setOpen}
           setRes={setRes}
           setUpdate={setUpdate}
-          setParameterOpen={setParameterOpen}
-          start={start}
+          setAmortizationOpen={setAmortizationOpen}
+          setAmortizationData={setAmortizationData}
         />
         {open ? (
           <CreateBuilding
@@ -253,11 +256,11 @@ function BuildingBusTable({
             text={deleteData.text}
           />
         ) : null}
-        {parameterOpen ? (
-          <BuildingParametersDialog
-            open={parameterOpen}
-            setOpen={setParameterOpen}
-            data={res}
+        {amortizationOpen && amortizationData ? (
+          <AmortizationDialog
+            open={amortizationOpen}
+            setOpen={setAmortizationOpen}
+            data={amortizationData}
           />
         ) : null}
       </AccordionPanel>

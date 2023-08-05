@@ -22,7 +22,8 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
-  CreateUpdateCreditParameter,
+  CreateUpdateAmortizationType,
+  CreateUpdateCreditParameterType,
   DeleteBusProd,
   DeleteForBusiness,
   PatchBusinessPlan,
@@ -94,7 +95,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -2047,9 +2048,30 @@ export function deleteLandForBusiness(
 
 export function createUpdateCreditParameter(
   bus: BusinessStore,
-  data: CreateUpdateCreditParameter
+  data: CreateUpdateCreditParameterType
 ) {
   client.business.createUpdateCreditParameter.query(data).then((res) => {
+    const business = bus.businessPlan.find((el) => el.id == res.id!);
+    const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id!);
+    if (business) {
+      bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
+      //@ts-ignore
+      bus.newBusinessPlan = res;
+    } else if (pubBusiness) {
+      bus.publicBusinessPlan = bus.publicBusinessPlan.filter(
+        (el) => el.id != res.id
+      );
+      //@ts-ignore
+      bus.newPublicBusinessPlan = res;
+    }
+  });
+}
+
+export function createUpdateAmortization(
+  bus: BusinessStore,
+  data: CreateUpdateAmortizationType
+) {
+  client.business.createUpdateAmortization.query(data).then((res) => {
     const business = bus.businessPlan.find((el) => el.id == res.id!);
     const pubBusiness = bus.publicBusinessPlan.find((el) => el.id == res.id!);
     if (business) {
