@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import Dialog from "src/components/Dialog";
 import { createUpdateAmortization } from "src/http/requests";
 import { Context } from "src/main";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import MyHeading from "src/ui/MyHeading";
 
 export interface amortizationProps {
@@ -29,8 +30,9 @@ type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   data: amortizationProps;
+  businessYear: number;
 };
-function AmortizationDialog({ data, open, setOpen }: props) {
+function AmortizationDialog({ data, open, setOpen, businessYear }: props) {
   const {
     register,
     handleSubmit,
@@ -41,12 +43,11 @@ function AmortizationDialog({ data, open, setOpen }: props) {
   const { business } = useContext(Context);
   const onSubmit = (res: amortizationProps) => {
     setOpen(false);
-    if (data.mainAmount == 1) {
-      res.amount = 1;
-    }
+    if (data.mainAmount == 1) res.amount = 1;
     createUpdateAmortization(business, {
       ...res,
       amount: +res.amount,
+      year: getYearFromString(res.introductionDate) - businessYear,
       depreciationPeriod: +res.depreciationPeriod,
     });
   };

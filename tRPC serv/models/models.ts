@@ -1408,6 +1408,7 @@ creditParameter.init(
 export interface Iamortization {
   id?: number | null;
   introductionDate: string;
+  year: number;
   depreciationPeriod: number;
   amount: number;
   depreciationPerMonth?: number;
@@ -1420,6 +1421,7 @@ export class amortization extends Model<Iamortization> {
   declare introductionData: string;
   declare depreciationPeriod: number;
   declare amount: number;
+  declare year: number;
   declare buildingId?: number;
   declare buyingMachineId?: number;
 }
@@ -1427,6 +1429,7 @@ export class amortization extends Model<Iamortization> {
 amortization.init(
   {
     introductionDate: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
     depreciationPeriod: { type: DataTypes.INTEGER },
     amount: { type: DataTypes.INTEGER },
   },

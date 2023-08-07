@@ -109,6 +109,7 @@ export type CreateUpdateCreditParameterType = z.infer<
 const createUpdateAmortization = z.object({
   id: z.number().nullish(),
   introductionDate: z.string(),
+  year: z.number(),
   depreciationPeriod: z.number(),
   amount: z.number(),
   buildingId: z.number().nullish(),
@@ -121,12 +122,10 @@ export type CreateUpdateAmortizationType = z.infer<
 const businessRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
     const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
-
     return res;
   }),
   create: publicProcedure.input(createType).query(async ({ input, ctx }) => {
-    const res: resBusinessPlan | undefined | null =
-      await BusinessService.create(ctx.user, input);
+    const res = await BusinessService.create(ctx.user, input);
     return res;
   }),
   patch: publicProcedure.input(patchType).query(async ({ input, ctx }) => {

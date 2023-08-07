@@ -30,7 +30,7 @@ function useBusinessPlanFinancingData(
       });
     }
     // const direct = useBusinessPlanData.oneDirect(myBusiness, i, start);
-    const direct = 0;
+    const direct = useBusinessPlanData.yearDirect(myBusiness, i, start);
     const fin = useBusinessPlanData.yearFin(myBusiness, i, start);
     const financing = useBusinessPlanData.yearFinancing(myBusiness, i, start);
     const permanent = useBusinessPlanData.yearPermanent(

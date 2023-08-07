@@ -21,6 +21,7 @@ import { deleteBuildingForBusiness } from "src/http/requests";
 import { Context } from "src/main";
 import CreateBuilding from "src/modules/CreateBuilding";
 import { CreateBuildingProps } from "src/modules/CreateBuilding/CreateBuilding";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
@@ -261,6 +262,7 @@ function BuildingBusTable({
             open={amortizationOpen}
             setOpen={setAmortizationOpen}
             data={amortizationData}
+            businessYear={getYearFromString(myBusiness.dateStart)}
           />
         ) : null}
       </AccordionPanel>

@@ -22,6 +22,7 @@ import { BuyingMachineTableHead } from "src/modules/BuyingMachineTable/BuyingMac
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "src/modules/CreateBuyingMachine";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
@@ -269,6 +270,7 @@ function MSHPBusTable({
             open={amortizationOpen}
             setOpen={setAmortizationOpen}
             data={amortizationData}
+            businessYear={getYearFromString(myBusiness.dateStart)}
           />
         ) : null}
       </AccordionPanel>

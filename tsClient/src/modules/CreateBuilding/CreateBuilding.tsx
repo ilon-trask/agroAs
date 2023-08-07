@@ -123,9 +123,6 @@ function CreateBuilding({
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
                   buildId: res.id!,
-                  depreciationPeriod: res.depreciationPeriod
-                    ? +res.depreciationPeriod
-                    : null,
                 });
               } else {
                 createBuildingForBusiness(business, {
@@ -133,9 +130,6 @@ function CreateBuilding({
                   businessPlanId: res.businessPlanId!,
                   startPrice: +res.startPrice,
                   enterpriseId: res.enterpriseId!,
-                  depreciationPeriod: res.depreciationPeriod
-                    ? +res.depreciationPeriod
-                    : null,
                 });
               }
               setUpdate(false);

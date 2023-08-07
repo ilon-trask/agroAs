@@ -1117,7 +1117,16 @@ function ProductionBusinessPlan({
                     return {
                       // year: i,
                       name: el.product?.name!,
-                      direct: (el.tech_cart?.costHectare || 0) * el.area,
+                      direct:
+                        (el.tech_cart?.costHectare || 0) * el.area +
+                        (el.tech_cart?.tech_operations?.reduce(
+                          (p, c) =>
+                            p +
+                            (c.costHandWork || 0) +
+                            (c.costMachineWork || 0),
+                          0
+                        ) || 0) *
+                          0.235,
                       permanent: 0,
                       general: 0,
                       outcome: (el.tech_cart?.costHectare || 0) * el.area,

@@ -44,12 +44,24 @@ class BusinessPlanData {
   ESV_VZ_ADM(thisWorkers: Iworker[]) {
     return this.OP_ADM_Fund(thisWorkers) * 0.235;
   }
-  // oneDirect(busProd: resBusProd) {
-  //   return (
-  //     this.oneOPFund(busProd) +
-  //     (busProd.tech_cart?.costHectare! * busProd.area || 0)
-  //   );
-  // }
+  oneDirect(busProd: resBusProd) {
+    return (
+      busProd.tech_cart?.costHectare! * busProd.area +
+      (busProd.tech_cart?.tech_operations?.reduce(
+        (p, c) => p + (c.costHandWork || 0) + (c.costMachineWork || 0),
+        0
+      ) || 0) *
+        0.235
+    );
+  }
+  yearDirect(myBusiness: resBusinessPlan, i: number, start: number) {
+    return +myBusiness.busProds
+      .filter((el) => el.year == i - start)
+      .reduce((p, c) => {
+        return p + this.oneDirect(c);
+      }, 0)
+      .toFixed(2);
+  }
   variables(thisWorkers: Iworker[], busProds: resBusProd[]) {
     return this.totalProduction(thisWorkers) + this.sumDirect(busProds);
   }
@@ -70,11 +82,11 @@ class BusinessPlanData {
     i: number,
     start: number
   ) {
-    return (
+    return +(
       this.yearPermanent(outcomes, i, start) +
       this.yearGeneralProduct(outcomes, i, start) +
       this.yearDirect(myBusiness, i, start)
-    );
+    ).toFixed(2);
   }
   yearItrLaborRemuneration(thisWorkers: Iworker[], i: number, start: number) {
     return Math.round(
@@ -113,7 +125,7 @@ class BusinessPlanData {
     return Math.round(
       outcomes
         ?.filter((el) => el.group == "Постійні" && el.year == i - start)
-        .reduce((p, c) => p + (c.costYear || 0), 0) * 1.235
+        .reduce((p, c) => p + (c.costYear || 0), 0)
     );
   }
   sumPermanent(outcomes: Ioutcome[]) {
@@ -121,22 +133,7 @@ class BusinessPlanData {
       ?.filter((el) => el.group == "Постійні")
       .reduce((p, c) => p + (c.costYear || 0), 0) * 1.235;
   }
-  yearDirect(myBusiness: resBusinessPlan, i: number, start: number) {
-    return myBusiness.busProds
-      .filter((el) => el.year == i - start)
-      .reduce((p, c) => {
-        let res =
-          Math.round(
-            (c.tech_cart?.totalCostHandWork ||
-              0 + c.tech_cart?.totalCostMachineWork! ||
-              0) *
-              c.area *
-              0.235
-          ) +
-            c.tech_cart?.costHectare! * c.area || 0;
-        return p + res;
-      }, 0);
-  }
+
   sumDirect(busProds: resBusProd[]) {
     return busProds.reduce((p, c) => {
       let res =

@@ -152,7 +152,7 @@ function OutcomeBusTable({
                         <Td>{i}</Td>
                         <Td>Разом:</Td>
                         <Td></Td>
-                        <Td>{yearAmount}</Td>
+                        <Td>{yearAmount.toFixed(2)}</Td>
                         <Td></Td>
                         <Td></Td>
                       </Tr>
@@ -285,7 +285,7 @@ function OutcomeBusTable({
                         <Td>{i}</Td>
                         <Td>Разом:</Td>
                         <Td></Td>
-                        <Td>{yearAmount}</Td>
+                        <Td>{yearAmount.toFixed(2)}</Td>
                         <Td></Td>
                         <Td></Td>
                       </Tr>

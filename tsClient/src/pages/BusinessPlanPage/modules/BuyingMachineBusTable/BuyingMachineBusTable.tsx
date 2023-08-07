@@ -16,6 +16,7 @@ import {
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "src/modules/CreateBuyingMachine";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
@@ -219,6 +220,7 @@ function BuyingMachineBusTable({
             open={amortizationOpen}
             setOpen={setAmortizationOpen}
             data={amortizationData}
+            businessYear={getYearFromString(myBusiness.dateStart)}
           />
         ) : null}
       </AccordionPanel>
