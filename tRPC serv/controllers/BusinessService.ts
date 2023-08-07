@@ -68,6 +68,19 @@ import {
 } from "./TechCartService";
 import { changeVegetationYear } from "./vegetationYearsService";
 import { changeWorkerRes } from "./workerService";
+import redis, { REDIS_DEFAULT_EX } from "../redis";
+const compareBusinessPlan = async (businessPlan: resBusinessPlan) => {
+  const redisBusinessPlan = await redis.get(businessPlan.id! + "");
+  if (redisBusinessPlan == JSON.stringify(businessPlan)) {
+    return JSON.parse(redisBusinessPlan);
+  }
+  await redis.setex(
+    businessPlan.id! + "",
+    REDIS_DEFAULT_EX,
+    JSON.stringify(businessPlan)
+  );
+  return businessPlan;
+};
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
 }
@@ -179,7 +192,45 @@ function changeBuildings(buildings: Ibuilding[]) {
       : null,
   }));
 }
-
+async function getsForBusinessPlan(plans:resBusinessPlan[]) {
+  return  await Promise.all(
+    plans.map(async (plan) => {
+      // console.time("test" + plan.id);
+      // console.log("test" + plan.id, new Date());
+      [
+        plan.buildings,
+        plan.buying_machines,
+        plan.workers,
+        plan.outcomes,
+        plan.lands,
+        plan.busProds,
+      ] = await Promise.all([
+        building.findAll({
+          where: { businessPlanId: plan.id },
+          include: amortization,
+        }),
+        buying_machine.findAll({
+          where: { businessPlanId: plan.id },
+          include: amortization,
+        }),
+        worker.findAll({
+          where: { businessPlanId: plan.id },
+        }),
+        outcome.findAll({
+          where: { businessPlanId: plan.id! },
+        }),
+        land.findAll({ where: { businessPlanId: plan.id } }),
+        ForBusProd(plan.busProds),
+      ]);
+      plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
+      plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
+      plan.buying_machines = JSON.parse(JSON.stringify(plan.buying_machines));
+      // console.log("test" + plan.id, new Date());
+      return plan;
+    })
+  );
+  
+}
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
@@ -217,6 +268,9 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       // console.log("test" + plan.id, new Date());
       return plan;
     })
+  );
+  plans = await Promise.all(
+    plans.map(async (el) => await compareBusinessPlan(el))
   );
   plans = plans.map((plan) => {
     plan.buying_machines = changeBuyingMachines(plan.buying_machines);
@@ -497,6 +551,7 @@ class BusinessService {
         include: includes,
       });
       console.timeEnd("include");
+
       console.time("func");
       plans = await changeFinancing(plans);
       console.timeEnd("func");
