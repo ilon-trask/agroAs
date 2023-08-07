@@ -33,6 +33,8 @@ import {
   IvegetationYears,
   creditParameter,
   IcreditParameter,
+  amortization,
+  Iamortization,
 } from "../models/models";
 import {
   CreateBuildingType,
@@ -42,7 +44,8 @@ import {
   CreateBusinessPlan,
   CreateBusProd,
   CreateFinancingForBusiness,
-  CreateUpdateCreditParameter,
+  CreateUpdateAmortizationType,
+  CreateUpdateCreditParameterType,
   DeleteBusinessPlan,
   DeleteBusProd,
   DeleteForBusiness,
@@ -65,6 +68,19 @@ import {
 } from "./TechCartService";
 import { changeVegetationYear } from "./vegetationYearsService";
 import { changeWorkerRes } from "./workerService";
+import redis, { REDIS_DEFAULT_EX } from "../redis";
+const compareBusinessPlan = async (businessPlan: resBusinessPlan) => {
+  const redisBusinessPlan = await redis.get(businessPlan.id! + "");
+  if (redisBusinessPlan == JSON.stringify(businessPlan)) {
+    return JSON.parse(redisBusinessPlan);
+  }
+  await redis.setex(
+    businessPlan.id! + "",
+    REDIS_DEFAULT_EX,
+    JSON.stringify(businessPlan)
+  );
+  return businessPlan;
+};
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
 }
@@ -146,15 +162,80 @@ const ForBusProd = async (busProds: resBusProd[]) => {
     })
   );
 };
-function changeBuilding(buildings: Ibuilding[]) {
-  return buildings.map((el) => ({
+function changeAmortization(
+  amortization: Iamortization,
+  price: number,
+  businessPlanYear: number
+): Iamortization {
+  return {
+    ...amortization,
+    introductionDate: [
+      businessPlanYear + amortization.year,
+      ...amortization.introductionDate.split("-").slice(1),
+    ].join("-"),
+    depreciationPerMonth: +(
+      (price * amortization.amount) /
+      (amortization.depreciationPeriod * 12)
+    ).toFixed(2),
+  };
+}
+function changeBuyingMachines(
+  buying_machines: Ibuying_machine[],
+  businessYear: number
+): Ibuying_machine[] {
+  return buying_machines.map((el) => ({
     ...el,
-    depreciationMonth: el.depreciationPeriod
-      ? +(el.startPrice / (el.depreciationPeriod * 12)).toFixed(2)
+    amortization: el.amortization
+      ? changeAmortization(el.amortization, el.price, businessYear)
       : null,
   }));
 }
-
+function changeBuildings(buildings: Ibuilding[], businessYear: number) {
+  return buildings.map((el) => ({
+    ...el,
+    amortization: el.amortization
+      ? changeAmortization(el.amortization, el.startPrice, businessYear)
+      : null,
+  }));
+}
+async function getsForBusinessPlan(plans: resBusinessPlan[]) {
+  return await Promise.all(
+    plans.map(async (plan) => {
+      // console.time("test" + plan.id);
+      // console.log("test" + plan.id, new Date());
+      [
+        plan.buildings,
+        plan.buying_machines,
+        plan.workers,
+        plan.outcomes,
+        plan.lands,
+        plan.busProds,
+      ] = await Promise.all([
+        building.findAll({
+          where: { businessPlanId: plan.id },
+          include: amortization,
+        }),
+        buying_machine.findAll({
+          where: { businessPlanId: plan.id },
+          include: amortization,
+        }),
+        worker.findAll({
+          where: { businessPlanId: plan.id },
+        }),
+        outcome.findAll({
+          where: { businessPlanId: plan.id! },
+        }),
+        land.findAll({ where: { businessPlanId: plan.id } }),
+        ForBusProd(plan.busProds),
+      ]);
+      plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
+      plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
+      plan.buying_machines = JSON.parse(JSON.stringify(plan.buying_machines));
+      // console.log("test" + plan.id, new Date());
+      return plan;
+    })
+  );
+}
 async function changeFinancing(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
@@ -171,9 +252,11 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       ] = await Promise.all([
         building.findAll({
           where: { businessPlanId: plan.id },
+          include: amortization,
         }),
         buying_machine.findAll({
           where: { businessPlanId: plan.id },
+          include: amortization,
         }),
         worker.findAll({
           where: { businessPlanId: plan.id },
@@ -186,16 +269,27 @@ async function changeFinancing(plans: resBusinessPlan[]) {
       ]);
       plan.outcomes = JSON.parse(JSON.stringify(plan.outcomes));
       plan.buildings = JSON.parse(JSON.stringify(plan.buildings));
+      plan.buying_machines = JSON.parse(JSON.stringify(plan.buying_machines));
       // console.log("test" + plan.id, new Date());
       return plan;
     })
   );
+  // plans = await Promise.all(
+  //   plans.map(async (el) => await compareBusinessPlan(el))
+  // );
   plans = plans.map((plan) => {
+    plan.buying_machines = changeBuyingMachines(
+      plan.buying_machines,
+      +plan.dateStart.split("-")[0]
+    );
     plan.MSHP = plan.buying_machines.filter((el) => el.purpose == "МШП") || [];
     plan.buying_machines = plan.buying_machines.filter(
       (el) => el.purpose != "МШП"
     );
-    plan.buildings = changeBuilding(plan.buildings);
+    plan.buildings = changeBuildings(
+      plan.buildings,
+      +plan.dateStart.split("-")[0]
+    );
     plan.workers = changeWorkerRes(plan.workers);
     plan.financings = [
       ...plan.financings.map((el) => {
@@ -321,6 +415,39 @@ async function changeFinancing(plans: resBusinessPlan[]) {
                 (i == start ? 13 - +plan.dateStart.split("-")[1] : 12),
             });
           });
+        const amorts: Iamortization[] = [];
+        plan.buildings.forEach((el) => {
+          if (el.amortization) amorts.push(el.amortization);
+        });
+        plan.buying_machines.forEach((el) => {
+          if (el.amortization) amorts.push(el.amortization);
+        });
+        plan.MSHP.forEach((el) => {
+          if (el.amortization) amorts.push(el.amortization);
+        });
+        outcomes.push({
+          costMonth: null,
+          type: "Операційні",
+          userId: "",
+          name: "Амортизація",
+          group: "Постійні",
+          date: i + "-01-01",
+          year: i - start,
+          costYear: amorts
+            .filter(
+              (el) =>
+                el.year <= i - start &&
+                el.year + el.depreciationPeriod >= i - start
+            )
+            .reduce((p, c) => {
+              let months = 12;
+              if (i - start == c.year) {
+                months = 13 - +c.introductionDate.split("-")[1];
+              }
+              return p + (c.depreciationPerMonth || 0) * months;
+            }, 0),
+          isDefault: true,
+        });
         outcomes.push({
           costMonth: null,
           type: "Операційні",
@@ -468,6 +595,7 @@ class BusinessService {
         include: includes,
       });
       console.timeEnd("include");
+
       console.time("func");
       plans = await changeFinancing(plans);
       console.timeEnd("func");
@@ -751,7 +879,6 @@ class BusinessService {
     if (!user) return;
     const res: Ibuilding = await building.create({
       name: data.name,
-      depreciationPeriod: data.depreciationPeriod,
       date: data.date,
       year: data.year,
       description: data.description,
@@ -770,13 +897,11 @@ class BusinessService {
     await building.update(
       {
         name: data.name,
-        depreciationPeriod: data.depreciationPeriod,
         startPrice: data.startPrice,
         date: data.date,
         description: data.description,
         businessPlanId: data.businessPlanId,
         enterpriseId: data.enterpriseId,
-        introductionDate: data.introductionDate,
       },
       { where: { id: data.buildId } }
     );
@@ -784,7 +909,15 @@ class BusinessService {
       where: { id: data.buildId },
     });
     if (!res) return;
-    return changeBuilding([JSON.parse(JSON.stringify(res))])[0];
+    const business: IbusinessPlan = JSON.parse(
+      JSON.stringify(
+        await businessPlan.findOne({ where: { id: res.businessPlanId! } })
+      )
+    );
+    return changeBuildings(
+      [JSON.parse(JSON.stringify(res))],
+      +business.dateStart.split("-")[0]
+    )[0];
   }
   async deleteBuildingForBusiness(
     user: Principal | undefined,
@@ -875,7 +1008,7 @@ class BusinessService {
     await land.destroy({ where: { id: data.id } });
     return data;
   }
-  async createUpdateCreditParameter(data: CreateUpdateCreditParameter) {
+  async createUpdateCreditParameter(data: CreateUpdateCreditParameterType) {
     const isParameter = await creditParameter.findOne({
       where: { financingId: data.financingId },
     });
@@ -889,6 +1022,14 @@ class BusinessService {
         ...data,
         termType: data.termType || "на бізнес-план",
       });
+    }
+    return await getBusinessPlan(data.busId);
+  }
+  async createUpdateAmortization(data: CreateUpdateAmortizationType) {
+    if (data.id) {
+      await amortization.update({ ...data }, { where: { id: data.id } });
+    } else {
+      await amortization.create({ ...data });
     }
     return await getBusinessPlan(data.busId);
   }

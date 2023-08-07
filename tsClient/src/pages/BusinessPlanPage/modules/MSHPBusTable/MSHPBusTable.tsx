@@ -22,6 +22,7 @@ import { BuyingMachineTableHead } from "src/modules/BuyingMachineTable/BuyingMac
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "src/modules/CreateBuyingMachine";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
 import MyDeleteIcon from "src/ui/Icons/MyDeleteIcon";
@@ -29,6 +30,9 @@ import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import AmortizationDialog, {
+  amortizationProps,
+} from "../AmortizationDialog/AmortizationDialog";
 type MSHPProps = {
   end: number;
   start: number;
@@ -37,6 +41,8 @@ type MSHPProps = {
   setRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
   setDeleteData: Dispatch<SetStateAction<DeleteProps>>;
   myBusiness: resBusinessPlan;
+  setAmortizationOpen: Dispatch<SetStateAction<boolean>>;
+  setAmortizationData: Dispatch<SetStateAction<amortizationProps | undefined>>;
 };
 function MSHPTable({
   end,
@@ -46,6 +52,8 @@ function MSHPTable({
   setRes,
   setUpdate,
   start,
+  setAmortizationData,
+  setAmortizationOpen,
 }: MSHPProps) {
   const { business } = useContext(Context);
   return (
@@ -90,7 +98,25 @@ function MSHPTable({
                     <Td>{el.price}</Td>
                     <Td>{el.price * el.amount}</Td>
                     <Td>
-                      <Button size={"sm"}>Додати</Button>
+                      <Button
+                        size={"sm"}
+                        onClick={() => {
+                          setAmortizationOpen(true);
+                          setAmortizationData({
+                            id: el.amortization?.id,
+                            amount: el.amortization?.amount || "",
+                            busId: myBusiness.id!,
+                            depreciationPeriod:
+                              el.amortization?.depreciationPeriod || 1,
+                            introductionDate:
+                              el.amortization?.introductionDate || "",
+                            mainAmount: el.amount,
+                            buyingMachineId: el.id,
+                          });
+                        }}
+                      >
+                        Додати
+                      </Button>
                     </Td>
                     <Td>
                       <MyDeleteIcon
@@ -200,6 +226,10 @@ function MSHPBusTable({
     () => myBusiness,
     [myBusiness.id, JSON.stringify(myBusiness.MSHP)]
   );
+  const [amortizationOpen, setAmortizationOpen] = useState(false);
+  const [amortizationData, setAmortizationData] = useState<
+    amortizationProps | undefined
+  >();
   return (
     <AccordionItem>
       <MyAccordionButton>
@@ -214,6 +244,8 @@ function MSHPBusTable({
           setRes={setRes}
           setUpdate={setUpdate}
           start={start}
+          setAmortizationData={setAmortizationData}
+          setAmortizationOpen={setAmortizationOpen}
         />
         {open ? (
           <CreateBuyingMachine
@@ -231,6 +263,14 @@ function MSHPBusTable({
             func={deleteData.func}
             setOpen={setDeleteData}
             text={deleteData.text}
+          />
+        ) : null}
+        {amortizationOpen && amortizationData ? (
+          <AmortizationDialog
+            open={amortizationOpen}
+            setOpen={setAmortizationOpen}
+            data={amortizationData}
+            businessYear={getYearFromString(myBusiness.dateStart)}
           />
         ) : null}
       </AccordionPanel>

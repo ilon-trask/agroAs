@@ -17,7 +17,6 @@ class BuildingService {
     if (!user) return;
     const res: Ibuilding = await building.create({
       name: data.name,
-      depreciationPeriod: data.depreciationPeriod,
       date: data.date,
       year: data.year,
       description: data.description,
@@ -33,7 +32,6 @@ class BuildingService {
     await building.update(
       {
         name: data.name,
-        depreciationPeriod: data.depreciationPeriod,
         startPrice: data.startPrice,
         date: data.date,
         description: data.description,

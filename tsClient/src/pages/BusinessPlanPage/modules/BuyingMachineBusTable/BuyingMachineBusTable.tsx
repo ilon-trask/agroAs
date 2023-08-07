@@ -16,11 +16,15 @@ import {
 import CreateBuyingMachine, {
   CreateBuyingMachineProps,
 } from "src/modules/CreateBuyingMachine";
+import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyPlusIcon from "src/ui/Icons/MyPlusIcon";
 import MyAccordionButton from "src/ui/MyAccordionButton";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
+import AmortizationDialog, {
+  amortizationProps,
+} from "../AmortizationDialog/AmortizationDialog";
 type BuyingProps = {
   start: number;
   end: number;
@@ -29,6 +33,8 @@ type BuyingProps = {
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setBuyingMachineRes: Dispatch<SetStateAction<CreateBuyingMachineProps>>;
   setDeleteData: Dispatch<SetStateAction<DeleteProps>>;
+  setAmortizationOpen: Dispatch<SetStateAction<boolean>>;
+  setAmortizationData: Dispatch<SetStateAction<amortizationProps | undefined>>;
 };
 function BuyingMachineTable({
   end,
@@ -38,6 +44,8 @@ function BuyingMachineTable({
   setBuyingMachineRes,
   setUpdate,
   setDeleteData,
+  setAmortizationData,
+  setAmortizationOpen,
 }: BuyingProps) {
   return (
     <MyTableContainer>
@@ -63,6 +71,8 @@ function BuyingMachineTable({
                       setUpdate={setUpdate}
                       setDeleteOpen={setDeleteData}
                       busId={myBusiness?.id!}
+                      setAmortizationData={setAmortizationData}
+                      setAmortizationOpen={setAmortizationOpen}
                       i={i}
                     />
                   ))
@@ -159,6 +169,10 @@ function BuyingMachineBusTable({
     isOpen: false,
     text: "техніку",
   });
+  const [amortizationOpen, setAmortizationOpen] = useState(false);
+  const [amortizationData, setAmortizationData] = useState<
+    amortizationProps | undefined
+  >();
   const businessData = useMemo(
     () => myBusiness,
     [
@@ -181,6 +195,8 @@ function BuyingMachineBusTable({
           setBuyingMachineRes={setBuyingMachineRes}
           setDeleteData={setDeleteData}
           setUpdate={setUpdate}
+          setAmortizationData={setAmortizationData}
+          setAmortizationOpen={setAmortizationOpen}
         />
         {buyingMachineOpen ? (
           <CreateBuyingMachine
@@ -197,6 +213,14 @@ function BuyingMachineBusTable({
             isOpen={deleteData.isOpen}
             setOpen={deleteData}
             text={deleteData.text}
+          />
+        ) : null}
+        {amortizationOpen && amortizationData ? (
+          <AmortizationDialog
+            open={amortizationOpen}
+            setOpen={setAmortizationOpen}
+            data={amortizationData}
+            businessYear={getYearFromString(myBusiness.dateStart)}
           />
         ) : null}
       </AccordionPanel>

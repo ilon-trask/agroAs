@@ -1061,6 +1061,7 @@ export interface Ibuying_machine {
   price: number;
   amount: number;
   purpose: BuyingMachinePurposeType | "МШП";
+  amortization?: Iamortization | null;
   userId: string;
   businessPlanId?: number;
   enterpriseId?: number | null;
@@ -1323,13 +1324,14 @@ export interface Ibuilding {
   readonly id?: number;
   name: string;
   startPrice: number;
-  depreciationPeriod: number | null;
+  // depreciationPeriod: number | null;
   date: string;
   year: number;
   description: string;
-  introductionDate: string | null;
+  // introductionDate: string | null;
   userId: string;
-  depreciationMonth?: number | null;
+  // depreciationMonth?: number | null;
+  amortization?: Iamortization | null;
   readonly enterpriseId?: number | null;
   readonly businessPlanId?: number | null;
 }
@@ -1340,20 +1342,20 @@ export class building extends Model<Ibuilding> {
   declare year: number;
   declare description: string;
   declare startPrice: number;
-  declare introductionDate: string;
-  declare depreciationPeriod: number;
+  // declare introductionDate: string;
+  // declare depreciationPeriod: number;
   declare userId: string;
 }
 building.init(
   {
     name: { type: DataTypes.STRING },
     startPrice: { type: DataTypes.DECIMAL(10, 2) },
-    depreciationPeriod: { type: DataTypes.INTEGER },
+    // depreciationPeriod: { type: DataTypes.INTEGER },
     date: { type: DataTypes.STRING },
     year: { type: DataTypes.INTEGER },
     description: { type: DataTypes.TEXT },
     userId: { type: DataTypes.STRING, allowNull: false },
-    introductionDate: { type: DataTypes.STRING },
+    // introductionDate: { type: DataTypes.STRING },
   },
   { sequelize }
 );
@@ -1402,6 +1404,38 @@ creditParameter.init(
   },
   { sequelize }
 );
+
+export interface Iamortization {
+  id?: number | null;
+  introductionDate: string;
+  year: number;
+  depreciationPeriod: number;
+  amount: number;
+  depreciationPerMonth?: number;
+  buildingId?: number | null;
+  buyingMachineId?: number | null;
+}
+
+export class amortization extends Model<Iamortization> {
+  declare id?: number;
+  declare introductionData: string;
+  declare depreciationPeriod: number;
+  declare amount: number;
+  declare year: number;
+  declare buildingId?: number;
+  declare buyingMachineId?: number;
+}
+
+amortization.init(
+  {
+    introductionDate: { type: DataTypes.STRING },
+    year: { type: DataTypes.INTEGER },
+    depreciationPeriod: { type: DataTypes.INTEGER },
+    amount: { type: DataTypes.INTEGER },
+  },
+  { sequelize }
+);
+
 financBus.init({}, { sequelize });
 tech_cart.hasMany(tech_operation, { onDelete: "CASCADE" });
 tech_operation.belongsTo(tech_cart);
@@ -1580,3 +1614,9 @@ financing.belongsTo(businessPlan);
 // yieldCalculation.belongsTo(culture);
 financing.hasOne(creditParameter);
 creditParameter.belongsTo(financing);
+
+building.hasOne(amortization);
+amortization.belongsTo(building);
+
+buying_machine.hasOne(amortization);
+amortization.belongsTo(buying_machine);

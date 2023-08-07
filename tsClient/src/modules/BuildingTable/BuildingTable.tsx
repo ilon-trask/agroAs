@@ -64,7 +64,7 @@ function BuildingTable({
             <Td>{el.name}</Td>
             <Td>{el.startPrice}</Td>
             <Td>{}</Td>
-            <Td>{el.depreciationPeriod}</Td>
+            <Td>{el.amortization?.depreciationPeriod}</Td>
             <Td
               onClick={() =>
                 setDeleteOpen({

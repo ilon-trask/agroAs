@@ -103,24 +103,29 @@ const createUpdateCreditParameter = z.object({
   commissionForCredit: z.number(),
   busId: z.number(),
 });
-export type CreateUpdateCreditParameter = z.infer<
+export type CreateUpdateCreditParameterType = z.infer<
   typeof createUpdateCreditParameter
 >;
+const createUpdateAmortization = z.object({
+  id: z.number().nullish(),
+  introductionDate: z.string(),
+  year: z.number(),
+  depreciationPeriod: z.number(),
+  amount: z.number(),
+  buildingId: z.number().nullish(),
+  buyingMachineId: z.number().nullish(),
+  busId: z.number(),
+});
+export type CreateUpdateAmortizationType = z.infer<
+  typeof createUpdateAmortization
+>;
 const businessRouter = router({
-  // getOnePlan: publicProcedure
-  //   .input(getOnePlan)
-  //   .query(async ({ ctx, input }) => {
-  //     const res = await BusinessService.getOnePlan(ctx.user, input);
-  //     return res;
-  //   }),
   get: publicProcedure.query(async ({ ctx }) => {
     const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
-
     return res;
   }),
   create: publicProcedure.input(createType).query(async ({ input, ctx }) => {
-    const res: resBusinessPlan | undefined | null =
-      await BusinessService.create(ctx.user, input);
+    const res = await BusinessService.create(ctx.user, input);
     return res;
   }),
   patch: publicProcedure.input(patchType).query(async ({ input, ctx }) => {
@@ -315,6 +320,12 @@ const businessRouter = router({
     .input(createUpdateCreditParameter)
     .query(async ({ ctx, input }) => {
       const res = await BusinessService.createUpdateCreditParameter(input);
+      return res;
+    }),
+  createUpdateAmortization: publicProcedure
+    .input(createUpdateAmortization)
+    .query(async ({ ctx, input }) => {
+      const res = await BusinessService.createUpdateAmortization(input);
       return res;
     }),
 });
