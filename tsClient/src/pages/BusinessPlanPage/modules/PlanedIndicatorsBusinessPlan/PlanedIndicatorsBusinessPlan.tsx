@@ -98,7 +98,12 @@ function PlanedIndicatorsBusinessPlan({
           return null;
         })()}{" "}
         прибуток:{" "}
-        {+data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome}.
+        {
+          +(
+            +data[data.length - 1]?.incomeNum! - data[data.length - 1]?.outcome
+          ).toFixed(2)
+        }
+        .
       </Text>
     </>
   );

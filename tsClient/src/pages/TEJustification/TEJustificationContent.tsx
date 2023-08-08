@@ -67,7 +67,9 @@ function TEJustificationContent(props: props) {
 
               <Td>{myJustification?.area}</Td>
               <Td>{myCart?.costHectare}</Td>
-              <Td>{myCart?.costHectare! * myJustification?.area!}</Td>
+              <Td>
+                {+(myCart?.costHectare! * myJustification?.area!).toFixed(2)}
+              </Td>
             </Tr>
           </Tbody>
         </Table>

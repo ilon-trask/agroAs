@@ -50,14 +50,14 @@ export default function AppRouter() {
   const { user } = useContext(Context);
   useEffect(() => {
     localStorage.setItem("lastLocation", location.pathname);
-  }, [location]);
+  }, [location.pathname]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const lastLocation = localStorage.getItem("lastLocation");
     if (lastLocation) {
-      localStorage.removeItem("lastLocation");
+      // localStorage.removeItem("lastLocation");
       navigate(lastLocation);
     }
   }, [navigate]);

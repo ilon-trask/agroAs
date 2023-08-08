@@ -130,9 +130,24 @@ function EnterpriseBusinessPlan({
       //   year: "ІТР",
       //   amount: Math.round(iSalaryYear * 0.235) + iSalaryYear,
       // });
+      const techAmount = +myBusiness.busProds
+        .filter((el) => el.year == i - start)
+        .reduce(
+          (p, c) =>
+            p +
+            (c.tech_cart?.costHectare || 0) * c.area +
+            (c.tech_cart?.tech_operations?.reduce(
+              (p, c) => p + (c.costHandWork || 0) + (c.costMachineWork || 0),
+              0
+            ) || 0) *
+              0.235,
+          0
+        )
+        .toFixed(2);
       wageAnalysisData.push({
         year: "Виробничий",
         amount: Math.round(vSalaryYear * 0.235) + vSalaryYear,
+        techAmount,
       });
       wageAnalysisData.push({
         bold: true,
@@ -143,6 +158,7 @@ function EnterpriseBusinessPlan({
           // Math.round(iSalaryYear * 0.235) +
           // iSalaryYear +
           Math.round(vSalaryYear * 0.235) + vSalaryYear,
+        techAmount,
       });
       const rentLand = myBusiness.lands.filter(
         (el) => +el.date.split("-")[0] == i && el.rightOfUse == "Оренда"
@@ -211,6 +227,7 @@ function EnterpriseBusinessPlan({
           },
           {
             header: "ЗГІДНО ПОТРЕБ ТЕХНОЛОГІЇ",
+            accessorKey: "techAmount",
           },
         ],
       },
