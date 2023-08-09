@@ -19,6 +19,7 @@ import {
   StaffingTableBodyRows,
   StaffingTableHeadRow,
 } from "../../../../modules/StaffingTable/StaffingTable";
+import CashFlowTableForBusiness from "../CashFlowTableForBusiness";
 
 function AdditionBusinessPlan({
   form,
@@ -371,6 +372,12 @@ function AdditionBusinessPlan({
       {(() => {
         const res = [];
         for (let i = start; i <= end; i++) {
+          const outcomes = myBusiness.outcomes.filter(
+            (el) => el.year == i - start
+          );
+          const busProds = myBusiness.busProds.filter(
+            (el) => el.year == i - start
+          );
           res.push(
             <Table size={"sm"} mt={"10px"} key={i}>
               <Thead>
@@ -394,61 +401,176 @@ function AdditionBusinessPlan({
                 </Tr>
               </Thead>
               <Tbody>
-                <Tr>
-                  <Td fontWeight={"bold"}>Постійні витрати</Td>
+                <Tr fontWeight={"bold"}>
+                  <Td>Постійні витрати</Td>
+                  <Td>
+                    {
+                      +outcomes
+                        .filter((el) => el.group == "Постійні")
+                        .reduce((p, c) => p + (c.costYear || 0), 0)
+                        .toFixed(2)
+                    }
+                  </Td>
                 </Tr>
-                <Tr>
-                  <Td>Заробітна плата</Td>
-                </Tr>
-                <Tr>
-                  <Td>Нарахування (ЄСВ ВЗ)</Td>
-                </Tr>
-                <Tr>
-                  <Td>Оренда плата за землю</Td>
-                </Tr>
-                <Tr>
-                  <Td>Податок з власників землі</Td>
-                </Tr>
-                <Tr>
-                  <Td>Електроенергія</Td>
-                </Tr>
-                <Tr>
-                  <Td>Витрати на офіс</Td>
-                </Tr>
-                <Tr>
-                  <Td>Податок (4 група)</Td>
-                </Tr>
-                <Tr>
-                  <Td>Амортизація ОЗ</Td>
-                </Tr>
-                <Tr>
-                  <Td>Амортизація БіоАктив</Td>
-                </Tr>
-                <Tr>
-                  <Td>% по кредиту</Td>
-                </Tr>
-                <Tr>
-                  <Td></Td>
-                </Tr>
+                {outcomes
+                  .filter((el) => el.group == "Постійні")
+                  .map((el) => (
+                    <Tr key={el.year + el.name}>
+                      <Td>{el.name}</Td>
+                      <Td>{el.costYear}</Td>
+                    </Tr>
+                  ))}
                 <Tr>
                   <Td fontWeight={"bold"}>Змінні витрати</Td>
                 </Tr>
                 <Tr>
                   <Td fontWeight={"bold"}>Прямі</Td>
                 </Tr>
-                <Tr>
-                  <Td>Догляд за насадженнями та збір</Td>
-                </Tr>
-                <Tr>
-                  <Td>Нарахування (ЄСВ ВЗ)</Td>
-                </Tr>
+                {busProds.map((el) => (
+                  <React.Fragment key={el.id}>
+                    <Tr>
+                      <Td>Разом по ТК {el.tech_cart?.nameCart}</Td>
+                      <Td>
+                        {+(el.area * (el.tech_cart?.costHectare || 0)).toFixed(
+                          2
+                        ) +
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) =>
+                                p +
+                                (c.costHandWork || 0) +
+                                (c.costMachineWork || 0),
+                              0
+                            ) || 0) *
+                            el.area *
+                            0.235
+                          ).toFixed(2)}
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Вартість техніки</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costCars || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Вартість палива</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costFuel || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Оплата праці механізована</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costMachineWork || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Оплата праці ручна</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costHandWork || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Вартість матеріалів</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costMaterials || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Вартість транспорту</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costTransport || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Вартість послуг</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) => p + (c.costServices || 0),
+                              0
+                            ) || 0) * el.area
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Нарахування (ЄСВ ВЗ)</Td>
+                      <Td>
+                        {
+                          +(
+                            (el.tech_cart?.tech_operations?.reduce(
+                              (p, c) =>
+                                p +
+                                (c.costHandWork || 0) +
+                                (c.costMachineWork || 0),
+                              0
+                            ) || 0) *
+                            el.area *
+                            0.235
+                          ).toFixed(2)
+                        }
+                      </Td>
+                    </Tr>
+                  </React.Fragment>
+                ))}
                 <Tr>
                   <Td></Td>
                 </Tr>
                 <Tr>
                   <Td fontWeight={"bold"}>Загально-виробничі</Td>
                 </Tr>
-                <Tr>
+                {outcomes.map((el) => (
+                  <Tr key={el.year + el.name}>
+                    <Td>{el.name}</Td>
+                    <Td>{el.costYear}</Td>
+                  </Tr>
+                ))}
+                {/* <Tr>
                   <Td>Елекроенергія</Td>
                 </Tr>
                 <Tr>
@@ -465,7 +587,7 @@ function AdditionBusinessPlan({
                 </Tr>
                 <Tr>
                   <Td></Td>
-                </Tr>
+                </Tr> */}
               </Tbody>
             </Table>
           );
@@ -473,9 +595,14 @@ function AdditionBusinessPlan({
         return res;
       })()}
       <Paragraph>Додаток Ґ. Грошовий потік</Paragraph>{" "}
-      <TableName> Грошовий потік</TableName>
+      <TableName>Грошовий потік</TableName>
       <TableNumber></TableNumber>
-      {(() => {
+      <CashFlowTableForBusiness
+        end={end}
+        myBusiness={myBusiness}
+        start={start}
+      />
+      {/* {(() => {
         const res = [];
         let startSum = myBusiness?.initialAmount! / 1000;
         let endSum = startSum;
@@ -522,7 +649,7 @@ function AdditionBusinessPlan({
           startSum = endSum;
         }
         return res;
-      })()}
+      })()} */}
     </>
   );
 }

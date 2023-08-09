@@ -236,7 +236,15 @@ async function getsForBusinessPlan(plans: resBusinessPlan[]) {
     })
   );
 }
-async function changeFinancing(plans: resBusinessPlan[]) {
+
+function changeOutcomes(outcomes: Ioutcome[], businessMonths: number) {
+  return outcomes.map((el) => ({
+    ...el,
+    costYear: (el.costMonth || 0) * (el.year == 1 ? 13 - businessMonths : 12),
+  }));
+}
+
+async function changeBusiness(plans: resBusinessPlan[]) {
   plans = JSON.parse(JSON.stringify(plans));
   plans = await Promise.all(
     plans.map(async (plan) => {
@@ -383,6 +391,16 @@ async function changeFinancing(plans: resBusinessPlan[]) {
         const fin = plan.financings.filter(
           (el) => el.year == i - start && el.type == "credit"
         );
+        plan.outcomes
+          .filter((el) => +el.year == i - start)
+          .forEach((el) => {
+            outcomes.push({
+              ...el,
+              costYear:
+                (el.costMonth || 0) *
+                (i == start ? 13 - +plan.dateStart.split("-")[1] : 12),
+            });
+          });
         outcomes.push({
           costMonth: null,
           type: "Операційні",
@@ -405,16 +423,6 @@ async function changeFinancing(plans: resBusinessPlan[]) {
           costYear: creditProc[i] || 0,
           isDefault: true,
         });
-        plan.outcomes
-          .filter((el) => +el.date.split("-")[0] == i)
-          .forEach((el) => {
-            outcomes.push({
-              ...el,
-              costYear:
-                (el.costMonth || 0) *
-                (i == start ? 13 - +plan.dateStart.split("-")[1] : 12),
-            });
-          });
         const amorts: Iamortization[] = [];
         plan.buildings.forEach((el) => {
           if (el.amortization) amorts.push(el.amortization);
@@ -578,7 +586,7 @@ export async function getBusinessPlan(businessPlanId: number) {
     //@ts-ignore
     include: includes,
   });
-  res = (await changeFinancing([res!]))[0];
+  res = (await changeBusiness([res!]))[0];
   return res;
 }
 class BusinessService {
@@ -597,7 +605,7 @@ class BusinessService {
       console.timeEnd("include");
 
       console.time("func");
-      plans = await changeFinancing(plans);
+      plans = await changeBusiness(plans);
       console.timeEnd("func");
       return plans;
     } else {
@@ -608,7 +616,7 @@ class BusinessService {
         include: includes,
       });
       console.timeEnd("include2");
-      return await changeFinancing(plans);
+      return await changeBusiness(plans);
       return plans;
     }
   }
@@ -700,7 +708,7 @@ class BusinessService {
     });
     console.timeEnd("запит");
     console.time("функ");
-    const akk = await changeFinancing(res);
+    const akk = await changeBusiness(res);
     console.timeEnd("функ");
     return akk;
   }
@@ -932,16 +940,28 @@ class BusinessService {
     data: createOutcomeType
   ) {
     if (!user) return;
-    const res: Ioutcome = await outcome.create({
-      name: data.name,
-      costMonth: data.costMonth,
-      date: data.date,
-      group: data.group,
-      userId: user.sub,
-      businessPlanId: data.businessPlanId!,
-      year: data.year,
-      type: data.type,
-    });
+    let res: Ioutcome = JSON.parse(
+      JSON.stringify(
+        await outcome.create({
+          name: data.name,
+          costMonth: data.costMonth,
+          date: data.date,
+          group: data.group,
+          userId: user.sub,
+          businessPlanId: data.businessPlanId!,
+          year: data.year,
+          type: data.type,
+        })
+      )
+    );
+    const business: IbusinessPlan = JSON.parse(
+      JSON.stringify(
+        await businessPlan.findOne({
+          where: { id: data.businessPlanId },
+        })
+      )
+    );
+    res = changeOutcomes([res], +business.dateStart.split("-")[1])[0];
     return res;
   }
   async patchOutcomeForBusiness(
@@ -959,9 +979,22 @@ class BusinessService {
       },
       { where: { id: data.outcomeId } }
     );
-    const res: Ioutcome | null = await outcome.findOne({
-      where: { id: data.outcomeId },
-    });
+    let res: Ioutcome | null = JSON.parse(
+      JSON.stringify(
+        await outcome.findOne({
+          where: { id: data.outcomeId },
+        })
+      )
+    );
+    if (!res) return;
+    const business: IbusinessPlan = JSON.parse(
+      JSON.stringify(
+        await businessPlan.findOne({
+          where: { id: data.businessPlanId },
+        })
+      )
+    );
+    res = changeOutcomes([res], +business.dateStart.split("-")[1])[0];
     return res;
   }
   async deleteOutcomeForBusiness(

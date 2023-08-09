@@ -786,9 +786,11 @@ function ProductionBusinessPlan({
                 <Td>{MSHPSum.toFixed(2)}</Td>
                 <Td>{0}</Td>
                 <Td>
-                  {+buyingSum.toFixed(2) +
+                  {(
+                    +buyingSum.toFixed(2) +
                     +businessSum.toFixed(2) +
-                    +MSHPSum.toFixed(2)}
+                    +MSHPSum.toFixed(2)
+                  ).toFixed(2)}
                 </Td>
               </Tr>
             );
@@ -1117,7 +1119,7 @@ function ProductionBusinessPlan({
                     return {
                       // year: i,
                       name: el.product?.name!,
-                      direct:
+                      direct: +(
                         (el.tech_cart?.costHectare || 0) * el.area +
                         (el.tech_cart?.tech_operations?.reduce(
                           (p, c) =>
@@ -1126,16 +1128,27 @@ function ProductionBusinessPlan({
                             (c.costMachineWork || 0),
                           0
                         ) || 0) *
-                          0.235,
+                          0.235
+                      ).toFixed(2),
                       permanent: 0,
                       general: 0,
-                      outcome: (el.tech_cart?.costHectare || 0) * el.area,
+                      outcome: +(
+                        (el.tech_cart?.costHectare || 0) * el.area
+                      ).toFixed(2),
                       amount: amount,
                     };
                   })
                 );
                 const directValue = busProd.reduce(
-                  (p, c) => p + (c.tech_cart?.costHectare || 0) * c.area,
+                  (p, c) =>
+                    p +
+                    (c.tech_cart?.costHectare || 0) * c.area +
+                    (c.tech_cart?.tech_operations?.reduce(
+                      (p, c) =>
+                        p + (c.costHandWork || 0) + (c.costMachineWork || 0),
+                      0
+                    ) || 0) *
+                      0.235,
                   0
                 );
                 const permanentValue = permanent.reduce(
@@ -1150,10 +1163,14 @@ function ProductionBusinessPlan({
                   // year: i,
                   name: i + " Разом:",
                   bold: true,
-                  direct: directValue,
-                  permanent: permanentValue,
-                  general: generalValue,
-                  outcome: generalValue + permanentValue + directValue,
+                  direct: +directValue.toFixed(2),
+                  permanent: +permanentValue.toFixed(2),
+                  general: +generalValue.toFixed(2),
+                  outcome: +(
+                    generalValue +
+                    permanentValue +
+                    directValue
+                  ).toFixed(2),
                 });
               }
               const columns: ColumnDef<{
