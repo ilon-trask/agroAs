@@ -135,12 +135,12 @@ function EnterpriseBusinessPlan({
         .reduce(
           (p, c) =>
             p +
-            (c.tech_cart?.costHectare || 0) * c.area +
-            (c.tech_cart?.tech_operations?.reduce(
-              (p, c) => p + (c.costHandWork || 0) + (c.costMachineWork || 0),
-              0
-            ) || 0) *
-              0.235,
+            c.area *
+              (c.tech_cart?.tech_operations?.reduce(
+                (p, c) => p + (c.costHandWork || 0) + (c.costMachineWork || 0),
+                0
+              ) || 0) *
+              1.235,
           0
         )
         .toFixed(2);

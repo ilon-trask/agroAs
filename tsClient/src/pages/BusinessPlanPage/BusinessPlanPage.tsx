@@ -46,7 +46,6 @@ import SaleBusTable from "./modules/SaleBusTable";
 import getStartAndEndBusinessPlan from "src/shared/funcs/getStartAndEndBusinessPlan";
 import LandBusTable from "./modules/LandBusTable";
 import PlanYieldBusTable from "./modules/PlanYieldBusTable";
-import als from "src/modules/AgreeCartsTable";
 export function getMonthAmountFromBusinessPlan(
   dateStart: string,
   i: number,
