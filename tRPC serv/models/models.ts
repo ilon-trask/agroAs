@@ -553,6 +553,9 @@ export interface IbusinessPlan {
   description?: string;
   enterpriseId?: number | null;
   userId: string;
+  goal: string | null | undefined;
+  responsiblePerson: string | null | undefined;
+  city: string | null | undefined;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -560,6 +563,9 @@ export class businessPlan extends Model<IbusinessPlan> {
   declare id?: number;
   declare name: string;
   declare initialAmount: number;
+  declare goal: string | null | undefined;
+  declare responsiblePerson: string | null | undefined;
+  declare city: string | null | undefined;
   declare dateStart: string;
   declare realizationTime: number;
   declare isPublic?: boolean;
@@ -572,6 +578,9 @@ businessPlan.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     topic: { type: DataTypes.TEXT },
     name: { type: DataTypes.STRING, allowNull: false },
+    goal: { type: DataTypes.TEXT },
+    responsiblePerson: { type: DataTypes.TEXT },
+    city: { type: DataTypes.TEXT },
     initialAmount: { type: DataTypes.INTEGER },
     dateStart: { type: DataTypes.DATEONLY },
     realizationTime: { type: DataTypes.INTEGER },
@@ -1131,6 +1140,8 @@ export interface Ienterprise {
   name: string;
   form: EnterpriseFormType;
   taxGroup: EnterpriseTaxGroupType;
+  leader?: string;
+  leaderEducation?: string;
   userId: string;
 }
 export class enterprise extends Model<Ienterprise> {
@@ -1146,6 +1157,8 @@ enterprise.init(
     name: { type: DataTypes.STRING },
     form: { type: DataTypes.STRING },
     taxGroup: { type: DataTypes.STRING },
+    leader: { type: DataTypes.STRING },
+    leaderEducation: { type: DataTypes.STRING },
     userId: { type: DataTypes.STRING, allowNull: false },
   },
   { sequelize }
@@ -1410,7 +1423,7 @@ export interface Iamortization {
   introductionDate: string;
   year: number;
   depreciationPeriod: number;
-  amount: number;
+  // amount: number;
   depreciationPerMonth?: number;
   buildingId?: number | null;
   buyingMachineId?: number | null;
@@ -1420,7 +1433,7 @@ export class amortization extends Model<Iamortization> {
   declare id?: number;
   declare introductionData: string;
   declare depreciationPeriod: number;
-  declare amount: number;
+  // declare amount: number;
   declare year: number;
   declare buildingId?: number;
   declare buyingMachineId?: number;
@@ -1431,7 +1444,7 @@ amortization.init(
     introductionDate: { type: DataTypes.STRING },
     year: { type: DataTypes.INTEGER },
     depreciationPeriod: { type: DataTypes.INTEGER },
-    amount: { type: DataTypes.INTEGER },
+    // amount: { type: DataTypes.INTEGER },
   },
   { sequelize }
 );

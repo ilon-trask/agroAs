@@ -26,6 +26,9 @@ function DataBasePage() {
     name: "",
     realizationTime: "",
     topic: "",
+    city: "",
+    goal: "",
+    responsiblePerson: "",
   });
   const [update, setUpdate] = useState(false);
   const [mapRes, setMapRes] = useState<cartProps>({

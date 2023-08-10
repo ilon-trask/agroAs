@@ -1,18 +1,32 @@
-import { Button, Container, Heading, Table, Td, Tr } from "@chakra-ui/react";
+import {
+  Button,
+  Container,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getBusinessPlans, getWorker } from "../http/requests";
-import { Context } from "../main";
-import CreateWorker from "../modules/CreateWorker";
-import { CreateWorkerProp } from "../modules/CreateWorker/CreateWorker";
-import { BUSINESSpLAN_ROUTER } from "../utils/consts";
-import { EnterpriseFormType } from "../shared/hook/useEnterpriseForm";
+import { getBusinessPlans, getWorker } from "../../http/requests";
+import { Context } from "../../main";
+import CreateWorker from "../../modules/CreateWorker";
+import { CreateWorkerProp } from "../../modules/CreateWorker/CreateWorker";
+import { BUSINESSpLAN_ROUTER } from "../../utils/consts";
+import { EnterpriseFormType } from "../../shared/hook/useEnterpriseForm";
 import getStartAndEndBusinessPlan from "src/shared/funcs/getStartAndEndBusinessPlan";
 import {
   StaffingTableBody,
   StaffingTableHeadRow,
 } from "src/modules/StaffingTable/StaffingTable";
+import MyHeading from "src/ui/MyHeading";
+import MyEditIcon from "src/ui/Icons/MyEditIcon";
+import EnterpriseLeaderDialog from "./modules/EnterpriseLeaderDialog";
 
 function EnterpriseFormPage() {
   const { form, busId } = useParams();
@@ -22,8 +36,8 @@ function EnterpriseFormPage() {
   const myBusiness =
     business.businessPlan.find((el) => el.id == +busId!) ||
     business.publicBusinessPlan.find((el) => el.id == +busId!);
-  //@ts-ignore
-  const { start, end } = getStartAndEndBusinessPlan(myBusiness);
+
+  const { start, end } = getStartAndEndBusinessPlan(myBusiness!);
   const [res, setRes] = useState<CreateWorkerProp>({
     amount: "",
     class: "",
@@ -37,24 +51,53 @@ function EnterpriseFormPage() {
     dateFrom: null,
     dateTo: null,
   });
-
+  const [leaderOpen, setLeaderOpen] = useState(false);
   useEffect(() => {
     getBusinessPlans(map, business);
     getWorker(enterpriseStore);
   }, []);
   const navigate = useNavigate();
   return (
-    <Container maxW={"container.lg"}>
+    <Container maxW={"container.xl"}>
       <Button
         onClick={() => navigate(BUSINESSpLAN_ROUTER + "/" + myBusiness?.id)}
       >
         Назад
       </Button>
-      <Heading textAlign={"center"} size={"md"} mt={3}>
+      <MyHeading>Керівник господарства</MyHeading>
+      <TableContainer maxW={"500px"} mx={"auto"}>
+        <Table size={"sm"}>
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th>П. І. Б.</Th>
+              <Th>Освіта</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>
+                <MyEditIcon onClick={() => setLeaderOpen(true)} />
+              </Td>
+              <Td>{myBusiness?.enterprise?.leader}</Td>
+              <Td>{myBusiness?.enterprise?.leaderEducation}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <EnterpriseLeaderDialog
+        busId={myBusiness?.id!}
+        enterpriseId={myBusiness?.enterpriseId!}
+        leader={myBusiness?.enterprise?.leader}
+        leaderEducation={myBusiness?.enterprise?.leaderEducation}
+        open={leaderOpen}
+        setOpen={setLeaderOpen}
+      />
+      <MyHeading mt={3}>
         Штатний роспис <br /> для ОПФ - {form}
         <br />
         розрахунок на рік
-      </Heading>
+      </MyHeading>
       <Table size="sm">
         <StaffingTableHeadRow />
         {(() => {

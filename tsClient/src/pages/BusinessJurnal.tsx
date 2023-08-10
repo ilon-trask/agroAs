@@ -52,6 +52,9 @@ function BusinessJurnal() {
     initialAmount: "",
     realizationTime: "",
     topic: "",
+    city: "",
+    goal: "",
+    responsiblePerson: "",
   });
   useBusiness(business, map);
   const navigate = useNavigate();

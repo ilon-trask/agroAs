@@ -330,10 +330,19 @@ function AdditionBusinessPlan({
             }
             res.push(
               <Tr fontWeight={"bold"} key={end + 1}>
-                <Td
-                  colSpan={3}
-                >{`Разом фонд оплати праці, років - ${myBusiness?.realizationTime}`}</Td>
-                <Td>{sum}</Td>
+                <Td colSpan={3}>Загальний фонд оплати праці з нарахуваннями</Td>
+                <Td>
+                  {myBusiness.workers.reduce(
+                    (p, c) =>
+                      p +
+                      (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+                        (+c.dateTo?.split("-")[1] -
+                          +c.dateFrom?.split("-")[1] +
+                          1 || 12) *
+                        c.amount,
+                    0
+                  )}
+                </Td>
               </Tr>
             );
             return res;

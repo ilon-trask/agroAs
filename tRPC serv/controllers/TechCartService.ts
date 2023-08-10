@@ -122,7 +122,6 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
           };
         })
       );
-
       return {
         ...cart,
         tech_operations,

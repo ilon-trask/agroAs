@@ -123,7 +123,12 @@ function QuizBusinessPopUp({
     >
       {screen == 1 ? (
         <Box>
-          <BusinessInputs res={res} setRes={setRes} isWOEnterprise={true} />
+          <BusinessInputs
+            res={res}
+            buttonText={""}
+            func={() => {}}
+            isWOEnterprise={true}
+          />
           <ModalFooter>
             <Button onClick={() => setScreen((prev) => prev + 1)}>Далі</Button>
           </ModalFooter>

@@ -57,7 +57,7 @@ function OutcomeBusTable({
                   <Th>Сатті витрат</Th>
                   <Th>Сума в місяць</Th>
                   <Th>Сума за рік</Th>
-                  <Th>Налаштування</Th>
+                  {/* <Th>Налаштування</Th> */}
                   <Th></Th>
                 </Tr>
               </Thead>
@@ -99,9 +99,9 @@ function OutcomeBusTable({
                           <Td>{el.name}</Td>
                           <Td>{el.costMonth}</Td>
                           <Td>{el.costYear}</Td>
-                          <Td>
+                          {/* <Td>
                             <Button size="sm">Додати</Button>
-                          </Td>
+                          </Td> */}
                           <Td>
                             {!el.isDefault ? (
                               <MyDeleteIcon
@@ -189,7 +189,7 @@ function OutcomeBusTable({
                   <Th>Сатті витрат</Th>
                   <Th>Сума в місяць</Th>
                   <Th>Сума за рік</Th>
-                  <Th>Налаштування</Th>
+                  {/* <Th>Налаштування</Th> */}
                   <Th></Th>
                 </Tr>
               </Thead>
@@ -232,9 +232,9 @@ function OutcomeBusTable({
                           <Td>{el.name}</Td>
                           <Td>{el.costMonth}</Td>
                           <Td>{el.costYear}</Td>
-                          <Td>
+                          {/* <Td>
                             <Button size="sm">Додати</Button>
-                          </Td>
+                          </Td> */}
                           <Td>
                             {!el.isDefault ? (
                               <MyDeleteIcon

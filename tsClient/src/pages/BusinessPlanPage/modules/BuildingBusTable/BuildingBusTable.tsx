@@ -107,7 +107,7 @@ function BuildingTable({
                           setAmortizationOpen(true);
                           setAmortizationData({
                             id: el.amortization?.id,
-                            amount: el.amortization?.amount || "",
+                            // amount: el.amortization?.amount || "",
                             busId: myBusiness.id!,
                             depreciationPeriod:
                               el.amortization?.depreciationPeriod || 25,

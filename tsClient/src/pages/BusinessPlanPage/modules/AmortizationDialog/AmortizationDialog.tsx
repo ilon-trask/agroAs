@@ -20,7 +20,7 @@ export interface amortizationProps {
   id?: number | null;
   introductionDate: string;
   depreciationPeriod: number | string;
-  amount: number | string;
+  // amount: number | string;
   mainAmount: number;
   buildingId?: number;
   buyingMachineId?: number;
@@ -43,10 +43,9 @@ function AmortizationDialog({ data, open, setOpen, businessYear }: props) {
   const { business } = useContext(Context);
   const onSubmit = (res: amortizationProps) => {
     setOpen(false);
-    if (data.mainAmount == 1) res.amount = 1;
     createUpdateAmortization(business, {
       ...res,
-      amount: +res.amount,
+      amount: +res.mainAmount,
       year: getYearFromString(res.introductionDate) - businessYear,
       depreciationPeriod: +res.depreciationPeriod,
     });
@@ -75,22 +74,7 @@ function AmortizationDialog({ data, open, setOpen, businessYear }: props) {
           {data.mainAmount != 1 ? (
             <Box>
               <FormLabel>Кільксть</FormLabel>
-              <Input
-                {...register("amount", {
-                  max: {
-                    value: data.mainAmount,
-                    message: "Значення перевищує " + data.mainAmount,
-                  },
-                  required: true,
-                })}
-                type={"number"}
-                inputMode={"numeric"}
-              />
-              {errors.amount ? (
-                <Text color={"red"} size={"sm"}>
-                  {errors.amount.message}
-                </Text>
-              ) : null}
+              <Input disabled={true} value={data.mainAmount} />
             </Box>
           ) : null}
         </Box>

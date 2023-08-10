@@ -83,7 +83,7 @@ export function BuyingMachineTableBodyRow({
             setAmortizationOpen(true);
             setAmortizationData({
               id: el.amortization?.id,
-              amount: el.amortization?.amount || "",
+              // amount: el.amortization?.amount || "",
               busId: busId,
               depreciationPeriod: el.amortization?.depreciationPeriod || 7,
               introductionDate: el.amortization?.introductionDate || "",
