@@ -12,6 +12,9 @@ export type CreateBusinessProp = {
   realizationTime: number | "";
   topic: string;
   enterpriseId?: number | string;
+  goal: string | null | undefined;
+  responsiblePerson: string | null | undefined;
+  city: string | null | undefined;
 };
 type props = {
   open: boolean;
@@ -40,50 +43,41 @@ function CreateBusiness({
   const { map, business } = useContext(Context);
 
   console.log(res);
-
+  const onSubmit = (data: CreateBusinessProp) => {
+    if (data) {
+      if (update) {
+        patchBusinessPlan(map, business, {
+          ...data,
+          initialAmount: +data.initialAmount,
+          realizationTime: +data.realizationTime,
+          planId: data.planId!,
+          enterpriseId: data.enterpriseId ? +data.enterpriseId : null,
+        });
+      } else {
+        createBusinessPlan(map, business, {
+          ...data,
+          initialAmount: +data.initialAmount,
+          realizationTime: +data.realizationTime,
+          enterpriseId: data.enterpriseId ? +data.enterpriseId : null,
+        });
+      }
+      setOpen(false);
+      setUpdate(false);
+      //@ts-ignore
+      setRes({});
+    }
+  };
   return (
     <Dialog
       open={open}
       setOpen={setOpen}
       setRes={setRes}
-      isErr={false}
       props={prop}
       res={obj}
-      setIsErr={() => {}}
       setUpdate={setUpdate}
       update={update}
     >
-      <BusinessInputs res={res} setRes={setRes} />
-      <ModalFooter>
-        <Button
-          onClick={() => {
-            if (res) {
-              if (update) {
-                patchBusinessPlan(map, business, {
-                  ...res,
-                  initialAmount: +res.initialAmount,
-                  realizationTime: +res.realizationTime,
-                  planId: res.planId!,
-                  enterpriseId: res.enterpriseId ? +res.enterpriseId : null,
-                });
-              } else {
-                createBusinessPlan(map, business, {
-                  ...res,
-                  initialAmount: +res.initialAmount,
-                  realizationTime: +res.realizationTime,
-                  enterpriseId: res.enterpriseId ? +res.enterpriseId : null,
-                });
-              }
-              setOpen(false);
-              setUpdate(false);
-              //@ts-ignore
-              setRes({});
-            }
-          }}
-        >
-          Зберегти
-        </Button>
-      </ModalFooter>
+      <BusinessInputs res={res} func={onSubmit} buttonText={"Зберегти"} />
     </Dialog>
   );
 }

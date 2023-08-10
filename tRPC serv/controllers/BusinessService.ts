@@ -165,6 +165,7 @@ const ForBusProd = async (busProds: resBusProd[]) => {
 function changeAmortization(
   amortization: Iamortization,
   price: number,
+  amount: number,
   businessPlanYear: number
 ): Iamortization {
   return {
@@ -174,7 +175,7 @@ function changeAmortization(
       ...amortization.introductionDate.split("-").slice(1),
     ].join("-"),
     depreciationPerMonth: +(
-      (price * amortization.amount) /
+      (price * amount) /
       (amortization.depreciationPeriod * 12)
     ).toFixed(2),
   };
@@ -186,7 +187,7 @@ function changeBuyingMachines(
   return buying_machines.map((el) => ({
     ...el,
     amortization: el.amortization
-      ? changeAmortization(el.amortization, el.price, businessYear)
+      ? changeAmortization(el.amortization, el.price, el.amount, businessYear)
       : null,
   }));
 }
@@ -194,7 +195,7 @@ function changeBuildings(buildings: Ibuilding[], businessYear: number) {
   return buildings.map((el) => ({
     ...el,
     amortization: el.amortization
-      ? changeAmortization(el.amortization, el.startPrice, businessYear)
+      ? changeAmortization(el.amortization, el.startPrice, 1, businessYear)
       : null,
   }));
 }
@@ -451,6 +452,8 @@ async function changeBusiness(plans: resBusinessPlan[]) {
               let months = 12;
               if (i - start == c.year) {
                 months = 13 - +c.introductionDate.split("-")[1];
+              } else if (i - start == c.year + c.depreciationPeriod) {
+                months = +c.introductionDate.split("-")[1];
               }
               return p + (c.depreciationPerMonth || 0) * months;
             }, 0),
@@ -628,15 +631,7 @@ class BusinessService {
 
     //@ts-ignore
     const plan: resBusinessPlan = await businessPlan.create(
-      {
-        name: data.name,
-        topic: data.topic,
-        initialAmount: data.initialAmount,
-        dateStart: data.dateStart,
-        enterpriseId: data.enterpriseId,
-        realizationTime: data.realizationTime,
-        userId: user.sub,
-      },
+      { ...data, userId: user.sub },
       //@ts-ignore
       { include: includes }
     );
@@ -646,14 +641,7 @@ class BusinessService {
     if (!user) return;
 
     const ind = await businessPlan.update(
-      {
-        dateStart: data.dateStart,
-        initialAmount: data.initialAmount,
-        enterpriseId: data.enterpriseId,
-        realizationTime: data.realizationTime,
-        topic: data.topic,
-        name: data.name,
-      },
+      { ...data },
       { where: { id: data.planId } }
     );
     return await getBusinessPlan(data.planId);

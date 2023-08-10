@@ -61,6 +61,7 @@ import {
 import EnterpriseStore from "../store/EnterpriseStore";
 import {
   CreateEnterpriseType,
+  PatchEnterpriseLeader,
   PatchEnterpriseType,
 } from "../../../tRPC serv/routes/enterpriseRouter";
 import {
@@ -749,7 +750,7 @@ export function createBusinessPlan(
   data: CreateBusinessPlan
 ) {
   map.isLoading = true;
-  client.business.create.query(data).then((res) => {
+  client.business.create.mutate(data).then((res) => {
     if (!res) return;
     Bus.newBusinessPlan = res as resBusinessPlan;
     map.isLoading = false;
@@ -774,7 +775,7 @@ export function patchBusinessPlan(
   data: PatchBusinessPlan
 ) {
   map.isLoading = true;
-  client.business.patch.query(data).then((res) => {
+  client.business.patch.mutate(data).then((res) => {
     if (res) {
       Bus.businessPlan = Bus.businessPlan.filter((el) => el.id != res.id);
       Bus.newBusinessPlan = res as resBusinessPlan;
@@ -1381,7 +1382,6 @@ export function patchEnterpriseForBusiness(
   data: PatchEnterpriseType,
   busId: number
 ) {
-  console.log("forBusiness");
   client.enterprise.patch.query(data).then((res) => {
     if (!res) return;
     EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
@@ -1397,6 +1397,29 @@ export function patchEnterpriseForBusiness(
     bus.newBusinessPlan = business;
   });
 }
+
+export function patchEnterpriseLeader(
+  bus: BusinessStore,
+  EnterpriseStore: EnterpriseStore,
+  data: PatchEnterpriseLeader,
+  busId: number
+) {
+  client.enterprise.patchEnterpriseLeader.query(data).then((res) => {
+    if (!res) return;
+    EnterpriseStore.enterprise = EnterpriseStore.enterprise.filter(
+      (el) => el.id != res.id
+    );
+    EnterpriseStore.newEnterprise = res;
+    const business = bus.businessPlan.find((el) => el.id == busId);
+    if (!business) return;
+
+    business.enterprise = res;
+    bus.businessPlan = bus.businessPlan.filter((el) => el.id != busId);
+    console.log(business);
+    bus.newBusinessPlan = business;
+  });
+}
+
 export function deleteEnterprise(
   EnterpriseStore: EnterpriseStore,
   entId: number

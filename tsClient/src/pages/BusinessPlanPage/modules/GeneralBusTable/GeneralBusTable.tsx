@@ -4,7 +4,6 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Thead,
   Tr,
 } from "@chakra-ui/react";
@@ -12,15 +11,13 @@ import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
 import MyEditIcon from "src/ui/Icons/MyEditIcon";
 import MyTableContainer from "src/ui/MyTableContainer";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
-import { setPatchBusinessPlan } from "../../../../modules/BusinessTable";
 import { CreateBusinessProp } from "../../../../modules/CreateBusiness";
 import CreateBusiness from "../../../../modules/CreateBusiness";
-import MyHeading from "src/ui/MyHeading";
 import MyAccordionButton from "src/ui/MyAccordionButton";
 import BusHeading from "src/ui/BusHeading";
 type generalProps = {
   setBusinessOpen: Dispatch<SetStateAction<boolean>>;
-  setBusinessRes: Dispatch<SetStateAction<any>>;
+  setBusinessRes: Dispatch<SetStateAction<CreateBusinessProp>>;
   dateStart: string;
   initialAmount: number;
   name: string;
@@ -28,6 +25,9 @@ type generalProps = {
   id: number;
   topic: string;
   enterpriseId: number;
+  goal: string | null | undefined;
+  responsiblePerson: string | null | undefined;
+  city: string | null | undefined;
 };
 function GeneralTable({
   setBusinessOpen,
@@ -39,6 +39,9 @@ function GeneralTable({
   name,
   realizationTime,
   topic,
+  city,
+  goal,
+  responsiblePerson,
 }: generalProps) {
   return (
     <MyTableContainer>
@@ -66,6 +69,9 @@ function GeneralTable({
                   planId: id,
                   topic: topic,
                   enterpriseId: enterpriseId,
+                  city: city,
+                  goal: goal,
+                  responsiblePerson: responsiblePerson,
                 });
               }}
             >
@@ -87,6 +93,9 @@ function GeneralBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
   const [businessOpen, setBusinessOpen] = useState(false);
   //@ts-ignore
   const [businessRes, setBusinessRes] = useState<CreateBusinessProp>({});
+  console.log("busRes");
+  console.log(businessRes);
+
   const BusinessData = useMemo(
     () => myBusiness,
     [
@@ -97,6 +106,9 @@ function GeneralBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
       myBusiness.id,
       myBusiness.topic,
       myBusiness.enterpriseId,
+      myBusiness.goal,
+      myBusiness.responsiblePerson,
+      myBusiness.city,
     ]
   );
   return (
@@ -106,9 +118,9 @@ function GeneralBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
       </MyAccordionButton>
       <AccordionPanel>
         <MemoedGeneralTable
-          {...myBusiness}
-          id={myBusiness.id!}
-          enterpriseId={myBusiness.enterpriseId!}
+          {...BusinessData}
+          id={BusinessData.id!}
+          enterpriseId={BusinessData.enterpriseId!}
           setBusinessOpen={setBusinessOpen}
           setBusinessRes={setBusinessRes}
         />

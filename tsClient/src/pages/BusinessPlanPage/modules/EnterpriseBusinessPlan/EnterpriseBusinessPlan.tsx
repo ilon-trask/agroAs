@@ -34,7 +34,7 @@ function EnterpriseBusinessPlan({
   end: number;
   aref: RefObject<HTMLTableElement>;
 }) {
-  let sum = 0;
+  // const  sum = 0;
   const salaryExpensesData = [];
   const wageAnalysisData = [];
   const groundSectionData: {
@@ -89,12 +89,12 @@ function EnterpriseBusinessPlan({
             (+e.dateTo?.split("-")[1] - +e.dateFrom?.split("-")[1] + 1 || 12);
         }
       });
-      sum +=
-        Math.round(adSalaryYear * 0.235) +
-        adSalaryYear +
-        Math.round(vSalaryYear * 0.235) +
-        vSalaryYear;
-      +(Math.round(iSalaryYear * 0.235) + iSalaryYear);
+      // sum +=
+      //   Math.round(adSalaryYear * 0.235) +
+      //   adSalaryYear +
+      //   Math.round(vSalaryYear * 0.235) +
+      //   vSalaryYear;
+      // +(Math.round(iSalaryYear * 0.235) + iSalaryYear);
       salaryExpensesData.push(
         {
           type: "Адміністративний",
@@ -307,7 +307,7 @@ function EnterpriseBusinessPlan({
           </Tr>
           <Tr>
             <Td>Юридична адреса</Td>
-            <Td>Україна</Td>
+            <Td>Україна {myBusiness.city}</Td>
           </Tr>
           <Tr>
             <Td>
@@ -424,12 +424,12 @@ function EnterpriseBusinessPlan({
             <Td></Td>
           </Tr>
           <Tr>
-            <Td rowSpan={2}>Керіник</Td> <Td>П.І.Б</Td>
+            <Td rowSpan={2}>Керівник</Td> <Td>П.І.Б</Td>
             <Td>Освіта</Td>
           </Tr>
           <Tr>
-            <Td></Td>
-            <Td></Td>
+            <Td>{myBusiness.enterprise?.leader}</Td>
+            <Td>{myBusiness.enterprise?.leaderEducation}</Td>
           </Tr>
         </Thead>
       </Table>
@@ -468,7 +468,18 @@ function EnterpriseBusinessPlan({
         <Tfoot>
           <Tr fontWeight={"bold"} key={0}>
             <Td colSpan={5}>Річний оплати праці з нарахуваннями</Td>
-            <Td>{sum}</Td>
+            <Td>
+              {myBusiness.workers.reduce(
+                (p, c) =>
+                  p +
+                  (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+                    (+c.dateTo?.split("-")[1] -
+                      +c.dateFrom?.split("-")[1] +
+                      1 || 12) *
+                    c.amount,
+                0
+              )}
+            </Td>
           </Tr>
         </Tfoot>
       </Table>

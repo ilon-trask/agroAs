@@ -49,6 +49,9 @@ const createType = z.object({
   enterpriseId: z.number().nullish().optional(),
   dateStart: z.string(),
   realizationTime: z.number(),
+  goal: z.string().nullish(),
+  responsiblePerson: z.string().nullish(),
+  city: z.string().nullish(),
 });
 export type CreateBusinessPlan = z.infer<typeof createType>;
 const patchType = createType.extend({
@@ -119,16 +122,17 @@ const createUpdateAmortization = z.object({
 export type CreateUpdateAmortizationType = z.infer<
   typeof createUpdateAmortization
 >;
+
 const businessRouter = router({
   get: publicProcedure.query(async ({ ctx }) => {
     const res: resBusinessPlan[] = await BusinessService.get(ctx.user);
     return res;
   }),
-  create: publicProcedure.input(createType).query(async ({ input, ctx }) => {
+  create: publicProcedure.input(createType).mutation(async ({ input, ctx }) => {
     const res = await BusinessService.create(ctx.user, input);
     return res;
   }),
-  patch: publicProcedure.input(patchType).query(async ({ input, ctx }) => {
+  patch: publicProcedure.input(patchType).mutation(async ({ input, ctx }) => {
     const res: resBusinessPlan | null | undefined = await BusinessService.patch(
       ctx.user,
       input

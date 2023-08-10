@@ -296,7 +296,7 @@ function ProductionBusinessPlan({
               (квітень-травень)
             </Td>
           </Tr>
-          <Tr>
+          {/* <Tr>
             <Td>Підготовка ділянки</Td>
             <Td></Td>
           </Tr>
@@ -323,7 +323,7 @@ function ProductionBusinessPlan({
           <Tr>
             <Td>Боротьба з хворобами і шкідниками</Td>
             <Td></Td>
-          </Tr>
+          </Tr> */}
           <Tr>
             <Td>Збір</Td>
             <Td>Ручний</Td>
@@ -760,6 +760,12 @@ function ProductionBusinessPlan({
                       (i == getYearFromString(c.amortization?.introductionDate!)
                         ? 13 -
                           getMonthFromString(c.amortization?.introductionDate!)
+                        : i ==
+                          getYearFromString(c.amortization?.introductionDate!) +
+                            (c.amortization?.depreciationPeriod || 0)
+                        ? getMonthFromString(
+                            c.amortization?.introductionDate!
+                          ) - 1
                         : 12),
                   0
                 )

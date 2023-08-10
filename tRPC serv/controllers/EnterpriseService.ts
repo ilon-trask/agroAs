@@ -2,6 +2,7 @@ import { Principal } from "..";
 import { enterprise, Ienterprise } from "../models/models";
 import {
   CreateEnterpriseType,
+  PatchEnterpriseLeader,
   PatchEnterpriseType,
 } from "../routes/enterpriseRouter";
 
@@ -41,6 +42,16 @@ class EnterpriseService {
   async delete(user: Principal | undefined, data: { entId: number }) {
     if (!user) return;
     const res = await enterprise.destroy({ where: { id: data.entId } });
+    return res;
+  }
+  async patchEnterpriseLeader(
+    user: Principal | undefined,
+    data: PatchEnterpriseLeader
+  ) {
+    await enterprise.update({ ...data }, { where: { id: data.enterpriseId } });
+    const res: Ienterprise | null = await enterprise.findOne({
+      where: { id: data.enterpriseId },
+    });
     return res;
   }
 }

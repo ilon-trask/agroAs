@@ -106,7 +106,7 @@ function EnterpriseBusTable({ myBusiness }: { myBusiness: resBusinessPlan }) {
   return (
     <AccordionItem>
       <MyAccordionButton>
-        <BusHeading>Підприємство</BusHeading>
+        <BusHeading>Господарство</BusHeading>
       </MyAccordionButton>
       <AccordionPanel>
         <MemoedEnterpriseTable

@@ -75,6 +75,9 @@ function BusinessTable({
       planId: original.id,
       topic: original.topic,
       enterpriseId: original.enterpriseId!,
+      city: original.city,
+      goal: original.goal,
+      responsiblePerson: original.responsiblePerson,
     });
   };
   const columns = useMemo<ColumnDef<resBusinessPlan>[]>(() => {

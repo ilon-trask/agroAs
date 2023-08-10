@@ -195,8 +195,13 @@ function BiznesPlanPage() {
           overflowY={"auto"}
         >
           <TitleBusinessPlan
-            topic={myBusiness?.topic!}
-            name={myBusiness?.name!}
+            topic={myBusiness.topic}
+            name={myBusiness.name}
+            city={myBusiness.city}
+            goal={myBusiness.goal}
+            responsiblePerson={myBusiness.responsiblePerson}
+            enterpriseName={myBusiness.enterprise?.name}
+            year={+myBusiness.dateStart.split("-")[0]}
             aref={titleRef}
           />
           <ResumeBusinessPlan

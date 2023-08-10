@@ -59,7 +59,7 @@ function LandTable({
             <Th>Ставка</Th>
             <Th>Плата за землю</Th>
             <Th>Власність</Th>
-            <Th>Налаштування</Th>
+            {/* <Th>Налаштування</Th> */}
             <Th></Th>
           </Tr>
         </Thead>
@@ -99,9 +99,9 @@ function LandTable({
                     <Td>{el.rate}</Td>
                     <Td>{el.area * el.rate}</Td>
                     <Td>{el.ownership}</Td>
-                    <Td>
+                    {/* <Td>
                       <Button size={"sm"}>Додати</Button>
-                    </Td>
+                    </Td> */}
                     <Td>
                       <MyDeleteIcon
                         onClick={() =>
