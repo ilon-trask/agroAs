@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
 import {
   Card,
   CardBody,
@@ -7,7 +7,6 @@ import {
   Text,
   Image,
   Box,
-  Divider,
   CardFooter,
   ButtonGroup,
   Button,
@@ -17,10 +16,6 @@ import { Itech_cart } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import TechnologicalMapPdf from "../pages/pdf/TechnologicalMapPdf";
-import { downloaded, getCarts, getTEJ } from "../http/requests";
-import getSectionsOpers from "../store/GetSectionsOpers";
 import { Context } from "../main";
 const IMGuRL =
   "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/unUsed";
@@ -46,12 +41,7 @@ function ButtonTEJ({
 
 function MainTable({ e }: props) {
   const navigate = useNavigate();
-  const { map, TEJ } = useContext(Context);
-  const sections = useMemo(() => {
-    let a = getSectionsOpers(map, e?.id!);
-    return a;
-  }, [map.opers]);
-  // getTEJ(TEJ);
+  const { TEJ } = useContext(Context);
 
   const myTEJ = TEJ.agreeJustification.find((el) => el.techCartId == e?.id);
   return (
@@ -73,7 +63,11 @@ function MainTable({ e }: props) {
             {e?.description}
           </Text>
         </Stack>
-        <Box minH={"180px"}>
+        <Box
+          minH={"180px"}
+          cursor={"pointer"}
+          onClick={() => navigate(TEHMAP_ROUTER + "/" + e?.id)}
+        >
           <Image
             src={IMGuRL + "/" + e?.id}
             h={"auto"}

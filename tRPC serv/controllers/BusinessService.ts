@@ -68,19 +68,19 @@ import {
 } from "./TechCartService";
 import { changeVegetationYear } from "./vegetationYearsService";
 import { changeWorkerRes } from "./workerService";
-import redis, { REDIS_DEFAULT_EX } from "../redis";
-const compareBusinessPlan = async (businessPlan: resBusinessPlan) => {
-  const redisBusinessPlan = await redis.get(businessPlan.id! + "");
-  if (redisBusinessPlan == JSON.stringify(businessPlan)) {
-    return JSON.parse(redisBusinessPlan);
-  }
-  await redis.setex(
-    businessPlan.id! + "",
-    REDIS_DEFAULT_EX,
-    JSON.stringify(businessPlan)
-  );
-  return businessPlan;
-};
+
+// const compareBusinessPlan = async (businessPlan: resBusinessPlan) => {
+//   const redisBusinessPlan = await redis.get(businessPlan.id! + "");
+//   if (redisBusinessPlan == JSON.stringify(businessPlan)) {
+//     return JSON.parse(redisBusinessPlan);
+//   }
+//   await redis.setex(
+//     businessPlan.id! + "",
+//     REDIS_DEFAULT_EX,
+//     JSON.stringify(businessPlan)
+//   );
+//   return businessPlan;
+// };
 export interface includeProduct extends Iproduct {
   culture: Iculture | undefined;
 }

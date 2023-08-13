@@ -16,8 +16,11 @@ import { observer } from "mobx-react-lite";
 import SkeletonCart from "../components/SkeletonCart";
 import { useNavigate } from "react-router-dom";
 import { HOW_ROUTER } from "../utils/consts";
-import MainTableItemJustification from "../components/MainTableItemJustification";
 import MyHeading from "src/ui/MyHeading";
+import YouTube from "react-youtube";
+import BusinessCatalogItem from "src/components/BusinessCatalogItem";
+import { getPublicBusiness } from "src/http/requests";
+import useBusinessDirection from "src/shared/hook/useBusinessDirection";
 
 function HeroSection() {
   const navigate = useNavigate();
@@ -54,10 +57,39 @@ function HeroSection() {
     </>
   );
 }
+function VidSection() {
+  return (
+    <>
+      <Box></Box>
+      <Box>
+        <Box mx={"auto"} maxW={"min-content"}>
+          <YouTube
+            videoId="Dc7LAgqy1_E"
+            opts={{
+              playerVars: {
+                fs: 1,
+              },
+            }}
+          />
+        </Box>
+      </Box>
+    </>
+  );
+}
 function MapScreen() {
   const { map } = useContext(Context);
 
-  const windW = window.innerWidth;
+  const [windW, setWindW] = useState(window.innerWidth);
+
+  const updateWindowWidth = () => {
+    setWindW(window.innerWidth);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateWindowWidth);
+    return () => {
+      window.removeEventListener("resize", updateWindowWidth);
+    };
+  }, []);
   return (
     <Tabs
       orientation={windW < 770 ? "horizontal" : "vertical"}
@@ -69,7 +101,7 @@ function MapScreen() {
         gridTemplateColumns={["1fr", "1fr", "1fr 3fr"]}
         gridColumnGap={"15px"}
         gridGap={"15px"}
-        maxW={"1300px"}
+        width={"80%"}
         mx={"auto"}
         mt={"15px"}
       >
@@ -78,9 +110,6 @@ function MapScreen() {
           overflowX={windW < 770 ? "scroll" : undefined}
           maxW={"100vw"}
         >
-          {/* <Text mt={"10px"} fontWeight={"bold"} fontSize={"20px"}>
-        КУЛЬТУРИ
-         </Text> */}
           <Box>
             <TabList gap={2}>
               <Tab
@@ -92,6 +121,7 @@ function MapScreen() {
               </Tab>
               {map.cultural.map((el) => (
                 <Tab
+                  key={el.id}
                   display={"block"}
                   textAlign={"left"}
                   _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
@@ -129,7 +159,7 @@ function MapScreen() {
             </Box>
           </TabPanel>
           {map.cultural.map((el) => (
-            <TabPanel>
+            <TabPanel key={el.id}>
               <Box>
                 <MyHeading mb={4}>Розрахунок прямих витрат</MyHeading>
                 <Box
@@ -158,12 +188,26 @@ function MapScreen() {
     </Tabs>
   );
 }
-function BusinessScreen() {
-  const { map, TEJ } = useContext(Context);
-  const navigate = useNavigate();
-  const windW = window.innerWidth;
+
+// const ObserverBusinessScreen = observer(BusinessScreen);
+const ObserverMapScreen = observer(MapScreen);
+function MainPage() {
+  const { map, business } = useContext(Context);
+  useEffect(() => getPublicBusiness(map, business), []);
+
+  const [windW, setWindW] = useState(window.innerWidth);
+
+  const updateWindowWidth = () => {
+    setWindW(window.innerWidth);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateWindowWidth);
+    return () => {
+      window.removeEventListener("resize", updateWindowWidth);
+    };
+  }, []);
   return (
-    <>
+    <Box>
       <Tabs
         orientation={windW < 770 ? "horizontal" : "vertical"}
         w={"100vw"}
@@ -174,11 +218,12 @@ function BusinessScreen() {
           gridTemplateColumns={["1fr", "1fr", "1fr 3fr"]}
           gridColumnGap={"15px"}
           gridGap={"15px"}
-          maxW={"1200px"}
+          width={"80%"}
           mx={"auto"}
           mt={"15px"}
         >
           <HeroSection />
+          <VidSection />
           <Box
             p={"15px"}
             overflowX={windW < 770 ? "scroll" : undefined}
@@ -190,10 +235,11 @@ function BusinessScreen() {
                 textAlign={"left"}
                 _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
               >
-                ТЕХНОЛОГІЇ
+                Напрямки
               </Tab>
-              {TEJ.technologies.map((el) => (
+              {useBusinessDirection.map((el) => (
                 <Tab
+                  key={el.id}
                   display={"block"}
                   textAlign={"left"}
                   _selected={{ bg: "rgba( 93, 160, 93, 0.55 )" }}
@@ -222,13 +268,13 @@ function BusinessScreen() {
                 >
                   {map.isLoading
                     ? [<SkeletonCart />, <SkeletonCart />, <SkeletonCart />]
-                    : TEJ.agreeJustification.map((e) => {
-                        return <MainTableItemJustification e={e} key={e.id} />;
-                      }) || <Text>Немає жодної карти</Text>}
+                    : business.publicBusinessPlan.map((e) => (
+                        <BusinessCatalogItem e={e} key={e.id} />
+                      )) || <Text>Немає жодного бізнес-плану</Text>}
                 </Box>
               </Box>
             </TabPanel>
-            {TEJ.technologies.map((el) => (
+            {/* {TEJ.technologies.map((el) => (
               <TabPanel>
                 {" "}
                 <Box>
@@ -255,22 +301,11 @@ function BusinessScreen() {
                   </Box>
                 </Box>
               </TabPanel>
-            ))}
+            ))} */}
           </TabPanels>
         </Box>
       </Tabs>
-    </>
-  );
-}
-function MainPage() {
-  const { map, TEJ } = useContext(Context);
-  const navigate = useNavigate();
-  const windW = window.innerWidth;
-
-  return (
-    <Box>
-      <BusinessScreen />
-      <MapScreen />
+      <ObserverMapScreen />
     </Box>
   );
 }

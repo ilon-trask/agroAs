@@ -1,6 +1,7 @@
-import { Box, Table, Td, Text, Th, Tr } from "@chakra-ui/react";
+import { Box, Image, Table, Td, Text, Th, Tr } from "@chakra-ui/react";
 import React, { RefObject } from "react";
-
+const IMGuRL =
+  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/business-imgs/title";
 function TitleBusinessPlan({
   topic,
   name,
@@ -9,6 +10,7 @@ function TitleBusinessPlan({
   responsiblePerson,
   enterpriseName,
   year,
+  id,
   aref,
 }: {
   topic: string;
@@ -18,6 +20,7 @@ function TitleBusinessPlan({
   responsiblePerson: string | null | undefined;
   enterpriseName: string | null | undefined;
   year: number;
+  id: number;
   aref: RefObject<HTMLTableElement>;
 }) {
   return (
@@ -29,18 +32,28 @@ function TitleBusinessPlan({
         fontSize={"60px"}
         lineHeight={10}
         color={"#20401E"}
+        mb={4}
       >
         <Text width={"min-content"} textAlign={"right"}>
           {topic}
         </Text>
       </Box>
-      <Text mt={40} fontSize={"32px"} fontWeight={"bold"} textAlign={"center"}>
+      <Box h={"330px"}>
+        <Image src={IMGuRL + "/" + id} h={"330px"} mx={"auto"} />
+      </Box>
+      <Text fontSize={"32px"} fontWeight={"bold"} textAlign={"center"}>
         Бізнес-план
       </Text>
-      <Text textAlign={"center"} mt={3}>
+      <Text
+        textAlign={"center"}
+        mt={3}
+        fontSize={"40px"}
+        lineHeight={10}
+        color={"#20401E"}
+      >
         {name}
       </Text>
-      <Table size="sm" mt={200} maxW={"80%"} mx={"auto"}>
+      <Table size="sm" mt={30} maxW={"80%"} mx={"auto"}>
         <Tr mt={5}>
           <Th fontWeight={"bold"} w="10%">
             Мета проекту
@@ -65,7 +78,7 @@ function TitleBusinessPlan({
         що не буде передана третім особам без попереднього погодження з
         розробником проекту
       </Text>
-      <Box mt={20} textAlign={"center"}>
+      <Box mt={"60px"} textAlign={"center"}>
         {/* <Text>{city || "Івано-франківськ"}</Text> */}
         <Text>{city}</Text>
         <Text>{year}</Text>

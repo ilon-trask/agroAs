@@ -32,6 +32,7 @@ import {
   opeInclude,
 } from "./OperService";
 import { CreateCartType, setIsBasicCartType } from "../routes/cartRouter";
+import redis from "../redis";
 export interface resMater extends Icost_material {
   purpose_material: Ipurpose_material;
 }
@@ -137,7 +138,10 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
       costMachineWork = 0,
       costCars = 0,
       costFuel = 0,
-      costHandWork = 0;
+      costHandWork = 0,
+      totalCostMaterials = 0,
+      totalCostServices = 0,
+      totalCostTransport = 0;
     if (!cart) {
       promises.push(cart);
       continue;
@@ -169,7 +173,9 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
         costCars += el.costCars || 0;
         costFuel += el.costFuel || 0;
         costHandWork += el.costHandWork || 0;
-
+        totalCostMaterials += el.costMaterials || 0;
+        totalCostServices += el.costServices || 0;
+        totalCostTransport += el.costTransport || 0;
         tech_cart.update(
           {
             costHectare,
@@ -177,6 +183,9 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
             totalCostHandWork: costHandWork,
             totalCostCars: costCars,
             totalCostMachineWork: costMachineWork,
+            totalCostMaterials,
+            totalCostServices,
+            totalCostTransport,
           },
           { where: { id: oper.techCartId } }
         );
@@ -184,6 +193,10 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
     }
   }
   await Promise.all(promises);
+  carts.forEach((el) => {
+    //@ts-ignore
+    if (el) redis.set(el.id!, JSON.stringify(el));
+  });
   return carts;
 }
 
@@ -300,8 +313,10 @@ async function checkMachineId(
 }
 class TechCartService {
   async getCart(cartId: number) {
+    //@ts-ignore
+    const redisCart = await redis.get(cartId);
+    if (redisCart) return JSON.parse(redisCart);
     let Scarts: resTechCartsWithOpers[];
-
     //@ts-ignore
     Scarts = await tech_cart.findAll({
       include: cartsIncludes,

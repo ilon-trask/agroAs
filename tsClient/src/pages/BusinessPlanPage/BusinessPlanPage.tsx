@@ -46,6 +46,8 @@ import SaleBusTable from "./modules/SaleBusTable";
 import getStartAndEndBusinessPlan from "src/shared/funcs/getStartAndEndBusinessPlan";
 import LandBusTable from "./modules/LandBusTable";
 import PlanYieldBusTable from "./modules/PlanYieldBusTable";
+const IMGuRL =
+  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/business-imgs";
 export function getMonthAmountFromBusinessPlan(
   dateStart: string,
   i: number,
@@ -123,7 +125,7 @@ function BiznesPlanPage() {
         {myBusiness.name}
       </MyHeading>
       {user.role != "" ? (
-        <Accordion allowMultiple={true} allowToggle={true} width={"1100px"}>
+        <Accordion allowMultiple={true} allowToggle={true} width={"100%"}>
           <GeneralBusTable myBusiness={myBusiness} />
           <EnterpriseBusTable myBusiness={myBusiness} />
           <LandBusTable myBusiness={myBusiness} start={start} end={end} />
@@ -149,14 +151,20 @@ function BiznesPlanPage() {
           <SaleBusTable myBusiness={myBusiness} end={end} start={start} />
         </Accordion>
       ) : null}
-      <Box display={"flex"} justifyContent={"center"}>
-        <Button>Сформувати</Button>
-      </Box>
       {user.role != "" ? (
-        <Box display={"flex"} justifyContent={"space-between"} ref={buttonsRef}>
-          <Button>Отримати PDF</Button>
-          <QuizButton myBusiness={myBusiness} />
-        </Box>
+        <>
+          <Box display={"flex"} justifyContent={"center"}>
+            <Button>Сформувати</Button>
+          </Box>
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            ref={buttonsRef}
+          >
+            <Button>Отримати PDF</Button>
+            <QuizButton myBusiness={myBusiness} />
+          </Box>
+        </>
       ) : null}
       <Box
         maxW={"1000px"}
@@ -203,6 +211,7 @@ function BiznesPlanPage() {
             enterpriseName={myBusiness.enterprise?.name}
             year={+myBusiness.dateStart.split("-")[0]}
             aref={titleRef}
+            id={myBusiness.id!}
           />
           <ResumeBusinessPlan
             productSet={productSet}

@@ -8,30 +8,19 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
-import css from "./Dialog.module.css";
 import {
   Box,
   Heading,
-  Select,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
   Button,
-  Center,
   ModalFooter,
   Input,
-  Image,
 } from "@chakra-ui/react";
-import {
-  setIsAgreeBusiness,
-  setIsAgreeCarts,
-  setIsPublic,
-  setIsPublicBusiness,
-  supabase,
-} from "../http/requests";
+import { setIsPublicBusiness, supabase } from "../http/requests";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -109,11 +98,11 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
                 <input
                   style={{ display: "none" }}
                   type="file"
-                  accept="image/jpg, image/png"
+                  accept="image/jpeg, image/png"
                   ref={imgRef}
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     if (!e.target.files) return;
-                    const file = e.target?.files[0];
+                    const file = e.target.files[0];
 
                     // const { data, error } = await supabase.storage
                     //   .from("images")

@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useContext, useState } from "react";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import {
   Box,
   Input,
@@ -12,6 +18,7 @@ import {
 import { CreateBusinessProp } from "../CreateBusiness";
 import { Context } from "../../../main";
 import { useForm } from "react-hook-form";
+import { supabase } from "src/http/requests";
 type props = {
   res: CreateBusinessProp;
   func: (data: CreateBusinessProp) => void;
@@ -20,6 +27,7 @@ type props = {
 };
 function BusinessInputs({ res, func, isWOEnterprise, buttonText }: props) {
   const { enterpriseStore } = useContext(Context);
+
   const {
     register,
     handleSubmit,
@@ -162,6 +170,32 @@ function BusinessInputs({ res, func, isWOEnterprise, buttonText }: props) {
             placeholder="Опишіть мету"
           />
         </Box>
+        {res.planId && (
+          <Box width={"90%"} mx={"auto"}>
+            <Text fontWeight={"bold"}>
+              Виберіть фото дял титульної сторінки
+            </Text>
+            <Input
+              cursor={"pointer"}
+              type="file"
+              id="input"
+              accept="image/jpeg, image/png"
+              onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                if (!e.target.files) return;
+                const file = e.target.files[0];
+                const data = await supabase.storage
+                  .from("business-imgs")
+                  .upload("title/" + res.planId, file);
+                //@ts-ignore
+                if (data.error?.error == "Duplicate") {
+                  const data = await supabase.storage
+                    .from("business-imgs")
+                    .update("title/" + res.planId, file);
+                }
+              }}
+            />
+          </Box>
+        )}
         {!isWOEnterprise && (
           <ModalFooter>
             <Button type="submit">{buttonText}</Button>

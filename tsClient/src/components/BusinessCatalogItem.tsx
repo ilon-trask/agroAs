@@ -41,7 +41,12 @@ function MainTable({ e }: props) {
             {e?.description}
           </Text>
         </Stack>
-        <Box minH={"180px"} m={3}>
+        <Box
+          minH={"180px"}
+          m={3}
+          cursor={"pointer"}
+          onClick={() => navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`)}
+        >
           <Image
             src={IMGuRL + "/" + e?.id}
             h={"auto"}
@@ -71,15 +76,10 @@ function MainTable({ e }: props) {
       </CardBody>
       <CardFooter pt={0}>
         <ButtonGroup spacing="2">
-          <Button
-            onClick={() => {
-              navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`);
-              console.log(BUSINESSpLAN_ROUTER + "/" + e?.id);
-            }}
-          >
+          <Button onClick={() => navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`)}>
             Бізнес-план
           </Button>
-          <Tooltip
+          {/* <Tooltip
             label="Рекомендації в розробці"
             bgColor={"grey.100"}
             color={"black"}
@@ -88,7 +88,7 @@ function MainTable({ e }: props) {
             <Button variant="ghost" colorScheme="blue">
               Рекомендації
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </ButtonGroup>
       </CardFooter>
     </Card>

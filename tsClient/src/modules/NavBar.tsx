@@ -7,6 +7,7 @@ import {
   ENTERPRISE_JOURNAL_ROUTER,
   LOGIN_ROUTE,
   MAP_ROUTE,
+  VIDEO_ROUTER,
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { supabase } from "../http/requests";
@@ -56,6 +57,12 @@ const NavBar = observer(() => {
               to={DATA_BASE_ROUTER}
             >
               База данних
+            </Link>
+            <Link
+              style={{ color: "#20401e", textDecoration: "none" }}
+              to={VIDEO_ROUTER}
+            >
+              Відео
             </Link>
           </Box>
         )}

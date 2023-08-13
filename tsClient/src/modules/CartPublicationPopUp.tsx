@@ -145,7 +145,7 @@ function CartPublicationPopUp({ data, setData }: props) {
                 <input
                   style={{ display: "none" }}
                   type="file"
-                  accept="image/jpg, image/png"
+                  accept="image/jpeg, image/png"
                   ref={imgRef}
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     if (!e.target.files) return;

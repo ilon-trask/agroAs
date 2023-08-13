@@ -4,33 +4,22 @@ import React, {
   Dispatch,
   SetStateAction,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from "react";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
 import {
   Box,
   Heading,
-  Select,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
   Button,
-  Center,
   ModalFooter,
   Input,
-  Image,
 } from "@chakra-ui/react";
-import {
-  setIsAgreeCarts,
-  setIsAgreeTEJ,
-  setIsPublic,
-  setIsPublicTEJ,
-  supabase,
-} from "../http/requests";
+import { setIsAgreeTEJ, setIsPublicTEJ, supabase } from "../http/requests";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -129,7 +118,7 @@ function TEJPublicationPopUp({ open, setOpen, TEJData }: props) {
                 <input
                   style={{ display: "none" }}
                   type="file"
-                  accept="image/jpg, image/png"
+                  accept="image/jpeg, image/png"
                   ref={imgRef}
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     if (!e.target.files) return;

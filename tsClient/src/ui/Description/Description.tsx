@@ -1,22 +1,16 @@
-import { Text } from "@chakra-ui/react";
+import { Text, TextProps } from "@chakra-ui/react";
 import React from "react";
-
-function Description({
-  children,
-  mt,
-}: {
-  children: any;
-  mt?: number | string;
-}) {
+interface Props extends TextProps {}
+function Description(props: Props) {
   return (
     <Text
       fontSize={"12px"}
       fontWeight={"normal"}
       textTransform={"none"}
-      mt={mt}
       marginTop={"5px"}
+      {...props}
     >
-      {children}
+      {props.children}
     </Text>
   );
 }

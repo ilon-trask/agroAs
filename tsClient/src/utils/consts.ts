@@ -17,3 +17,4 @@ export const ENTERPRISE_ROUTER = "/Enterprise";
 export const ENTERPRISE_FORM_ROUTER = "/EnterpriseForm";
 export const ENTERPRISE_TAX_GROUP = "/EnterpriseTax";
 export const DATA_BASE_ROUTER = "/DataBase";
+export const VIDEO_ROUTER = "/Video";
