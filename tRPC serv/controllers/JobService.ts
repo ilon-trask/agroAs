@@ -5,11 +5,18 @@ import { CreateJobType, PatchJobType } from "../routes/jobRouter";
 
 class JobService {
   async get(user: Principal | undefined) {
-    const res: Ijob[] | null = await job.findAll({
-      //@ts-ignore
-      where: { [Op.or]: { userId: user.sub, userId: null } },
-    });
-    return res;
+    if (user) {
+      const res: Ijob[] | null = await job.findAll({
+        //@ts-ignore
+        where: { [Op.or]: { userId: user.sub, userId: null } },
+      });
+      return res;
+    } else {
+      const res = await job.findAll({
+        where: { userId: null },
+      });
+      return res;
+    }
   }
   async create(user: Principal | undefined, data: CreateJobType) {
     if (!user) return;

@@ -12,11 +12,11 @@ import {
   Button,
   Tooltip,
 } from "@chakra-ui/react";
-import { Itech_cart } from "../../../tRPC serv/models/models";
+import { Itech_cart } from "../../../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
-import { Context } from "../main";
+import { TEHMAP_ROUTER, TEJ_ROUTER } from "../../../utils/consts";
+import { Context } from "../../../main";
 const IMGuRL =
   "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/unUsed";
 type props = { e: Itech_cart | undefined };

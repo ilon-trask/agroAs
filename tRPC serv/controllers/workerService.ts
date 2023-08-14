@@ -9,7 +9,7 @@ export function changeWorkerRes(arr: Iworker[]) {
     const el = arr[i];
     if (el.dateFrom && el.dateTo) {
       el.amountOfMounths =
-        +el.dateTo.split("-")[1] - +el.dateFrom.split("-")[1];
+        +el.dateTo.split("-")[1] - +el.dateFrom.split("-")[1] + 1;
     } else {
       el.amountOfMounths = 12;
     }

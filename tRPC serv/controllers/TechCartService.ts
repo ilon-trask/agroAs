@@ -7,7 +7,6 @@ import {
   cost_material,
   cost_service,
   cost_transport,
-  grade,
   Iaggregate,
   Icost_hand_work,
   Icost_material,
@@ -28,11 +27,10 @@ import {
   changeOper,
   guestAggregate,
   guest_cost_hand_work,
-  Icell,
   opeInclude,
 } from "./OperService";
-import { CreateCartType, setIsBasicCartType } from "../routes/cartRouter";
-import redis from "../redis";
+import { CreateCartType } from "../routes/cartRouter";
+import redis, { REDIS_DEFAULT_EX } from "../redis";
 export interface resMater extends Icost_material {
   purpose_material: Ipurpose_material;
 }
@@ -195,7 +193,7 @@ export async function changeCarts(Scarts: (resTechCartsWithOpers | null)[]) {
   await Promise.all(promises);
   carts.forEach((el) => {
     //@ts-ignore
-    if (el) redis.set(el.id!, JSON.stringify(el));
+    if (el) redis.setex(el.id!, REDIS_DEFAULT_EX, JSON.stringify(el));
   });
   return carts;
 }
@@ -315,7 +313,7 @@ class TechCartService {
   async getCart(cartId: number) {
     //@ts-ignore
     const redisCart = await redis.get(cartId);
-    if (redisCart) return JSON.parse(redisCart);
+    if (redisCart) return [JSON.parse(redisCart)];
     let Scarts: resTechCartsWithOpers[];
     //@ts-ignore
     Scarts = await tech_cart.findAll({
@@ -469,7 +467,6 @@ class TechCartService {
       return await guestPatchCart(data);
     }
   }
-
   async delete(id: number, user: Principal | undefined) {
     if (!user) return;
     //@ts-ignore

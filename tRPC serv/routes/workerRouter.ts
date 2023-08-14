@@ -30,17 +30,20 @@ export const workerRouter = router({
     const res = await workerService.get(ctx.user);
     return res;
   }),
-  create: publicProcedure.input(createWorker).query(async ({ ctx, input }) => {
-    const res = await workerService.create(ctx.user, input);
-    return res;
-  }),
-  patch: publicProcedure.input(patchWorker).query(async ({ ctx, input }) => {
+  create: publicProcedure
+    .input(createWorker)
+    .mutation(async ({ ctx, input }) => {
+      const res = await workerService.create(ctx.user, input);
+      return res;
+    }),
+  patch: publicProcedure.input(patchWorker).mutation(async ({ ctx, input }) => {
     const res = await workerService.patch(ctx.user, input);
     return res;
   }),
+
   delete: publicProcedure
     .input(z.object({ workerId: z.number() }))
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const res = await workerService.delete(ctx.user, input);
       return res;
     }),

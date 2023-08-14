@@ -95,7 +95,7 @@ const TechnologicalMap = observer(() => {
     labels: CartNamesData.map((el) => el.name),
     datasets: [
       {
-        label: "# of Votes",
+        label: "Сума",
         //@ts-ignore
         data: CartNamesData.map((el) => myMap && myMap[el.label]),
         backgroundColor: CartNamesData.map((el) => el.bgColor),
@@ -151,7 +151,7 @@ const TechnologicalMap = observer(() => {
         <Box ref={pdfContent} className="print-container">
           {myMap ? (
             <TechnologicalMapContent
-              tech_opers={operData}
+              tech_opers={myMap.tech_operations || operData}
               myMap={myMap}
               useIcons={user.isAuth}
               deleteOpen={deleteOpen}
@@ -227,8 +227,9 @@ const TechnologicalMap = observer(() => {
                       <Td>
                         {myMap?.costHectare
                           ? +(
-                              //@ts-ignore
-                              ((myMap[el.label] || 0) / myMap.costHectare) *
+                              (//@ts-ignore
+                              (myMap[el.label] || 0) /
+                                myMap.costHectare) *
                               100
                             ).toFixed(1)
                           : null}

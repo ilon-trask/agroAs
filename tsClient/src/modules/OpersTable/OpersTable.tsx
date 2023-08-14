@@ -101,11 +101,10 @@ function OpersTable(props: props) {
   operData.sort((a, b) => a.id! - b.id!);
   console.log(operData);
 
-  const sections = useMemo(() => {
-    let a = getSectionsOpers(map, props.id, operData);
-
-    return a;
-  }, [map.opers, operData]);
+  const sections = useMemo(
+    () => getSectionsOpers(map, props.id, operData),
+    [map.opers, operData]
+  );
 
   let sum = 0;
   let technic = 0;

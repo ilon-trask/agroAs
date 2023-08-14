@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React from "react";
 import {
   Card,
   CardBody,
@@ -7,36 +7,19 @@ import {
   Text,
   Image,
   Box,
-  Divider,
   CardFooter,
   ButtonGroup,
   Button,
-  Tooltip,
 } from "@chakra-ui/react";
-import {
-  ItechnologicalEconomicJustification,
-  Itech_cart,
-} from "../../../tRPC serv/models/models";
+import { IbusinessPlan } from "../../../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { TEHMAP_ROUTER, TEJ_ROUTER } from "../utils/consts";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import TechnologicalMapPdf from "../pages/pdf/TechnologicalMapPdf";
-import { downloaded, getCarts } from "../http/requests";
-import getSectionsOpers from "../store/GetSectionsOpers";
-import { Context } from "../main";
-import { resTechnologicalEconomicJustification } from "../../../tRPC serv/controllers/TEJService";
+import { BUSINESSpLAN_ROUTER } from "../../../utils/consts";
 const IMGuRL =
-  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/TEJ";
-type props = { e: resTechnologicalEconomicJustification | undefined };
-
-function MainTableItemJustification({ e }: props) {
+  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/business-imgs";
+type props = { e: IbusinessPlan | undefined };
+function MainTable({ e }: props) {
   const navigate = useNavigate();
-  const { map } = useContext(Context);
-  const sections = useMemo(() => {
-    let a = getSectionsOpers(map, e?.id!);
-    return a;
-  }, [map.opers]);
   return (
     <Card maxW="sm" mx={"auto"}>
       <CardBody
@@ -47,51 +30,52 @@ function MainTableItemJustification({ e }: props) {
       >
         <Stack mt="2" spacing="3">
           <Heading size="md" textAlign={"center"} textColor={"#20401e"}>
-            {e?.culture.name || ""}
+            {e?.name || ""}
           </Heading>
-          <Text>
+          {/* <Text>
             <b>Автор:</b> {e?.authorName}
-          </Text>
+          </Text> */}
           <Text maxW="250px" minH={"48px"}>
-            {e?.publicComment}
+            {e?.description}
           </Text>
         </Stack>
-        <Box minH={"180px"}>
+        <Box
+          minH={"180px"}
+          m={3}
+          cursor={"pointer"}
+          onClick={() => navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`)}
+        >
           <Image
             src={IMGuRL + "/" + e?.id}
             h={"auto"}
             w={"220px"}
             mx={"auto"}
-            alt={e?.culture.name}
+            alt={e?.name}
           />
         </Box>
-        {/* <Stack mt="6" spacing="1" mb={0}>
-          <Box display={"flex"} justifyContent={"space-between"}>
+        <Stack mt="6" spacing="1" mb={0}>
+          {/* <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Площа</Box>
             <Box>{e?.area || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Загальна вартість </Box>
-            <Box>{e?.area! * e?.costHectare! || "0"}</Box>
+            <Box>{e?.area! * e?.totalCost! || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>
-            <Box>{e?.costHectare || "0"}</Box>
+            <Box>{e?.totalCost || "0"}</Box>
           </Box> */}
-        <Box display={"flex"} justifyContent={"space-between"}>
-          <Box fontWeight={"bold"}>Оновлено</Box>
-          <Box>{e?.updatedAt?.toLocaleString().slice(0, 9) || "0"}</Box>
-        </Box>
-        {/* </Stack> */}
+          <Box display={"flex"} justifyContent={"space-between"}>
+            <Box fontWeight={"bold"}>Оновлено</Box>
+            <Box>{e?.updatedAt?.toLocaleString().slice(0, 9) || "0"}</Box>
+          </Box>
+        </Stack>
       </CardBody>
       <CardFooter pt={0}>
         <ButtonGroup spacing="2">
-          <Button
-            onClick={() => {
-              navigate(TEJ_ROUTER + "/" + e?.id);
-            }}
-          >
-            До ТЕО
+          <Button onClick={() => navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`)}>
+            Бізнес-план
           </Button>
           {/* <Tooltip
             label="Рекомендації в розробці"
@@ -109,4 +93,4 @@ function MainTableItemJustification({ e }: props) {
   );
 }
 
-export default observer(MainTableItemJustification);
+export default observer(MainTable);

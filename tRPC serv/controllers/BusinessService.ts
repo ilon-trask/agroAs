@@ -36,6 +36,7 @@ import {
   amortization,
   Iamortization,
 } from "../models/models";
+import redis, { REDIS_DEFAULT_EX } from "../redis";
 import {
   CreateBuildingType,
   PatchBuildingType,
@@ -154,7 +155,10 @@ const ForBusProd = async (busProds: resBusProd[]) => {
       );
       return {
         ...prod,
-        tech_cart: (await changeCarts([prod.tech_cart]))[0],
+        tech_cart:
+          //@ts-ignore
+          JSON.parse((await redis.get(prod.techCartId)) + "") ||
+          (await changeCarts([prod.tech_cart]))[0],
         vegetationYear: vegetation
           ? changeVegetationYear(vegetation, prod.product!)
           : null,
