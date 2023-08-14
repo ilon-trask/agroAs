@@ -13,10 +13,10 @@ import {
   Button,
   Skeleton,
 } from "@chakra-ui/react";
-import { Itech_cart } from "../../../tRPC serv/models/models";
+import { Itech_cart } from "../../../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { TEHMAP_ROUTER } from "../utils/consts";
+import { TEHMAP_ROUTER } from "../../../utils/consts";
 function MainTable() {
   const navigate = useNavigate();
   return (

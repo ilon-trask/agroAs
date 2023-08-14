@@ -19,7 +19,12 @@ import React, {
 } from "react";
 import { CreateJobType } from "../../../../tRPC serv/routes/jobRouter";
 import Dialog from "../../components/Dialog";
-import { createWorker, getJob, patchWorker } from "../../http/requests";
+import {
+  createWorker,
+  getJob,
+  guestPatchWorker,
+  patchWorker,
+} from "../../http/requests";
 import { Context } from "../../main";
 import useEnterpriseForm, {
   EnterpriseFormType,
@@ -69,7 +74,7 @@ function CreateWorker({
     isQO: false,
     name: "",
   });
-  const { enterpriseStore, business } = useContext(Context);
+  const { enterpriseStore, business, user } = useContext(Context);
   useEffect(() => {
     getJob(enterpriseStore);
   }, []);
@@ -86,157 +91,193 @@ function CreateWorker({
       setRes={setRes}
       setIsErr={() => {}}
     >
-      <Box>
-        <Heading size={"md"} textAlign="center">
-          Дані про персонал
-        </Heading>
-        <Box display={"flex"} alignItems={"center"} gap={5}>
-          <Text minW={"max-content"}>Назва посади</Text>
-          <Select
-            value={res.jobId}
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, jobId: e.target.value as any }))
-            }
-          >
-            <option value="" hidden defaultChecked>
-              Виберіть опцію
-            </option>
-            {enterpriseStore.job.map((el) => (
-              <option key={el.id} value={el.id}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-          <Button minW={"max-content"} onClick={() => setOpenJob(true)}>
-            Створити професію
-          </Button>
-        </Box>
+      {user.role == "" ? (
         <Box>
-          <Text>Кількість</Text>
-          <Input
-            value={res.amount}
-            type={"number"}
-            inputMode="numeric"
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, amount: e.target.value as any }))
-            }
-          />
-        </Box>
-        <Box>
-          <Text>Місячний оклад</Text>
-          <Input
-            value={res.salary}
-            type={"number"}
-            inputMode="numeric"
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, salary: e.target.value as any }))
-            }
-          />
-        </Box>
-        <Box>
-          <Text>Клас персоналу</Text>
-          <Select
-            value={res.class}
-            onChange={(e) =>
-              setRes((prev) => ({ ...prev, class: e.target.value as any }))
-            }
-          >
-            <option value="" hidden defaultChecked>
-              Виберіть опцію
-            </option>
-            {useWorkerClasses.map((el) => (
-              <option key={el.id} value={el.name}>
-                {el.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
-        <Box>
-          <CheckboxGroup>
-            <Checkbox
-              isChecked={!!res.isConst}
-              onChange={() => setRes((prev) => ({ ...prev, isConst: true }))}
-            >
-              Постійний
-            </Checkbox>
-            <Checkbox
-              isChecked={!res.isConst}
-              onChange={() => setRes((prev) => ({ ...prev, isConst: false }))}
-            >
-              Сезонний
-            </Checkbox>
-          </CheckboxGroup>
-        </Box>
-        {!res.isConst && (
-          <Box display={"flex"} justifyContent={"space-around"}>
-            <Box>
-              <Text>Нанятий з </Text>
-              <Input
-                value={res.dateFrom?.toLocaleString()}
-                type={"date"}
-                onChange={(e) =>
-                  setRes((prev) => ({ ...prev, dateFrom: e.target.value }))
-                }
-              />
-            </Box>
-            <Box>
-              <Text>Нанятий до</Text>
-              <Input
-                value={res.dateTo?.toLocaleString()}
-                type={"date"}
-                onChange={(e) =>
-                  setRes((prev) => ({ ...prev, dateTo: e.target.value }))
-                }
-              />
-            </Box>
+          <Heading size={"md"} textAlign="center">
+            Дані про персонал
+          </Heading>
+          <Box>
+            <Text>Місячний оклад</Text>
+            <Input
+              value={res.salary}
+              type={"number"}
+              inputMode="numeric"
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, salary: e.target.value as any }))
+              }
+            />
           </Box>
-        )}
-      </Box>
+        </Box>
+      ) : (
+        <Box>
+          <Heading size={"md"} textAlign="center">
+            Дані про персонал
+          </Heading>
+          <Box display={"flex"} alignItems={"center"} gap={5}>
+            <Text minW={"max-content"}>Назва посади</Text>
+            <Select
+              value={res.jobId}
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, jobId: e.target.value as any }))
+              }
+            >
+              <option value="" hidden defaultChecked>
+                Виберіть опцію
+              </option>
+              {enterpriseStore.job.map((el) => (
+                <option key={el.id} value={el.id}>
+                  {el.name}
+                </option>
+              ))}
+            </Select>
+            <Button minW={"max-content"} onClick={() => setOpenJob(true)}>
+              Створити професію
+            </Button>
+          </Box>
+          <Box>
+            <Text>Кількість</Text>
+            <Input
+              value={res.amount}
+              type={"number"}
+              inputMode="numeric"
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, amount: e.target.value as any }))
+              }
+            />
+          </Box>
+          <Box>
+            <Text>Місячний оклад</Text>
+            <Input
+              value={res.salary}
+              type={"number"}
+              inputMode="numeric"
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, salary: e.target.value as any }))
+              }
+            />
+          </Box>
+          <Box>
+            <Text>Клас персоналу</Text>
+            <Select
+              value={res.class}
+              onChange={(e) =>
+                setRes((prev) => ({ ...prev, class: e.target.value as any }))
+              }
+            >
+              <option value="" hidden defaultChecked>
+                Виберіть опцію
+              </option>
+              {useWorkerClasses.map((el) => (
+                <option key={el.id} value={el.name}>
+                  {el.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+          <Box>
+            <CheckboxGroup>
+              <Checkbox
+                isChecked={!!res.isConst}
+                onChange={() => setRes((prev) => ({ ...prev, isConst: true }))}
+              >
+                Постійний
+              </Checkbox>
+              <Checkbox
+                isChecked={!res.isConst}
+                onChange={() => setRes((prev) => ({ ...prev, isConst: false }))}
+              >
+                Сезонний
+              </Checkbox>
+            </CheckboxGroup>
+          </Box>
+          {!res.isConst && (
+            <Box display={"flex"} justifyContent={"space-around"}>
+              <Box>
+                <Text>Нанятий з </Text>
+                <Input
+                  value={res.dateFrom?.toLocaleString()}
+                  type={"date"}
+                  onChange={(e) =>
+                    setRes((prev) => ({ ...prev, dateFrom: e.target.value }))
+                  }
+                />
+              </Box>
+              <Box>
+                <Text>Нанятий до</Text>
+                <Input
+                  value={res.dateTo?.toLocaleString()}
+                  type={"date"}
+                  onChange={(e) =>
+                    setRes((prev) => ({ ...prev, dateTo: e.target.value }))
+                  }
+                />
+              </Box>
+            </Box>
+          )}
+        </Box>
+      )}
       <ModalFooter>
-        <Button
-          isDisabled={!res.amount && !res.class && !res.jobId && !res.salary}
-          onClick={() => {
-            if (res.amount && res.class && res.jobId && res.salary) {
-              res.jobId = +res.jobId;
-              res.amount = +res.amount;
-              res.salary = +res.salary;
-              res.form = form;
-              if (update) {
-                patchWorker(business, {
-                  ...res,
-                  form: res.form,
-                  amount: res.amount,
-                  isConst: !!res.isConst,
-                  salary: res.salary,
-                  class: res.class,
-                  jobId: res.jobId,
+        {user.role == "" ? (
+          <Button
+            isDisabled={!res.salary}
+            onClick={() => {
+              setOpen(false);
+              if (res.salary) {
+                guestPatchWorker(enterpriseStore, {
                   workerId: res.workerId!,
-                });
-              } else {
-                createWorker(business, {
-                  ...res,
-                  form: res.form,
-                  amount: res.amount,
-                  isConst: !!res.isConst,
                   salary: res.salary,
-                  class: res.class,
-                  jobId: res.jobId,
                 });
               }
-              //@ts-ignore
-              setRes((prev) => ({
-                businessPlanId: prev.businessPlanId,
-                enterpriseId: prev.enterpriseId,
-                isConst: true,
-                form: form,
-              }));
-              setOpen(false);
-              setUpdate(false);
-            }
-          }}
-        >
-          Збегерти
-        </Button>
+            }}
+          >
+            Зберегти
+          </Button>
+        ) : (
+          <Button
+            isDisabled={!res.amount && !res.class && !res.jobId && !res.salary}
+            onClick={() => {
+              if (res.amount && res.class && res.jobId && res.salary) {
+                res.jobId = +res.jobId;
+                res.amount = +res.amount;
+                res.salary = +res.salary;
+                res.form = form;
+                if (update) {
+                  patchWorker(business, {
+                    ...res,
+                    form: res.form,
+                    amount: res.amount,
+                    isConst: !!res.isConst,
+                    salary: res.salary,
+                    class: res.class,
+                    jobId: res.jobId,
+                    workerId: res.workerId!,
+                  });
+                } else {
+                  createWorker(business, {
+                    ...res,
+                    form: res.form,
+                    amount: res.amount,
+                    isConst: !!res.isConst,
+                    salary: res.salary,
+                    class: res.class,
+                    jobId: res.jobId,
+                  });
+                }
+                //@ts-ignore
+                setRes((prev) => ({
+                  businessPlanId: prev.businessPlanId,
+                  enterpriseId: prev.enterpriseId,
+                  isConst: true,
+                  form: form,
+                }));
+                setOpen(false);
+                setUpdate(false);
+              }
+            }}
+          >
+            Зберегти
+          </Button>
+        )}
       </ModalFooter>
       <CreateJob
         open={openJob}

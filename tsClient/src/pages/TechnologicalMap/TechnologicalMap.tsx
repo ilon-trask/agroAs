@@ -11,10 +11,9 @@ import CreateCostServices from "src/modules/CreateCostServices";
 import CreateCostTransport from "src/modules/CreateCostTransport";
 import CreateCostMechanical from "src/modules/CreateCostMechanical/CreateCostMechanical";
 import CreateCart, { cartProps } from "src/modules/CreateCart";
-import GeneralDataTable from "src/modules/GeneralDataTable";
-import OpersTable from "src/modules/OpersTable";
+
 import { Icell } from "../../../../tRPC serv/controllers/OperService";
-import { Text, Button, Box } from "@chakra-ui/react";
+import { Button, Box, Table, Thead, Tbody, Th, Tr, Td } from "@chakra-ui/react";
 import NoAuthAlert from "src/components/NoAuthAlert";
 import DeleteAlert from "src/components/DeleteAlert";
 import {
@@ -31,8 +30,11 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import TechnologicalMapPdf from "../pdf/TechnologicalMapPdf";
 import getSectionsOpers from "src/store/GetSectionsOpers";
 import ComplexChose from "src/modules/ComplexChose";
-import MyHeading from "src/ui/MyHeading";
+
 import TechnologicalMapContent from "./TechnologicalMapContent";
+import { DoughnutChart } from "src/shared/charts";
+import MyHeading from "src/ui/MyHeading";
+import { CartNamesData } from ".";
 export type createOperProps<T> = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -71,10 +73,10 @@ const TechnologicalMap = observer(() => {
   let myMap = map.allMaps.find((el) => el.id == id);
   const operData = map.opers.filter((el) => el?.techCartId == id);
   operData.sort((a, b) => a.id! - b.id!);
-  const sections = useMemo(() => {
-    let a = getSectionsOpers(map, +id!);
-    return a;
-  }, [map.opers, operData]);
+  const sections = useMemo(
+    () => getSectionsOpers(map, +id!),
+    [map.opers, operData]
+  );
   console.log(myMap);
   console.log(operData);
 
@@ -89,6 +91,19 @@ const TechnologicalMap = observer(() => {
     }
   }, []);
 
+  const data = {
+    labels: CartNamesData.map((el) => el.name),
+    datasets: [
+      {
+        label: "Сума",
+        //@ts-ignore
+        data: CartNamesData.map((el) => myMap && myMap[el.label]),
+        backgroundColor: CartNamesData.map((el) => el.bgColor),
+        borderColor: CartNamesData.map((el) => el.borderColor),
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <Box pb={"25px"}>
       <Box px={["10px", "40px"]}>
@@ -136,7 +151,7 @@ const TechnologicalMap = observer(() => {
         <Box ref={pdfContent} className="print-container">
           {myMap ? (
             <TechnologicalMapContent
-              tech_opers={operData}
+              tech_opers={myMap.tech_operations || operData}
               myMap={myMap}
               useIcons={user.isAuth}
               deleteOpen={deleteOpen}
@@ -173,6 +188,57 @@ const TechnologicalMap = observer(() => {
           ) : (
             ""
           )}
+        </Box>
+        <Box display={"flex"}>
+          <Box width={"25%"} mx={"auto"} px={"auto"}>
+            <DoughnutChart data={data} />
+          </Box>
+          <Box width={"50%"} px={"auto"}>
+            <MyHeading>Структура прямих витрат</MyHeading>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Колір</Th>
+                  <Th>Назва</Th>
+                  <Th>Сума</Th>
+                  <Th>Частка %</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {myMap &&
+                  CartNamesData.map((el) => (
+                    <Tr key={el.name}>
+                      <Td>
+                        <Box
+                          h={2}
+                          bgColor={el.bgColor}
+                          borderColor={el.borderColor}
+                          borderWidth={2}
+                        />
+                      </Td>
+                      <Td>{el.name}</Td>
+
+                      <Td>
+                        {
+                          //@ts-ignore
+                          (myMap[el.label] || 0) * (myMap?.area || 0)
+                        }
+                      </Td>
+                      <Td>
+                        {myMap?.costHectare
+                          ? +(
+                              (//@ts-ignore
+                              (myMap[el.label] || 0) /
+                                myMap.costHectare) *
+                              100
+                            ).toFixed(1)
+                          : null}
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+          </Box>
         </Box>
         <OperSection
           open={open}

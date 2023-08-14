@@ -8,30 +8,20 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Icell } from "../../../tRPC serv/controllers/OperService";
 import { Context } from "../main";
-import css from "./Dialog.module.css";
 import {
   Box,
   Heading,
-  Select,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
   Button,
-  Center,
   ModalFooter,
   Input,
-  Image,
+  Text,
 } from "@chakra-ui/react";
-import {
-  setIsAgreeBusiness,
-  setIsAgreeCarts,
-  setIsPublic,
-  setIsPublicBusiness,
-  supabase,
-} from "../http/requests";
+import { setIsPublicBusiness, supabase } from "../http/requests";
 type props = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -104,16 +94,16 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
                     imgRef?.current?.click();
                   }}
                 >
-                  Додоти фото
+                  Додоти фото БП
                 </Button>
                 <input
                   style={{ display: "none" }}
                   type="file"
-                  accept="image/jpg, image/png"
+                  accept="image/jpeg, image/png"
                   ref={imgRef}
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     if (!e.target.files) return;
-                    const file = e.target?.files[0];
+                    const file = e.target.files[0];
 
                     // const { data, error } = await supabase.storage
                     //   .from("images")
@@ -136,6 +126,30 @@ function PublicationPopUp({ open, setOpen, data, setData }: props) {
               </Box>
             ) : null}
           </Box>
+          {user.role == "ADMIN" || user.role == "service_role" ? (
+            <Box width={"90%"} mx={"auto"}>
+              <Text fontWeight={"bold"}>Виберіть фото для ШП</Text>
+              <Input
+                cursor={"pointer"}
+                type="file"
+                id="input"
+                accept="image/jpeg, image/png"
+                onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                  if (!e.target.files) return;
+                  const file = e.target.files[0];
+                  const res = await supabase.storage
+                    .from("business-imgs")
+                    .upload("SHP/" + data.BusinessId, file);
+                  //@ts-ignore
+                  if (res.error?.error == "Duplicate") {
+                    const res = await supabase.storage
+                      .from("business-imgs")
+                      .update("SHP/" + data.BusinessId, file);
+                  }
+                }}
+              />
+            </Box>
+          ) : null}
           {isErr ? "Ви не заповнили поля" : ""}
         </ModalBody>
         <ModalFooter>

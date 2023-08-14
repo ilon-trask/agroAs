@@ -19,8 +19,15 @@ import {
   Iaggregate,
   purpose_material,
 } from "../models/models";
+import redis, { REDIS_DEFAULT_EX } from "../redis";
 
-import { resMater, resTechOperation } from "./TechCartService";
+import {
+  cartsIncludes,
+  changeCarts,
+  resMater,
+  resTechCartsWithOpers,
+  resTechOperation,
+} from "./TechCartService";
 
 export type prope =
   | resMater
@@ -203,6 +210,75 @@ export const opeInclude = [
   cost_hand_work,
   { model: aggregate, include: [tractor, agricultural_machine] },
 ];
+async function changeRedisCart(cartId: number, oper: resTechOperation) {
+  const cart: resTechCartsWithOpers | null = JSON.parse(
+    //@ts-ignore
+    (await redis.get(cartId)) + ""
+  );
+  if (!cart?.tech_operations) return;
+  cart.tech_operations = [
+    ...cart.tech_operations?.filter((el) => el.id != oper.id),
+    oper,
+  ] //@ts-ignore
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const [
+    costHectare,
+    costMachineWork,
+    costCars,
+    costFuel,
+    costHandWork,
+    totalCostMaterials,
+    totalCostServices,
+    totalCostTransport,
+  ] = (() => {
+    let costHectare = 0,
+      costMachineWork = 0,
+      costCars = 0,
+      costFuel = 0,
+      costHandWork = 0,
+      totalCostMaterials = 0,
+      totalCostServices = 0,
+      totalCostTransport = 0;
+
+    for (let i = 0; i < cart.tech_operations.length; i++) {
+      const el = cart.tech_operations[i];
+      costHectare +=
+        el.costMachineWork! + el.costCars! + el.costFuel! + el.costHandWork! ||
+        el.costHandWork ||
+        el.costServices ||
+        el.costTransport ||
+        el.costMaterials ||
+        0;
+      costMachineWork += el.costMachineWork || 0;
+      costCars += el.costCars || 0;
+      costFuel += el.costFuel || 0;
+      costHandWork += el.costHandWork || 0;
+      totalCostMaterials += el.costMaterials || 0;
+      totalCostServices += el.costServices || 0;
+      totalCostTransport += el.costTransport || 0;
+    }
+    return [
+      costHectare,
+      costMachineWork,
+      costCars,
+      costFuel,
+      costHandWork,
+      totalCostMaterials,
+      totalCostServices,
+      totalCostTransport,
+    ];
+  })();
+  cart.costHectare = costHectare;
+  cart.totalCostMachineWork = costMachineWork;
+  cart.totalCostCars = costCars;
+  cart.totalCostFuel = costFuel;
+  cart.totalCostHandWork = costHandWork;
+  cart.totalCostMaterials = totalCostMaterials;
+  cart.totalCostServices = totalCostServices;
+  cart.totalCostTransport = totalCostTransport;
+  //@ts-ignore
+  (await redis.setex(cartId, REDIS_DEFAULT_EX, JSON.stringify(cart))) + "";
+}
 async function createOper(
   cartId: number,
   nameOper: string,
@@ -220,7 +296,8 @@ async function createOper(
     sectionId: section,
     date: date,
   });
-  const oper = JSON.parse(JSON.stringify(Soper));
+  const oper: Itech_operation = JSON.parse(JSON.stringify(Soper));
+
   return oper;
 }
 
@@ -500,6 +577,7 @@ async function updateOper(
       { model: aggregate, include: [tractor, agricultural_machine] },
     ],
   });
+
   oper = await changeOper(oper!, oper?.techCartId!);
   return oper;
 }
@@ -540,17 +618,45 @@ class OperService {
       where: { id: costMaterialPre.id },
       include: purpose_material,
     });
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
+
     tech_cart.update(
       {
         costHectare:
           cart?.costHectare! +
+          costMaterial.price * costMaterial.consumptionPerHectare,
+        totalCostMaterials:
+          cart?.totalCostMaterials! +
           costMaterial.price * costMaterial.consumptionPerHectare,
       },
       { where: { id: cartId } }
     );
     oper.costMaterials =
       costMaterial.price * costMaterial.consumptionPerHectare;
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
+    await redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        tech_operation: [
+          ...(redisCart.tech_operations || []),
+          { ...oper, cost_material: costMaterial },
+        ],
+        costHectare:
+          cart?.costHectare! +
+          costMaterial.price * costMaterial.consumptionPerHectare,
+        totalCostMaterials:
+          cart?.totalCostMaterials! +
+          costMaterial.price * costMaterial.consumptionPerHectare,
+      })
+    );
     return { oper, prope: costMaterial };
   }
   async createCostServices(data: IdataCreateCostServices) {
@@ -571,20 +677,40 @@ class OperService {
       unitsOfCost,
       techOperationId: operId,
     });
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
     tech_cart.update(
       {
         costHectare: cart?.costHectare! + costService.price,
+        totalCostServices: cart?.totalCostServices! + costService.price,
       },
       { where: { id: cartId } }
     );
     oper.costServices = costService.price;
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
+    await redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        tech_operation: [
+          ...(redisCart.tech_operations || []),
+          { ...oper, cost_service: costService },
+        ],
+        costHectare: cart?.costHectare! + costService.price,
+        totalCostServices: cart?.totalCostServices! + costService.price,
+      })
+    );
     return { oper, prope: costService };
   }
   async createCostTransport(data: IdataCreateCostTransport) {
     const {
       cartId,
-
       arr: {
         cell,
         res: { nameOper, date, price, unitsOfCost },
@@ -599,17 +725,37 @@ class OperService {
       unitsOfCost,
       techOperationId: operId,
     });
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
     tech_cart.update(
       {
         costHectare: cart?.costHectare! + costTransport.price,
+        totalCostTransport: cart?.totalCostTransport! + costTransport.price,
       },
       { where: { id: cartId } }
     );
     oper.costTransport = costTransport.price;
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
+    await redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        tech_operation: [
+          ...(redisCart.tech_operations || []),
+          { ...oper, cost_transport: costTransport },
+        ],
+        costHectare: cart?.costHectare! + costTransport.price,
+        totalCostTransport: cart?.totalCostTransport! + costTransport.price,
+      })
+    );
     return { oper, prope: costTransport };
   }
-
   async createCostMechanical(data: IdataCreateCostMechanical) {
     const {
       cartId,
@@ -628,7 +774,9 @@ class OperService {
       },
     } = data;
     let sum: number;
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
     const Tractor = await tractor.findOne({ where: { id: idTractor } });
     const machine = await agricultural_machine.findOne({
       where: { id: idMachine },
@@ -684,6 +832,10 @@ class OperService {
           costCars +
           costFuel +
           costHandWork,
+        totalCostCars: cart.totalCostCars! + costCars,
+        totalCostFuel: cart.totalCostFuel! + costFuel,
+        totalCostHandWork: cart.totalCostHandWork! + costHandWork,
+        totalCostMachineWork: cart.totalCostMachineWork! + costMachineWork,
       },
       { where: { id: cartId } }
     );
@@ -691,6 +843,33 @@ class OperService {
     oper.costCars = costCars;
     oper.costFuel = costFuel;
     oper.costHandWork = costHandWork;
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
+
+    await redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        tech_operation: [
+          ...(redisCart.tech_operations || []),
+          { ...oper, aggregate: Aggregate },
+        ],
+        costHectare:
+          cart.costHectare! +
+          costMachineWork +
+          costCars +
+          costFuel +
+          costHandWork,
+        totalCostCars: cart.totalCostCars! + costCars,
+        totalCostFuel: cart.totalCostFuel! + costFuel,
+        totalCostHandWork: cart.totalCostHandWork! + costHandWork,
+        totalCostMachineWork: cart.totalCostMachineWork! + costMachineWork,
+      })
+    );
     return { oper, prope: Aggregate };
   }
   async createCostHandWork(data: IdataCreateCostHandWork) {
@@ -715,7 +894,9 @@ class OperService {
         section,
       },
     } = data;
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
     const Grade = await grade.findOne({ where: { id: gradeId } });
     if (!Grade || !cart) throw new Error("");
 
@@ -759,11 +940,32 @@ class OperService {
       );
     }
     tech_cart.update(
-      { costHectare: cart.costHectare! + cost },
+      {
+        costHectare: cart.costHectare! + cost,
+        totalCostHandWork: cart.totalCostHandWork! + cost,
+      },
       { where: { id: cartId } }
     );
     oper.costHandWork = cost;
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
 
+    await redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        tech_operation: [
+          ...(redisCart.tech_operations || []),
+          { ...oper, cost_hand_work: costHandWork },
+        ],
+        costHectare: cart.costHectare! + cost,
+        totalCostHandWork: cart.totalCostHandWork! + cost,
+      })
+    );
     return { oper, prope: costHandWork };
   }
   async patchCostMaterials(
@@ -893,7 +1095,7 @@ class OperService {
 
       oper = await changeOper(oper, oper.techCartId!);
     }
-
+    changeRedisCart(oper?.techCartId!, oper!);
     return oper;
   }
   async patchCostService(
@@ -1012,6 +1214,7 @@ class OperService {
 
       oper = await changeOper(oper, oper.techCartId!);
     }
+    changeRedisCart(oper?.techCartId!, oper!);
     return oper;
   }
   async patchCostTransport(
@@ -1130,6 +1333,7 @@ class OperService {
 
       oper = await changeOper(oper, oper.techCartId!);
     }
+    changeRedisCart(oper?.techCartId!, oper!);
     return oper;
   }
   async patchCostMechanical(
@@ -1273,6 +1477,7 @@ class OperService {
 
       oper = await changeOper(oper, oper.techCartId!);
     }
+    changeRedisCart(oper?.techCartId!, oper!);
     return oper;
   }
   async patchCostHandWork(
@@ -1427,13 +1632,14 @@ class OperService {
 
       oper = await changeOper(oper, oper.techCartId!);
     }
+    changeRedisCart(oper?.techCartId!, oper!);
     return oper;
   }
 
   async deleteOper(data: { cartId: number; operId: number }) {
     const { cartId, operId } = data;
 
-    let elem: any | null = await tech_operation.findOne({
+    let elem: resTechOperation | null = await tech_operation.findOne({
       where: { id: operId },
       include: [
         cost_material,
@@ -1443,10 +1649,14 @@ class OperService {
         { model: aggregate, include: [tractor, agricultural_machine] },
       ],
     });
-    elem = await changeOper(elem, elem.techCartId!);
+    if (!elem) throw new Error("Немає операції при видаленні");
 
-    if (!elem) throw new Error("");
-    const cart = await tech_cart.findOne({ where: { id: cartId } });
+    elem = await changeOper(elem, elem.techCartId!);
+    if (!elem) throw new Error("Немає операції при видаленні після");
+
+    const cart: Itech_cart | null = JSON.parse(
+      JSON.stringify(await tech_cart.findOne({ where: { id: cartId } }))
+    );
     tech_cart.update(
       {
         costHectare:
@@ -1460,8 +1670,54 @@ class OperService {
             elem.costTransport ||
             elem.costMaterials ||
             0),
+        totalCostCars: cart?.totalCostCars! - (elem.costCars || 0)!,
+        totalCostFuel: cart?.totalCostFuel! - (elem.costFuel || 0)!,
+        totalCostHandWork: cart?.totalCostHandWork! - (elem.costHandWork || 0)!,
+        totalCostMachineWork:
+          cart?.totalCostMachineWork! - (elem.costMachineWork || 0)!,
+        totalCostMaterials:
+          cart?.totalCostMaterials! - (elem.costMaterials || 0)!,
+        totalCostServices: cart?.totalCostServices! - (elem.costServices || 0)!,
+        totalCostTransport:
+          cart?.totalCostTransport! - (elem.costTransport || 0)!,
       },
       { where: { id: cartId } }
+    );
+    const redisCart: resTechCartsWithOpers = JSON.parse(
+      //@ts-ignore
+      await redis.get(cart.id!)
+    );
+    redis.setex(
+      //@ts-ignore
+      cart.id!,
+      REDIS_DEFAULT_EX,
+      JSON.stringify({
+        ...cart,
+        CostHectare:
+          cart?.costHectare! -
+          (elem.costMachineWork! +
+            elem.costCars! +
+            elem.costFuel! +
+            elem.costHandWork! ||
+            elem.costHandWork ||
+            elem.costServices ||
+            elem.costTransport ||
+            elem.costMaterials ||
+            0),
+        totalCostCars: cart?.totalCostCars! - (elem.costCars || 0)!,
+        totalCostFuel: cart?.totalCostFuel! - (elem.costFuel || 0)!,
+        totalCostHandWork: cart?.totalCostHandWork! - (elem.costHandWork || 0)!,
+        totalCostMachineWork:
+          cart?.totalCostMachineWork! - (elem.costMachineWork || 0)!,
+        totalCostMaterials:
+          cart?.totalCostMaterials! - (elem.costMaterials || 0)!,
+        totalCostServices: cart?.totalCostServices! - (elem.costServices || 0)!,
+        totalCostTransport:
+          cart?.totalCostTransport! - (elem.costTransport || 0)!,
+        tech_operation: redisCart.tech_operations?.filter(
+          (el) => el.id != elem?.id!
+        ),
+      })
     );
     if (elem.cell == "costHandWork") {
       await cost_hand_work.destroy({ where: { techOperationId: elem.id } });

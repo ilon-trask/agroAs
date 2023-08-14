@@ -182,8 +182,8 @@ export interface Itech_operation {
   costServices?: number;
   techCartId?: number;
   sectionId?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export class tech_operation extends Model<Itech_operation> {
@@ -1205,6 +1205,7 @@ export interface Iworker {
   enterpriseId?: number;
   jobId?: number;
   businessPlanId?: number;
+  createdAt?: Date | string;
 }
 
 export class worker extends Model<Iworker> {

@@ -9,11 +9,11 @@ import {
   Tab,
   TabPanel,
 } from "@chakra-ui/react";
-import MainTableItem from "../components/MainTableItem";
+import MainTableItem from "./MainPage/components/MainTableItem";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import SkeletonCart from "../components/SkeletonCart";
-import BusinessCatalogItem from "../components/BusinessCatalogItem";
+import SkeletonCart from "./MainPage/components/SkeletonCart";
+import BusinessCatalogItem from "./MainPage/components/BusinessCatalogItem";
 import { getBusinessPlans } from "../http/requests";
 import useBusiness from "../shared/hook/useBusiness";
 

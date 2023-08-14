@@ -96,7 +96,7 @@ export const supabase = createClient(
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: import.meta.env.VITE_SERVER_URL + "",
+      url: "http://localhost:5000" || import.meta.env.VITE_SERVER_URL + "",
       async headers() {
         const {
           data: { session },
@@ -1464,7 +1464,7 @@ export function getWorker(enterprise: EnterpriseStore) {
   });
 }
 export function createWorker(bus: BusinessStore, data: CreateWorkerType) {
-  client.worker.create.query(data).then((res) => {
+  client.worker.create.mutate(data).then((res) => {
     if (!res) return;
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
@@ -1472,7 +1472,7 @@ export function createWorker(bus: BusinessStore, data: CreateWorkerType) {
   });
 }
 export function patchWorker(bus: BusinessStore, data: PatchWorkerType) {
-  client.worker.patch.query(data).then((res) => {
+  client.worker.patch.mutate(data).then((res) => {
     if (!res) return;
     bus.businessPlan = bus.businessPlan.filter((el) => el.id != res.id);
     //@ts-ignore
@@ -1483,7 +1483,7 @@ export function deleteWorker(
   enterprise: EnterpriseStore,
   data: { workerId: number }
 ) {
-  client.worker.delete.query(data).then((res) => {
+  client.worker.delete.mutate(data).then((res) => {
     enterprise.worker = enterprise.worker.filter(
       (el) => el.id != data.workerId
     );
@@ -2109,4 +2109,20 @@ export function createUpdateAmortization(
       bus.newPublicBusinessPlan = res;
     }
   });
+}
+
+export function guestPatchWorker(
+  enterprise: EnterpriseStore,
+  data: {
+    workerId: number;
+    salary: number;
+  }
+) {
+  const thisWorker = enterprise.worker.find((el) => el.id == data.workerId);
+  enterprise.worker = [
+    //@ts-ignore
+    ...enterprise.worker.filter((el) => el.id != data.workerId),
+    //@ts-ignore
+    { ...thisWorker, salary: +data.salary },
+  ];
 }

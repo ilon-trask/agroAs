@@ -12,6 +12,7 @@ import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/Busines
 import { ColumnDef } from "@tanstack/react-table";
 import TableComponent from "src/components/TableComponent";
 import TableContent from "src/components/TableComponent/TableContent";
+import { EnterpriseFormDiagram } from "src/pages/EnterpriseFormPage";
 
 function EnterpriseBusinessPlan({
   name,
@@ -483,6 +484,12 @@ function EnterpriseBusinessPlan({
           </Tr>
         </Tfoot>
       </Table>
+      <EnterpriseFormDiagram
+        workers={myBusiness.workers}
+        display={"block"}
+        chartWidth={"40%"}
+        tableWidth={"100%"}
+      />
       <Description>
         Оплату праці виробничого персоналу плануємо при розрахунках
         технологічної карти згідно потреб технології і порівнюємо з штатним

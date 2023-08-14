@@ -13,6 +13,7 @@ import React, { useContext, useState } from "react";
 import DeleteAlert, { DeleteProps } from "src/components/DeleteAlert";
 import { deleteOutcomeForBusiness } from "src/http/requests";
 import { Context } from "src/main";
+import { CartNamesData } from "src/pages/TechnologicalMap";
 import getYearFromString from "src/shared/funcs/getYearFromString";
 import BusHeading from "src/ui/BusHeading";
 import MyAddIcon from "src/ui/Icons/MyAddIcon";
@@ -43,6 +44,77 @@ function OutcomeBusTable({
   const { business } = useContext(Context);
   return (
     <>
+      <AccordionItem>
+        <MyAccordionButton>
+          <BusHeading>Витрати прямі</BusHeading>
+        </MyAccordionButton>
+        <AccordionPanel>
+          <MyTableContainer>
+            <Table size="sm">
+              <Thead whiteSpace={"pre-wrap"}>
+                <Tr>
+                  <Th>Назва карти</Th>
+                  {CartNamesData.map((el) => (
+                    <Th key={el.name}>{el.name}</Th>
+                  ))}
+                  <Th>ЄСВ-22 ВЗ-1.5</Th>
+                  <Th>Разом</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(() => {
+                  const res = [];
+                  for (let i = start; i <= end; i++) {
+                    let sum = 0;
+                    const busProd = myBusiness.busProds.filter(
+                      (el) => el.year == i - start
+                    );
+
+                    busProd.forEach(({ id, tech_cart, area }) => {
+                      const ESV = +(
+                        ((tech_cart?.totalCostMachineWork || 0) +
+                          (tech_cart?.totalCostHandWork || 0)) *
+                        0.235
+                      ).toFixed(2);
+                      const hectare = +(
+                        (tech_cart?.costHectare || 0) * area +
+                        ESV
+                      ).toFixed(2);
+                      sum += hectare;
+                      res.push(
+                        <Tr key={id}>
+                          <Td>{tech_cart?.nameCart}</Td>
+                          {CartNamesData.map((el) => (
+                            <Td key={el.name}>
+                              {
+                                //@ts-ignore
+                                +((tech_cart[el.label] || 0) * area).toFixed(2)
+                              }
+                            </Td>
+                          ))}
+                          <Td>{ESV}</Td>
+                          <Td>{hectare}</Td>
+                        </Tr>
+                      );
+                    });
+                    res.push(
+                      <Tr key={i} fontWeight={"bold"}>
+                        <Td>{i}</Td>
+                        {CartNamesData.map((el) => (
+                          <Td key={el.name}></Td>
+                        ))}
+                        <Td></Td>
+                        <Td>{+sum.toFixed(2)}</Td>
+                      </Tr>
+                    );
+                  }
+                  return res;
+                })()}
+              </Tbody>
+            </Table>
+          </MyTableContainer>
+        </AccordionPanel>
+      </AccordionItem>
       <AccordionItem>
         <MyAccordionButton>
           <BusHeading>Витрати постійні</BusHeading>

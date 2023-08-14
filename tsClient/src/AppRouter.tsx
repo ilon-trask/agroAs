@@ -34,6 +34,7 @@ import {
   ENTERPRISE_FORM_ROUTER,
   ENTERPRISE_TAX_GROUP,
   DATA_BASE_ROUTER,
+  VIDEO_ROUTER,
 } from "./utils/consts";
 
 import BusinessJurnal from "./pages/BusinessJurnal";
@@ -44,6 +45,7 @@ import EnterpriseTaxPage from "./pages/EnterpriseTaxPage";
 import DataBasePage from "./pages/DataBasePage";
 import MapJornal from "./pages/MapJornal";
 import { Context } from "./main";
+import VideoPage from "./pages/VideoPage";
 
 export default function AppRouter() {
   const location = useLocation();
@@ -74,7 +76,10 @@ export default function AppRouter() {
       />
       <Route path={BUSINESScATALOG_ROUTER} element={<BusinessCatalog />} />
       {user.role == "service_role" && (
-        <Route path={MAP_ROUTE} element={<MapJornal />} />
+        <>
+          <Route path={MAP_ROUTE} element={<MapJornal />} />
+          <Route path={VIDEO_ROUTER} element={<VideoPage />} />
+        </>
       )}
       <Route path={HOW_ROUTER} element={<HowThisWork />} />
 
@@ -95,6 +100,7 @@ export default function AppRouter() {
         element={<EnterpriseTaxPage />}
       />
       <Route path={DATA_BASE_ROUTER} element={<DataBasePage />} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

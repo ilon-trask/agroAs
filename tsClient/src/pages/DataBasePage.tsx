@@ -75,6 +75,7 @@ function DataBasePage() {
           setPublicationOpen={setPublicationOpen as any}
         />
       </MyTableContainer>
+      <MyHeading>Відео матеріали</MyHeading>
     </Container>
   );
 }

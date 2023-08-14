@@ -10,6 +10,7 @@ import { Context } from "../../main";
 
 import { CreateWorkerProp } from "../CreateWorker/CreateWorker";
 export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
+  const { user } = useContext(Context);
   return (
     <Tr>
       {!isPlan && <Th></Th>}
@@ -24,9 +25,9 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>ЄСВ 22%</Th>
       <Th>Військовий збір 1,5%</Th>
       <Th>Загальний фонд ОП</Th>
-      <Th>Вид найму</Th>
-      <Th>Налаштування</Th>
-      {!isPlan && <Th></Th>}
+      {user.role != "" && <Th>Вид найму</Th>}
+      {user.role != "" && <Th>Налаштування</Th>}
+      {!isPlan && user.role != "" && <Th></Th>}
     </Tr>
   );
 }
@@ -38,6 +39,7 @@ function StaffingTableRow({
   setUpdate,
   isPlan,
   i,
+  dateStart,
 }: {
   name: string;
   el: Iworker;
@@ -46,8 +48,9 @@ function StaffingTableRow({
   setOpen?: Dispatch<SetStateAction<boolean>>;
   isPlan?: boolean;
   i?: number;
+  dateStart?: string | null;
 }) {
-  const { enterpriseStore } = useContext(Context);
+  const { enterpriseStore, user } = useContext(Context);
   const yearSalary =
     el.salary *
     (+el.dateTo?.split("-")[1] - +el.dateFrom?.split("-")[1] + 1 || 12) *
@@ -85,24 +88,28 @@ function StaffingTableRow({
       <Td>{el.salary}</Td>
       {isPlan && <Td></Td>}
       <Td>
-        {(el.dateFrom?.split("-")[1] || "") +
-          "." +
-          (el.dateFrom?.split("-")[2] || "")}
+        {dateStart
+          ? dateStart.split("-")[1] + "." + dateStart.split("-")[2]
+          : (el.dateFrom?.split("-")[1] || "01") +
+            "." +
+            (el.dateFrom?.split("-")[2] || "01")}
       </Td>
       <Td>
-        {(el.dateTo?.split("-")[1] || "") +
+        {(el.dateTo?.split("-")[1] || "12") +
           "." +
-          (el.dateTo?.split("-")[2] || "")}
+          (el.dateTo?.split("-")[2] || "31")}
       </Td>
       <Td>{yearSalary}</Td>
       <Td>{yearSalary * 0.22}</Td>
       <Td>{yearSalary * 0.015}</Td>
       <Td>{yearSalary + yearSalary * 0.22 + yearSalary * 0.015}</Td>
-      <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>
-      <Td>
-        <Button size="sm">Додати</Button>
-      </Td>
-      {!isPlan && (
+      {user.role != "" && <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>}
+      {user.role != "" && (
+        <Td>
+          <Button size="sm">Додати</Button>
+        </Td>
+      )}
+      {!isPlan && user.role != "" && (
         <Td onClick={() => deleteWorker(enterpriseStore, { workerId: el.id! })}>
           <MyDeleteIcon />
         </Td>
@@ -117,6 +124,7 @@ export function StaffingTableBodyRows({
   setUpdate,
   isPlan,
   i,
+  dateStart,
 }: {
   thisWorkers: Iworker[] | undefined;
   setRes?: Dispatch<SetStateAction<CreateWorkerProp>>;
@@ -124,14 +132,15 @@ export function StaffingTableBodyRows({
   setOpen?: Dispatch<SetStateAction<boolean>>;
   isPlan?: boolean;
   i?: number;
+  dateStart?: string | null;
 }) {
-  const { enterpriseStore } = useContext(Context);
+  const { enterpriseStore, user } = useContext(Context);
   return (
     <>
       <Tr>
         {/* <Td></Td> */}
         {/* <Td></Td> */}
-        <Td colSpan={7}>Адмінісаративний персонал</Td>
+        <Td colSpan={user.role == "" ? 11 : 14}>Адмінісаративний персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job?.find((e) => e.id == el.jobId);
@@ -146,13 +155,14 @@ export function StaffingTableBodyRows({
               setUpdate={setUpdate}
               isPlan={isPlan}
               i={i}
+              dateStart={dateStart}
             />
           );
       })}
       <Tr>
         {/* <Td></Td>
         <Td></Td> */}
-        <Td colSpan={7}>Інженерно технічний</Td>
+        <Td colSpan={user.role == "" ? 11 : 14}>Інженерно технічний</Td>
       </Tr>
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job.find((e) => e.id == el.jobId);
@@ -167,13 +177,14 @@ export function StaffingTableBodyRows({
               setUpdate={setUpdate}
               isPlan={isPlan}
               i={i}
+              dateStart={dateStart}
             />
           );
       })}
       <Tr>
         {/* <Td></Td>
         <Td></Td> */}
-        <Td colSpan={7}>Виробничий персонал</Td>
+        <Td colSpan={user.role == "" ? 11 : 14}>Виробничий персонал</Td>
       </Tr>
       {thisWorkers?.map((el) => {
         const job = enterpriseStore.job?.find((e) => e.id == el.jobId);
@@ -188,6 +199,7 @@ export function StaffingTableBodyRows({
               setUpdate={setUpdate}
               isPlan={isPlan}
               i={i}
+              dateStart={dateStart}
             />
           );
       })}
@@ -211,10 +223,13 @@ export function StaffingTableBody({
   start: number;
   myBusiness: resBusinessPlan | undefined;
 }) {
+  const { user } = useContext(Context);
+
   return (
     <Tbody>
       <StaffingTableBodyRows
         thisWorkers={thisWorkers}
+        dateStart={i - start == 0 ? myBusiness?.dateStart : null}
         setRes={setRes}
         setOpen={setOpen}
         setUpdate={setUpdate}
@@ -222,24 +237,26 @@ export function StaffingTableBody({
       />
       <Tr fontWeight={"bold"}>
         <Td>
-          <MyPlusIcon
-            onClick={() => {
-              setOpen(true);
-              setRes((prev) => ({
-                amount: "",
-                class: "",
-                enterpriseId: myBusiness?.enterpriseId!,
-                businessPlanId: myBusiness?.id!,
-                year: i - start,
-                isConst: true,
-                form: prev.form,
-                jobId: "",
-                salary: "",
-                dateFrom: null,
-                dateTo: null,
-              }));
-            }}
-          />
+          {user.role == "" ? null : (
+            <MyPlusIcon
+              onClick={() => {
+                setOpen(true);
+                setRes((prev) => ({
+                  amount: "",
+                  class: "",
+                  enterpriseId: myBusiness?.enterpriseId!,
+                  businessPlanId: myBusiness?.id!,
+                  year: i - start,
+                  isConst: true,
+                  form: prev.form,
+                  jobId: "",
+                  salary: "",
+                  dateFrom: null,
+                  dateTo: null,
+                }));
+              }}
+            />
+          )}
         </Td>
         <Td>{i}</Td>
         <Td>Разом</Td>
@@ -293,9 +310,9 @@ export function StaffingTableBody({
             0
           )}
         </Td>
-        <Td></Td>
-        <Td></Td>
-        <Td></Td>
+        {user.role != "" && <Td></Td>}
+        {user.role != "" && <Td></Td>}
+        {user.role != "" && <Td></Td>}
       </Tr>
     </Tbody>
   );

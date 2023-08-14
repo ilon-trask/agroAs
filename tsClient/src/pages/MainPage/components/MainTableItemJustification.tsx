@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Card,
   CardBody,
@@ -13,15 +13,23 @@ import {
   Button,
   Tooltip,
 } from "@chakra-ui/react";
-import { IbusinessPlan } from "../../../tRPC serv/models/models";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { BUSINESSpLAN_ROUTER, TEHMAP_ROUTER } from "../utils/consts";
+import { TEJ_ROUTER } from "../../../utils/consts";
+import getSectionsOpers from "../../../store/GetSectionsOpers";
+import { Context } from "../../../main";
+import { resTechnologicalEconomicJustification } from "../../../../../tRPC serv/controllers/TEJService";
 const IMGuRL =
-  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/business-imgs";
-type props = { e: IbusinessPlan | undefined };
-function MainTable({ e }: props) {
+  "https://bicofnobkczquxvztyzl.supabase.co/storage/v1/object/public/images/TEJ";
+type props = { e: resTechnologicalEconomicJustification | undefined };
+
+function MainTableItemJustification({ e }: props) {
   const navigate = useNavigate();
+  const { map } = useContext(Context);
+  const sections = useMemo(() => {
+    let a = getSectionsOpers(map, e?.id!);
+    return a;
+  }, [map.opers]);
   return (
     <Card maxW="sm" mx={"auto"}>
       <CardBody
@@ -32,54 +40,53 @@ function MainTable({ e }: props) {
       >
         <Stack mt="2" spacing="3">
           <Heading size="md" textAlign={"center"} textColor={"#20401e"}>
-            {e?.name || ""}
+            {e?.culture.name || ""}
           </Heading>
-          {/* <Text>
+          <Text>
             <b>Автор:</b> {e?.authorName}
-          </Text> */}
+          </Text>
           <Text maxW="250px" minH={"48px"}>
-            {e?.description}
+            {e?.publicComment}
           </Text>
         </Stack>
-        <Box minH={"180px"} m={3}>
+        <Box minH={"180px"}>
           <Image
             src={IMGuRL + "/" + e?.id}
             h={"auto"}
             w={"220px"}
             mx={"auto"}
-            alt={e?.name}
+            alt={e?.culture.name}
           />
         </Box>
-        <Stack mt="6" spacing="1" mb={0}>
-          {/* <Box display={"flex"} justifyContent={"space-between"}>
+        {/* <Stack mt="6" spacing="1" mb={0}>
+          <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Площа</Box>
             <Box>{e?.area || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Загальна вартість </Box>
-            <Box>{e?.area! * e?.totalCost! || "0"}</Box>
+            <Box>{e?.area! * e?.costHectare! || "0"}</Box>
           </Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box fontWeight={"bold"}>Собівартість 1 га</Box>
-            <Box>{e?.totalCost || "0"}</Box>
+            <Box>{e?.costHectare || "0"}</Box>
           </Box> */}
-          <Box display={"flex"} justifyContent={"space-between"}>
-            <Box fontWeight={"bold"}>Оновлено</Box>
-            <Box>{e?.updatedAt?.toLocaleString().slice(0, 9) || "0"}</Box>
-          </Box>
-        </Stack>
+        <Box display={"flex"} justifyContent={"space-between"}>
+          <Box fontWeight={"bold"}>Оновлено</Box>
+          <Box>{e?.updatedAt?.toLocaleString().slice(0, 9) || "0"}</Box>
+        </Box>
+        {/* </Stack> */}
       </CardBody>
       <CardFooter pt={0}>
         <ButtonGroup spacing="2">
           <Button
             onClick={() => {
-              navigate(BUSINESSpLAN_ROUTER + `/${e?.id}`);
-              console.log(BUSINESSpLAN_ROUTER + "/" + e?.id);
+              navigate(TEJ_ROUTER + "/" + e?.id);
             }}
           >
-            Бізнес-план
+            До ТЕО
           </Button>
-          <Tooltip
+          {/* <Tooltip
             label="Рекомендації в розробці"
             bgColor={"grey.100"}
             color={"black"}
@@ -88,11 +95,11 @@ function MainTable({ e }: props) {
             <Button variant="ghost" colorScheme="blue">
               Рекомендації
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </ButtonGroup>
       </CardFooter>
     </Card>
   );
 }
 
-export default observer(MainTable);
+export default observer(MainTableItemJustification);
