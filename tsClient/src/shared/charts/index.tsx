@@ -11,6 +11,8 @@ import {
   Legend,
   Filler,
   ArcElement,
+  registerables,
+  BarController,
 } from "chart.js";
 import { Line, Bar, Chart, Doughnut } from "react-chartjs-2";
 import { ChartData, ChartOptions } from "chart.js/dist/types/index";
@@ -24,7 +26,9 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  BarController,
+  ...registerables
 );
 export function LineChart({
   data,
@@ -51,10 +55,10 @@ export function ChartChart({
   data,
   options,
 }: {
-  options: ChartOptions;
+  options?: ChartOptions;
   data: ChartData;
 }) {
-  return <Chart type="bar" data={data} />;
+  return <Chart type="line" options={options} data={data} />;
 }
 export function DoughnutChart({
   data,

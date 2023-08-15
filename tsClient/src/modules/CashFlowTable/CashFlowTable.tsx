@@ -61,7 +61,7 @@ export function CashFlowTableHeadBegin({
       <Th></Th>
       <Th>{startSum ?? 0}</Th>
       <Th colSpan={3}>Залишок на початок періоду {year || 2222}</Th>
-      <Th></Th>
+      {/* <Th></Th> */}
     </Tr>
   );
 }

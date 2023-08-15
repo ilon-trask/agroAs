@@ -313,16 +313,14 @@ class TechCartService {
   async getCart(cartId: number) {
     //@ts-ignore
     const redisCart = await redis.get(cartId);
-    if (redisCart) return [JSON.parse(redisCart)];
+    if (redisCart) return [JSON.parse(redisCart) as resTechCartsWithOpers];
     let Scarts: resTechCartsWithOpers[];
     //@ts-ignore
     Scarts = await tech_cart.findAll({
       include: cartsIncludes,
       where: { id: cartId },
     });
-
     const carts = await changeCarts(Scarts);
-
     return carts;
   }
   async getOnlyCarts(user: Principal | undefined) {
