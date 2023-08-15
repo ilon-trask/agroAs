@@ -157,12 +157,18 @@ const ForBusProd = async (busProds: resBusProd[]) => {
           })
         )
       );
+      const cart = async () => {
+        //@ts-ignore
+        const redisCart = await redis.get(prod.techCartId);
+        if (redisCart) {
+          return JSON.parse(redisCart) as resTechCartsWithOpers;
+        }
+        const cart = (await changeCarts([prod.tech_cart]))[0];
+        return cart;
+      };
       return {
         ...prod,
-        tech_cart:
-          //@ts-ignore
-          JSON.parse((await redis.get(prod.techCartId)) + "") ||
-          (await changeCarts([prod.tech_cart]))[0],
+        tech_cart: await cart(),
         vegetationYear: vegetation
           ? changeVegetationYear(vegetation, prod.product!)
           : null,
