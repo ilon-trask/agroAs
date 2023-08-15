@@ -1,4 +1,12 @@
-import { Table, Th, Thead, Tr, Text, Box } from "@chakra-ui/react";
+import {
+  Table,
+  Th,
+  Thead,
+  Tr,
+  Text,
+  Box,
+  TableContainer,
+} from "@chakra-ui/react";
 import React, { RefObject, useMemo } from "react";
 import TableComponent from "src/components/TableComponent";
 import { ColumnDef } from "@tanstack/react-table";
@@ -15,10 +23,12 @@ function PlanedIndicatorsBusinessPlan({
   start,
   end,
   myBusiness,
+  height,
   aref,
 }: {
   start: number;
   end: number;
+  height: number;
   myBusiness: resBusinessPlan;
   aref: RefObject<HTMLTableElement>;
 }) {
@@ -175,7 +185,9 @@ function PlanedIndicatorsBusinessPlan({
           </Tr>
         </Thead>
       </Table>
-      <TableComponent data={data} columns={columns} fontSize={"10px"} />
+      <TableContainer maxW={height + "px"} overflowX={"auto"}>
+        <TableComponent data={data} columns={columns} fontSize={"10px"} />
+      </TableContainer>
       <Text fontWeight={"bold"} fontSize={"20px"}>
         Результат: період
         {(() => {
@@ -202,18 +214,26 @@ function PlanedIndicatorsBusinessPlan({
       </Text>
       <Box>
         <LineChart options={options} data={chartData} />
-        <Description >Будуємо графік витрат: На осі абсцис відкладіть обсяги продажів (або виробництва), а на осі ординат - витрати. Перевірте, як змінюються витрати при зміні обсягу.
-<br/>
-Будуємо графік доходів: На тому ж графіку відкладіть графік доходів. Він може бути лінією, що піднімається з точки початку і зростає зі збільшенням обсягу продажів.
-<br/>
-
-Знаходимо точку перетину: Точка, де графіки доходів і витрат перетинаються, вказує на точку без збитковості.
-<br/>
-
-Знаходимо значення показників: З точки перетину ви можете зчитати обсяг продажів (або виробництва), який відповідає точці без збитковості.
-
-<br/>
-Графічний метод дозволяє визначити необхідний обсяг продажів, при якому бізнес не втрачає і не отримує прибутку, і може бути корисним для планування виробництва та продажів.</Description>
+        <Description>
+          Будуємо графік витрат: На осі абсцис відкладіть обсяги продажів (або
+          виробництва), а на осі ординат - витрати. Перевірте, як змінюються
+          витрати при зміні обсягу.
+          <br />
+          Будуємо графік доходів: На тому ж графіку відкладіть графік доходів.
+          Він може бути лінією, що піднімається з точки початку і зростає зі
+          збільшенням обсягу продажів.
+          <br />
+          Знаходимо точку перетину: Точка, де графіки доходів і витрат
+          перетинаються, вказує на точку без збитковості.
+          <br />
+          Знаходимо значення показників: З точки перетину ви можете зчитати
+          обсяг продажів (або виробництва), який відповідає точці без
+          збитковості.
+          <br />
+          Графічний метод дозволяє визначити необхідний обсяг продажів, при
+          якому бізнес не втрачає і не отримує прибутку, і може бути корисним
+          для планування виробництва та продажів.
+        </Description>
       </Box>
     </>
   );

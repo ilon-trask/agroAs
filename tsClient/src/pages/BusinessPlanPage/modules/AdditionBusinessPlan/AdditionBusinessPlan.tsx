@@ -1,4 +1,13 @@
-import { Table, Tbody, Td, Th, Thead, Tr, Box } from "@chakra-ui/react";
+import {
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  Box,
+  TableContainer,
+} from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { RefObject, useContext, useMemo } from "react";
 import { Context } from "src/main";
@@ -32,6 +41,7 @@ function AdditionBusinessPlan({
   thisDerj,
   thisGrand,
   thisInvestment,
+  height,
   aref,
 }: {
   form: EnterpriseFormType;
@@ -44,6 +54,7 @@ function AdditionBusinessPlan({
   thisInvestment: Ifinancing[] | undefined;
   thisDerj: Ifinancing[] | undefined;
   thisGrand: Ifinancing[] | undefined;
+  height: number;
   aref: RefObject<HTMLTableElement>;
 }) {
   const { map, income } = useContext(Context);
@@ -295,60 +306,64 @@ function AdditionBusinessPlan({
       </SectionTitle>
       <Paragraph>Додаток А. Установчі документи</Paragraph>
       <Paragraph>Додаток Б. Штатний роспис</Paragraph>
-      <Table size={"sm"}>
-        <Thead>
-          <StaffingTableHeadRow isPlan={true} />
-        </Thead>
-        <Tbody>
-          {(() => {
-            let sum = 0;
-            const res = [];
-            for (let i = start; i <= end; i++) {
-              thisWorkers
-                .filter((el) => el.year == i - start)
-                .forEach((el) => {
-                  sum +=
-                    el.salary *
-                    (+el.dateTo?.split("-")[1] -
-                      +el.dateFrom?.split("-")[1] +
-                      1 || 12) *
-                    el.amount;
-                });
+      <TableContainer maxW={`${height}px`} overflowX={"auto"}>
+        <Table size={"sm"}>
+          <Thead>
+            <StaffingTableHeadRow isPlan={true} />
+          </Thead>
+          <Tbody>
+            {(() => {
+              let sum = 0;
+              const res = [];
+              for (let i = start; i <= end; i++) {
+                thisWorkers
+                  .filter((el) => el.year == i - start)
+                  .forEach((el) => {
+                    sum +=
+                      el.salary *
+                      (+el.dateTo?.split("-")[1] -
+                        +el.dateFrom?.split("-")[1] +
+                        1 || 12) *
+                      el.amount;
+                  });
+                res.push(
+                  <React.Fragment key={i}>
+                    <Tr>
+                      <Td>{i}</Td>
+                    </Tr>
+                    <StaffingTableBodyRows
+                      thisWorkers={thisWorkers.filter(
+                        (el) => el.year == i - start
+                      )}
+                      isPlan={true}
+                    />
+                  </React.Fragment>
+                );
+              }
               res.push(
-                <React.Fragment key={i}>
-                  <Tr>
-                    <Td>{i}</Td>
-                  </Tr>
-                  <StaffingTableBodyRows
-                    thisWorkers={thisWorkers.filter(
-                      (el) => el.year == i - start
+                <Tr fontWeight={"bold"} key={end + 1}>
+                  <Td colSpan={3}>
+                    Загальний фонд оплати праці з нарахуваннями
+                  </Td>
+                  <Td>
+                    {myBusiness.workers.reduce(
+                      (p, c) =>
+                        p +
+                        (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
+                          (+c.dateTo?.split("-")[1] -
+                            +c.dateFrom?.split("-")[1] +
+                            1 || 12) *
+                          c.amount,
+                      0
                     )}
-                    isPlan={true}
-                  />
-                </React.Fragment>
+                  </Td>
+                </Tr>
               );
-            }
-            res.push(
-              <Tr fontWeight={"bold"} key={end + 1}>
-                <Td colSpan={3}>Загальний фонд оплати праці з нарахуваннями</Td>
-                <Td>
-                  {myBusiness.workers.reduce(
-                    (p, c) =>
-                      p +
-                      (c.salary * 0.015 + c.salary * 0.22 + c.salary) *
-                        (+c.dateTo?.split("-")[1] -
-                          +c.dateFrom?.split("-")[1] +
-                          1 || 12) *
-                        c.amount,
-                    0
-                  )}
-                </Td>
-              </Tr>
-            );
-            return res;
-          })()}
-        </Tbody>
-      </Table>
+              return res;
+            })()}
+          </Tbody>
+        </Table>
+      </TableContainer>
       <Paragraph>Додаток В. Технологічні карти</Paragraph>
       {(() => {
         const res = [];

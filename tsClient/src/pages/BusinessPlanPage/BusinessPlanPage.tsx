@@ -114,7 +114,7 @@ function BiznesPlanPage() {
     ({ type }) => type == "derj_support"
   );
   const thisGrand = myBusiness?.financings.filter((el) => el.type == "grant");
-
+  const height = 720 * 1.4;
   return (
     <Box overflowX={"auto"} maxW={"1100px"} mx={"auto"}>
       <Button onClick={() => navigate("/")} mt={"15px"}>
@@ -196,10 +196,10 @@ function BiznesPlanPage() {
         <Box
           mt={4}
           w={"720px"}
-          h={`${720 * 1.4}px`}
+          h={`${height}px`}
           border={"black 2px solid"}
           p={"30px"}
-          px={"30px"}
+          px={"15px"}
           overflowY={"auto"}
         >
           <TitleBusinessPlan
@@ -222,23 +222,23 @@ function BiznesPlanPage() {
             cultureSet={cultureSet}
             end={end}
             start={start}
-            form={myBusiness?.enterprise?.form!}
+            form={myBusiness.enterprise?.form!}
             myBusiness={myBusiness!}
-            name={myBusiness?.enterprise?.name!}
-            taxGroup={myBusiness?.enterprise?.taxGroup!}
+            name={myBusiness.enterprise?.name!}
+            taxGroup={myBusiness.enterprise?.taxGroup!}
             thisWorkers={thisWorkers}
             aref={enterpriseRef}
           />
           <ProductionBusinessPlan
             end={end}
             start={start}
-            myBusiness={myBusiness!}
+            myBusiness={myBusiness}
             aref={productionRef}
           />
           <FinancingBusinessPlan
             start={start}
             end={end}
-            myBusiness={myBusiness!}
+            myBusiness={myBusiness}
             thisCredit={thisCredit}
             thisDerj={thisDerj}
             thisGrand={thisGrand}
@@ -249,14 +249,16 @@ function BiznesPlanPage() {
             aref={indicatorRef}
             start={start}
             end={end}
-            myBusiness={myBusiness!}
+            height={height}
+            myBusiness={myBusiness}
           />
           <AdditionBusinessPlan
             start={start}
             end={end}
-            form={myBusiness?.enterprise?.form!}
-            myBusiness={myBusiness!}
-            thisWorkers={thisWorkers!}
+            height={height}
+            form={myBusiness.enterprise?.form!}
+            myBusiness={myBusiness}
+            thisWorkers={thisWorkers}
             cultureSet={cultureSet}
             thisCredit={thisCredit}
             thisDerj={thisDerj}

@@ -130,12 +130,10 @@ function EnterpriseFormDiagram(props: props) {
                 <Td>{el.name}</Td>
                 <Td>{el.data}</Td>
                 <Td>
-                  {
-                    +(
-                      //@ts-ignore
-                      ((el.data / arr[arr.length - 1].data) * 100).toFixed(1)
-                    )
-                  }
+                  {+(
+                    //@ts-ignore
+                    ((el.data / arr[arr.length - 1].data) * 100).toFixed(1)
+                  ) || 0}
                 </Td>
               </Tr>
             ))}

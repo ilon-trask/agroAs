@@ -143,6 +143,10 @@ const includes = [
   // { model: worker },
   // { model: land },
 ];
+// async function getRedisCart(cartId: number) {
+//   const cart = await redis.get(cartId);
+//   return cart ? JSON.parse(cart) : false;
+// }
 const ForBusProd = async (busProds: resBusProd[]) => {
   return await Promise.all(
     busProds.map(async (prod) => {

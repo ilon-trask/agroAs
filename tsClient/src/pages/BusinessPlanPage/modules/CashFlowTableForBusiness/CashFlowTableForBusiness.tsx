@@ -11,7 +11,7 @@ import TableName from "src/ui/TableName";
 import TableNumber from "src/ui/TableNumber";
 import { resBusinessPlan } from "../../../../../../tRPC serv/controllers/BusinessService";
 import { ChartData, ChartOptions } from "chart.js/dist/types/index";
-import { BarChart, ChartChart } from "src/shared/charts";
+import { ChartChart } from "src/shared/charts";
 function CashFlowTableForBusiness({
   myBusiness,
   end,
@@ -66,25 +66,25 @@ function CashFlowTableForBusiness({
         borderColor: "red",
       },
       {
-        type: "bar" as const,
+        type: "bar",
         label: "Реалізація",
         data: realization,
         backgroundColor: "rgb(7, 179, 16)",
       },
       {
-        type: "bar" as const,
+        type: "bar",
         label: "Інші доходи",
         data: otherIncome,
         backgroundColor: "rgb(0, 117, 6)",
       },
       {
-        type: "bar" as const,
+        type: "bar",
         label: "Інвестиційні",
         data: investment,
         backgroundColor: "rgb(163, 3, 25)",
       },
       {
-        type: "bar" as const,
+        type: "bar",
         label: "Операційні",
         data: operation,
         backgroundColor: "rgb(201, 12, 37)",
@@ -97,7 +97,7 @@ function CashFlowTableForBusiness({
       <Table size={"sm"}>
         <Thead>
           <Tr>
-            <Td colSpan={4}>
+            <Td colSpan={5}>
               <Description>
                 Грошовий потік є ключовим фінансовим показником, який відображає
                 рух грошових коштів у бізнесі на протязі певного періоду. Він
@@ -296,7 +296,7 @@ function CashFlowTableForBusiness({
         })()}
       </Table>
       <Box>
-        <ChartChart options={options} data={data} />
+        <ChartChart data={data} />
       </Box>
     </>
   );

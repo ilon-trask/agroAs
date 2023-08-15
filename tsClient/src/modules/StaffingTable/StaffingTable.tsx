@@ -18,7 +18,7 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>Посада</Th>
       <Th>Кількість</Th>
       <Th>Місячний оклад</Th>
-      {isPlan && <Th>Дата початку</Th>}
+
       <Th>Початок сезону</Th>
       <Th>Кінець сезону</Th>
       <Th>Річний фонд ОП</Th>
@@ -26,7 +26,7 @@ export function StaffingTableHeadRow({ isPlan }: { isPlan?: boolean }) {
       <Th>Військовий збір 1,5%</Th>
       <Th>Загальний фонд ОП</Th>
       {user.role != "" && <Th>Вид найму</Th>}
-      {user.role != "" && <Th>Налаштування</Th>}
+      {user.role != "" && !isPlan && <Th>Налаштування</Th>}
       {!isPlan && user.role != "" && <Th></Th>}
     </Tr>
   );
@@ -86,7 +86,7 @@ function StaffingTableRow({
       <Td>{name}</Td>
       <Td>{el.amount}</Td>
       <Td>{el.salary}</Td>
-      {isPlan && <Td></Td>}
+
       <Td>
         {dateStart
           ? dateStart.split("-")[1] + "." + dateStart.split("-")[2]
@@ -104,7 +104,7 @@ function StaffingTableRow({
       <Td>{yearSalary * 0.015}</Td>
       <Td>{yearSalary + yearSalary * 0.22 + yearSalary * 0.015}</Td>
       {user.role != "" && <Td>{el.isConst ? "Постійний" : "Сезонний"}</Td>}
-      {user.role != "" && (
+      {user.role != "" && !isPlan && (
         <Td>
           <Button size="sm">Додати</Button>
         </Td>
